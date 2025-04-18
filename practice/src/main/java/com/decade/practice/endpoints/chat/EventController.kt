@@ -13,7 +13,7 @@ import com.decade.practice.model.entity.*
 import com.decade.practice.util.EventPageUtils
 import com.decade.practice.util.ImageUtils
 import com.decade.practice.util.inspectOwner
-import com.decade.practice.websocket.QUEUE_DESTINATION
+import com.decade.practice.websocket.MQ_DESTINATION
 import jakarta.persistence.EntityNotFoundException
 import jakarta.servlet.http.HttpServletRequest
 import jakarta.validation.Valid
@@ -26,6 +26,7 @@ import org.springframework.validation.annotation.Validated
 import org.springframework.web.bind.annotation.*
 import org.springframework.web.multipart.MultipartFile
 import java.io.IOException
+import java.net.URI
 import java.util.*
 import java.util.concurrent.TimeUnit
 import kotlin.math.min
@@ -53,7 +54,7 @@ class EventController(
             saved.forEach {
                 template.convertAndSendToUser(
                     it.owner.username,
-                    QUEUE_DESTINATION,
+                    MQ_DESTINATION,
                     it
                 )
             }
@@ -105,14 +106,11 @@ class EventController(
         val maxHeight = min(event.image.height, DEFAULT_HEIGHT)
         val image = ImageUtils.crop(file.inputStream, maxWidth, maxHeight)
 
-        val url = imageStore.save(image)
-        event.image.uri = url.toString()
-        event.image.width = image.width
-        event.image.height = image.height
+        event.image = imageStore.save(image)
         try {
             return pushEvent(userRepo.get(sender), event)
         } catch (e: Exception) {
-            imageStore.remove(url)
+            imageStore.remove(URI(event.image.uri))
             throw e
         }
     }

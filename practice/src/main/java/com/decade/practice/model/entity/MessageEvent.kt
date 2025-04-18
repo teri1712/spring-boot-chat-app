@@ -71,7 +71,7 @@ class ImageEvent(
     @field:Valid
     @Column(updatable = false)
     @Embedded
-    val image: ImageSpec
+    var image: ImageSpec
 ) : ChatEvent(chat, sender, IMAGE) {
     constructor(event: ImageEvent) :
             this(event.chat, event.sender, event.image)

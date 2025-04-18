@@ -7,7 +7,8 @@ import jakarta.validation.constraints.NotNull
 @Embeddable
 @JsonDeserialize
 open class ImageSpec(
-    var uri: String,
+    val uri: String,
+    val filename: String,
     @field:NotNull var width: Int = DEFAULT_WIDTH,
     @field:NotNull var height: Int = DEFAULT_HEIGHT,
     var format: String = DEFAULT_FORMAT,

@@ -1,5 +1,6 @@
 package com.decade.practice.image;
 
+import com.decade.practice.model.embeddable.ImageSpec;
 import org.springframework.core.io.Resource;
 
 import java.awt.image.BufferedImage;
@@ -10,7 +11,7 @@ public interface ImageStore {
 
       boolean support(URI uri);
 
-      URI save(BufferedImage image) throws IOException;
+      ImageSpec save(BufferedImage image) throws IOException;
 
       Resource read(URI uri) throws IOException;
 

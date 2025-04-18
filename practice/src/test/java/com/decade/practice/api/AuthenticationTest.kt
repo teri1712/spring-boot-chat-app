@@ -9,6 +9,7 @@ import com.decade.practice.endpoints.auth.AuthenticationController
 import com.decade.practice.endpoints.auth.MAX_USERNAME_LENGTH
 import com.decade.practice.endpoints.auth.MIN_USERNAME_LENGTH
 import com.decade.practice.image.ImageStore
+import com.decade.practice.model.embeddable.ImageSpec
 import com.decade.practice.model.entity.User
 import com.decade.practice.model.entity.WELCOME
 import com.decade.practice.model.local.AccountEntry
@@ -37,7 +38,6 @@ import org.springframework.util.LinkedMultiValueMap
 import org.springframework.util.MultiValueMap
 import org.springframework.web.client.HttpClientErrorException
 import org.springframework.web.client.RestClient
-import java.net.URL
 import java.util.*
 import kotlin.test.assertNotNull
 
@@ -89,7 +89,7 @@ class SignUpTest {
         ).thenReturn(User("123", "123"))
 
         Mockito.`when`(imageStore.save(Mockito.any())).thenAnswer {
-            URL("http://localhost:8080")
+            ImageSpec("", "")
         }
     }
 

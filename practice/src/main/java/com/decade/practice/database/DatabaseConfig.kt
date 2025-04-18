@@ -15,7 +15,7 @@ import org.springframework.data.jpa.repository.config.EnableJpaRepositories
 
 @Configuration(proxyBeanMethods = false)
 @EntityScan("com.decade.practice.model")
-@EnableJpaRepositories(basePackages = ["com.decade.practice.repository"])
+@EnableJpaRepositories(basePackages = ["com.decade.practice.database.repository"])
 class DatabaseConfig(
     @Value("\${admin.username}")
     private val admin_username: String,

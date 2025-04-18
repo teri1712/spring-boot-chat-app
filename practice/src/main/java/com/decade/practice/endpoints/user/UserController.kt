@@ -2,7 +2,6 @@ package com.decade.practice.endpoints.user
 
 import com.decade.practice.database.UserOperations
 import com.decade.practice.image.ImageStore
-import com.decade.practice.model.embeddable.ImageSpec
 import com.decade.practice.model.entity.User
 import com.decade.practice.security.model.JwtUser
 import com.decade.practice.util.ImageUtils
@@ -20,6 +19,7 @@ import org.springframework.web.bind.annotation.RequestMapping
 import org.springframework.web.bind.annotation.RequestParam
 import org.springframework.web.multipart.MultipartFile
 import java.io.IOException
+import java.net.URI
 import java.util.*
 
 @Controller
@@ -52,12 +52,11 @@ class UserController(
         @RequestParam file: MultipartFile
     ): ResponseEntity<User> {
         val cropped = ImageUtils.crop(file.inputStream)
-        val url = imageStore.save(cropped)
-        val avatar = ImageSpec(url.toString())
+        val avatar = imageStore.save(cropped)
         try {
             return ResponseEntity.ok(userOperations.update(jwtUser.id, avatar))
         } catch (e: Exception) {
-            imageStore.remove(url)
+            imageStore.remove(URI(avatar.uri))
             throw e
         }
     }

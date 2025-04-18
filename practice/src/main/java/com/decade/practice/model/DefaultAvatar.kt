@@ -11,4 +11,5 @@ object DefaultAvatar : ImageSpec(
     uri = AVATAR_URL,
     width = WIDTH,
     height = HEIGHT,
+    filename = ""
 )

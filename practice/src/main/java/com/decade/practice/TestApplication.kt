@@ -24,6 +24,7 @@ fun main(args: Array<String>) {
     val userRepo = context.getBean(UserRepository::class.java)
     val transactionOperations = context.getBean(TransactionOperations::class.java)
     val eventStore = context.getBean(EventStore::class.java)
+
     transactionOperations.executeWithoutResult {
 
         userService.create(
@@ -32,7 +33,7 @@ fun main(args: Array<String>) {
             "Luffy",
             Date(),
             MALE,
-            ImageSpec("http://192.168.1.6:8080/image?filename=luffy.jpeg"),
+            ImageSpec("http://192.168.3.104:8080/image?filename=luffy.jpeg", "luffy.jpeg"),
             true
         )
         userService.create(
@@ -41,7 +42,7 @@ fun main(args: Array<String>) {
             "Nami",
             Date(),
             MALE,
-            ImageSpec("http://192.168.1.6:8080/image?filename=nami.jpeg"),
+            ImageSpec("http://192.168.3.104:8080/image?filename=nami.jpeg", "nami.jpeg"),
             true
         )
         userService.create(
@@ -50,7 +51,7 @@ fun main(args: Array<String>) {
             "Chopper",
             Date(),
             MALE,
-            ImageSpec("http://192.168.1.6:8080/image?filename=chopper.jpeg"),
+            ImageSpec("http://192.168.3.104:8080/image?filename=chopper.jpeg", "chopper.jpeg"),
             true
         )
 

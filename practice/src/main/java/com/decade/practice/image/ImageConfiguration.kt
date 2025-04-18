@@ -1,11 +1,13 @@
 package com.decade.practice.image
 
+import com.decade.practice.model.embeddable.ImageSpec
 import jakarta.servlet.http.HttpServletRequest
 import org.springframework.beans.factory.annotation.Qualifier
 import org.springframework.context.annotation.Bean
 import org.springframework.context.annotation.Configuration
 import org.springframework.core.io.Resource
 import org.springframework.core.io.UrlResource
+import org.springframework.http.CacheControl
 import org.springframework.http.MediaType
 import org.springframework.http.ResponseEntity
 import org.springframework.web.bind.annotation.GetMapping
@@ -21,11 +23,12 @@ import java.net.URI
 import java.net.URL
 import java.nio.file.Paths
 import java.util.*
+import java.util.concurrent.TimeUnit
 import javax.imageio.ImageIO
 
 private const val fileSystemImageStore = "fileSystemImageStore"
 private const val DIRECTORY = "./images/"
-private const val EXTENSION = "jpeg"
+private const val FORMAT = "jpeg"
 private const val PATH = "/image"
 private const val QUERY = "filename="
 private const val QUERY_PATH = "$PATH?$QUERY"
@@ -46,7 +49,7 @@ private class FileSystemImageStore : ImageStore {
     }
 
     @Throws(IOException::class)
-    override fun save(image: BufferedImage): URI {
+    override fun save(image: BufferedImage): ImageSpec {
         val httpRequest =
             (RequestContextHolder.getRequestAttributes() as ServletRequestAttributes)
                 .request
@@ -54,16 +57,17 @@ private class FileSystemImageStore : ImageStore {
         if (!directory.exists())
             directory.mkdir()
 
-        val filename = UUID.randomUUID().toString() + "." + EXTENSION
+        val filename = UUID.randomUUID().toString() + "." + FORMAT
         val file = File(directory, filename)
-        ImageIO.write(image, EXTENSION, file)
+        ImageIO.write(image, FORMAT, file)
 
         val scheme = httpRequest.scheme
         val server = httpRequest.serverName
         val port = httpRequest.serverPort
 
         val base = "$scheme://$server:$port"
-        return URL(base + QUERY_PATH + filename).toURI()
+        val uri = URL(base + QUERY_PATH + filename).toString()
+        return ImageSpec(uri, filename, image.width, image.height, FORMAT)
     }
 
     @Throws(IOException::class)
@@ -107,8 +111,13 @@ class ImageController(
             val queryString = request.queryString
             val uri = URL("$requestURL?$queryString").toURI()
             val resource = store.read(uri)
+            val cacheControl = CacheControl.maxAge(30, TimeUnit.DAYS)
+                .cachePublic()
 
-            return ResponseEntity.ok().contentType(MediaType.IMAGE_JPEG).body(resource)
+            return ResponseEntity.ok()
+                .cacheControl(cacheControl)
+                .contentType(MediaType.IMAGE_JPEG)
+                .body(resource)
         } catch (e: IOException) {
             return ResponseEntity.notFound().build()
         }

@@ -27,7 +27,7 @@ class MessageController(
 
 
     private fun Chat.resolveDestination() =
-        "$CHAT_DESTINATION-${identifier}"
+        "$MQ_CHAT_DESTINATION-${identifier}"
 
 
     @MessageMapping(TYPING_DESTINATION)

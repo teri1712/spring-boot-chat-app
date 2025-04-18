@@ -100,13 +100,10 @@ class AuthenticationController(
         @RequestPart dob: Date,
         @RequestPart("avatar", required = false) file: MultipartFile?,
     ): ResponseEntity<String> {
-        val uri: URI?
         val avatar: ImageSpec
         if (file != null) {
-            uri = imageStore.save(ImageUtils.crop(file.inputStream))
-            avatar = ImageSpec(uri.toString())
+            avatar = imageStore.save(ImageUtils.crop(file.inputStream))
         } else {
-            uri = null
             avatar = DefaultAvatar
         }
 
@@ -123,7 +120,8 @@ class AuthenticationController(
             return ResponseEntity.ok().body("Account created")
         } catch (e: Exception) {
             e.printStackTrace()
-            if (uri != null) imageStore.remove(uri)
+            if (avatar != DefaultAvatar)
+                imageStore.remove(URI(avatar.uri))
             if (e is DataIntegrityViolationException) {
                 return ResponseEntity.status(HttpStatus.CONFLICT.value()).body("Username exists")
             } else {

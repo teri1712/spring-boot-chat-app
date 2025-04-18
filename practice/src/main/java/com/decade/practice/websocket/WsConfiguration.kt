@@ -17,12 +17,12 @@ import org.springframework.web.socket.server.HandshakeInterceptor
 
 const val HANDSHAKE_DESTINATION = "/handshake"
 const val USER_DESTINATION = "/user"
-const val QUEUE_DESTINATION = "/queue"
-const val CHAT_DESTINATION = "/chat"
+const val MQ_DESTINATION = "/queue/message"
+const val MQ_CHAT_DESTINATION = "/queue/chat"
 const val TYPING_DESTINATION = "/typing"
 
-const val USER_QUEUE_DESTINATION = "$USER_DESTINATION$QUEUE_DESTINATION"
-val BROKER_DESTINATIONS = hashSetOf(CHAT_DESTINATION, QUEUE_DESTINATION)
+const val USER_QUEUE_DESTINATION = "$USER_DESTINATION$MQ_DESTINATION"
+val BROKER_DESTINATIONS = hashSetOf(MQ_CHAT_DESTINATION, MQ_DESTINATION)
 
 
 @Configuration
@@ -71,7 +71,7 @@ class WsConfiguration(
     }
 
     override fun configureMessageBroker(registry: MessageBrokerRegistry) {
-        registry.enableSimpleBroker(*BROKER_DESTINATIONS.toTypedArray())
+        registry.enableStompBrokerRelay(*BROKER_DESTINATIONS.toTypedArray())
         registry.setUserDestinationPrefix(USER_DESTINATION)
     }
 
