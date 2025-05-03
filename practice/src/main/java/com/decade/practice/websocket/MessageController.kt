@@ -16,41 +16,41 @@ import org.springframework.util.MimeTypeUtils
 
 @Controller
 class MessageController(
-    private val brokerTemplate: SimpMessagingTemplate,
-    private val eventRepo: EventRepository,
-    private val entityRepo: WsEntityRepository,
+      private val brokerTemplate: SimpMessagingTemplate,
+      private val eventRepo: EventRepository,
+      private val entityRepo: WsEntityRepository,
 ) {
 
-    @SubscribeMapping(USER_QUEUE_DESTINATION)
-    fun subsSelf(user: User) =
-        eventRepo.findFirstByOwnerOrderByEventVersionDesc(user)
+      @SubscribeMapping(USER_QUEUE_DESTINATION)
+      fun subsSelf(user: User) =
+            eventRepo.findFirstByOwnerOrderByEventVersionDesc(user)
 
 
-    private fun Chat.resolveDestination() =
-        "$MQ_CHAT_DESTINATION-${identifier}"
+      private fun Chat.resolveDestination() =
+            "$MQ_CHAT_DESTINATION-${identifier}"
 
 
-    @MessageMapping(TYPING_DESTINATION)
-    fun pingType(
-        chat: Chat,
-        from: User,
-        message: Message<*>
-    ) {
-        val accessor = SimpMessageHeaderAccessor.wrap(message)
-        accessor.setContentType(MimeTypeUtils.APPLICATION_JSON)
+      @MessageMapping(TYPING_DESTINATION)
+      fun pingType(
+            chat: Chat,
+            from: User,
+            message: Message<*>
+      ) {
+            val accessor = SimpMessageHeaderAccessor.wrap(message)
+            accessor.setContentType(MimeTypeUtils.APPLICATION_JSON)
 
-        val type = entityRepo.getType(chat, from, false)
-        brokerTemplate.convertAndSend(chat.resolveDestination(), type!!, accessor.messageHeaders)
-    }
+            val type = entityRepo.getType(chat, from, false)
+            brokerTemplate.convertAndSend(chat.resolveDestination(), type!!, accessor.messageHeaders)
+      }
 
-    @SubscribeMapping(TYPING_DESTINATION)
-    fun subsType(
-        chat: Chat,
-        from: User,
-        message: Message<*>
-    ): TypeEvent? {
-        brokerTemplate.send(chat.resolveDestination(), message)
-        return entityRepo.getType(chat, chat.inspectPartner(from))
-    }
+      @SubscribeMapping(TYPING_DESTINATION)
+      fun subsType(
+            chat: Chat,
+            from: User,
+            message: Message<*>
+      ): TypeEvent? {
+            brokerTemplate.send(chat.resolveDestination(), message)
+            return entityRepo.getType(chat, chat.inspectPartner(from))
+      }
 
 }

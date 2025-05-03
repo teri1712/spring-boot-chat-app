@@ -13,15 +13,23 @@ import java.util.*
 @Repository
 interface UserRepository : JpaRepository<User, UUID> {
 
-    @Transactional(isolation = Isolation.READ_COMMITTED, readOnly = true)
-    fun getByUsername(username: String): User
+      @Transactional(isolation = Isolation.READ_COMMITTED, readOnly = true)
+      fun getByUsername(username: String): User
 
-    @Lock(LockModeType.OPTIMISTIC)
-    @Query("SELECT u FROM User u WHERE u.id = :id")
-    fun getOptimistic(id: UUID): User
+      @Lock(LockModeType.OPTIMISTIC)
+      @Query("SELECT u FROM User u WHERE u.id = :id")
+      fun getOptimistic(id: UUID): User
 
-    @Lock(LockModeType.OPTIMISTIC_FORCE_INCREMENT)
-    @Query("SELECT u FROM User u WHERE u.username = :username")
-    fun getOptimisticIncrement(username: String): User
+      @Lock(LockModeType.PESSIMISTIC_WRITE)
+      @Query("SELECT u FROM User u WHERE u.id = :id")
+      fun getPessimisticWrite(id: UUID): User
+
+      @Lock(LockModeType.PESSIMISTIC_WRITE)
+      @Query("SELECT u FROM User u WHERE u.username = :username")
+      fun getPessimisticWrite(username: String): User
+
+      @Lock(LockModeType.OPTIMISTIC_FORCE_INCREMENT)
+      @Query("SELECT u FROM User u WHERE u.username = :username")
+      fun getOptimisticIncrement(username: String): User
 
 }

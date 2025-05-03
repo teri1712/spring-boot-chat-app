@@ -1,4 +1,4 @@
-package com.decade.practice.stat.model
+package com.decade.practice.online.model
 
 import com.decade.practice.model.entity.User
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize
@@ -13,14 +13,14 @@ private const val KEYSPACE = "ONLINE"
 @JsonDeserialize
 @RedisHash(KEYSPACE, timeToLive = FIVE_MINUTES)
 data class OnlineStatus(
-    @Id
-    val username: String,
-    val at: Long = Instant.now().epochSecond
+      @Id
+      val username: String,
+      val at: Long = Instant.now().epochSecond
 ) {
-    @Transient
-    var user: User? = null
+      @Transient
+      var user: User? = null
 
-    constructor(user: User, at: Long = System.currentTimeMillis()) : this(user.username, at) {
-        this.user = user
-    }
+      constructor(user: User, at: Long = System.currentTimeMillis()) : this(user.username, at) {
+            this.user = user
+      }
 }

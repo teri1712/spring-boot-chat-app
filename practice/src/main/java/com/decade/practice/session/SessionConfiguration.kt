@@ -1,5 +1,6 @@
 package com.decade.practice.session
 
+import com.decade.practice.security.TokenCredentialService
 import org.springframework.context.annotation.Bean
 import org.springframework.context.annotation.Configuration
 import org.springframework.context.event.GenericApplicationListenerAdapter
@@ -11,7 +12,7 @@ import org.springframework.session.Session
 import org.springframework.session.SessionRepository
 
 @Configuration
-class SessionConfig {
+class SessionConfiguration {
 
 //      @Bean
 //      fun springSessionDefaultRedisSerializer(): GenericJackson2JsonRedisSerializer {
@@ -26,15 +27,20 @@ class SessionConfig {
       @Bean
       fun sessionRegistry(delegating: DelegatingApplicationListener): SessionRegistry {
             val registry = SessionRegistryImpl()
-            delegating.addListener(GenericApplicationListenerAdapter(registry)) // catch session events only
+            delegating.addListener(GenericApplicationListenerAdapter(registry))
             return registry
       }
 
       @Bean
       fun passwordChangeRemoveSessionsAccountListener(
             sessionRepository: SessionRepository<out Session>,
-            sessionRegistry: SessionRegistry
-      ): PasswordChangeRemoveSessionsAccountListener {
-            return PasswordChangeRemoveSessionsAccountListener(sessionRegistry, sessionRepository)
+            sessionRegistry: SessionRegistry,
+            credentialService: TokenCredentialService
+      ): PasswordChangeSessionInvalidator {
+            return PasswordChangeSessionInvalidator(
+                  sessionRegistry,
+                  sessionRepository,
+                  credentialService
+            )
       }
 }

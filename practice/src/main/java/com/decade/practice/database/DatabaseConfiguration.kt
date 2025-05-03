@@ -16,24 +16,24 @@ import org.springframework.data.jpa.repository.config.EnableJpaRepositories
 @Configuration(proxyBeanMethods = false)
 @EntityScan("com.decade.practice.model")
 @EnableJpaRepositories(basePackages = ["com.decade.practice.database.repository"])
-class DatabaseConfig(
-    @Value("\${admin.username}")
-    private val admin_username: String,
-    @Value("\${admin.password}")
-    private val admin_password: String
+class DatabaseConfiguration(
+      @Value("\${admin.username}")
+      private val admin_username: String,
+      @Value("\${admin.password}")
+      private val admin_password: String
 ) : ApplicationContextAware {
 
-    private lateinit var appCtx: ApplicationContext
+      private lateinit var appCtx: ApplicationContext
 
-    @EventListener(ApplicationReadyEvent::class)
-    fun onApplicationReady() {
-        val adminRepo = appCtx.getBean(AdminRepository::class.java)
-        if (adminRepo.getOrNull() == null) {
-            adminRepo.save(Admin(admin_username, admin_password))
-        }
-    }
+      @EventListener(ApplicationReadyEvent::class)
+      fun onApplicationReady() {
+            val adminRepo = appCtx.getBean(AdminRepository::class.java)
+            if (adminRepo.getOrNull() == null) {
+                  adminRepo.save(Admin(admin_username, admin_password))
+            }
+      }
 
-    override fun setApplicationContext(applicationContext: ApplicationContext) {
-        appCtx = applicationContext
-    }
+      override fun setApplicationContext(applicationContext: ApplicationContext) {
+            appCtx = applicationContext
+      }
 }

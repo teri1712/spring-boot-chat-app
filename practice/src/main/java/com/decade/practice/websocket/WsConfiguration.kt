@@ -29,50 +29,52 @@ val BROKER_DESTINATIONS = hashSetOf(MQ_CHAT_DESTINATION, MQ_DESTINATION)
 @EnableWebSocket
 @EnableWebSocketMessageBroker
 class WsConfiguration(
-    private val entityRepo: WsEntityRepository,
-    private val interceptors: List<ChannelInterceptor>,
-    private val handShakeInterceptors: List<HandshakeInterceptor>
+      private val entityRepo: WsEntityRepository,
+      private val interceptors: List<ChannelInterceptor>,
+      private val handShakeInterceptors: List<HandshakeInterceptor>
 ) : WebSocketMessageBrokerConfigurer {
 
-    override fun registerStompEndpoints(registry: StompEndpointRegistry) {
-        registry.addEndpoint(HANDSHAKE_DESTINATION).addInterceptors(object : HandshakeInterceptor {
-            @Throws(Exception::class)
-            override fun beforeHandshake(
-                request: ServerHttpRequest,
-                response: ServerHttpResponse,
-                wsHandler: WebSocketHandler,
-                attributes: Map<String, Any>
-            ): Boolean {
-                return request.principal != null
+      override fun registerStompEndpoints(registry: StompEndpointRegistry) {
+            registry.addEndpoint(HANDSHAKE_DESTINATION)
+                  .addInterceptors(object : HandshakeInterceptor {
+                        @Throws(Exception::class)
+                        override fun beforeHandshake(
+                              request: ServerHttpRequest,
+                              response: ServerHttpResponse,
+                              wsHandler: WebSocketHandler,
+                              attributes: Map<String, Any>
+                        ): Boolean {
+                              return request.principal != null
+                        }
+
+                        override fun afterHandshake(
+                              request: ServerHttpRequest,
+                              response: ServerHttpResponse,
+                              wsHandler: WebSocketHandler,
+                              exception: Exception?
+                        ) {
+                        }
+                  }).addInterceptors(*handShakeInterceptors.toTypedArray())
+                  .setAllowedOrigins("http://localhost:4200")
+            // .withSockJS();
+      }
+
+      override fun configureClientInboundChannel(registration: ChannelRegistration) {
+            interceptors.forEach {
+                  registration.interceptors(it)
             }
-
-            override fun afterHandshake(
-                request: ServerHttpRequest,
-                response: ServerHttpResponse,
-                wsHandler: WebSocketHandler,
-                exception: Exception?
-            ) {
-            }
-        }).addInterceptors(*handShakeInterceptors.toTypedArray())
-        // .withSockJS();
-    }
-
-    override fun configureClientInboundChannel(registration: ChannelRegistration) {
-        interceptors.forEach {
-            registration.interceptors(it)
-        }
-    }
+      }
 
 
-    override fun addArgumentResolvers(argumentResolvers: MutableList<HandlerMethodArgumentResolver>) {
-        argumentResolvers.add(ChatIdentifierArgumentResolver())
-        argumentResolvers.add(UserArgumentResolver(entityRepo))
-        argumentResolvers.add(ChatArgumentResolver(entityRepo))
-    }
+      override fun addArgumentResolvers(argumentResolvers: MutableList<HandlerMethodArgumentResolver>) {
+            argumentResolvers.add(ChatIdentifierArgumentResolver())
+            argumentResolvers.add(UserArgumentResolver(entityRepo))
+            argumentResolvers.add(ChatArgumentResolver(entityRepo))
+      }
 
-    override fun configureMessageBroker(registry: MessageBrokerRegistry) {
-        registry.enableStompBrokerRelay(*BROKER_DESTINATIONS.toTypedArray())
-        registry.setUserDestinationPrefix(USER_DESTINATION)
-    }
+      override fun configureMessageBroker(registry: MessageBrokerRegistry) {
+            registry.enableSimpleBroker(*BROKER_DESTINATIONS.toTypedArray())
+            registry.setUserDestinationPrefix(USER_DESTINATION)
+      }
 
 }

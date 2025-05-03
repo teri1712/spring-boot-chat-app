@@ -1,14 +1,16 @@
-package com.decade.practice.database;
+package com.decade.practice.core;
 
 import com.decade.practice.model.embeddable.ImageSpec;
 import com.decade.practice.model.entity.User;
-import com.decade.practice.security.model.CredentialModifierInformation;
+import com.decade.practice.model.local.Account;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.security.access.AccessDeniedException;
+import org.springframework.security.core.userdetails.UserDetails;
 
 import java.util.Date;
 import java.util.UUID;
 
+// Java interface for Mockito mocking
 public interface UserOperations {
 
       User create(String username,
@@ -23,7 +25,8 @@ public interface UserOperations {
 
       User update(UUID id, ImageSpec avatar);
 
-      User update(CredentialModifierInformation credential, String password) throws AccessDeniedException;
+      User update(UUID id, String password, String modifierToken) throws AccessDeniedException;
 
-      User validateCredential(CredentialModifierInformation credential) throws AccessDeniedException;
+      Account prepareAccount(UserDetails details);
+
 }

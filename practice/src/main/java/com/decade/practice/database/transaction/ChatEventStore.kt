@@ -1,7 +1,7 @@
 package com.decade.practice.database.transaction
 
-import com.decade.practice.database.ChatOperations
-import com.decade.practice.database.EventStore
+import com.decade.practice.core.ChatOperations
+import com.decade.practice.core.EventStore
 import com.decade.practice.model.entity.ChatEvent
 import com.decade.practice.model.entity.isMessage
 import com.decade.practice.util.inspectOwner
@@ -18,38 +18,38 @@ import org.springframework.transaction.annotation.Transactional
 @Component
 @Primary
 class ChatEventStore(
-    private val eventStore: UserEventStore,
-    private val chatOperations: ChatOperations,
+      private val eventStore: UserEventStore,
+      private val chatOperations: ChatOperations,
 ) : EventStore {
 
-    @PersistenceContext
-    lateinit var em: EntityManager
+      @PersistenceContext
+      lateinit var em: EntityManager
 
-    @Transactional(isolation = Isolation.READ_COMMITTED)
-    @Throws(
-        NoSuchElementException::class,
-        ConstraintViolationException::class
-    )
-    override fun save(event: ChatEvent): Collection<ChatEvent> {
-        val chat = chatOperations.getOrCreateChat(event.chatIdentifier)
-        em.lock(chat, LockModeType.PESSIMISTIC_WRITE)
-        if (event.isMessage()) {
-            chat.messageCount++
-        }
-        event.chat = chat
+      @Transactional(isolation = Isolation.READ_COMMITTED)
+      @Throws(
+            NoSuchElementException::class,
+            ConstraintViolationException::class
+      )
+      override fun save(event: ChatEvent): Collection<ChatEvent> {
+            val chat = chatOperations.getOrCreateChat(event.chatIdentifier)
+            em.lock(chat, LockModeType.PESSIMISTIC_WRITE)
+            if (event.isMessage()) {
+                  chat.messageCount++
+            }
+            event.chat = chat
 
-        val me = chat.inspectOwner(event.sender)
-        val you = chat.inspectPartner(me)
+            val me = chat.inspectOwner(event.sender)
+            val you = chat.inspectPartner(me)
 
-        val mine = event.copy().apply {
-            localId = event.localId
-        }
-        val yours = event.copy()
+            val mine = event.copy().apply {
+                  localId = event.localId
+            }
+            val yours = event.copy()
 
-        mine.owner = me
-        yours.owner = you
+            mine.owner = me
+            yours.owner = you
 
-        return eventStore.save(mine) + eventStore.save(yours)
-    }
+            return eventStore.save(mine) + eventStore.save(yours)
+      }
 
 }

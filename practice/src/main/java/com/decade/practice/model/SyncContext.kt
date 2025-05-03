@@ -12,17 +12,17 @@ const val STARTING_VERSION = 0
 
 @Entity
 data class SyncContext(
-    // primary key is derived
-    @MapsId // PrimaryKeyJoinColumn
-    @OneToOne
-    var owner: User
+      // primary key is derived
+      @MapsId // PrimaryKeyJoinColumn
+      @OneToOne
+      var owner: User
 ) {
-    @Id
-    var id: UUID? = null
+      @Id
+      var id: UUID? = null
 
-    var eventVersion: Int = STARTING_VERSION
+      var eventVersion: Int = STARTING_VERSION
 
-    fun incVersion(): Int {
-        return ++this.eventVersion
-    }
+      fun incVersion(): Int {
+            return ++this.eventVersion
+      }
 }

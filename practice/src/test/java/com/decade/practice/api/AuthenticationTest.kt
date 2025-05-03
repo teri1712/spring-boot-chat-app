@@ -1,6 +1,6 @@
 package com.decade.practice.api
 
-import com.decade.practice.database.UserOperations
+import com.decade.practice.core.UserOperations
 import com.decade.practice.database.repository.UserRepository
 import com.decade.practice.database.transaction.UserService
 import com.decade.practice.database.transaction.create
@@ -38,211 +38,210 @@ import org.springframework.util.LinkedMultiValueMap
 import org.springframework.util.MultiValueMap
 import org.springframework.web.client.HttpClientErrorException
 import org.springframework.web.client.RestClient
-import java.util.*
 import kotlin.test.assertNotNull
 
 @WebMvcTest(controllers = [AuthenticationController::class])
 @AutoConfigureMockMvc(addFilters = false)
 @ExtendWith(
-    OutputCaptureExtension::class
+      OutputCaptureExtension::class
 )
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
 @Import(
-    UserService::class,
-    ExceptionControllerAdvice::class,
+      UserService::class,
+      ExceptionControllerAdvice::class,
 )
 class SignUpTest {
 
-    @Autowired
-    private lateinit var mockMvc: MockMvc
+      @Autowired
+      private lateinit var mockMvc: MockMvc
 
-    @MockBean
-    private lateinit var userOperations: UserOperations
+      @MockBean
+      private lateinit var userOperations: UserOperations
 
-    @MockBean
-    private lateinit var encoder: PasswordEncoder
+      @MockBean
+      private lateinit var encoder: PasswordEncoder
 
-    @MockBean
-    private lateinit var userRepository: UserRepository
+      @MockBean
+      private lateinit var userRepository: UserRepository
 
-    @MockBean
-    private lateinit var contextRepo: SecurityContextRepository
+      @MockBean
+      private lateinit var contextRepo: SecurityContextRepository
 
-    @MockBean
-    private lateinit var imageStore: ImageStore
+      @MockBean
+      private lateinit var imageStore: ImageStore
 
-    @BeforeEach
-    fun mockBeans() {
-        Mockito.`when`(encoder.encode(Mockito.anyString())).thenAnswer {
-            it.getArgument<String>(0)
-        }
-        Mockito.`when`(
-            userOperations.create(
-                Mockito.anyString(),      // username
-                Mockito.anyString(),      // password
-                Mockito.anyString(),      // name
-                Mockito.any(),      // dob
-                Mockito.anyString(),      // gender
-                Mockito.any(),            // avatar (or use a more specific matcher if needed)
-                Mockito.any(),            // avatar (or use a more specific matcher if needed)
+      @BeforeEach
+      fun mockBeans() {
+            Mockito.`when`(encoder.encode(Mockito.anyString())).thenAnswer {
+                  it.getArgument<String>(0)
+            }
+            Mockito.`when`(
+                  userOperations.create(
+                        Mockito.anyString(),      // username
+                        Mockito.anyString(),      // password
+                        Mockito.anyString(),      // name
+                        Mockito.any(),      // dob
+                        Mockito.anyString(),      // gender
+                        Mockito.any(),            // avatar (or use a more specific matcher if needed)
+                        Mockito.any(),            // avatar (or use a more specific matcher if needed)
+                  )
+            ).thenReturn(User("123", "123"))
+
+            Mockito.`when`(imageStore.save(Mockito.any())).thenAnswer {
+                  ImageSpec("", "")
+            }
+      }
+
+
+      @Test
+      @Throws(Exception::class)
+      fun SignUp_Expect_Username_Validation_Non_Space_Error() {
+            mockMvc.perform(
+                  MockMvcRequestBuilders.multipart("/authentication/sign-up")
+                        .file(MockMultipartFile("file", "filename.txt", "text/plain", "file content".toByteArray()))
+                        .param("username", "user name")
+                        .param("password", "password")
+                        .param("name", "user")
+                        .param("gender", "Male")
+                        .param("dob", "2021-07-20")
             )
-        ).thenReturn(User("123", "123"))
+                  .andExpect(MockMvcResultMatchers.status().isBadRequest())
+                  .andExpect(
+                        MockMvcResultMatchers.content()
+                              .string(Matchers.containsString("Username must not contain spaces."))
+                  )
+      }
 
-        Mockito.`when`(imageStore.save(Mockito.any())).thenAnswer {
-            ImageSpec("", "")
-        }
-    }
-
-
-    @Test
-    @Throws(Exception::class)
-    fun SignUp_Expect_Username_Validation_Non_Space_Error() {
-        mockMvc.perform(
-            MockMvcRequestBuilders.multipart("/authentication/sign-up")
-                .file(MockMultipartFile("file", "filename.txt", "text/plain", "file content".toByteArray()))
-                .param("username", "user name")
-                .param("password", "password")
-                .param("name", "user")
-                .param("gender", "Male")
-                .param("dob", "2021-07-20")
-        )
-            .andExpect(MockMvcResultMatchers.status().isBadRequest())
-            .andExpect(
-                MockMvcResultMatchers.content()
-                    .string(Matchers.containsString("Username must not contain spaces."))
+      @Test
+      @Throws(Exception::class)
+      fun SignUp_Expect_Username_Validation_Length_Error() {
+            mockMvc.perform(
+                  MockMvcRequestBuilders.multipart("/authentication/sign-up")
+                        .file(MockMultipartFile("file", "filename.txt", "text/plain", "file content".toByteArray()))
+                        .param("username", "user")
+                        .param("password", "password")
+                        .param("name", "user")
+                        .param("gender", "Male")
+                        .param("dob", "2021-07-20")
             )
-    }
+                  .andExpect(MockMvcResultMatchers.status().isBadRequest())
+                  .andExpect(
+                        MockMvcResultMatchers.content()
+                              .string(Matchers.containsString("Username length must be between $MIN_USERNAME_LENGTH and $MAX_USERNAME_LENGTH characters"))
+                  )
+      }
 
-    @Test
-    @Throws(Exception::class)
-    fun SignUp_Expect_Username_Validation_Length_Error() {
-        mockMvc.perform(
-            MockMvcRequestBuilders.multipart("/authentication/sign-up")
-                .file(MockMultipartFile("file", "filename.txt", "text/plain", "file content".toByteArray()))
-                .param("username", "user")
-                .param("password", "password")
-                .param("name", "user")
-                .param("gender", "Male")
-                .param("dob", "2021-07-20")
-        )
-            .andExpect(MockMvcResultMatchers.status().isBadRequest())
-            .andExpect(
-                MockMvcResultMatchers.content()
-                    .string(Matchers.containsString("Username length must be between $MIN_USERNAME_LENGTH and $MAX_USERNAME_LENGTH characters"))
+      @Test
+      @Throws(Exception::class)
+      fun SignUp_Expect_Password_Validation_Error() {
+            mockMvc.perform(
+                  MockMvcRequestBuilders.multipart("/authentication/sign-up")
+                        .file(MockMultipartFile("file", "filename.txt", "text/plain", "file content".toByteArray()))
+
+                        .param("username", "username")
+                        .param("name", "user")
+                        .param("password", "pass")
+                        .param("gender", "Male")
+                        .param("dob", "2021-07-20")
             )
-    }
+                  .andExpect(MockMvcResultMatchers.status().isBadRequest())
+                  .andExpect(MockMvcResultMatchers.content().string(Matchers.containsString("Password too weak")))
+      }
 
-    @Test
-    @Throws(Exception::class)
-    fun SignUp_Expect_Password_Validation_Error() {
-        mockMvc.perform(
-            MockMvcRequestBuilders.multipart("/authentication/sign-up")
-                .file(MockMultipartFile("file", "filename.txt", "text/plain", "file content".toByteArray()))
-
-                .param("username", "username")
-                .param("name", "user")
-                .param("password", "pass")
-                .param("gender", "Male")
-                .param("dob", "2021-07-20")
-        )
-            .andExpect(MockMvcResultMatchers.status().isBadRequest())
-            .andExpect(MockMvcResultMatchers.content().string(Matchers.containsString("Password too weak")))
-    }
-
-    @Test
-    @Throws(Exception::class)
-    fun SignUp_Expect_Success() {
-        mockMvc.perform(
-            MockMvcRequestBuilders.multipart("/authentication/sign-up")
-                .file(MockMultipartFile("file", "filename.txt", "text/plain", "file content".toByteArray()))
-                .param("username", "username")
-                .param("password", "password")
-                .param("name", "user")
-                .param("gender", "Male")
-                .param("dob", "2021-07-20")
-        )
-            .andExpect(MockMvcResultMatchers.status().isOk())
-    }
+      @Test
+      @Throws(Exception::class)
+      fun SignUp_Expect_Success() {
+            mockMvc.perform(
+                  MockMvcRequestBuilders.multipart("/authentication/sign-up")
+                        .file(MockMultipartFile("file", "filename.txt", "text/plain", "file content".toByteArray()))
+                        .param("username", "username")
+                        .param("password", "password")
+                        .param("name", "user")
+                        .param("gender", "Male")
+                        .param("dob", "2021-07-20")
+            )
+                  .andExpect(MockMvcResultMatchers.status().isOk())
+      }
 }
 
 
 @SpringBootTest(
-    webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT,
-    properties = ["spring.jpa.database=H2"]
+      webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT,
+      properties = ["spring.jpa.database=H2"]
 )
 @ExtendWith(
-    OutputCaptureExtension::class
+      OutputCaptureExtension::class
 )
 @AutoConfigureTestDatabase(connection = EmbeddedDatabaseConnection.H2) // or using autoconfigured embedded datasource.
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
 class LoginTest {
 
-    @LocalServerPort
-    val port = 0
+      @LocalServerPort
+      val port = 0
 
-    @Autowired
-    lateinit var userOperations: UserOperations
+      @Autowired
+      lateinit var userOperations: UserOperations
 
-    @Autowired
-    lateinit var passwordEncoder: PasswordEncoder
+      @Autowired
+      lateinit var passwordEncoder: PasswordEncoder
 
-    @Autowired
-    lateinit var userRepository: UserRepository
+      @Autowired
+      lateinit var userRepository: UserRepository
 
-    lateinit var user: User
+      lateinit var user: User
 
-    lateinit var client: RestClient
+      lateinit var client: RestClient
 
-    @BeforeAll
-    fun setUp() {
-        user = userOperations.create("abc", "abc")
-    }
-
-
-    @Test
-    @Throws(Exception::class)
-    fun Login_With_Valid_Credential() {
-        client = RestClient.builder()
-            .baseUrl("http://localhost:$port/login")
-            .build()
+      @BeforeAll
+      fun setUp() {
+            user = userOperations.create("abc", "abc")
+      }
 
 
-        val form: MultiValueMap<String, String> = LinkedMultiValueMap()
-        form.add("username", "abc")
-        form.add("password", "abc")
-
-        val received = client.post()
-            .contentType(MediaType.APPLICATION_FORM_URLENCODED).body(form)
-            .retrieve().body(AccountEntry::class.java)
-
-        assertNotNull(received)
-        assertNotNull(received.account)
-        assertNotNull(received.chatSnapshots)
-        assertNotNull(received.chatSnapshots.size == 1)
-        assertNotNull(received.chatSnapshots[0].eventList.size == 1)
-        assertNotNull(received.chatSnapshots[0].eventList[0].edges.size == 1)
-        assertNotNull(received.chatSnapshots[0].eventList[0].eventType == WELCOME)
-
-    }
-
-    @Test
-    @Throws(Exception::class)
-    fun Login_With_InValid_Credential() {
-
-        client = RestClient.builder()
-            .baseUrl("http://localhost:$port/login")
-            .build()
+      @Test
+      @Throws(Exception::class)
+      fun Login_With_Valid_Credential() {
+            client = RestClient.builder()
+                  .baseUrl("http://localhost:$port/login")
+                  .build()
 
 
-        val form: MultiValueMap<String, String> = LinkedMultiValueMap()
-        form.add("username", "abc")
-        form.add("password", "zzz")
+            val form: MultiValueMap<String, String> = LinkedMultiValueMap()
+            form.add("username", "abc")
+            form.add("password", "abc")
 
-        assertThrows<HttpClientErrorException.Unauthorized> {
-            client.post()
-                .contentType(MediaType.APPLICATION_FORM_URLENCODED).body(form)
-                .retrieve().body(AccountEntry::class.java)
-        }
-    }
+            val received = client.post()
+                  .contentType(MediaType.APPLICATION_FORM_URLENCODED).body(form)
+                  .retrieve().body(AccountEntry::class.java)
+
+            assertNotNull(received)
+            assertNotNull(received.account)
+            assertNotNull(received.chatSnapshots)
+            assertNotNull(received.chatSnapshots.size == 1)
+            assertNotNull(received.chatSnapshots[0].eventList.size == 1)
+            assertNotNull(received.chatSnapshots[0].eventList[0].edges.size == 1)
+            assertNotNull(received.chatSnapshots[0].eventList[0].eventType == WELCOME)
+
+      }
+
+      @Test
+      @Throws(Exception::class)
+      fun Login_With_InValid_Credential() {
+
+            client = RestClient.builder()
+                  .baseUrl("http://localhost:$port/login")
+                  .build()
+
+
+            val form: MultiValueMap<String, String> = LinkedMultiValueMap()
+            form.add("username", "abc")
+            form.add("password", "zzz")
+
+            assertThrows<HttpClientErrorException.Unauthorized> {
+                  client.post()
+                        .contentType(MediaType.APPLICATION_FORM_URLENCODED).body(form)
+                        .retrieve().body(AccountEntry::class.java)
+            }
+      }
 
 }

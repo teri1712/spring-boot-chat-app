@@ -18,71 +18,72 @@ const val ICON = "ICON"
 @Entity
 @DiscriminatorValue(ICON)
 class IconEvent(
-    chat: Chat,
-    sender: User,
+      chat: Chat,
+      sender: User,
 
-    @field:NotNull
-    @Column(updatable = false)
-    val resourceId: Int
+      @field:NotNull
+      @Column(updatable = false)
+      val resourceId: Int
 ) : ChatEvent(chat, sender, ICON) {
-    constructor(event: IconEvent) : this(event.chat, event.sender, event.resourceId)
+      constructor(event: IconEvent) : this(event.chat, event.sender, event.resourceId)
 
-    override fun copy(): ChatEvent {
-        return IconEvent(this)
-    }
+      override fun copy(): ChatEvent {
+            val icon = IconEvent(this)
+            return icon
+      }
 
-    @get:JsonGetter
-    val iconEvent
-        get() = com.decade.practice.model.local.IconEvent(resourceId)
+      @get:JsonGetter
+      val iconEvent
+            get() = com.decade.practice.model.local.IconEvent(resourceId)
 }
 
 
 @Entity
 @DiscriminatorValue(TEXT)
 open class TextEvent(
-    chat: Chat,
-    sender: User,
+      chat: Chat,
+      sender: User,
 
-    @field:NotEmpty
-    @Column(updatable = false)
-    val content: String
+      @field:NotEmpty
+      @Column(updatable = false)
+      val content: String
 ) : ChatEvent(chat, sender, TEXT) {
 
-    constructor(event: TextEvent) :
-            this(event.chat, event.sender, event.content)
+      constructor(event: TextEvent) :
+              this(event.chat, event.sender, event.content)
 
-    override fun copy(): ChatEvent {
-        return TextEvent(this)
-    }
+      override fun copy(): ChatEvent {
+            return TextEvent(this)
+      }
 
-    @get:JsonGetter
-    val textEvent
-        get() = com.decade.practice.model.local.TextEvent(content)
+      @get:JsonGetter
+      val textEvent
+            get() = com.decade.practice.model.local.TextEvent(content)
 }
 
 
 @Entity
 @DiscriminatorValue(IMAGE)
 class ImageEvent(
-    chat: Chat,
-    sender: User,
+      chat: Chat,
+      sender: User,
 
-    @field:NotNull
-    @field:Valid
-    @Column(updatable = false)
-    @Embedded
-    var image: ImageSpec
+      @field:NotNull
+      @field:Valid
+      @Column(updatable = false)
+      @Embedded
+      var image: ImageSpec
 ) : ChatEvent(chat, sender, IMAGE) {
-    constructor(event: ImageEvent) :
-            this(event.chat, event.sender, event.image)
+      constructor(event: ImageEvent) :
+              this(event.chat, event.sender, event.image)
 
-    override fun copy(): ChatEvent {
-        return ImageEvent(this)
-    }
+      override fun copy(): ChatEvent {
+            return ImageEvent(this)
+      }
 
-    @get:JsonGetter
-    val imageEvent
-        get() = com.decade.practice.model.local.ImageEvent(image)
+      @get:JsonGetter
+      val imageEvent
+            get() = com.decade.practice.model.local.ImageEvent(image)
 }
 
 

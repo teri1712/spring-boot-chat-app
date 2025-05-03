@@ -1,6 +1,7 @@
 package com.decade.practice.endpoints.chat
 
-import com.decade.practice.database.ChatOperations
+import com.decade.practice.core.ChatOperations
+import com.decade.practice.database.repository.ChatRepository
 import com.decade.practice.database.repository.UserRepository
 import com.decade.practice.database.repository.get
 import com.decade.practice.model.embeddable.ChatIdentifier
@@ -19,40 +20,41 @@ import java.util.concurrent.TimeUnit
 @RestController
 @RequestMapping("/chat")
 class ChatController(
-    private val userRepo: UserRepository,
-    private val chatOperations: ChatOperations,
+      private val userRepo: UserRepository,
+      private val chatRepo: ChatRepository,
+      private val chatOperations: ChatOperations,
 ) {
 
-    @GetMapping("/snapshot")
-    fun get(
-        @AuthenticationPrincipal(expression = "id") id: UUID,
-        @RequestParam @Validated identifier: ChatIdentifier,
-        @RequestParam(required = false) atVersion: Int?
-    ): ResponseEntity<ChatSnapshot> {
+      @GetMapping("/snapshot")
+      fun get(
+            @AuthenticationPrincipal(expression = "id") id: UUID,
+            @RequestParam @Validated identifier: ChatIdentifier,
+            @RequestParam(required = false) atVersion: Int?
+      ): ResponseEntity<ChatSnapshot> {
 
-        val cacheControl = CacheControl.maxAge(30, TimeUnit.DAYS)
-            .cachePublic()
+            val cacheControl = CacheControl.maxAge(30, TimeUnit.DAYS)
+                  .cachePublic()
 
-        val me = userRepo.get(id)
-        val chat = chatOperations.getOrCreateChat(identifier)
-        val snapshot = chatOperations.getSnapshot(chat, me, atVersion ?: me.syncContext.eventVersion)
+            val me = userRepo.get(id)
+            val chat = chatOperations.getOrCreateChat(identifier)
+            val snapshot = chatOperations.getSnapshot(chat, me, atVersion ?: me.syncContext.eventVersion)
+            return ResponseEntity.ok().cacheControl(cacheControl).body(snapshot)
+      }
 
-        return ResponseEntity.ok().cacheControl(cacheControl).body(snapshot)
-    }
-
-    @GetMapping
-    fun list(
-        @AuthenticationPrincipal(expression = "id") id: UUID,
-        @RequestParam @Validated startAt: ChatIdentifier,
-        @RequestParam atVersion: Int,
-    ): ResponseEntity<List<ChatSnapshot>> {
-        val owner = userRepo.get(id)
-        val cacheControl = CacheControl.maxAge(30, TimeUnit.DAYS)
-            .cachePublic()
-        val chatList = chatOperations.listChat(
-            owner, atVersion, startAt
-        )
-            .map { chat -> chatOperations.getSnapshot(chat, owner, atVersion) }
-        return ResponseEntity.ok().cacheControl(cacheControl).body(chatList)
-    }
+      @GetMapping
+      fun list(
+            @AuthenticationPrincipal(expression = "id") id: UUID,
+            @RequestParam(required = false) @Validated startAt: ChatIdentifier?,
+            @RequestParam atVersion: Int,
+      ): ResponseEntity<List<ChatSnapshot>> {
+            val chat = if (startAt == null) null else chatRepo.get(startAt)
+            val owner = userRepo.get(id)
+            val cacheControl = CacheControl.maxAge(30, TimeUnit.DAYS)
+                  .cachePublic()
+            val chatList = chatOperations.listChat(owner, atVersion, chat)
+            val snapshotList = chatList.map { chat ->
+                  chatOperations.getSnapshot(chat, owner, atVersion)
+            }
+            return ResponseEntity.ok().cacheControl(cacheControl).body(snapshotList)
+      }
 }

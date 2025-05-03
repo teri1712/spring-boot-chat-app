@@ -1,4 +1,4 @@
-package com.decade.practice.stat
+package com.decade.practice.online
 
 import com.fasterxml.jackson.databind.ObjectMapper
 import com.fasterxml.jackson.databind.SerializationFeature
@@ -12,13 +12,13 @@ import java.security.Principal
 @RequestMapping("/online")
 class OnlineController(private val stat: OnlineStatistic) {
 
-    @GetMapping
-    fun listOnline(principal: Principal) = stat.getOnlineList(principal.name).also {
-        println(ObjectMapper().enable(SerializationFeature.INDENT_OUTPUT).writeValueAsString(it))
-    }
+      @GetMapping
+      fun listOnline(principal: Principal) = stat.getOnlineList(principal.name).also {
+            println(ObjectMapper().enable(SerializationFeature.INDENT_OUTPUT).writeValueAsString(it))
+      }
 
-    @GetMapping("/{username}")
-    fun get(@PathVariable username: String) = stat.get(username)
+      @GetMapping("/{username}")
+      fun get(@PathVariable username: String) = stat.get(username)
 
 
 }

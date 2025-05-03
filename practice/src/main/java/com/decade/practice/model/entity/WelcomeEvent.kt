@@ -6,17 +6,17 @@ import jakarta.persistence.Entity
 const val WELCOME = "HELLO WORLD"
 
 private fun welcomeMessage(user: User): String {
-    return "HELLO ${user.username}"
+      return "HELLO ${user.username}"
 }
 
 @Entity
 @DiscriminatorValue(WELCOME)
 class WelcomeEvent(
-    chat: Chat,
-    admin: User,
-    user: User,
+      chat: Chat,
+      admin: User,
+      user: User,
 ) : TextEvent(chat, admin, welcomeMessage(user)) {
-    init {
-        owner = user
-    }
+      init {
+            owner = user
+      }
 }
