@@ -1,5 +1,6 @@
 package com.decade.practice.online
 
+import com.decade.practice.core.OnlineStatistic
 import com.decade.practice.model.domain.entity.User
 import com.decade.practice.online.model.OnlineStatus
 import com.decade.practice.websocket.WsEntityRepository
@@ -48,7 +49,7 @@ class OnlineStatusManager(
             )
       }
 
-      private fun set(user: User, at: Long): OnlineStatus {
+      override fun set(user: User, at: Long): OnlineStatus {
             evict()
             val status = onlineRepo.save(OnlineStatus(user, at))
             zSet.add(KEYSPACE, status.username, status.at.toDouble())
@@ -58,7 +59,7 @@ class OnlineStatusManager(
       override fun preSend(message: Message<*>, channel: MessageChannel): Message<*>? {
             val principal = SimpMessageHeaderAccessor.getUser(message.headers)
                   ?: return message
-            set(entityRepo.getUser(principal.name), Instant.now().epochSecond)
+            set(entityRepo.getUser(principal.name))
             return message
       }
 
@@ -72,7 +73,7 @@ class OnlineStatusManager(
             wsHandler: WebSocketHandler, exception: Exception?
       ) {
             val username = request.principal!!.name
-            set(entityRepo.getUser(username), Instant.now().epochSecond)
+            set(entityRepo.getUser(username))
       }
 
       override fun get(username: String): OnlineStatus =

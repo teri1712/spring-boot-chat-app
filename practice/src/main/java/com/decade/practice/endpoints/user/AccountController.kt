@@ -34,7 +34,7 @@ class AccountController(
 ) {
 
 
-      @PreAuthorize("isAuthenticated() and hasRole('ROLE_USER')")
+      @PreAuthorize("isAuthenticated() and authentication.authorities.?[authority.toLowerCase().contains('user')].size() > 0")
       @GetMapping
       fun get(
             @AuthenticationPrincipal(expression = "name") username: String,

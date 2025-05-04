@@ -1,6 +1,7 @@
 package com.decade.practice.endpoints.chat
 
 import com.decade.practice.core.ChatOperations
+import com.decade.practice.core.OnlineStatistic
 import com.decade.practice.database.repository.EventRepository
 import com.decade.practice.database.repository.UserRepository
 import com.decade.practice.database.transaction.ChatEventStore
@@ -36,6 +37,7 @@ class EventController(
       private val template: SimpMessagingTemplate,
       private val chatOperations: ChatOperations,
       private val evenRepo: EventRepository,
+      private val onlineStat: OnlineStatistic,
       private val userRepo: UserRepository,
       private val imageStore: ImageStore,
 ) {
@@ -45,6 +47,7 @@ class EventController(
             sender: User,
             @RequestBody event: E
       ): E {
+            onlineStat.set(sender)
             event.sender = sender
             try {
                   val saved = chatEventStore.save(event)

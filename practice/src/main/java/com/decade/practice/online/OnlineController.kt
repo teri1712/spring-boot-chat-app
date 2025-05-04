@@ -1,5 +1,6 @@
 package com.decade.practice.online
 
+import com.decade.practice.core.OnlineStatistic
 import com.fasterxml.jackson.databind.ObjectMapper
 import com.fasterxml.jackson.databind.SerializationFeature
 import org.springframework.web.bind.annotation.GetMapping

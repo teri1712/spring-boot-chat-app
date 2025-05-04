@@ -35,11 +35,16 @@ class PasswordChangeSessionInvalidator(
       }
 
       override fun afterPasswordChanged(account: User, success: Boolean) {
-            if (success) {
-                  invalidateSessions()
-                  reactivateCurrentToken()
-            } else {
-                  restoreTokens()
+            try {
+                  if (success) {
+                        invalidateSessions()
+                        reactivateCurrentToken()
+                  } else {
+                        restoreTokens()
+                  }
+            } finally {
+                  if (TransactionSynchronizationManager.hasResource(INVALIDATED_TOKENS))
+                        TransactionSynchronizationManager.unbindResource(INVALIDATED_TOKENS)
             }
       }
 
@@ -75,6 +80,7 @@ class PasswordChangeSessionInvalidator(
       private fun invalidateTokens() {
             val username = currentAuthentication.name
             val deletedTokens = credentialService.evict(username)
+            //prepare for restoration on failures
             TransactionSynchronizationManager.bindResource(INVALIDATED_TOKENS, deletedTokens)
       }
 }
