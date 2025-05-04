@@ -3,13 +3,13 @@ package com.decade.practice.ws
 import com.decade.practice.core.ChatOperations
 import com.decade.practice.core.UserOperations
 import com.decade.practice.database.transaction.create
-import com.decade.practice.model.TypeEvent
-import com.decade.practice.model.entity.Chat
-import com.decade.practice.model.entity.User
+import com.decade.practice.model.domain.TypeEvent
+import com.decade.practice.model.domain.embeddable.ChatIdentifier
+import com.decade.practice.model.domain.entity.Chat
+import com.decade.practice.model.domain.entity.User
 import com.decade.practice.security.jwt.JwtCredentialService
 import com.decade.practice.util.TokenUtils.BEARER
 import com.decade.practice.util.TokenUtils.HEADER_NAME
-import com.decade.practice.util.toIdentifier
 import com.decade.practice.websocket.CHAT_HEADER
 import com.decade.practice.websocket.HANDSHAKE_DESTINATION
 import com.decade.practice.websocket.TYPING_DESTINATION
@@ -69,7 +69,7 @@ class TypeEventTest {
       fun beforeAll() {
             me = userOperations.create("first", "first", true)
             you = userOperations.create("second", "second", true)
-            chat = chatOperations.getOrCreateChat(toIdentifier(me.id, you.id))
+            chat = chatOperations.getOrCreateChat(ChatIdentifier.from(me, you))
 
             myToken = credentialService.create(me).accessToken
             yourToken = credentialService.create(you).accessToken

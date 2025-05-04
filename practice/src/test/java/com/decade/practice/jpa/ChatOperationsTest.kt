@@ -6,7 +6,7 @@ import com.decade.practice.database.DatabaseConfiguration
 import com.decade.practice.database.transaction.ChatService
 import com.decade.practice.database.transaction.UserService
 import com.decade.practice.database.transaction.create
-import com.decade.practice.model.entity.User
+import com.decade.practice.model.domain.entity.User
 import org.junit.jupiter.api.Assertions
 import org.junit.jupiter.api.Order
 import org.junit.jupiter.api.Test

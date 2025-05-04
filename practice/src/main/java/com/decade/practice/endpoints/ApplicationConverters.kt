@@ -1,6 +1,6 @@
 package com.decade.practice.endpoints
 
-import com.decade.practice.model.embeddable.ChatIdentifier
+import com.decade.practice.model.domain.embeddable.ChatIdentifier
 import org.springframework.context.annotation.Configuration
 import org.springframework.core.convert.converter.Converter
 import org.springframework.format.FormatterRegistry

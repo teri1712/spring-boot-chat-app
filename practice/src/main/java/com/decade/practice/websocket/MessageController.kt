@@ -1,9 +1,9 @@
 package com.decade.practice.websocket
 
 import com.decade.practice.database.repository.EventRepository
-import com.decade.practice.model.TypeEvent
-import com.decade.practice.model.entity.Chat
-import com.decade.practice.model.entity.User
+import com.decade.practice.model.domain.TypeEvent
+import com.decade.practice.model.domain.entity.Chat
+import com.decade.practice.model.domain.entity.User
 import com.decade.practice.util.inspectPartner
 import org.springframework.messaging.Message
 import org.springframework.messaging.handler.annotation.MessageMapping

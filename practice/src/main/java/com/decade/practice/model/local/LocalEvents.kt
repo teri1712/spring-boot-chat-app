@@ -1,6 +1,6 @@
 package com.decade.practice.model.local
 
-import com.decade.practice.model.embeddable.ImageSpec
+import com.decade.practice.model.domain.embeddable.ImageSpec
 
 
 data class TextEvent(val content: String)

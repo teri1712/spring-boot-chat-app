@@ -1,6 +1,6 @@
 package com.decade.practice.image
 
-import com.decade.practice.model.embeddable.ImageSpec
+import com.decade.practice.model.domain.embeddable.ImageSpec
 import jakarta.servlet.http.HttpServletRequest
 import org.springframework.beans.factory.annotation.Qualifier
 import org.springframework.context.annotation.Bean

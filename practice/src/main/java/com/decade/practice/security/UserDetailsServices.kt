@@ -30,6 +30,7 @@ class SaveOnLoadOauth2UserService<R : OAuth2UserRequest, U : OAuth2User>(
       private val userOperations: UserOperations,
       private val delegate: OAuth2UserService<R, U>
 ) : OAuth2UserService<R, U> {
+
       override fun loadUser(userRequest: R?): U {
             val oAuth2User = delegate.loadUser(userRequest)
             val username = oAuth2User.name

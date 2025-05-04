@@ -2,9 +2,9 @@ package com.decade.practice.database.transaction
 
 import com.decade.practice.core.EventStore
 import com.decade.practice.database.repository.*
-import com.decade.practice.model.entity.ChatEvent
-import com.decade.practice.model.entity.Edge
-import com.decade.practice.model.entity.isMessage
+import com.decade.practice.model.domain.entity.ChatEvent
+import com.decade.practice.model.domain.entity.Edge
+import com.decade.practice.model.domain.entity.isMessage
 import jakarta.persistence.EntityManager
 import jakarta.persistence.PersistenceContext
 import org.springframework.stereotype.Service

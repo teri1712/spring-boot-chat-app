@@ -2,8 +2,8 @@ package com.decade.practice.database.transaction
 
 import com.decade.practice.core.ChatOperations
 import com.decade.practice.core.EventStore
-import com.decade.practice.model.entity.ChatEvent
-import com.decade.practice.model.entity.isMessage
+import com.decade.practice.model.domain.entity.ChatEvent
+import com.decade.practice.model.domain.entity.isMessage
 import com.decade.practice.util.inspectOwner
 import com.decade.practice.util.inspectPartner
 import jakarta.persistence.EntityManager

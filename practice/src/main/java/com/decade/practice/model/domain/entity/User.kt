@@ -1,8 +1,8 @@
-package com.decade.practice.model.entity
+package com.decade.practice.model.domain.entity
 
-import com.decade.practice.model.DefaultAvatar
-import com.decade.practice.model.SyncContext
-import com.decade.practice.model.embeddable.ImageSpec
+import com.decade.practice.model.domain.DefaultAvatar
+import com.decade.practice.model.domain.SyncContext
+import com.decade.practice.model.domain.embeddable.ImageSpec
 import com.fasterxml.jackson.annotation.JsonIgnore
 import com.fasterxml.jackson.annotation.JsonProperty
 import jakarta.persistence.*
@@ -12,7 +12,10 @@ const val MALE: String = "male"
 const val FEMALE: String = "female"
 
 @Entity
-@Table(name = "UserMember", indexes = [Index(columnList = "username")])
+@Table(
+      name = "UserMember", indexes = [
+            Index(columnList = "name")]
+)
 @Inheritance(strategy = InheritanceType.SINGLE_TABLE)
 @DiscriminatorColumn(name = "role")
 @DiscriminatorValue("ROLE_USER")

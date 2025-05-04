@@ -2,22 +2,20 @@ package com.decade.practice.endpoints.user
 
 import com.decade.practice.core.UserOperations
 import com.decade.practice.database.repository.UserRepository
-import com.decade.practice.database.repository.get
 import com.decade.practice.image.ImageStore
-import com.decade.practice.model.entity.User
+import com.decade.practice.model.domain.entity.User
 import com.decade.practice.model.local.Account
 import com.decade.practice.model.local.AccountEntry
-import com.decade.practice.security.jwt.JwtUser
 import com.decade.practice.util.ImageUtils
 import jakarta.persistence.OptimisticLockException
 import jakarta.validation.constraints.NotEmpty
 import jakarta.validation.constraints.Past
 import jakarta.validation.constraints.Size
 import org.springframework.http.ResponseEntity
+import org.springframework.security.access.AccessDeniedException
 import org.springframework.security.access.prepost.PreAuthorize
 import org.springframework.security.core.annotation.AuthenticationPrincipal
 import org.springframework.stereotype.Controller
-import org.springframework.validation.annotation.Validated
 import org.springframework.web.bind.annotation.GetMapping
 import org.springframework.web.bind.annotation.PostMapping
 import org.springframework.web.bind.annotation.RequestMapping
@@ -29,7 +27,6 @@ import java.util.*
 
 @Controller
 @RequestMapping("/account")
-@Validated
 class AccountController(
       private val imageStore: ImageStore,
       private val userOperations: UserOperations,
@@ -40,11 +37,11 @@ class AccountController(
       @PreAuthorize("isAuthenticated() and hasRole('ROLE_USER')")
       @GetMapping
       fun get(
-            @AuthenticationPrincipal(expression = "id") id: UUID,
+            @AuthenticationPrincipal(expression = "name") username: String,
       ) = ResponseEntity.ok(
             AccountEntry(
                   Account(
-                        userRepository.get(id),
+                        userRepository.getByUsername(username),
                         credential = null
                   ), emptyList()
             )
@@ -54,7 +51,7 @@ class AccountController(
       @PostMapping("/information")
       @Throws(OptimisticLockException::class)
       fun updateInformation(
-            @AuthenticationPrincipal(expression = "id") id: UUID,
+            @AuthenticationPrincipal(expression = "id") idOptional: Optional<UUID>,
             @Size(min = 4, max = 100, message = "Name length must be between 4-100")
             @RequestParam name: String,
             @Past(message = "Do you have time machine.")
@@ -62,19 +59,27 @@ class AccountController(
             @NotEmpty
             @RequestParam gender: String
       ): ResponseEntity<User> {
+            val id = idOptional.orElseThrow {
+                  // Only application's principals can modify the information
+                  throw AccessDeniedException("Operation not supported")
+            }
             return ResponseEntity.ok(userOperations.update(id, name, dob, gender))
       }
 
       @PostMapping("/avatar")
       @Throws(IOException::class, OptimisticLockException::class)
       fun updateAvatar(
-            @AuthenticationPrincipal jwtUser: JwtUser,
+            @AuthenticationPrincipal(expression = "id") idOptional: Optional<UUID>,
             @RequestParam file: MultipartFile
       ): ResponseEntity<User> {
+            val id = idOptional.orElseThrow {
+                  // Only application's principals can modify the information
+                  throw AccessDeniedException("Operation not supported")
+            }
             val cropped = ImageUtils.crop(file.inputStream)
             val avatar = imageStore.save(cropped)
             try {
-                  return ResponseEntity.ok(userOperations.update(jwtUser.id, avatar))
+                  return ResponseEntity.ok(userOperations.update(id, avatar))
             } catch (e: Exception) {
                   imageStore.remove(URI(avatar.uri))
                   throw e

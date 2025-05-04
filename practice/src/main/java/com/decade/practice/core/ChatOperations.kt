@@ -1,10 +1,9 @@
 package com.decade.practice.core
 
-import com.decade.practice.model.embeddable.ChatIdentifier
-import com.decade.practice.model.entity.Chat
-import com.decade.practice.model.entity.User
-import com.decade.practice.model.local.ChatSnapshot
-import com.decade.practice.util.toIdentifier
+import com.decade.practice.model.domain.ChatSnapshot
+import com.decade.practice.model.domain.embeddable.ChatIdentifier
+import com.decade.practice.model.domain.entity.Chat
+import com.decade.practice.model.domain.entity.User
 import java.util.*
 
 private const val CONVERSATION_LIMIT: Int = 20
@@ -17,7 +16,7 @@ interface ChatOperations {
       fun getOrCreateChat(
             owner: UUID,
             partner: UUID
-      ) = getOrCreateChat(toIdentifier(owner, partner))
+      ) = getOrCreateChat(ChatIdentifier.from(owner, partner))
 
       fun listChat(
             owner: User,

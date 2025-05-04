@@ -1,7 +1,7 @@
 package com.decade.practice.util
 
-import com.decade.practice.model.embeddable.ImageSpec.Companion.DEFAULT_HEIGHT
-import com.decade.practice.model.embeddable.ImageSpec.Companion.DEFAULT_WIDTH
+import com.decade.practice.model.domain.embeddable.ImageSpec.Companion.DEFAULT_HEIGHT
+import com.decade.practice.model.domain.embeddable.ImageSpec.Companion.DEFAULT_WIDTH
 import java.awt.RenderingHints
 import java.awt.image.BufferedImage
 import java.io.IOException

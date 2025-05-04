@@ -9,9 +9,9 @@ import com.decade.practice.endpoints.auth.AuthenticationController
 import com.decade.practice.endpoints.auth.MAX_USERNAME_LENGTH
 import com.decade.practice.endpoints.auth.MIN_USERNAME_LENGTH
 import com.decade.practice.image.ImageStore
-import com.decade.practice.model.embeddable.ImageSpec
-import com.decade.practice.model.entity.User
-import com.decade.practice.model.entity.WELCOME
+import com.decade.practice.model.domain.embeddable.ImageSpec
+import com.decade.practice.model.domain.entity.User
+import com.decade.practice.model.domain.entity.WELCOME
 import com.decade.practice.model.local.AccountEntry
 import org.hamcrest.Matchers
 import org.junit.jupiter.api.*

@@ -2,7 +2,7 @@ package com.decade.practice.database
 
 import com.decade.practice.database.repository.AdminRepository
 import com.decade.practice.database.repository.getOrNull
-import com.decade.practice.model.entity.Admin
+import com.decade.practice.model.domain.entity.Admin
 import org.springframework.beans.factory.annotation.Value
 import org.springframework.boot.autoconfigure.domain.EntityScan
 import org.springframework.boot.context.event.ApplicationReadyEvent

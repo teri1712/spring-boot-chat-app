@@ -1,4 +1,4 @@
-package com.decade.practice.model.embeddable
+package com.decade.practice.model.domain.embeddable
 
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize
 import jakarta.persistence.Embeddable

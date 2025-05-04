@@ -1,6 +1,6 @@
 package com.decade.practice.online
 
-import com.decade.practice.model.entity.User
+import com.decade.practice.model.domain.entity.User
 import com.decade.practice.online.model.OnlineStatus
 import com.decade.practice.websocket.WsEntityRepository
 import org.springframework.context.annotation.Bean

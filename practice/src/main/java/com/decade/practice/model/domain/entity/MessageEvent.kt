@@ -1,6 +1,6 @@
-package com.decade.practice.model.entity
+package com.decade.practice.model.domain.entity
 
-import com.decade.practice.model.embeddable.ImageSpec
+import com.decade.practice.model.domain.embeddable.ImageSpec
 import com.fasterxml.jackson.annotation.JsonGetter
 import jakarta.persistence.Column
 import jakarta.persistence.DiscriminatorValue

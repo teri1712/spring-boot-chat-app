@@ -1,7 +1,7 @@
 package com.decade.practice.model.local
 
-import com.decade.practice.model.SyncContext
-import com.decade.practice.model.entity.User
+import com.decade.practice.model.domain.SyncContext
+import com.decade.practice.model.domain.entity.User
 import com.decade.practice.security.model.TokenCredential
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize
 import com.fasterxml.jackson.databind.annotation.JsonSerialize

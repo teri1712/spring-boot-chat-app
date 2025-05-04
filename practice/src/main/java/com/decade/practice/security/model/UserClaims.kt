@@ -1,6 +1,6 @@
 package com.decade.practice.security.model
 
-import com.decade.practice.model.entity.User
+import com.decade.practice.model.domain.entity.User
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize
 import java.util.*
 

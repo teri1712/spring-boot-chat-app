@@ -3,7 +3,7 @@ package com.decade.practice
 import com.decade.practice.database.repository.UserRepository
 import com.decade.practice.database.transaction.ChatService
 import com.decade.practice.database.transaction.UserService
-import com.decade.practice.model.entity.User
+import com.decade.practice.model.domain.entity.User
 import com.decade.practice.security.*
 import com.decade.practice.security.jwt.JwtCredentialService
 import com.decade.practice.security.jwt.JwtTokenFilter

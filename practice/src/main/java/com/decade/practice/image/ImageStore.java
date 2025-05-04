@@ -1,6 +1,6 @@
 package com.decade.practice.image;
 
-import com.decade.practice.model.embeddable.ImageSpec;
+import com.decade.practice.model.domain.embeddable.ImageSpec;
 import org.springframework.core.io.Resource;
 
 import java.awt.image.BufferedImage;

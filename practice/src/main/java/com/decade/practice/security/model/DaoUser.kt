@@ -1,12 +1,13 @@
 package com.decade.practice.security.model
 
-import com.decade.practice.model.entity.User
+import com.decade.practice.model.domain.entity.User
+import org.springframework.security.core.AuthenticatedPrincipal
 import org.springframework.security.core.GrantedAuthority
 import org.springframework.security.core.authority.SimpleGrantedAuthority
 import org.springframework.security.core.userdetails.UserDetails
 import java.util.*
 
-class DaoUser(user: User) : UserDetails {
+class DaoUser(user: User) : UserDetails, AuthenticatedPrincipal {
 
       val id = user.id
       private val _password: String = user.password
@@ -32,6 +33,10 @@ class DaoUser(user: User) : UserDetails {
       override fun equals(other: Any?): Boolean {
             return if (other == null) false
             else other.hashCode() == hashCode()
+      }
+
+      override fun getName(): String {
+            return _username
       }
 }
 

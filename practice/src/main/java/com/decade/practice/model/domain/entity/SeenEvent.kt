@@ -1,4 +1,4 @@
-package com.decade.practice.model.entity
+package com.decade.practice.model.domain.entity
 
 import com.fasterxml.jackson.annotation.JsonGetter
 import jakarta.persistence.Column

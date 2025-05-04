@@ -1,6 +1,6 @@
-package com.decade.practice.model
+package com.decade.practice.model.domain
 
-import com.decade.practice.model.entity.User
+import com.decade.practice.model.domain.entity.User
 import jakarta.persistence.Entity
 import jakarta.persistence.Id
 import jakarta.persistence.MapsId

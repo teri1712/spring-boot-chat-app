@@ -10,10 +10,10 @@ import com.decade.practice.database.repository.EdgeRepository
 import com.decade.practice.database.repository.UserRepository
 import com.decade.practice.database.repository.get
 import com.decade.practice.database.transaction.*
-import com.decade.practice.model.entity.Chat
-import com.decade.practice.model.entity.ChatEvent
-import com.decade.practice.model.entity.TextEvent
-import com.decade.practice.model.entity.User
+import com.decade.practice.model.domain.entity.Chat
+import com.decade.practice.model.domain.entity.ChatEvent
+import com.decade.practice.model.domain.entity.TextEvent
+import com.decade.practice.model.domain.entity.User
 import com.decade.practice.util.inspectPartner
 import org.junit.jupiter.api.*
 import org.junit.jupiter.api.extension.ExtendWith

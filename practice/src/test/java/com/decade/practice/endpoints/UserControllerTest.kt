@@ -2,8 +2,8 @@ package com.decade.practice.endpoints
 
 import com.decade.practice.core.UserOperations
 import com.decade.practice.image.ImageStore
-import com.decade.practice.model.embeddable.ImageSpec
-import com.decade.practice.model.entity.User
+import com.decade.practice.model.domain.embeddable.ImageSpec
+import com.decade.practice.model.domain.entity.User
 import org.junit.jupiter.api.DisplayName
 import org.junit.jupiter.api.Test
 import org.mockito.BDDMockito.*

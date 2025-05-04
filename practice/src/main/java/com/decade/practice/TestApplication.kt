@@ -3,10 +3,10 @@ package com.decade.practice
 import com.decade.practice.core.EventStore
 import com.decade.practice.core.UserOperations
 import com.decade.practice.database.repository.UserRepository
-import com.decade.practice.model.embeddable.ImageSpec
-import com.decade.practice.model.entity.Chat
-import com.decade.practice.model.entity.MALE
-import com.decade.practice.model.entity.TextEvent
+import com.decade.practice.model.domain.embeddable.ImageSpec
+import com.decade.practice.model.domain.entity.Chat
+import com.decade.practice.model.domain.entity.MALE
+import com.decade.practice.model.domain.entity.TextEvent
 import org.springframework.boot.SpringApplication
 import org.springframework.boot.autoconfigure.SpringBootApplication
 import org.springframework.transaction.support.TransactionOperations

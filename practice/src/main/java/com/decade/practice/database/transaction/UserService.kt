@@ -5,9 +5,9 @@ import com.decade.practice.database.repository.AdminRepository
 import com.decade.practice.database.repository.UserRepository
 import com.decade.practice.database.repository.get
 import com.decade.practice.event.AccountEventListener
-import com.decade.practice.model.DefaultAvatar
-import com.decade.practice.model.embeddable.ImageSpec
-import com.decade.practice.model.entity.*
+import com.decade.practice.model.domain.DefaultAvatar
+import com.decade.practice.model.domain.embeddable.ImageSpec
+import com.decade.practice.model.domain.entity.*
 import com.decade.practice.model.local.Account
 import com.decade.practice.security.TokenCredentialService
 import jakarta.persistence.EntityManager

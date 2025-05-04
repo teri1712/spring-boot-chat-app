@@ -1,6 +1,6 @@
 package com.decade.practice.security
 
-import com.decade.practice.model.entity.User
+import com.decade.practice.model.domain.entity.User
 import com.decade.practice.security.model.TokenCredential
 import com.decade.practice.security.model.UserClaims
 import org.springframework.security.access.AccessDeniedException
@@ -10,6 +10,8 @@ interface TokenCredentialService {
       @Throws(AccessDeniedException::class)
       fun validate(refreshToken: String)
       fun evict(username: String): List<String>
+
+      fun evict(username: String, refreshToken: String)
       fun add(username: String, refreshToken: String)
 
       fun decodeToken(token: String): UserClaims

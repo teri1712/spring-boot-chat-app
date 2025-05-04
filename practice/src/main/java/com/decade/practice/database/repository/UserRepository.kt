@@ -1,6 +1,6 @@
 package com.decade.practice.database.repository
 
-import com.decade.practice.model.entity.User
+import com.decade.practice.model.domain.entity.User
 import jakarta.persistence.LockModeType
 import org.springframework.data.jpa.repository.JpaRepository
 import org.springframework.data.jpa.repository.Lock
@@ -31,5 +31,7 @@ interface UserRepository : JpaRepository<User, UUID> {
       @Lock(LockModeType.OPTIMISTIC_FORCE_INCREMENT)
       @Query("SELECT u FROM User u WHERE u.username = :username")
       fun getOptimisticIncrement(username: String): User
+
+      fun findByNameContainingAndRole(name: String, role: String): List<User>
 
 }

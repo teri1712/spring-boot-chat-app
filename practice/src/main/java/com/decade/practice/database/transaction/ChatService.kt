@@ -3,10 +3,10 @@ package com.decade.practice.database.transaction
 import com.decade.practice.core.ChatOperations
 import com.decade.practice.core.common.SelfAware
 import com.decade.practice.database.repository.*
-import com.decade.practice.model.embeddable.ChatIdentifier
-import com.decade.practice.model.entity.Chat
-import com.decade.practice.model.entity.User
-import com.decade.practice.model.local.ChatSnapshot
+import com.decade.practice.model.domain.ChatSnapshot
+import com.decade.practice.model.domain.embeddable.ChatIdentifier
+import com.decade.practice.model.domain.entity.Chat
+import com.decade.practice.model.domain.entity.User
 import com.decade.practice.model.local.Conversation
 import com.decade.practice.util.EventPageUtils
 import jakarta.persistence.EntityManager

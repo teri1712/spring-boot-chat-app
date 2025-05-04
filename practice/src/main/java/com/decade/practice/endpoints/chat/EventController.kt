@@ -3,13 +3,12 @@ package com.decade.practice.endpoints.chat
 import com.decade.practice.core.ChatOperations
 import com.decade.practice.database.repository.EventRepository
 import com.decade.practice.database.repository.UserRepository
-import com.decade.practice.database.repository.get
 import com.decade.practice.database.transaction.ChatEventStore
 import com.decade.practice.image.ImageStore
-import com.decade.practice.model.embeddable.ChatIdentifier
-import com.decade.practice.model.embeddable.ImageSpec.Companion.DEFAULT_HEIGHT
-import com.decade.practice.model.embeddable.ImageSpec.Companion.DEFAULT_WIDTH
-import com.decade.practice.model.entity.*
+import com.decade.practice.model.domain.embeddable.ChatIdentifier
+import com.decade.practice.model.domain.embeddable.ImageSpec.Companion.DEFAULT_HEIGHT
+import com.decade.practice.model.domain.embeddable.ImageSpec.Companion.DEFAULT_WIDTH
+import com.decade.practice.model.domain.entity.*
 import com.decade.practice.util.EventPageUtils
 import com.decade.practice.util.ImageUtils
 import com.decade.practice.util.inspectOwner
@@ -26,7 +25,6 @@ import org.springframework.web.bind.annotation.*
 import org.springframework.web.multipart.MultipartFile
 import java.io.IOException
 import java.net.URI
-import java.util.*
 import java.util.concurrent.TimeUnit
 import kotlin.math.min
 
@@ -69,31 +67,31 @@ class EventController(
       @PostMapping("/seen")
       @Throws(EntityNotFoundException::class)
       fun pushEvent(
-            @AuthenticationPrincipal(expression = "id") sender: UUID,
+            @AuthenticationPrincipal(expression = "name") username: String,
             @RequestBody @Valid record: SeenEvent
-      ): SeenEvent = pushEvent(userRepo.get(sender), record)
+      ): SeenEvent = pushEvent(userRepo.getByUsername(username), record)
 
 
       @PostMapping("/text")
       @Throws(EntityNotFoundException::class)
       fun pushEvent(
-            @AuthenticationPrincipal(expression = "id") sender: UUID,
+            @AuthenticationPrincipal(expression = "name") username: String,
             @RequestBody @Valid event: TextEvent
-      ): TextEvent = pushEvent(userRepo.get(sender), event)
+      ): TextEvent = pushEvent(userRepo.getByUsername(username), event)
 
 
       @PostMapping("/icon")
       @Throws(EntityNotFoundException::class)
       fun pushEvent(
-            @AuthenticationPrincipal(expression = "id") sender: UUID,
+            @AuthenticationPrincipal(expression = "name") username: String,
             @RequestBody @Valid event: IconEvent
-      ): IconEvent = pushEvent(userRepo.get(sender), event)
+      ): IconEvent = pushEvent(userRepo.getByUsername(username), event)
 
 
       @PostMapping("/image")
       @Throws(EntityNotFoundException::class, IOException::class)
       fun pushEvent(
-            @AuthenticationPrincipal(expression = "id") sender: UUID,
+            @AuthenticationPrincipal(expression = "name") username: String,
             @RequestPart("event") @Valid event: ImageEvent,
             @RequestPart("file") file: MultipartFile
       ): ImageEvent {
@@ -103,7 +101,7 @@ class EventController(
 
             event.image = imageStore.save(image)
             try {
-                  return pushEvent(userRepo.get(sender), event)
+                  return pushEvent(userRepo.getByUsername(username), event)
             } catch (e: Exception) {
                   imageStore.remove(URI(event.image.uri))
                   throw e
@@ -113,13 +111,13 @@ class EventController(
       @GetMapping("/chat")
       @Throws(EntityNotFoundException::class)
       fun pullEvents(
-            @AuthenticationPrincipal(expression = "id") id: UUID,
+            @AuthenticationPrincipal(expression = "name") username: String,
             @RequestParam @Validated identifier: ChatIdentifier,
             @RequestParam atVersion: Int
       ): ResponseEntity<List<ChatEvent>> {
 
             val chat = chatOperations.getOrCreateChat(identifier)
-            val user = chat.inspectOwner(id)
+            val user = chat.inspectOwner(username)
             val page = EventPageUtils.pageEvent
             val cacheControl = CacheControl.maxAge(30, TimeUnit.DAYS)
                   .cachePublic()
@@ -132,11 +130,11 @@ class EventController(
       @GetMapping
       @Throws(EntityNotFoundException::class)
       fun pullEvents(
-            @AuthenticationPrincipal(expression = "id") id: UUID,
+            @AuthenticationPrincipal(expression = "name") username: String,
             @RequestParam atVersion: Int
       ): ResponseEntity<List<ChatEvent>> {
 
-            val owner = userRepo.get(id)
+            val owner = userRepo.getByUsername(username)
             val page = EventPageUtils.pageEvent
             val cacheControl = CacheControl.maxAge(30, TimeUnit.DAYS)
                   .cachePublic()

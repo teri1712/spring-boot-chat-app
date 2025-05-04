@@ -1,6 +1,6 @@
 package com.decade.practice.online.model
 
-import com.decade.practice.model.entity.User
+import com.decade.practice.model.domain.entity.User
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize
 import org.springframework.data.annotation.Id
 import org.springframework.data.annotation.Transient

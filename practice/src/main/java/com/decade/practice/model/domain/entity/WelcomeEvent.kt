@@ -1,4 +1,4 @@
-package com.decade.practice.model.entity
+package com.decade.practice.model.domain.entity
 
 import jakarta.persistence.DiscriminatorValue
 import jakarta.persistence.Entity

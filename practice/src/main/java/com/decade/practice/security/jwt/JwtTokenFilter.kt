@@ -6,7 +6,6 @@ import jakarta.servlet.ServletException
 import jakarta.servlet.http.HttpServletRequest
 import jakarta.servlet.http.HttpServletResponse
 import org.springframework.security.core.context.SecurityContextHolder
-import org.springframework.security.web.context.SecurityContextRepository
 import org.springframework.stereotype.Service
 import org.springframework.web.filter.OncePerRequestFilter
 import java.io.IOException
@@ -14,7 +13,6 @@ import java.io.IOException
 
 @Service
 class JwtTokenFilter(
-      private val contextRepo: SecurityContextRepository,
       private val jwtCredentialService: JwtCredentialService,
 ) : OncePerRequestFilter() {
 
@@ -32,7 +30,11 @@ class JwtTokenFilter(
                   if (accessToken != null) {
                         val claims = jwtCredentialService.decodeToken(accessToken)
                         val principal = JwtUser(claims)
-                        contextRepo.save(request, response, principal, accessToken)
+                        val context = SecurityContextHolder.createEmptyContext()
+                        val authentication = JwtUserAuthentication(principal, accessToken)
+                        context.authentication = authentication
+                        SecurityContextHolder.setContext(context)
+                        // NOTE: For token-based authentication, will not be saved into security context repository
                   }
                   filterChain.doFilter(request, response)
 
@@ -42,20 +44,4 @@ class JwtTokenFilter(
             }
       }
 
-}
-
-fun SecurityContextRepository.save(
-      request: HttpServletRequest,
-      response: HttpServletResponse,
-      principal: JwtUser,
-      accessToken: String
-) {
-      val context = SecurityContextHolder.createEmptyContext()
-      val authentication = JwtUserAuthentication(
-            principal,
-            accessToken
-      )
-      context.authentication = authentication
-      SecurityContextHolder.setContext(context)
-      saveContext(context, request, response)
 }

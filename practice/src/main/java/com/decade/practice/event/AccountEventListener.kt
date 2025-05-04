@@ -1,6 +1,6 @@
 package com.decade.practice.event
 
-import com.decade.practice.model.entity.User
+import com.decade.practice.model.domain.entity.User
 
 interface AccountEventListener {
 

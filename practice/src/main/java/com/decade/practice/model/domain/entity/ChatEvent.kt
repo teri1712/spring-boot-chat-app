@@ -1,7 +1,7 @@
-package com.decade.practice.model.entity
+package com.decade.practice.model.domain.entity
 
-import com.decade.practice.model.STARTING_VERSION
-import com.decade.practice.model.embeddable.ChatIdentifier
+import com.decade.practice.model.domain.STARTING_VERSION
+import com.decade.practice.model.domain.embeddable.ChatIdentifier
 import com.decade.practice.model.local.LocalChat
 import com.decade.practice.util.inspectPartner
 import com.fasterxml.jackson.annotation.*

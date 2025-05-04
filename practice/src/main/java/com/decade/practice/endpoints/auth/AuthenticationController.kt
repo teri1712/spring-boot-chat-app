@@ -4,12 +4,11 @@ import com.decade.practice.core.UserOperations
 import com.decade.practice.database.transaction.create
 import com.decade.practice.endpoints.validation.StrongPassword
 import com.decade.practice.image.ImageStore
-import com.decade.practice.model.DefaultAvatar
-import com.decade.practice.model.embeddable.ImageSpec
-import com.decade.practice.model.entity.User
+import com.decade.practice.model.domain.DefaultAvatar
+import com.decade.practice.model.domain.embeddable.ImageSpec
+import com.decade.practice.model.domain.entity.User
+import com.decade.practice.model.dto.SignUpRequest
 import com.decade.practice.security.TokenCredentialService
-import com.decade.practice.security.jwt.JwtUser
-import com.decade.practice.security.jwt.save
 import com.decade.practice.security.model.DaoUser
 import com.decade.practice.util.ImageUtils
 import com.decade.practice.util.TokenUtils
@@ -17,12 +16,8 @@ import com.fasterxml.jackson.databind.ObjectMapper
 import com.fasterxml.jackson.databind.SerializationFeature
 import jakarta.servlet.http.HttpServletRequest
 import jakarta.servlet.http.HttpServletResponse
-import jakarta.validation.constraints.NotBlank
-import jakarta.validation.constraints.Past
-import jakarta.validation.constraints.Pattern
-import jakarta.validation.constraints.Size
+import jakarta.validation.Valid
 import org.springframework.dao.DataIntegrityViolationException
-import org.springframework.format.annotation.DateTimeFormat
 import org.springframework.http.HttpStatus
 import org.springframework.http.MediaType
 import org.springframework.http.ResponseEntity
@@ -59,10 +54,7 @@ class AuthenticationController(
             credentialService.validate(refreshToken)
 
             val claims = credentialService.decodeToken(refreshToken)
-            val principal = JwtUser(claims)
-
             val credential = credentialService.create(claims, refreshToken)
-            contextRepo.save(request, response, principal, credential.accessToken)
 
             response.contentType = MediaType.APPLICATION_JSON_VALUE
             response.characterEncoding = Charsets.UTF_8.name()
@@ -79,29 +71,8 @@ class AuthenticationController(
       fun signUp(
             request: HttpServletRequest,
             response: HttpServletResponse,
-            @Size(
-                  min = MIN_USERNAME_LENGTH,
-                  max = MAX_USERNAME_LENGTH,
-                  message = "Username length must be between "
-                          + "$MIN_USERNAME_LENGTH and $MAX_USERNAME_LENGTH "
-                          + "characters"
-            )
-            @NotBlank(message = "Username must not be empty")
-            @Pattern(regexp = "\\S+", message = "Username must not contain spaces.")
-            @RequestPart username: String,
-
-            @StrongPassword
-            @RequestPart password: String,
-
-            @NotBlank
-            @RequestPart name: String,
-
-            @NotBlank
-            @RequestPart gender: String,
-
-            @Past @DateTimeFormat(iso = DateTimeFormat.ISO.DATE)
-            @RequestPart dob: Date,
-            @RequestPart("avatar", required = false) file: MultipartFile?,
+            @RequestPart("information") @Valid information: SignUpRequest,
+            @RequestPart("file", required = false) file: MultipartFile?,
       ): ResponseEntity<String> {
             val avatar: ImageSpec
             if (file != null) {
@@ -111,10 +82,17 @@ class AuthenticationController(
             }
 
             try {
-                  val user = userOperations.create(username, password, name, dob, gender, avatar)
+                  val user = userOperations.create(
+                        information.username,
+                        information.password,
+                        information.name,
+                        information.dob,
+                        information.gender,
+                        avatar
+                  )
                   val context = SecurityContextHolder.createEmptyContext()
                   context.authentication = UsernamePasswordAuthenticationToken(
-                        DaoUser(user), password,
+                        DaoUser(user), information.password,
                         listOf(SimpleGrantedAuthority("ROLE_USER"))
                   )
                   contextRepo.saveContext(context, request, response)
