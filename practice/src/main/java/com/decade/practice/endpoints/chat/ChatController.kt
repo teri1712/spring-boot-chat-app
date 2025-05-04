@@ -37,7 +37,9 @@ class ChatController(
             val me = userRepo.getByUsername(username)
             val chat = chatOperations.getOrCreateChat(identifier)
             val snapshot = chatOperations.getSnapshot(chat, me, atVersion ?: me.syncContext.eventVersion)
-            return ResponseEntity.ok().cacheControl(cacheControl).body(snapshot)
+            return ResponseEntity.ok().cacheControl(cacheControl)
+                  .varyBy("Cookie", "Authorization")
+                  .body(snapshot)
       }
 
       @GetMapping
@@ -54,6 +56,8 @@ class ChatController(
             val snapshotList = chatList.map { chat ->
                   chatOperations.getSnapshot(chat, owner, atVersion)
             }
-            return ResponseEntity.ok().cacheControl(cacheControl).body(snapshotList)
+            return ResponseEntity.ok().cacheControl(cacheControl)
+                  .varyBy("Cookie", "Authorization")
+                  .body(snapshotList)
       }
 }

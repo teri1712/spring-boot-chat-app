@@ -1,6 +1,7 @@
 package com.decade.practice
 
 import com.decade.practice.core.EventStore
+import com.decade.practice.core.OnlineStatistic
 import com.decade.practice.core.UserOperations
 import com.decade.practice.database.repository.UserRepository
 import com.decade.practice.model.domain.embeddable.ImageSpec
@@ -10,6 +11,7 @@ import com.decade.practice.model.domain.entity.TextEvent
 import org.springframework.boot.SpringApplication
 import org.springframework.boot.autoconfigure.SpringBootApplication
 import org.springframework.transaction.support.TransactionOperations
+import java.time.Instant
 import java.util.*
 
 
@@ -24,6 +26,7 @@ fun main(args: Array<String>) {
       val userRepo = context.getBean(UserRepository::class.java)
       val transactionOperations = context.getBean(TransactionOperations::class.java)
       val eventStore = context.getBean(EventStore::class.java)
+      val onlineStat = context.getBean(OnlineStatistic::class.java)
 
       transactionOperations.executeWithoutResult {
 
@@ -67,5 +70,8 @@ fun main(args: Array<String>) {
             eventStore.save(event = TextEvent(Chat(luffy, chopper), chopper, "Vcl").apply {
                   createdTime = System.currentTimeMillis() - 5 * 60 * 1000
             })
+
+            onlineStat.set(nami, Instant.now().epochSecond - 2 * 60)
+            onlineStat.set(chopper, Instant.now().epochSecond - 10 * 60)
       }
 }

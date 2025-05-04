@@ -126,6 +126,7 @@ class EventController(
                   .cachePublic()
             val events = evenRepo.findByOwnerAndChatAndEventVersionLessThanEqual(user, chat, atVersion, page)
             return ResponseEntity.ok()
+                  .varyBy("Cookie", "Authorization")
                   .cacheControl(cacheControl)
                   .body(events)
       }
@@ -143,6 +144,7 @@ class EventController(
                   .cachePublic()
             val eventList = evenRepo.findByOwnerAndEventVersionLessThanEqual(owner, atVersion, page)
             return ResponseEntity.ok()
+                  .varyBy("Cookie", "Authorization")
                   .cacheControl(cacheControl)
                   .body(eventList)
       }

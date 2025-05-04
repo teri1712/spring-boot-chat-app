@@ -1,8 +1,7 @@
 package com.decade.practice.websocket
 
-import com.decade.practice.database.repository.ChatRepository
+import com.decade.practice.core.ChatOperations
 import com.decade.practice.database.repository.UserRepository
-import com.decade.practice.database.repository.get
 import com.decade.practice.model.domain.TypeEvent
 import com.decade.practice.model.domain.embeddable.ChatIdentifier
 import com.decade.practice.model.domain.entity.Chat
@@ -30,7 +29,7 @@ private const val TYPE_KEYSPACE: String = "Typing"
 
 @Configuration
 @EnableCaching
-class CachingConfig {
+class CacheConfiguration {
 
       fun cacheManager(connectionFactory: RedisConnectionFactory, seconds: Long): CacheManager {
             return RedisCacheManager.builder(RedisCacheWriter.lockingRedisCacheWriter(connectionFactory))
@@ -60,7 +59,7 @@ class CachingConfig {
 @Component
 class WsCachedEntityRepository(
       private val userRepo: UserRepository,
-      private val chatRepo: ChatRepository
+      private val chatOperations: ChatOperations
 ) : WsEntityRepository {
 
       @Cacheable(
@@ -76,12 +75,12 @@ class WsCachedEntityRepository(
             key = "#id.toString()"
       )
       override fun getChat(id: ChatIdentifier): Chat =
-            chatRepo.get(id)
+            chatOperations.getOrCreateChat(id)
 
 
       @Cacheable(
             value = [TYPE_KEYSPACE],
-            key = "T(com.decade.practice.model.TypeEventKt).determineKey(#from,#chat)",
+            key = "T(com.decade.practice.model.domain.TypeEventKt).determineKey(#from,#chat)",
             cacheManager = TYPE_REPOSITORY_CACHE_MANAGER,
             unless = "#result == null"
       )
