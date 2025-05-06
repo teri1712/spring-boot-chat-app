@@ -8,16 +8,16 @@ import org.springframework.boot.test.autoconfigure.jdbc.AutoConfigureTestDatabas
 import org.springframework.boot.test.context.SpringBootTest;
 
 @SpringBootTest(
-    webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT,
-    properties = {
-        "spring.jpa.database=H2"})
+      webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT,
+      properties = {
+            "spring.jpa.database=H2"})
 @AutoConfigureTestDatabase(
-    connection = EmbeddedDatabaseConnection.H2
+      connection = EmbeddedDatabaseConnection.H2
 ) // or using autoconfigured embedded datasource.
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
 public class BootstrapTest {
 
-    @Test
-    public void contextLoads() {
-    }
+      @Test
+      public void given_application_when_contextLoads_then_startsSuccessfully() {
+      }
 }

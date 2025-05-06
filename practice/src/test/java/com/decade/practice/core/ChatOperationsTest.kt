@@ -49,7 +49,7 @@ class ChatOperationsTest {
       @Test
       @Rollback(false)
       @Order(1)
-      fun prepareUsers() {
+      fun prepare() {
             Mockito.`when`(encoder.encode(Mockito.anyString())).thenAnswer {
                   it.getArgument<String>(0)
             }
@@ -60,7 +60,7 @@ class ChatOperationsTest {
 
       @Test
       @Order(2)
-      fun Get_Or_Create_Chat_Transactional_Expected_Instance_Returned() {
+      fun given_twoUsers_when_getOrCreateChat_then_returnsChatInstance() {
             val chat = chatOperations.getOrCreateChat(first.id, second.id)
             Assertions.assertNotNull(chat.interactTime)
       }

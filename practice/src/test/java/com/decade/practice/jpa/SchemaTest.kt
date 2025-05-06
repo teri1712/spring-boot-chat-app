@@ -53,7 +53,7 @@ class SchemaTest {
       }
 
       @Test
-      fun Insert_Existing_User_Expect_Unique_Exception() {
+      fun given_duplicateUsername_when_insertingUser_then_throwsUniqueConstraintException() {
 //            Assertions.assertThrows(
 //                  ConstraintViolationException::class.java
 //            ) { entityManager.persistAndFlush(mockUser()) }

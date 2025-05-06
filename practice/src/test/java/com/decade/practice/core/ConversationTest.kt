@@ -93,7 +93,7 @@ class ConversationTest {
       }
 
       @BeforeEach
-      fun mock() {
+      fun prepare() {
             first = userRepo.getByUsername(first.username)
             second = userRepo.getByUsername(second.username)
             third = userRepo.getByUsername(third.username)
@@ -101,7 +101,7 @@ class ConversationTest {
 
 
       @Test
-      fun Adding_Record_Expect_Two_Edge_Created() {
+      fun given_newMessageBetweenUsers_when_eventSaved_then_createsEdgesAndUpdatesChatStats() {
             val event: ChatEvent = sendEvent(first, second, "Hello")
 
             Assertions.assertEquals(5, edgeRepo.count())
@@ -113,7 +113,7 @@ class ConversationTest {
       }
 
       @Test
-      fun Adding_Record_Expect_Chat_Order_Changed() {
+      fun given_multipleMessages_when_queryingChats_then_ordersByLatestActivity() {
             Assertions.assertEquals(3, chatRepo.count())
 
             sendEvent(first, second, "Hello")
