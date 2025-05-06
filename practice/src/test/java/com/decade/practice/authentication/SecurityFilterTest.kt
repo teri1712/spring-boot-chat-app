@@ -1,5 +1,6 @@
-package com.decade.practice
+package com.decade.practice.authentication
 
+import com.decade.practice.MockEndpoints
 import com.decade.practice.database.repository.UserRepository
 import com.decade.practice.database.transaction.ChatService
 import com.decade.practice.database.transaction.UserService
@@ -8,8 +9,8 @@ import com.decade.practice.security.*
 import com.decade.practice.security.jwt.JwtCredentialService
 import com.decade.practice.security.jwt.JwtTokenFilter
 import com.decade.practice.session.SessionConfiguration
-import com.decade.practice.util.TokenUtils.BEARER
-import com.decade.practice.util.TokenUtils.HEADER_NAME
+import com.decade.practice.util.TokenUtils
+import com.decade.practice.utils.ErrorMessageMatcher
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.TestInstance
@@ -74,7 +75,7 @@ class SecurityFilterTest {
 
       @Test
       @Throws(Exception::class)
-      fun Login_Will_Fail() {
+      fun given_nonExistentUsername_when_login_then_failsWithUnauthorized() {
             mockMvc.perform(SecurityMockMvcRequestBuilders.formLogin().user("vcl").password(PASSWORD))
                   .andExpect(MockMvcResultMatchers.status().isUnauthorized())
                   .andExpect(ErrorMessageMatcher.errorMessage("Username not found"))
@@ -82,14 +83,14 @@ class SecurityFilterTest {
 
       @Test
       @Throws(Exception::class)
-      fun Login_Success() {
+      fun given_validCredentials_when_login_then_succeeds() {
             mockMvc.perform(SecurityMockMvcRequestBuilders.formLogin().user(USERNAME).password(PASSWORD))
                   .andExpect(MockMvcResultMatchers.status().isOk())
       }
 
       @Test
       @Throws(Exception::class)
-      fun Login_With_Wrong_Password() {
+      fun given_validUsernameWithInvalidPassword_when_login_then_failsWithUnauthorized() {
             mockMvc.perform(
                   SecurityMockMvcRequestBuilders.formLogin()
                         .user(USERNAME)
@@ -101,13 +102,13 @@ class SecurityFilterTest {
 
       @Test
       @Throws(Exception::class)
-      fun Authenticated_With_JWT_Token() {
+      fun given_validJwtToken_when_requestProtectedResource_then_succeeds() {
             val user = userRepo.getByUsername(USERNAME)
             val accessToken = credentialService.create(user).accessToken
 
             mockMvc.perform(
                   MockMvcRequestBuilders.get("/mock")
-                        .header(HEADER_NAME, "$BEARER $accessToken")
+                        .header(TokenUtils.HEADER_NAME, "${TokenUtils.BEARER} $accessToken")
             )
                   .andExpect(MockMvcResultMatchers.status().isOk())
       }

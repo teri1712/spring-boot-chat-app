@@ -33,7 +33,7 @@ class UserControllerTest {
 
       @Test
       @DisplayName("POST /user/information - valid request should return 200 OK")
-      fun testUpdateInformationSuccess() {
+      fun given_validUserInformation_when_updateInformation_then_returnsSuccessWithUpdatedUser() {
             // Given
             val fakeUserId = UUID.randomUUID()
             val resultUser = User(
@@ -67,7 +67,7 @@ class UserControllerTest {
 
       @Test
       @DisplayName("POST /user/avatar - valid request should return 200 OK")
-      fun testUpdateAvatarSuccess() {
+      fun given_validAvatarData_when_updateAvatar_then_returnsSuccessWithUpdatedUser() {
             // Given
             val fakeUserId = UUID.randomUUID()
             val resultUser = User(

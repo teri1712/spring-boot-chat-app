@@ -34,10 +34,14 @@ import java.io.IOException
 import java.net.URI
 import java.util.*
 
-
+// Defines maximum and minimum length for usernames
 const val MAX_USERNAME_LENGTH = 20
 const val MIN_USERNAME_LENGTH = 5
 
+/**
+ * REST controller for handling authentication-related requests.
+ * Provides endpoints for refreshing tokens, signing up, and changing passwords.
+ */
 @RestController
 @RequestMapping("/authentication")
 class AuthenticationController(
@@ -47,15 +51,22 @@ class AuthenticationController(
       private val credentialService: TokenCredentialService,
 ) {
 
+      /**
+       * Refreshes an access token using a valid refresh token.
+       * Throws an exception if the refresh token is missing or invalid.
+       */
       @PostMapping("/refresh")
       fun refresh(request: HttpServletRequest, response: HttpServletResponse) {
             val refreshToken = TokenUtils.extractRefreshToken(request)
                   ?: throw AccessDeniedException("NO TOKEN REPRESENTED")
+            // Validate the provided refresh token
             credentialService.validate(refreshToken)
 
+            // Decode the token claims and create a new credential object
             val claims = credentialService.decodeToken(refreshToken)
             val credential = credentialService.create(claims, refreshToken)
 
+            // Write the new credential as JSON to the response
             response.contentType = MediaType.APPLICATION_JSON_VALUE
             response.characterEncoding = Charsets.UTF_8.name()
             response.writer.write(
@@ -65,6 +76,11 @@ class AuthenticationController(
             )
       }
 
+      /**
+       * Creates a new user account.
+       * If an avatar file is included, it will be stored using the ImageStore.
+       * Otherwise, a default avatar is used.
+       */
       @PostMapping("/sign-up")
       @PreAuthorize("isAnonymous()")
       @Throws(IOException::class)
@@ -74,14 +90,15 @@ class AuthenticationController(
             @RequestPart("information") @Valid information: SignUpRequest,
             @RequestPart("file", required = false) file: MultipartFile?,
       ): ResponseEntity<String> {
-            val avatar: ImageSpec
-            if (file != null) {
-                  avatar = imageStore.save(ImageUtils.crop(file.inputStream))
+            // Determine which avatar to use
+            val avatar: ImageSpec = if (file != null) {
+                  imageStore.save(ImageUtils.crop(file.inputStream))
             } else {
-                  avatar = DefaultAvatar
+                  DefaultAvatar
             }
 
-            try {
+            return try {
+                  // Create the user using the provided information
                   val user = userOperations.create(
                         information.username,
                         information.password,
@@ -90,6 +107,8 @@ class AuthenticationController(
                         information.gender,
                         avatar
                   )
+
+                  // Build and store an authentication token into the SecurityContext
                   val context = SecurityContextHolder.createEmptyContext()
                   context.authentication = UsernamePasswordAuthenticationToken(
                         DaoUser(user), information.password,
@@ -98,38 +117,45 @@ class AuthenticationController(
                   contextRepo.saveContext(context, request, response)
                   SecurityContextHolder.setContext(context)
 
-                  return ResponseEntity.ok().body("Account created")
+                  // Account creation was successful
+                  ResponseEntity.ok().body("Account created")
             } catch (e: Exception) {
                   e.printStackTrace()
+                  // Remove uploaded avatar if creation failed (unless using the default avatar)
                   if (avatar != DefaultAvatar)
                         imageStore.remove(URI(avatar.uri))
+
+                  // Handle the specific case of a username conflict
                   if (e is DataIntegrityViolationException) {
-                        return ResponseEntity.status(HttpStatus.CONFLICT.value()).body("Username exists")
+                        ResponseEntity.status(HttpStatus.CONFLICT.value()).body("Username exists")
                   } else {
+                        // Rethrow any other exception
                         throw e
                   }
             }
       }
 
-
+      /**
+       * Changes the current user's password.
+       * Requires a valid modifier token (refreshToken) and user must be authenticated.
+       */
       @PostMapping("/password")
-      @PreAuthorize(
-            "isAuthenticated()"
-      )
+      @PreAuthorize("isAuthenticated()")
       fun changePassword(
             request: HttpServletRequest,
             @AuthenticationPrincipal(expression = "id") idOptional: Optional<UUID>,
             @StrongPassword @RequestParam password: String
       ): ResponseEntity<User> {
+            // Retrieve the user ID from the authentication principal
             val id = idOptional.orElseThrow {
-                  // Only application's principals can modify the password
+                  // Ensures only real-application users can modify passwords
                   throw AccessDeniedException("Operation not supported")
             }
-            // Require a modifier token to modify the password
-            val refreshToken =
-                  TokenUtils.extractRefreshToken(request)
-                        ?: throw AccessDeniedException("Missing modifier token")
+            // Must have a valid modifier token to update the password
+            val refreshToken = TokenUtils.extractRefreshToken(request)
+                  ?: throw AccessDeniedException("Missing modifier token")
 
+            // Update the user's password
             val user: User = userOperations.update(id, password, refreshToken)
             return ResponseEntity.ok(user)
       }

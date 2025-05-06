@@ -8,14 +8,14 @@ import org.springframework.stereotype.Component
 
 @Component
 class WsDestinationsGuard : ChannelInterceptor {
-    override fun preSend(message: Message<*>, channel: MessageChannel): Message<*>? {
-        val destination = SimpMessageHeaderAccessor.getDestination(message.headers)
-            ?: return message
+      override fun preSend(message: Message<*>, channel: MessageChannel): Message<*>? {
+            val destination = SimpMessageHeaderAccessor.getDestination(message.headers)
+                  ?: return message
 
-        for (prefix in BROKER_DESTINATIONS)
-            if (destination.startsWith(prefix))
-                return null
+            for (prefix in BROKER_DESTINATIONS)
+                  if (destination.startsWith(prefix))
+                        return null
 
-        return message
-    }
+            return message
+      }
 }

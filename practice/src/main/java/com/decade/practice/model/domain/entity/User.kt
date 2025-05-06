@@ -65,10 +65,6 @@ open class User(
       // before cascading this child tables
       var syncContext: SyncContext = SyncContext(this)
 
-      // for invalidate tokens
-      @JsonIgnore
-      var passwordVersion = 0
-
 
       override fun equals(other: Any?): Boolean {
             if (this === other) return true

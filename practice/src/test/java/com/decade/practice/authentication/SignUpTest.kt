@@ -1,9 +1,8 @@
-package com.decade.practice.api
+package com.decade.practice.authentication
 
 import com.decade.practice.core.UserOperations
 import com.decade.practice.database.repository.UserRepository
 import com.decade.practice.database.transaction.UserService
-import com.decade.practice.database.transaction.create
 import com.decade.practice.endpoints.ExceptionControllerAdvice
 import com.decade.practice.endpoints.auth.AuthenticationController
 import com.decade.practice.endpoints.auth.MAX_USERNAME_LENGTH
@@ -11,34 +10,24 @@ import com.decade.practice.endpoints.auth.MIN_USERNAME_LENGTH
 import com.decade.practice.image.ImageStore
 import com.decade.practice.model.domain.embeddable.ImageSpec
 import com.decade.practice.model.domain.entity.User
-import com.decade.practice.model.domain.entity.WELCOME
-import com.decade.practice.model.local.AccountEntry
 import org.hamcrest.Matchers
-import org.junit.jupiter.api.*
+import org.junit.jupiter.api.BeforeEach
+import org.junit.jupiter.api.Test
+import org.junit.jupiter.api.TestInstance
 import org.junit.jupiter.api.extension.ExtendWith
 import org.mockito.Mockito
 import org.springframework.beans.factory.annotation.Autowired
-import org.springframework.boot.jdbc.EmbeddedDatabaseConnection
-import org.springframework.boot.test.autoconfigure.jdbc.AutoConfigureTestDatabase
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest
-import org.springframework.boot.test.context.SpringBootTest
 import org.springframework.boot.test.mock.mockito.MockBean
 import org.springframework.boot.test.system.OutputCaptureExtension
-import org.springframework.boot.test.web.server.LocalServerPort
 import org.springframework.context.annotation.Import
-import org.springframework.http.MediaType
 import org.springframework.mock.web.MockMultipartFile
 import org.springframework.security.crypto.password.PasswordEncoder
 import org.springframework.security.web.context.SecurityContextRepository
 import org.springframework.test.web.servlet.MockMvc
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders
 import org.springframework.test.web.servlet.result.MockMvcResultMatchers
-import org.springframework.util.LinkedMultiValueMap
-import org.springframework.util.MultiValueMap
-import org.springframework.web.client.HttpClientErrorException
-import org.springframework.web.client.RestClient
-import kotlin.test.assertNotNull
 
 @WebMvcTest(controllers = [AuthenticationController::class])
 @AutoConfigureMockMvc(addFilters = false)
@@ -95,7 +84,7 @@ class SignUpTest {
 
       @Test
       @Throws(Exception::class)
-      fun SignUp_Expect_Username_Validation_Non_Space_Error() {
+      fun given_usernameWithSpaces_when_signUp_then_returnsValidationError() {
             mockMvc.perform(
                   MockMvcRequestBuilders.multipart("/authentication/sign-up")
                         .file(MockMultipartFile("file", "filename.txt", "text/plain", "file content".toByteArray()))
@@ -114,7 +103,7 @@ class SignUpTest {
 
       @Test
       @Throws(Exception::class)
-      fun SignUp_Expect_Username_Validation_Length_Error() {
+      fun given_usernameTooShort_when_signUp_then_returnsLengthValidationError() {
             mockMvc.perform(
                   MockMvcRequestBuilders.multipart("/authentication/sign-up")
                         .file(MockMultipartFile("file", "filename.txt", "text/plain", "file content".toByteArray()))
@@ -133,7 +122,7 @@ class SignUpTest {
 
       @Test
       @Throws(Exception::class)
-      fun SignUp_Expect_Password_Validation_Error() {
+      fun given_weakPassword_when_signUp_then_returnsPasswordValidationError() {
             mockMvc.perform(
                   MockMvcRequestBuilders.multipart("/authentication/sign-up")
                         .file(MockMultipartFile("file", "filename.txt", "text/plain", "file content".toByteArray()))
@@ -150,7 +139,7 @@ class SignUpTest {
 
       @Test
       @Throws(Exception::class)
-      fun SignUp_Expect_Success() {
+      fun given_validSignupData_when_signUp_then_succeeds() {
             mockMvc.perform(
                   MockMvcRequestBuilders.multipart("/authentication/sign-up")
                         .file(MockMultipartFile("file", "filename.txt", "text/plain", "file content".toByteArray()))
@@ -162,86 +151,4 @@ class SignUpTest {
             )
                   .andExpect(MockMvcResultMatchers.status().isOk())
       }
-}
-
-
-@SpringBootTest(
-      webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT,
-      properties = ["spring.jpa.database=H2"]
-)
-@ExtendWith(
-      OutputCaptureExtension::class
-)
-@AutoConfigureTestDatabase(connection = EmbeddedDatabaseConnection.H2) // or using autoconfigured embedded datasource.
-@TestInstance(TestInstance.Lifecycle.PER_CLASS)
-class LoginTest {
-
-      @LocalServerPort
-      val port = 0
-
-      @Autowired
-      lateinit var userOperations: UserOperations
-
-      @Autowired
-      lateinit var passwordEncoder: PasswordEncoder
-
-      @Autowired
-      lateinit var userRepository: UserRepository
-
-      lateinit var user: User
-
-      lateinit var client: RestClient
-
-      @BeforeAll
-      fun setUp() {
-            user = userOperations.create("abc", "abc")
-      }
-
-
-      @Test
-      @Throws(Exception::class)
-      fun Login_With_Valid_Credential() {
-            client = RestClient.builder()
-                  .baseUrl("http://localhost:$port/login")
-                  .build()
-
-
-            val form: MultiValueMap<String, String> = LinkedMultiValueMap()
-            form.add("username", "abc")
-            form.add("password", "abc")
-
-            val received = client.post()
-                  .contentType(MediaType.APPLICATION_FORM_URLENCODED).body(form)
-                  .retrieve().body(AccountEntry::class.java)
-
-            assertNotNull(received)
-            assertNotNull(received.account)
-            assertNotNull(received.chatSnapshots)
-            assertNotNull(received.chatSnapshots.size == 1)
-            assertNotNull(received.chatSnapshots[0].eventList.size == 1)
-            assertNotNull(received.chatSnapshots[0].eventList[0].edges.size == 1)
-            assertNotNull(received.chatSnapshots[0].eventList[0].eventType == WELCOME)
-
-      }
-
-      @Test
-      @Throws(Exception::class)
-      fun Login_With_InValid_Credential() {
-
-            client = RestClient.builder()
-                  .baseUrl("http://localhost:$port/login")
-                  .build()
-
-
-            val form: MultiValueMap<String, String> = LinkedMultiValueMap()
-            form.add("username", "abc")
-            form.add("password", "zzz")
-
-            assertThrows<HttpClientErrorException.Unauthorized> {
-                  client.post()
-                        .contentType(MediaType.APPLICATION_FORM_URLENCODED).body(form)
-                        .retrieve().body(AccountEntry::class.java)
-            }
-      }
-
 }

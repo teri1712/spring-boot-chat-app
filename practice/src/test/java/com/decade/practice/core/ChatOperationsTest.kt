@@ -1,7 +1,5 @@
-package com.decade.practice.jpa
+package com.decade.practice.core
 
-import com.decade.practice.core.ChatOperations
-import com.decade.practice.core.UserOperations
 import com.decade.practice.database.DatabaseConfiguration
 import com.decade.practice.database.transaction.ChatService
 import com.decade.practice.database.transaction.UserService
