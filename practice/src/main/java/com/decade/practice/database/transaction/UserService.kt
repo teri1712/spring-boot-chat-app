@@ -1,6 +1,7 @@
 package com.decade.practice.database.transaction
 
 import com.decade.practice.core.UserOperations
+import com.decade.practice.core.common.SelfAwareBean
 import com.decade.practice.database.repository.AdminRepository
 import com.decade.practice.database.repository.UserRepository
 import com.decade.practice.database.repository.get
@@ -28,14 +29,17 @@ import org.springframework.transaction.support.TransactionSynchronizationManager
 import java.util.*
 
 @Service
-@Transactional(isolation = Isolation.READ_COMMITTED, propagation = Propagation.REQUIRES_NEW)
+@Transactional(
+      isolation = Isolation.READ_COMMITTED,
+      propagation = Propagation.REQUIRES_NEW
+)
 class UserService(
       private val userRepo: UserRepository,
       private val adminRepo: AdminRepository,
       private val encoder: PasswordEncoder,
       private val credentialService: TokenCredentialService,
       private val accountListeners: List<AccountEventListener>,
-) : UserOperations {
+) : SelfAwareBean(), UserOperations {
 
       @PersistenceContext
       private lateinit var em: EntityManager
@@ -76,6 +80,25 @@ class UserService(
                         }
                   })
             return user
+      }
+
+      override fun createOauth2User(
+            username: String,
+            name: String,
+            picture: String?
+      ): User? {
+            val password = UUID.randomUUID().toString()
+            val avatar = if (picture != null)
+                  ImageSpec(picture, picture)
+            else
+                  DefaultAvatar
+            return (self as UserService).create(
+                  username,
+                  password,
+                  name, Date(),
+                  MALE, avatar,
+                  false
+            )
       }
 
       @Throws(OptimisticLockException::class)
@@ -139,7 +162,15 @@ fun UserOperations.create(
       gender: String,
       avatar: ImageSpec
 ): User {
-      return create(username, password, name, dob, gender, avatar, false)
+      return create(
+            username,
+            password,
+            name,
+            dob,
+            gender,
+            avatar,
+            false
+      )
 }
 
 @Throws(DataIntegrityViolationException::class)
@@ -148,15 +179,13 @@ fun UserOperations.create(
       password: String,
       usernameAsIdentifier: Boolean = false
 ): User {
-      return create(username, password, username, Date(), MALE, DefaultAvatar, usernameAsIdentifier)
-}
-
-@Throws(DataIntegrityViolationException::class)
-fun UserOperations.createOauth2User(username: String, name: String, picture: String?): User {
-      val password = UUID.randomUUID().toString()
-      val avatar = if (picture != null)
-            ImageSpec(picture, picture)
-      else
-            DefaultAvatar
-      return create(username, password, name, Date(), MALE, avatar, false)
+      return create(
+            username,
+            password,
+            username,
+            Date(),
+            MALE,
+            DefaultAvatar,
+            usernameAsIdentifier
+      )
 }

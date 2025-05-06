@@ -1,4 +1,4 @@
-package com.decade.practice.endpoints.user
+package com.decade.practice.controllers
 
 import com.decade.practice.core.UserOperations
 import com.decade.practice.database.repository.UserRepository

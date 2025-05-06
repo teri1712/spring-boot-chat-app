@@ -1,4 +1,4 @@
-package com.decade.practice.endpoints.validation
+package com.decade.practice.controllers.validation
 
 import com.decade.practice.model.domain.embeddable.ChatIdentifier
 import org.springframework.validation.Errors

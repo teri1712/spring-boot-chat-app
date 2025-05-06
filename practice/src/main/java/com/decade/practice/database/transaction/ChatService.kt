@@ -1,7 +1,7 @@
 package com.decade.practice.database.transaction
 
 import com.decade.practice.core.ChatOperations
-import com.decade.practice.core.common.SelfAware
+import com.decade.practice.core.common.SelfAwareBean
 import com.decade.practice.database.repository.*
 import com.decade.practice.model.domain.ChatSnapshot
 import com.decade.practice.model.domain.embeddable.ChatIdentifier
@@ -23,7 +23,7 @@ class ChatService(
       private val eventRepo: EventRepository,
       private val edgeRepo: EdgeRepository,
       private val chatRepo: ChatRepository,
-) : SelfAware(), ChatOperations {
+) : SelfAwareBean(), ChatOperations {
 
       @PersistenceContext
       private lateinit var em: EntityManager

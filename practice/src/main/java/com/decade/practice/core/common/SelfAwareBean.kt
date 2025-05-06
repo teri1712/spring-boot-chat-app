@@ -4,7 +4,8 @@ import org.springframework.beans.BeansException
 import org.springframework.context.ApplicationContext
 import org.springframework.context.ApplicationContextAware
 
-open class SelfAware : ApplicationContextAware {
+// FOR AOP's drawback
+open class SelfAwareBean : ApplicationContextAware {
       private lateinit var appCtx: ApplicationContext
 
       @Throws(BeansException::class)
@@ -13,7 +14,7 @@ open class SelfAware : ApplicationContextAware {
       }
 
       @Volatile
-      protected var self: SelfAware? = null
+      protected var self: SelfAwareBean? = null
             get() {
                   if (field == null) {
                         synchronized(this) {

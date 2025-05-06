@@ -1,6 +1,6 @@
 package com.decade.practice.websocket
 
-import com.decade.practice.endpoints.extractChatIdentifier
+import com.decade.practice.controllers.extractChatIdentifier
 import com.decade.practice.model.domain.embeddable.ChatIdentifier
 import com.decade.practice.model.domain.entity.Chat
 import com.decade.practice.model.domain.entity.User

@@ -1,4 +1,4 @@
-package com.decade.practice.endpoints.chat
+package com.decade.practice.controllers
 
 import com.decade.practice.core.ChatOperations
 import com.decade.practice.core.OnlineStatistic

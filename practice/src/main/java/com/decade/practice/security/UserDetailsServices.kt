@@ -2,7 +2,6 @@ package com.decade.practice.security
 
 import com.decade.practice.core.UserOperations
 import com.decade.practice.database.repository.UserRepository
-import com.decade.practice.database.transaction.createOauth2User
 import com.decade.practice.security.model.DaoUser
 import org.springframework.dao.DataIntegrityViolationException
 import org.springframework.security.core.userdetails.UserDetails

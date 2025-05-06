@@ -21,6 +21,8 @@ public interface UserOperations {
                   ImageSpec avatar,
                   boolean usernameAsIdentifier) throws DataIntegrityViolationException;
 
+      User createOauth2User(String username, String name, String picture) throws DataIntegrityViolationException;
+
       User update(UUID id, String name, Date birthday, String gender);
 
       User update(UUID id, ImageSpec avatar);

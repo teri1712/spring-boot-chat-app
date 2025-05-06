@@ -1,8 +1,8 @@
-package com.decade.practice.endpoints.auth
+package com.decade.practice.controllers
 
+import com.decade.practice.controllers.validation.StrongPassword
 import com.decade.practice.core.UserOperations
 import com.decade.practice.database.transaction.create
-import com.decade.practice.endpoints.validation.StrongPassword
 import com.decade.practice.image.ImageStore
 import com.decade.practice.model.domain.DefaultAvatar
 import com.decade.practice.model.domain.embeddable.ImageSpec

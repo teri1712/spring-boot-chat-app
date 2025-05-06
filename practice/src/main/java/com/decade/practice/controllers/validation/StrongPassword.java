@@ -1,4 +1,4 @@
-package com.decade.practice.endpoints.validation;
+package com.decade.practice.controllers.validation;
 
 import jakarta.validation.Constraint;
 import jakarta.validation.Payload;
@@ -12,9 +12,9 @@ import java.lang.annotation.Target;
 @Target({ElementType.FIELD, ElementType.METHOD, ElementType.PARAMETER})
 @Retention(RetentionPolicy.RUNTIME)
 public @interface StrongPassword {
-    String message() default "Password too weak";
+      String message() default "Password too weak";
 
-    Class<?>[] groups() default {};
+      Class<?>[] groups() default {};
 
-    Class<? extends Payload>[] payload() default {};
+      Class<? extends Payload>[] payload() default {};
 }

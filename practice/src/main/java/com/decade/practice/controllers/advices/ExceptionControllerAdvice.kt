@@ -1,7 +1,5 @@
-package com.decade.practice.endpoints
+package com.decade.practice.controllers.advices
 
-import com.decade.practice.endpoints.validation.ChatIdentifierValidator
-import com.decade.practice.model.domain.embeddable.ChatIdentifier
 import jakarta.persistence.EntityNotFoundException
 import jakarta.persistence.OptimisticLockException
 import org.springframework.http.HttpHeaders
@@ -10,11 +8,13 @@ import org.springframework.http.HttpStatusCode
 import org.springframework.http.ResponseEntity
 import org.springframework.messaging.handler.annotation.MessageExceptionHandler
 import org.springframework.web.bind.MethodArgumentNotValidException
-import org.springframework.web.bind.WebDataBinder
-import org.springframework.web.bind.annotation.*
+import org.springframework.web.bind.annotation.ExceptionHandler
+import org.springframework.web.bind.annotation.ResponseStatus
+import org.springframework.web.bind.annotation.RestControllerAdvice
 import org.springframework.web.context.request.WebRequest
 import org.springframework.web.method.annotation.HandlerMethodValidationException
 import org.springframework.web.servlet.mvc.method.annotation.ResponseEntityExceptionHandler
+
 
 @RestControllerAdvice
 class ExceptionControllerAdvice : ResponseEntityExceptionHandler() {
@@ -64,14 +64,5 @@ class ExceptionControllerAdvice : ResponseEntityExceptionHandler() {
             request: WebRequest
       ): ResponseEntity<Any> {
             return ResponseEntity.badRequest().body(ex.message)
-      }
-}
-
-@ControllerAdvice
-class ValidationAdvice {
-      @InitBinder
-      protected fun initBinder(binder: WebDataBinder) {
-            if (binder.target is ChatIdentifier)
-                  binder.addValidators(ChatIdentifierValidator())
       }
 }

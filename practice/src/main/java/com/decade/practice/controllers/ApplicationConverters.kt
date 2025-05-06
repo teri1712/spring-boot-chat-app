@@ -1,4 +1,4 @@
-package com.decade.practice.endpoints
+package com.decade.practice.controllers
 
 import com.decade.practice.model.domain.embeddable.ChatIdentifier
 import org.springframework.context.annotation.Configuration

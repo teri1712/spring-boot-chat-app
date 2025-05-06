@@ -1,12 +1,12 @@
 package com.decade.practice.authentication
 
+import com.decade.practice.controllers.AuthenticationController
+import com.decade.practice.controllers.MAX_USERNAME_LENGTH
+import com.decade.practice.controllers.MIN_USERNAME_LENGTH
+import com.decade.practice.controllers.advices.ExceptionControllerAdvice
 import com.decade.practice.core.UserOperations
 import com.decade.practice.database.repository.UserRepository
 import com.decade.practice.database.transaction.UserService
-import com.decade.practice.endpoints.ExceptionControllerAdvice
-import com.decade.practice.endpoints.auth.AuthenticationController
-import com.decade.practice.endpoints.auth.MAX_USERNAME_LENGTH
-import com.decade.practice.endpoints.auth.MIN_USERNAME_LENGTH
 import com.decade.practice.image.ImageStore
 import com.decade.practice.model.domain.embeddable.ImageSpec
 import com.decade.practice.model.domain.entity.User

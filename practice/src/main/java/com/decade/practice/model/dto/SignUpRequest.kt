@@ -1,8 +1,8 @@
 package com.decade.practice.model.dto
 
-import com.decade.practice.endpoints.auth.MAX_USERNAME_LENGTH
-import com.decade.practice.endpoints.auth.MIN_USERNAME_LENGTH
-import com.decade.practice.endpoints.validation.StrongPassword
+import com.decade.practice.controllers.MAX_USERNAME_LENGTH
+import com.decade.practice.controllers.MIN_USERNAME_LENGTH
+import com.decade.practice.controllers.validation.StrongPassword
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize
 import jakarta.validation.constraints.NotBlank
 import jakarta.validation.constraints.Past
