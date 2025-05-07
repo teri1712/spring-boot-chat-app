@@ -4,8 +4,8 @@ import com.decade.practice.core.UserOperations
 import com.decade.practice.database.transaction.create
 import com.decade.practice.model.domain.entity.*
 import com.decade.practice.security.jwt.JwtCredentialService
-import com.decade.practice.util.TokenUtils.BEARER
-import com.decade.practice.util.TokenUtils.HEADER_NAME
+import com.decade.practice.utils.TokenUtils.BEARER
+import com.decade.practice.utils.TokenUtils.HEADER_NAME
 import com.decade.practice.websocket.HANDSHAKE_DESTINATION
 import com.decade.practice.websocket.USER_QUEUE_DESTINATION
 import org.junit.jupiter.api.*

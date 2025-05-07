@@ -1,4 +1,4 @@
-package com.decade.practice.util
+package com.decade.practice.utils
 
 import com.decade.practice.model.domain.embeddable.ImageSpec.Companion.DEFAULT_HEIGHT
 import com.decade.practice.model.domain.embeddable.ImageSpec.Companion.DEFAULT_WIDTH

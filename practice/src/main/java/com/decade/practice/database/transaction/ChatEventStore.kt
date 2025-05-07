@@ -4,8 +4,8 @@ import com.decade.practice.core.ChatOperations
 import com.decade.practice.core.EventStore
 import com.decade.practice.model.domain.entity.ChatEvent
 import com.decade.practice.model.domain.entity.isMessage
-import com.decade.practice.util.inspectOwner
-import com.decade.practice.util.inspectPartner
+import com.decade.practice.utils.inspectOwner
+import com.decade.practice.utils.inspectPartner
 import jakarta.persistence.EntityManager
 import jakarta.persistence.LockModeType
 import jakarta.persistence.PersistenceContext

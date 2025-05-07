@@ -1,6 +1,7 @@
 package com.decade.practice.controllers
 
 import com.decade.practice.controllers.validation.StrongPassword
+import com.decade.practice.core.TokenCredentialService
 import com.decade.practice.core.UserOperations
 import com.decade.practice.database.transaction.create
 import com.decade.practice.image.ImageStore
@@ -8,10 +9,9 @@ import com.decade.practice.model.domain.DefaultAvatar
 import com.decade.practice.model.domain.embeddable.ImageSpec
 import com.decade.practice.model.domain.entity.User
 import com.decade.practice.model.dto.SignUpRequest
-import com.decade.practice.security.TokenCredentialService
 import com.decade.practice.security.model.DaoUser
-import com.decade.practice.util.ImageUtils
-import com.decade.practice.util.TokenUtils
+import com.decade.practice.utils.ImageUtils
+import com.decade.practice.utils.TokenUtils
 import com.fasterxml.jackson.databind.ObjectMapper
 import com.fasterxml.jackson.databind.SerializationFeature
 import jakarta.servlet.http.HttpServletRequest

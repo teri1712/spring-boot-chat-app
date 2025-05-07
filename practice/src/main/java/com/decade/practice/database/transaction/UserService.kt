@@ -1,5 +1,6 @@
 package com.decade.practice.database.transaction
 
+import com.decade.practice.core.TokenCredentialService
 import com.decade.practice.core.UserOperations
 import com.decade.practice.core.common.SelfAwareBean
 import com.decade.practice.database.repository.AdminRepository
@@ -10,7 +11,6 @@ import com.decade.practice.model.domain.DefaultAvatar
 import com.decade.practice.model.domain.embeddable.ImageSpec
 import com.decade.practice.model.domain.entity.*
 import com.decade.practice.model.local.Account
-import com.decade.practice.security.TokenCredentialService
 import jakarta.persistence.EntityManager
 import jakarta.persistence.OptimisticLockException
 import jakarta.persistence.PersistenceContext

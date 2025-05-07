@@ -2,7 +2,7 @@ package com.decade.practice.model.local
 
 import com.decade.practice.model.domain.entity.Chat
 import com.decade.practice.model.domain.entity.User
-import com.decade.practice.util.inspectPartner
+import com.decade.practice.utils.inspectPartner
 
 
 data class Conversation(

@@ -1,4 +1,4 @@
-package com.decade.practice.util
+package com.decade.practice.utils
 
 import org.springframework.data.domain.PageRequest
 import org.springframework.data.domain.Sort

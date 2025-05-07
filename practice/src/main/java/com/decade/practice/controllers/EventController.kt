@@ -10,14 +10,14 @@ import com.decade.practice.model.domain.embeddable.ChatIdentifier
 import com.decade.practice.model.domain.embeddable.ImageSpec.Companion.DEFAULT_HEIGHT
 import com.decade.practice.model.domain.embeddable.ImageSpec.Companion.DEFAULT_WIDTH
 import com.decade.practice.model.domain.entity.*
-import com.decade.practice.util.EventPageUtils
-import com.decade.practice.util.ImageUtils
-import com.decade.practice.util.inspectOwner
+import com.decade.practice.utils.CacheUtils.defaultCacheControl
+import com.decade.practice.utils.EventPageUtils.pageEvent
+import com.decade.practice.utils.ImageUtils
+import com.decade.practice.utils.inspectOwner
 import com.decade.practice.websocket.MQ_DESTINATION
 import jakarta.persistence.EntityNotFoundException
 import jakarta.validation.Valid
 import org.springframework.dao.DataIntegrityViolationException
-import org.springframework.http.CacheControl
 import org.springframework.http.ResponseEntity
 import org.springframework.messaging.simp.SimpMessagingTemplate
 import org.springframework.security.core.annotation.AuthenticationPrincipal
@@ -26,7 +26,6 @@ import org.springframework.web.bind.annotation.*
 import org.springframework.web.multipart.MultipartFile
 import java.io.IOException
 import java.net.URI
-import java.util.concurrent.TimeUnit
 import kotlin.math.min
 
 
@@ -121,10 +120,8 @@ class EventController(
 
             val chat = chatOperations.getOrCreateChat(identifier)
             val user = chat.inspectOwner(username)
-            val page = EventPageUtils.pageEvent
-            val cacheControl = CacheControl.maxAge(30, TimeUnit.DAYS)
-                  .cachePublic()
-            val events = evenRepo.findByOwnerAndChatAndEventVersionLessThanEqual(user, chat, atVersion, page)
+            val cacheControl = defaultCacheControl
+            val events = evenRepo.findByOwnerAndChatAndEventVersionLessThanEqual(user, chat, atVersion, pageEvent)
             return ResponseEntity.ok()
                   .varyBy("Cookie", "Authorization")
                   .cacheControl(cacheControl)
@@ -139,10 +136,8 @@ class EventController(
       ): ResponseEntity<List<ChatEvent>> {
 
             val owner = userRepo.getByUsername(username)
-            val page = EventPageUtils.pageEvent
-            val cacheControl = CacheControl.maxAge(30, TimeUnit.DAYS)
-                  .cachePublic()
-            val eventList = evenRepo.findByOwnerAndEventVersionLessThanEqual(owner, atVersion, page)
+            val cacheControl = defaultCacheControl
+            val eventList = evenRepo.findByOwnerAndEventVersionLessThanEqual(owner, atVersion, pageEvent)
             return ResponseEntity.ok()
                   .varyBy("Cookie", "Authorization")
                   .cacheControl(cacheControl)

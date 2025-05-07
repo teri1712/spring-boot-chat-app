@@ -1,9 +1,9 @@
 package com.decade.practice.session
 
+import com.decade.practice.core.TokenCredentialService
 import com.decade.practice.event.AccountEventListener
 import com.decade.practice.model.domain.entity.User
-import com.decade.practice.security.TokenCredentialService
-import com.decade.practice.util.TokenUtils
+import com.decade.practice.utils.TokenUtils
 import jakarta.servlet.http.HttpServletRequest
 import org.springframework.security.core.context.SecurityContextHolder
 import org.springframework.security.core.session.SessionRegistry

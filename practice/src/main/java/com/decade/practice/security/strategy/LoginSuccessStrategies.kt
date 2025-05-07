@@ -1,4 +1,4 @@
-package com.decade.practice.security
+package com.decade.practice.security.strategy
 
 import com.decade.practice.core.ChatOperations
 import com.decade.practice.core.UserOperations

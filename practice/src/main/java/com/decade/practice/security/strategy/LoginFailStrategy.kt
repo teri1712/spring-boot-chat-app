@@ -1,4 +1,4 @@
-package com.decade.practice.security
+package com.decade.practice.security.strategy
 
 import jakarta.servlet.http.HttpServletRequest
 import jakarta.servlet.http.HttpServletResponse

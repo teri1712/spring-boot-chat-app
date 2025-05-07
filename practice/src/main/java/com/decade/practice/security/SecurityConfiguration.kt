@@ -2,6 +2,10 @@ package com.decade.practice.security
 
 import com.decade.practice.core.UserOperations
 import com.decade.practice.security.jwt.JwtTokenFilter
+import com.decade.practice.security.strategy.LoginFailStrategy
+import com.decade.practice.security.strategy.LoginSuccessStrategy
+import com.decade.practice.security.strategy.LogoutStrategy
+import com.decade.practice.security.strategy.Oauth2LoginSuccessStrategy
 import org.springframework.beans.BeansException
 import org.springframework.beans.factory.config.BeanPostProcessor
 import org.springframework.context.annotation.Bean

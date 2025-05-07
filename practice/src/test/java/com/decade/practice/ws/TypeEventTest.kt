@@ -8,8 +8,8 @@ import com.decade.practice.model.domain.embeddable.ChatIdentifier
 import com.decade.practice.model.domain.entity.Chat
 import com.decade.practice.model.domain.entity.User
 import com.decade.practice.security.jwt.JwtCredentialService
-import com.decade.practice.util.TokenUtils.BEARER
-import com.decade.practice.util.TokenUtils.HEADER_NAME
+import com.decade.practice.utils.TokenUtils.BEARER
+import com.decade.practice.utils.TokenUtils.HEADER_NAME
 import com.decade.practice.websocket.CHAT_HEADER
 import com.decade.practice.websocket.HANDSHAKE_DESTINATION
 import com.decade.practice.websocket.TYPING_DESTINATION

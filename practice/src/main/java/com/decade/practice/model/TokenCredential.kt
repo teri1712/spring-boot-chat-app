@@ -1,8 +1,7 @@
-package com.decade.practice.security.model
+package com.decade.practice.model
 
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize
 import com.fasterxml.jackson.databind.annotation.JsonSerialize
-
 
 @JsonDeserialize
 @JsonSerialize

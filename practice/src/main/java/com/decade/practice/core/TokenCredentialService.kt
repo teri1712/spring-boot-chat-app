@@ -1,7 +1,7 @@
-package com.decade.practice.security
+package com.decade.practice.core
 
+import com.decade.practice.model.TokenCredential
 import com.decade.practice.model.domain.entity.User
-import com.decade.practice.security.model.TokenCredential
 import com.decade.practice.security.model.UserClaims
 import org.springframework.security.access.AccessDeniedException
 

@@ -1,11 +1,7 @@
-package com.decade.practice.controllers
+package com.decade.practice.controllers.converters
 
 import com.decade.practice.model.domain.embeddable.ChatIdentifier
-import org.springframework.context.annotation.Configuration
 import org.springframework.core.convert.converter.Converter
-import org.springframework.format.FormatterRegistry
-import org.springframework.web.servlet.config.annotation.CorsRegistry
-import org.springframework.web.servlet.config.annotation.WebMvcConfigurer
 import java.util.*
 
 fun String.extractChatIdentifier(): ChatIdentifier {
@@ -20,16 +16,4 @@ fun String.extractChatIdentifier(): ChatIdentifier {
 
 class ChatIdentifierConverter : Converter<String, ChatIdentifier> {
       override fun convert(source: String): ChatIdentifier = source.extractChatIdentifier()
-}
-
-
-@Configuration
-class WebConfiguration : WebMvcConfigurer {
-      override fun addFormatters(registry: FormatterRegistry) {
-            registry.addConverter(ChatIdentifierConverter())
-      }
-
-      override fun addCorsMappings(registry: CorsRegistry) {
-            super.addCorsMappings(registry)
-      }
 }

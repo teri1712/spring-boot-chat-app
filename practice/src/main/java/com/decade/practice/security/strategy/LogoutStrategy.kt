@@ -1,6 +1,7 @@
-package com.decade.practice.security
+package com.decade.practice.security.strategy
 
-import com.decade.practice.util.TokenUtils
+import com.decade.practice.core.TokenCredentialService
+import com.decade.practice.utils.TokenUtils
 import jakarta.servlet.http.HttpServletRequest
 import jakarta.servlet.http.HttpServletResponse
 import org.springframework.security.core.Authentication

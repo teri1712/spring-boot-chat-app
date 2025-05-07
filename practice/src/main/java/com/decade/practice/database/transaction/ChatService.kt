@@ -8,7 +8,7 @@ import com.decade.practice.model.domain.embeddable.ChatIdentifier
 import com.decade.practice.model.domain.entity.Chat
 import com.decade.practice.model.domain.entity.User
 import com.decade.practice.model.local.Conversation
-import com.decade.practice.util.EventPageUtils
+import com.decade.practice.utils.EventPageUtils
 import jakarta.persistence.EntityManager
 import jakarta.persistence.PersistenceContext
 import org.hibernate.exception.ConstraintViolationException

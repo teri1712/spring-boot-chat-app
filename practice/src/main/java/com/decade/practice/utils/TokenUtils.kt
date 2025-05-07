@@ -1,4 +1,4 @@
-package com.decade.practice.util
+package com.decade.practice.utils
 
 import jakarta.servlet.http.HttpServletRequest
 

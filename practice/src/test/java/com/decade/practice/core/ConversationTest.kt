@@ -11,7 +11,7 @@ import com.decade.practice.model.domain.entity.Chat
 import com.decade.practice.model.domain.entity.ChatEvent
 import com.decade.practice.model.domain.entity.TextEvent
 import com.decade.practice.model.domain.entity.User
-import com.decade.practice.util.inspectPartner
+import com.decade.practice.utils.inspectPartner
 import org.junit.jupiter.api.*
 import org.junit.jupiter.api.extension.ExtendWith
 import org.mockito.Mockito

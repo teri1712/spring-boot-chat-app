@@ -1,6 +1,6 @@
 package com.decade.practice.session
 
-import com.decade.practice.security.TokenCredentialService
+import com.decade.practice.core.TokenCredentialService
 import org.springframework.context.annotation.Bean
 import org.springframework.context.annotation.Configuration
 import org.springframework.context.event.GenericApplicationListenerAdapter
@@ -30,6 +30,20 @@ class SessionConfiguration {
             delegating.addListener(GenericApplicationListenerAdapter(registry))
             return registry
       }
+
+      /**
+       * Creates a listener for password change events that invalidates sessions.
+       *
+       * When a user changes their password, this component ensures that:
+       * - All other sessions for that user are terminated
+       * - Token credentials are properly managed during the password change process
+       * - Only the current session remains valid after a password change
+       *
+       * @param sessionRepository Repository for accessing and manipulating sessions
+       * @param sessionRegistry Registry of active sessions in the application
+       * @param credentialService Service for managing token-based credentials
+       * @return PasswordChangeSessionInvalidator instance
+       */
 
       @Bean
       fun passwordChangeRemoveSessionsAccountListener(

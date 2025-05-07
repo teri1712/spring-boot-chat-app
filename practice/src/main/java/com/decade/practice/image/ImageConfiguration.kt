@@ -1,13 +1,13 @@
 package com.decade.practice.image
 
 import com.decade.practice.model.domain.embeddable.ImageSpec
+import com.decade.practice.utils.CacheUtils.defaultCacheControl
 import jakarta.servlet.http.HttpServletRequest
 import org.springframework.beans.factory.annotation.Qualifier
 import org.springframework.context.annotation.Bean
 import org.springframework.context.annotation.Configuration
 import org.springframework.core.io.Resource
 import org.springframework.core.io.UrlResource
-import org.springframework.http.CacheControl
 import org.springframework.http.MediaType
 import org.springframework.http.ResponseEntity
 import org.springframework.web.bind.annotation.GetMapping
@@ -23,7 +23,6 @@ import java.net.URI
 import java.net.URL
 import java.nio.file.Paths
 import java.util.*
-import java.util.concurrent.TimeUnit
 import javax.imageio.ImageIO
 
 private const val fileSystemImageStore = "fileSystemImageStore"
@@ -111,8 +110,7 @@ class ImageController(
                   val queryString = request.queryString
                   val uri = URL("$requestURL?$queryString").toURI()
                   val resource = store.read(uri)
-                  val cacheControl = CacheControl.maxAge(30, TimeUnit.DAYS)
-                        .cachePublic()
+                  val cacheControl = defaultCacheControl
 
                   return ResponseEntity.ok()
                         .cacheControl(cacheControl)

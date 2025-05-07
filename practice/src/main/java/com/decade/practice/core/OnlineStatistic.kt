@@ -1,7 +1,7 @@
 package com.decade.practice.core
 
+import com.decade.practice.model.OnlineStatus
 import com.decade.practice.model.domain.entity.User
-import com.decade.practice.online.model.OnlineStatus
 import java.time.Instant
 
 interface OnlineStatistic {

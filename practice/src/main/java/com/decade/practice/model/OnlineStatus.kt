@@ -1,4 +1,4 @@
-package com.decade.practice.online.model
+package com.decade.practice.model
 
 import com.decade.practice.model.domain.entity.User
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize

@@ -6,7 +6,7 @@ import com.decade.practice.image.ImageStore
 import com.decade.practice.model.domain.entity.User
 import com.decade.practice.model.local.Account
 import com.decade.practice.model.local.AccountEntry
-import com.decade.practice.util.ImageUtils
+import com.decade.practice.utils.ImageUtils
 import jakarta.persistence.OptimisticLockException
 import jakarta.validation.constraints.NotEmpty
 import jakarta.validation.constraints.Past

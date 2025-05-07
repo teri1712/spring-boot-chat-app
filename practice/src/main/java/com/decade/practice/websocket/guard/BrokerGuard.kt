@@ -1,5 +1,6 @@
-package com.decade.practice.websocket
+package com.decade.practice.websocket.guard
 
+import com.decade.practice.websocket.BROKER_DESTINATIONS
 import org.springframework.messaging.Message
 import org.springframework.messaging.MessageChannel
 import org.springframework.messaging.simp.SimpMessageHeaderAccessor
@@ -7,7 +8,7 @@ import org.springframework.messaging.support.ChannelInterceptor
 import org.springframework.stereotype.Component
 
 @Component
-class WsDestinationsGuard : ChannelInterceptor {
+class BrokerGuard : ChannelInterceptor {
       override fun preSend(message: Message<*>, channel: MessageChannel): Message<*>? {
             val destination = SimpMessageHeaderAccessor.getDestination(message.headers)
                   ?: return message
