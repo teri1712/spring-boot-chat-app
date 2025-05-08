@@ -3,6 +3,8 @@ package com.decade.practice.utils;
 import org.springframework.test.web.servlet.MvcResult;
 import org.springframework.test.web.servlet.ResultMatcher;
 
+import java.util.TreeSet;
+
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
 public class ErrorMessageMatcher implements ResultMatcher {
@@ -18,6 +20,7 @@ public class ErrorMessageMatcher implements ResultMatcher {
       }
 
       public static ErrorMessageMatcher errorMessage(String errorMessage) {
+            TreeSet<Integer> set = new TreeSet<>();
             return new ErrorMessageMatcher(errorMessage);
       }
 }

@@ -148,9 +148,8 @@ class SecurityConfiguration : GlobalAuthenticationConfigurerAdapter() {
                   }
                   .oauth2Client { }
                   .oauth2ResourceServer { oauth2 ->
-                        oauth2.bearerTokenResolver(HeaderBearerTokenResolver("Oauth2-AccessToken"))
-                        oauth2.jwt {
-                        }
+                        oauth2.bearerTokenResolver(HeaderBearerTokenResolver("Oauth2-Token"))
+                        oauth2.jwt { }
                   }
                   .sessionManagement { session ->
                         session

@@ -27,6 +27,7 @@ import org.springframework.security.authentication.UsernamePasswordAuthenticatio
 import org.springframework.security.core.annotation.AuthenticationPrincipal
 import org.springframework.security.core.authority.SimpleGrantedAuthority
 import org.springframework.security.core.context.SecurityContextHolder
+import org.springframework.security.oauth2.jwt.Jwt
 import org.springframework.security.web.context.SecurityContextRepository
 import org.springframework.web.bind.annotation.*
 import org.springframework.web.multipart.MultipartFile
@@ -50,6 +51,29 @@ class AuthenticationController(
       private val imageStore: ImageStore,
       private val credentialService: TokenCredentialService,
 ) {
+      /**
+       * Handles OAuth2 authentication exchange.
+       * Creates or finds a user based on the JWT claims from the OAuth2 provider,
+       * then redirects to the account endpoint to get the AccountEntry.
+       */
+      @PostMapping("/oauth2")
+      fun exchange(@AuthenticationPrincipal jwt: Jwt, response: HttpServletResponse) {
+            // Use jwt sub as username
+            val username = jwt.subject
+
+            // Extract the user's name and picture from the JWT claims
+            val claims = jwt.claims
+            val name = claims["name"].toString()
+            val picture = claims["picture"].toString()
+            try {
+                  // Create the user based on the provided username
+                  userOperations.createOauth2User(username, name, picture)
+            } catch (ignored: DataIntegrityViolationException) {
+            }
+
+            // Redirect to the account endpoint to get the AccountEntry
+            response.sendRedirect("/account")
+      }
 
       /**
        * Refreshes an access token using a valid refresh token.

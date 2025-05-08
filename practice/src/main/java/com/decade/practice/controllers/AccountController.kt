@@ -50,7 +50,7 @@ class AccountController(
 
       @PostMapping("/information")
       @Throws(OptimisticLockException::class)
-      fun updateInformation(
+      fun modifyInformation(
             @AuthenticationPrincipal(expression = "id") idOptional: Optional<UUID>,
             @Size(min = 4, max = 100, message = "Name length must be between 4-100")
             @RequestParam name: String,
@@ -68,7 +68,7 @@ class AccountController(
 
       @PostMapping("/avatar")
       @Throws(IOException::class, OptimisticLockException::class)
-      fun updateAvatar(
+      fun modifyAvatar(
             @AuthenticationPrincipal(expression = "id") idOptional: Optional<UUID>,
             @RequestParam file: MultipartFile
       ): ResponseEntity<User> {
