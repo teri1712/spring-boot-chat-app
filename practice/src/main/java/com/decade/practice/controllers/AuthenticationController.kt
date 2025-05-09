@@ -57,7 +57,11 @@ class AuthenticationController(
        * then redirects to the account endpoint to get the AccountEntry.
        */
       @PostMapping("/oauth2")
-      fun exchange(@AuthenticationPrincipal jwt: Jwt, response: HttpServletResponse) {
+      fun exchange(
+            @AuthenticationPrincipal jwt: Jwt,
+            request: HttpServletRequest,
+            response: HttpServletResponse
+      ) {
             // Use jwt sub as username
             val username = jwt.subject
 
@@ -72,7 +76,7 @@ class AuthenticationController(
             }
 
             // Redirect to the account endpoint to get the AccountEntry
-            response.sendRedirect("/account")
+            request.getRequestDispatcher("/account").forward(request, response)
       }
 
       /**

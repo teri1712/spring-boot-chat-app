@@ -53,7 +53,7 @@ class ExceptionControllerAdvice : ResponseEntityExceptionHandler() {
       ): ResponseEntity<Any> {
             return ResponseEntity.badRequest().body(
                   ex.allErrors
-                        .map { it.defaultMessage }
+                        .first().defaultMessage
             )
       }
 

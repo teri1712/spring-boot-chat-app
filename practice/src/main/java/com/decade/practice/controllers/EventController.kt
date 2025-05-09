@@ -28,7 +28,11 @@ import java.io.IOException
 import java.net.URI
 import kotlin.math.min
 
-
+/**
+ * REST controller for managing chat events in the messaging system.
+ * Provides endpoints for pushing different types of events (seen status, text messages,
+ * icons, images) and retrieving events for chats.
+ */
 @RestController
 @RequestMapping("/message")
 class EventController(
@@ -41,6 +45,15 @@ class EventController(
       private val imageStore: ImageStore,
 ) {
 
+      /**
+       * Generic method to process and distribute chat events.
+       * Updates the user's online status, saves the event, and pushes it to recipients via WebSocket.
+       *
+       * @param sender The user sending the event
+       * @param event The chat event to be processed
+       * @return The saved event with the same local ID
+       * @throws EntityNotFoundException If the user or other required entities aren't found
+       */
       @Throws(EntityNotFoundException::class)
       private fun <E : ChatEvent> pushEvent(
             sender: User,
@@ -66,6 +79,15 @@ class EventController(
             }
       }
 
+      /**
+       * Endpoint for pushing "seen" events.
+       * Marks messages as seen by a user.
+       *
+       * @param username The authenticated user's username
+       * @param record The seen event data
+       * @return The saved seen event
+       * @throws EntityNotFoundException If the user isn't found
+       */
       @PostMapping("/seen")
       @Throws(EntityNotFoundException::class)
       fun pushEvent(
@@ -73,7 +95,15 @@ class EventController(
             @RequestBody @Valid record: SeenEvent
       ): SeenEvent = pushEvent(userRepo.getByUsername(username), record)
 
-
+      /**
+       * Endpoint for pushing text message events.
+       * Sends a text message from one user to another.
+       *
+       * @param username The authenticated user's username
+       * @param event The text event containing the message
+       * @return The saved text event
+       * @throws EntityNotFoundException If the user isn't found
+       */
       @PostMapping("/text")
       @Throws(EntityNotFoundException::class)
       fun pushEvent(
@@ -81,7 +111,15 @@ class EventController(
             @RequestBody @Valid event: TextEvent
       ): TextEvent = pushEvent(userRepo.getByUsername(username), event)
 
-
+      /**
+       * Endpoint for pushing icon events.
+       * Sends an icon/emoji from one user to another.
+       *
+       * @param username The authenticated user's username
+       * @param event The icon event data
+       * @return The saved icon event
+       * @throws EntityNotFoundException If the user isn't found
+       */
       @PostMapping("/icon")
       @Throws(EntityNotFoundException::class)
       fun pushEvent(
@@ -89,7 +127,17 @@ class EventController(
             @RequestBody @Valid event: IconEvent
       ): IconEvent = pushEvent(userRepo.getByUsername(username), event)
 
-
+      /**
+       * Endpoint for pushing image events with file upload.
+       * Processes the uploaded image file, stores it, and sends an image event.
+       *
+       * @param username The authenticated user's username
+       * @param event The image event metadata
+       * @param file The image file being uploaded
+       * @return The saved image event
+       * @throws EntityNotFoundException If the user isn't found
+       * @throws IOException If there's an error processing the image file
+       */
       @PostMapping("/image")
       @Throws(EntityNotFoundException::class, IOException::class)
       fun pushEvent(
@@ -110,6 +158,16 @@ class EventController(
             }
       }
 
+      /**
+       * Retrieves events for a specific chat up to a given version number.
+       * Uses cache control headers for efficient client-side caching.
+       *
+       * @param username The authenticated user's username
+       * @param identifier The chat identifier (participants)
+       * @param atVersion The maximum event version to retrieve
+       * @return A list of chat events for the specified chat
+       * @throws EntityNotFoundException If the user or chat isn't found
+       */
       @GetMapping("/chat")
       @Throws(EntityNotFoundException::class)
       fun pullEvents(
@@ -128,6 +186,15 @@ class EventController(
                   .body(events)
       }
 
+      /**
+       * Retrieves all events for a user up to a given version number.
+       * Fetches events across all chats the user participates in.
+       *
+       * @param username The authenticated user's username
+       * @param atVersion The maximum event version to retrieve
+       * @return A list of chat events for the user
+       * @throws EntityNotFoundException If the user isn't found
+       */
       @GetMapping
       @Throws(EntityNotFoundException::class)
       fun pullEvents(
