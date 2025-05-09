@@ -6,5 +6,4 @@ import java.util.concurrent.TimeUnit
 object CacheUtils {
       val defaultCacheControl = CacheControl
             .maxAge(30, TimeUnit.DAYS)
-            .cachePublic()
 }
