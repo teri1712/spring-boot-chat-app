@@ -1,9 +1,9 @@
 package com.decade.practice.authentication
 
-import com.decade.practice.controllers.AuthenticationController
-import com.decade.practice.controllers.MAX_USERNAME_LENGTH
-import com.decade.practice.controllers.MIN_USERNAME_LENGTH
 import com.decade.practice.controllers.advices.ExceptionControllerAdvice
+import com.decade.practice.controllers.rest.AuthenticationController
+import com.decade.practice.controllers.rest.MAX_USERNAME_LENGTH
+import com.decade.practice.controllers.rest.MIN_USERNAME_LENGTH
 import com.decade.practice.core.UserOperations
 import com.decade.practice.database.repository.UserRepository
 import com.decade.practice.database.transaction.UserService

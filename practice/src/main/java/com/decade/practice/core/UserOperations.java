@@ -25,6 +25,8 @@ public interface UserOperations {
 
       User update(UUID id, String name, Date birthday, String gender);
 
+      User update(UUID id, String name, Date birthday, String gender, ImageSpec avatar);
+
       User update(UUID id, ImageSpec avatar);
 
       User update(UUID id, String password, String modifierToken) throws AccessDeniedException;

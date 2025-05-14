@@ -107,11 +107,24 @@ class UserService(
             name: String,
             birthday: Date,
             gender: String
-      ) = userRepo.getOptimistic(id).also {
-            it.name = name
-            it.dob = birthday
-            it.gender.add(gender)
+      ) = userRepo.getOptimistic(id).also { u ->
+            u.name = name
+            u.dob = birthday
+            u.gender.add(gender)
+      }
 
+      @Throws(OptimisticLockException::class)
+      override fun update(
+            id: UUID,
+            name: String,
+            birthday: Date,
+            gender: String,
+            avatar: ImageSpec
+      ) = userRepo.getOptimistic(id).also { u ->
+            u.name = name
+            u.dob = birthday
+            u.gender.add(gender)
+            u.avatar = avatar
       }
 
       @Throws(OptimisticLockException::class)
@@ -125,7 +138,10 @@ class UserService(
       @Throws(AccessDeniedException::class, OptimisticLockException::class)
       override fun update(id: UUID, password: String, modifierToken: String): User {
             val user = userRepo.getPessimisticWrite(id)
-            credentialService.validate(modifierToken)
+            if (!encoder.matches(modifierToken, user.password)) {
+                  credentialService.validate(modifierToken)
+            }
+
             user.password = encoder.encode(password)
             accountListeners.forEach { listeners ->
                   listeners.beforePasswordChanged(user)

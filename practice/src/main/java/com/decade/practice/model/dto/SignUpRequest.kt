@@ -1,7 +1,7 @@
 package com.decade.practice.model.dto
 
-import com.decade.practice.controllers.MAX_USERNAME_LENGTH
-import com.decade.practice.controllers.MIN_USERNAME_LENGTH
+import com.decade.practice.controllers.rest.MAX_USERNAME_LENGTH
+import com.decade.practice.controllers.rest.MIN_USERNAME_LENGTH
 import com.decade.practice.controllers.validation.StrongPassword
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize
 import jakarta.validation.constraints.NotBlank

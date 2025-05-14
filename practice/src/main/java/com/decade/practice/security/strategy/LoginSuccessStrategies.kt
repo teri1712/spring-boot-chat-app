@@ -3,6 +3,7 @@ package com.decade.practice.security.strategy
 import com.decade.practice.core.ChatOperations
 import com.decade.practice.core.UserOperations
 import com.decade.practice.model.local.AccountEntry
+import com.decade.practice.utils.PlatformsUtils
 import com.fasterxml.jackson.databind.ObjectMapper
 import com.fasterxml.jackson.databind.SerializationFeature
 import jakarta.servlet.http.HttpServletRequest
@@ -28,14 +29,11 @@ class LoginSuccessStrategy(
             httpResponse: HttpServletResponse,
             authentication: Authentication
       ) {
-            onAuthenticationSuccess(httpResponse, authentication)
-      }
+            if (PlatformsUtils.isBrowserNavigation(httpRequest)) {
+                  httpResponse.sendRedirect("/profile")
+                  return
+            }
 
-      @Throws(IOException::class)
-      fun onAuthenticationSuccess(
-            httpResponse: HttpServletResponse,
-            authentication: Authentication,
-      ) {
             val principal = authentication.principal
             if (principal !is UserDetails) {
                   throw AccessDeniedException("Operation not supported")
@@ -54,6 +52,7 @@ class LoginSuccessStrategy(
             )
             httpResponse.writer.flush()
       }
+
 }
 
 

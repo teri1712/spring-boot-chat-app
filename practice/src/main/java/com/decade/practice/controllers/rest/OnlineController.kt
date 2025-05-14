@@ -1,4 +1,4 @@
-package com.decade.practice.controllers
+package com.decade.practice.controllers.rest
 
 import com.decade.practice.core.OnlineStatistic
 import com.fasterxml.jackson.databind.ObjectMapper

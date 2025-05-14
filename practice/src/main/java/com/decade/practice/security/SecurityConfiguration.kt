@@ -2,18 +2,15 @@ package com.decade.practice.security
 
 import com.decade.practice.core.UserOperations
 import com.decade.practice.security.jwt.JwtTokenFilter
-import com.decade.practice.security.strategy.LoginFailStrategy
-import com.decade.practice.security.strategy.LoginSuccessStrategy
-import com.decade.practice.security.strategy.LogoutStrategy
-import com.decade.practice.security.strategy.Oauth2LoginSuccessStrategy
+import com.decade.practice.security.strategy.*
 import org.springframework.beans.BeansException
 import org.springframework.beans.factory.config.BeanPostProcessor
 import org.springframework.context.annotation.Bean
 import org.springframework.context.annotation.Configuration
+import org.springframework.http.HttpMethod
 import org.springframework.http.HttpStatus
 import org.springframework.security.authentication.ProviderManager
 import org.springframework.security.authentication.dao.AbstractUserDetailsAuthenticationProvider
-import org.springframework.security.config.Customizer
 import org.springframework.security.config.Customizer.withDefaults
 import org.springframework.security.config.annotation.authentication.builders.AuthenticationManagerBuilder
 import org.springframework.security.config.annotation.authentication.configuration.GlobalAuthenticationConfigurerAdapter
@@ -27,7 +24,6 @@ import org.springframework.security.oauth2.client.oidc.userinfo.OidcUserService
 import org.springframework.security.oauth2.client.userinfo.DefaultOAuth2UserService
 import org.springframework.security.oauth2.server.resource.web.HeaderBearerTokenResolver
 import org.springframework.security.web.SecurityFilterChain
-import org.springframework.security.web.authentication.HttpStatusEntryPoint
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter
 import org.springframework.security.web.authentication.logout.HttpStatusReturningLogoutSuccessHandler
 import org.springframework.security.web.context.DelegatingSecurityContextRepository
@@ -103,7 +99,7 @@ class SecurityConfiguration : GlobalAuthenticationConfigurerAdapter() {
             userOperations: UserOperations
       ): SecurityFilterChain {
             http
-                  .requestCache(Customizer.withDefaults())
+                  .requestCache(withDefaults())
                   .securityContext { context ->
                         context.securityContextRepository(contextRepository())
                   }
@@ -112,11 +108,12 @@ class SecurityConfiguration : GlobalAuthenticationConfigurerAdapter() {
                   .formLogin { login ->
                         login.successHandler(strategy)
                               .failureHandler(LoginFailStrategy())
+                              .loginPage("/login")
                               .permitAll()
                   }
                   .exceptionHandling { exceptionHandling ->
                         exceptionHandling.accessDeniedPage(null)
-                              .authenticationEntryPoint(HttpStatusEntryPoint(HttpStatus.UNAUTHORIZED))
+                              .authenticationEntryPoint(EntryPointStrategy())
                   }
                   .logout { logout: LogoutConfigurer<HttpSecurity?> ->
                         logout.logoutSuccessHandler(HttpStatusReturningLogoutSuccessHandler(HttpStatus.OK))
@@ -127,6 +124,7 @@ class SecurityConfiguration : GlobalAuthenticationConfigurerAdapter() {
                   .authorizeHttpRequests { authorize ->
                         authorize.requestMatchers("/image").permitAll()
                               .requestMatchers("/authentication/**").permitAll()
+                              .requestMatchers(HttpMethod.GET, "/login").permitAll()
                               .anyRequest().authenticated()
                   }
                   .oauth2Login { oauth2 ->

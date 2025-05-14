@@ -1,13 +1,11 @@
-package com.decade.practice.controllers
+package com.decade.practice.controllers.rest
 
-import com.decade.practice.controllers.validation.StrongPassword
 import com.decade.practice.core.TokenCredentialService
 import com.decade.practice.core.UserOperations
 import com.decade.practice.database.transaction.create
 import com.decade.practice.image.ImageStore
 import com.decade.practice.model.domain.DefaultAvatar
 import com.decade.practice.model.domain.embeddable.ImageSpec
-import com.decade.practice.model.domain.entity.User
 import com.decade.practice.model.dto.SignUpRequest
 import com.decade.practice.security.model.DaoUser
 import com.decade.practice.utils.ImageUtils
@@ -29,11 +27,13 @@ import org.springframework.security.core.authority.SimpleGrantedAuthority
 import org.springframework.security.core.context.SecurityContextHolder
 import org.springframework.security.oauth2.jwt.Jwt
 import org.springframework.security.web.context.SecurityContextRepository
-import org.springframework.web.bind.annotation.*
+import org.springframework.web.bind.annotation.PostMapping
+import org.springframework.web.bind.annotation.RequestMapping
+import org.springframework.web.bind.annotation.RequestPart
+import org.springframework.web.bind.annotation.RestController
 import org.springframework.web.multipart.MultipartFile
 import java.io.IOException
 import java.net.URI
-import java.util.*
 
 // Defines maximum and minimum length for usernames
 const val MAX_USERNAME_LENGTH = 20
@@ -163,29 +163,5 @@ class AuthenticationController(
             }
       }
 
-      /**
-       * Changes the current user's password.
-       * Requires a valid modifier token (refreshToken) and user must be authenticated.
-       */
-      @PostMapping("/password")
-      @PreAuthorize("isAuthenticated()")
-      fun changePassword(
-            request: HttpServletRequest,
-            @AuthenticationPrincipal(expression = "id") idOptional: Optional<UUID>,
-            @StrongPassword @RequestParam password: String
-      ): ResponseEntity<User> {
-            // Retrieve the user ID from the authentication principal
-            val id = idOptional.orElseThrow {
-                  // Ensures only real-application users can modify passwords
-                  throw AccessDeniedException("Operation not supported")
-            }
-            // Must have a valid modifier token to update the password
-            val refreshToken = TokenUtils.extractRefreshToken(request)
-                  ?: throw AccessDeniedException("Missing modifier token")
-
-            // Update the user's password
-            val user: User = userOperations.update(id, password, refreshToken)
-            return ResponseEntity.ok(user)
-      }
 
 }

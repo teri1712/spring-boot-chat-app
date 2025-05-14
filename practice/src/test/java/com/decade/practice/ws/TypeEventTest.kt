@@ -10,9 +10,9 @@ import com.decade.practice.model.domain.entity.User
 import com.decade.practice.security.jwt.JwtCredentialService
 import com.decade.practice.utils.TokenUtils.BEARER
 import com.decade.practice.utils.TokenUtils.HEADER_NAME
-import com.decade.practice.websocket.CHAT_HEADER
 import com.decade.practice.websocket.HANDSHAKE_DESTINATION
 import com.decade.practice.websocket.TYPING_DESTINATION
+import com.decade.practice.websocket.arguments.CHAT_HEADER
 import org.junit.jupiter.api.*
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.boot.jdbc.EmbeddedDatabaseConnection

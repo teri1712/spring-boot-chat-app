@@ -18,5 +18,9 @@ object TokenUtils {
             return null
       }
 
+      fun hasToken(request: HttpServletRequest): Boolean =
+            extractToken(request) != null || extractRefreshToken(request) != null
+
       fun extractRefreshToken(request: HttpServletRequest): String? = request.getParameter(REFRESH_PARAM)
+//            ?: request.cookies?.find { cookie -> cookie.name == REFRESH_PARAM }?.value
 }

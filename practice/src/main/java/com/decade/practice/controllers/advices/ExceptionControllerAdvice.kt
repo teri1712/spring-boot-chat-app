@@ -20,28 +20,18 @@ import org.springframework.web.servlet.mvc.method.annotation.ResponseEntityExcep
 class ExceptionControllerAdvice : ResponseEntityExceptionHandler() {
 
       @ExceptionHandler(
-            EntityNotFoundException::class,
-            NoSuchElementException::class,
-            NullPointerException::class
+            EntityNotFoundException::class, NoSuchElementException::class, NullPointerException::class
       )
-      @ResponseStatus(
-            value = HttpStatus.NOT_FOUND,
-            reason = "THE REQUESTED RESOURCE NOT FOUND"
-      )
+      @ResponseStatus(value = HttpStatus.NOT_FOUND, reason = "THE REQUESTED RESOURCE NOT FOUND")
       @MessageExceptionHandler(
-            EntityNotFoundException::class,
-            NoSuchElementException::class,
-            NullPointerException::class
+            EntityNotFoundException::class, NoSuchElementException::class, NullPointerException::class
       )
       fun handleNoElement(e: Exception) {
             e.printStackTrace()
       }
 
       @ExceptionHandler(OptimisticLockException::class)
-      @ResponseStatus(
-            value = HttpStatus.BAD_REQUEST,
-            reason = "UPDATE FAILED, TRY AGAIN"
-      )
+      @ResponseStatus(value = HttpStatus.BAD_REQUEST, reason = "UPDATE FAILED, TRY AGAIN")
       fun handleLockException() {
       }
 

@@ -16,11 +16,11 @@ import java.util.*
 
 
 @SpringBootApplication
-class TestApplication
+class DevelopmentApplication
 
 fun main(args: Array<String>) {
-      val app = SpringApplication(TestApplication::class.java)
-      app.setAdditionalProfiles("testing")
+      val app = SpringApplication(DevelopmentApplication::class.java)
+      app.setAdditionalProfiles("development")
       val context = app.run(*args)
       val userService = context.getBean(UserOperations::class.java)
       val userRepo = context.getBean(UserRepository::class.java)

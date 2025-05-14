@@ -9,6 +9,7 @@ import org.springframework.web.bind.annotation.InitBinder
 
 @ControllerAdvice
 class ValidationControllerAdvice {
+
       @InitBinder
       protected fun initBinder(binder: WebDataBinder) {
             if (binder.target is ChatIdentifier)
