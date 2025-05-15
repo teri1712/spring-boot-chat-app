@@ -40,19 +40,20 @@ class ExceptionControllerAdvice : ResponseEntityExceptionHandler() {
             headers: HttpHeaders,
             status: HttpStatusCode,
             request: WebRequest
-      ): ResponseEntity<Any> {
-            return ResponseEntity.badRequest().body(
+      ): ResponseEntity<Any> = ResponseEntity
+            .badRequest()
+            .body(
                   ex.allErrors
                         .first().defaultMessage
             )
-      }
 
       override fun handleMethodArgumentNotValid(
             ex: MethodArgumentNotValidException,
             headers: HttpHeaders,
             status: HttpStatusCode,
             request: WebRequest
-      ): ResponseEntity<Any> {
-            return ResponseEntity.badRequest().body(ex.message)
-      }
+      ): ResponseEntity<Any> = ResponseEntity
+            .badRequest()
+            .body(ex.message)
+
 }

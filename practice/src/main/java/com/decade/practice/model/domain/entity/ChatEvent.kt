@@ -98,4 +98,5 @@ abstract class ChatEvent(
       val senderId: UUID
             get() = sender.id
 
+
 }

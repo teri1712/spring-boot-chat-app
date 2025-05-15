@@ -1,0 +1,27 @@
+version: '3.8'
+
+services:
+    spring-boot:
+        build:
+            context: .
+            dockerfile: Dockerfile
+        environment:
+            - DECADE=true
+        ports:
+            - "8080:8080"
+        depends_on:
+            - mysql
+            - redis
+    mysql:
+        image: mysql:8.0
+        environment:
+            MYSQL_ROOT_PASSWORD: root
+            MYSQL_DATABASE: chatapp
+        ports:
+            - "3306:3306"
+
+    redis:
+        image: redis/redis-stack:latest
+        ports:
+            - "6379:6379"
+            - "8001:8001"

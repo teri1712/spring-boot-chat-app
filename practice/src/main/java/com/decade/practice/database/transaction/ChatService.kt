@@ -32,6 +32,7 @@ class ChatService(
             try {
                   return chatRepo.get(identifier)
             } catch (e: NoSuchElementException) {
+                  e.printStackTrace()
                   ensureExists(identifier)
             }
             return chatRepo.get(identifier)
@@ -41,7 +42,7 @@ class ChatService(
             try {
                   (self as ChatService).createChat(chatIdentifier)
             } catch (ignored: ConstraintViolationException) {
-                  println(ignored)
+                  ignored.printStackTrace()
             }
       }
 
