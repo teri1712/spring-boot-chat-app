@@ -3,6 +3,13 @@
 A real-time chat application built with Spring Boot for the backend and Angular for the frontend. Users can manage
 profiles, authenticate, and participate in live chat rooms.
 
+## Demo
+
+A live version of this project is available at:
+
+* Android: [https://youtu.be/E1SQVj2nTtw](https://youtu.be/E1SQVj2nTtw)
+* Web: [https://youtu.be/xm_pWF36_Uo](https://youtu.be/xm_pWF36_Uo)
+
 ### Tech Stack
 
 * **Backend:** Spring Boot, Spring Security, Spring Data JPA, WebSocket
@@ -14,8 +21,7 @@ profiles, authenticate, and participate in live chat rooms.
 ### Repositories
 
 * Backend: [https://github.com/teri1712/spring-boot-chat-app.git](https://github.com/teri1712/spring-boot-chat-app.git)
-*
-Frontend: [https://github.com/teri1712/angular-chat-application.git](https://github.com/teri1712/angular-chat-application.git)
+* Frontend: [https://github.com/teri1712/angular-chat-application.git](https://github.com/teri1712/angular-chat-application.git)
 
 ### Prerequisites
 
