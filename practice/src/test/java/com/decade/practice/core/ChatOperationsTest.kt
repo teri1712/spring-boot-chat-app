@@ -1,33 +1,37 @@
 package com.decade.practice.core
 
+import com.decade.practice.DevelopmentApplication
 import com.decade.practice.database.DatabaseConfiguration
 import com.decade.practice.database.transaction.ChatService
 import com.decade.practice.database.transaction.UserService
 import com.decade.practice.database.transaction.create
 import com.decade.practice.model.domain.entity.User
-import org.junit.jupiter.api.Assertions
-import org.junit.jupiter.api.Order
-import org.junit.jupiter.api.Test
-import org.junit.jupiter.api.TestInstance
+import com.decade.practice.security.jwt.JwtCredentialService
+import org.junit.jupiter.api.*
 import org.junit.jupiter.api.extension.ExtendWith
 import org.mockito.Mockito
 import org.springframework.beans.factory.annotation.Autowired
+import org.springframework.boot.autoconfigure.data.redis.RedisAutoConfiguration
 import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest
 import org.springframework.boot.test.mock.mockito.MockBean
 import org.springframework.boot.test.system.OutputCaptureExtension
 import org.springframework.context.annotation.Import
+import org.springframework.data.redis.connection.RedisConnection
+import org.springframework.data.redis.core.RedisTemplate
 import org.springframework.security.crypto.password.PasswordEncoder
 import org.springframework.test.annotation.Rollback
+import org.springframework.test.context.ActiveProfiles
+import org.springframework.test.context.ContextConfiguration
 
-@DataJpaTest(
-      properties = [
-            "spring.datasource.url=jdbc:h2:mem:test",
-            "spring.datasource.driver-class-name=org.h2.Driver",
-            "spring.jpa.database=H2"]
-)
+@DataJpaTest
+@ActiveProfiles("development")
+@ContextConfiguration(classes = [DevelopmentApplication::class])
 @ExtendWith(OutputCaptureExtension::class)
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
 @Import(
+
+      RedisAutoConfiguration::class,
+      JwtCredentialService::class,
       ChatService::class,
       UserService::class,
       DatabaseConfiguration::class
@@ -63,5 +67,19 @@ class ChatOperationsTest {
       fun given_twoUsers_when_getOrCreateChat_then_returnsChatInstance() {
             val chat = chatOperations.getOrCreateChat(first.id, second.id)
             Assertions.assertNotNull(chat.interactTime)
+      }
+
+
+      @Autowired
+      lateinit var redisTemplate: RedisTemplate<Any, Any>
+
+      @AfterAll
+      fun tearDown() {
+
+            redisTemplate.execute({ conn: RedisConnection? ->
+                  conn!!.flushDb()
+                  null
+            })
+
       }
 }

@@ -1,5 +1,6 @@
 package com.decade.practice.ws
 
+import com.decade.practice.DevelopmentApplication
 import com.decade.practice.core.ChatOperations
 import com.decade.practice.core.UserOperations
 import com.decade.practice.database.transaction.create
@@ -19,11 +20,15 @@ import org.springframework.boot.jdbc.EmbeddedDatabaseConnection
 import org.springframework.boot.test.autoconfigure.jdbc.AutoConfigureTestDatabase
 import org.springframework.boot.test.context.SpringBootTest
 import org.springframework.boot.test.web.server.LocalServerPort
+import org.springframework.data.redis.connection.RedisConnection
+import org.springframework.data.redis.core.RedisTemplate
 import org.springframework.messaging.converter.MessageConverter
 import org.springframework.messaging.simp.stomp.StompFrameHandler
 import org.springframework.messaging.simp.stomp.StompHeaders
 import org.springframework.messaging.simp.stomp.StompSession
 import org.springframework.messaging.simp.stomp.StompSessionHandlerAdapter
+import org.springframework.test.context.ActiveProfiles
+import org.springframework.test.context.ContextConfiguration
 import org.springframework.web.socket.WebSocketHttpHeaders
 import org.springframework.web.socket.client.standard.StandardWebSocketClient
 import org.springframework.web.socket.messaging.WebSocketStompClient
@@ -35,8 +40,10 @@ import kotlin.test.assertNotNull
 
 @SpringBootTest(
       webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT,
-      properties = ["spring.jpa.database=H2"]
 )
+
+@ActiveProfiles("development")
+@ContextConfiguration(classes = [DevelopmentApplication::class])
 @AutoConfigureTestDatabase(connection = EmbeddedDatabaseConnection.H2) // or using autoconfigured embedded datasource.
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
 @TestMethodOrder(MethodOrderer.OrderAnnotation::class)
@@ -156,5 +163,18 @@ class TypeEventTest {
             assertNotNull(myEvent.get())
             assertNotNull(yourEvent.get())
             assertEquals(yourEvent.get(), myEvent.get())
+      }
+
+      @Autowired
+      lateinit var redisTemplate: RedisTemplate<Any, Any>
+
+      @AfterAll
+      fun tearDown() {
+
+            redisTemplate.execute({ conn: RedisConnection? ->
+                  conn!!.flushDb()
+                  null
+            })
+
       }
 }

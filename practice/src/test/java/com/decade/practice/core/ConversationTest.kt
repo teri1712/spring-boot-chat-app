@@ -1,6 +1,7 @@
 package com.decade.practice.core
 
 
+import com.decade.practice.DevelopmentApplication
 import com.decade.practice.database.DatabaseConfiguration
 import com.decade.practice.database.repository.ChatRepository
 import com.decade.practice.database.repository.EdgeRepository
@@ -11,27 +12,32 @@ import com.decade.practice.model.domain.entity.Chat
 import com.decade.practice.model.domain.entity.ChatEvent
 import com.decade.practice.model.domain.entity.TextEvent
 import com.decade.practice.model.domain.entity.User
+import com.decade.practice.security.jwt.JwtCredentialService
 import com.decade.practice.utils.inspectPartner
 import org.junit.jupiter.api.*
 import org.junit.jupiter.api.extension.ExtendWith
 import org.mockito.Mockito
 import org.springframework.beans.factory.annotation.Autowired
+import org.springframework.boot.autoconfigure.data.redis.RedisAutoConfiguration
 import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest
 import org.springframework.boot.test.mock.mockito.MockBean
 import org.springframework.boot.test.system.OutputCaptureExtension
 import org.springframework.context.annotation.Import
+import org.springframework.data.redis.connection.RedisConnection
+import org.springframework.data.redis.core.RedisTemplate
 import org.springframework.security.crypto.password.PasswordEncoder
+import org.springframework.test.context.ActiveProfiles
+import org.springframework.test.context.ContextConfiguration
 import org.springframework.transaction.support.TransactionOperations
 
-@DataJpaTest(
-      properties = [
-            "spring.datasource.url=jdbc:h2:mem:test",
-            "spring.datasource.driver-class-name=org.h2.Driver",
-            "spring.jpa.database=H2"]
-)
+@DataJpaTest
+@ActiveProfiles("development")
+@ContextConfiguration(classes = [DevelopmentApplication::class])
 @ExtendWith(OutputCaptureExtension::class)
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
 @Import(
+      RedisAutoConfiguration::class,
+      JwtCredentialService::class,
       ChatService::class,
       ChatEventStore::class,
       UserEventStore::class,
@@ -155,5 +161,19 @@ class ConversationTest {
             Assertions.assertEquals(1 + 2 + 2, edgeRepo.findByOwner(first).size)
             Assertions.assertEquals(1 + 1, edgeRepo.findByOwner(second).size)
             Assertions.assertEquals(1 + 1, edgeRepo.findByOwner(third).size)
+      }
+
+
+      @Autowired
+      lateinit var redisTemplate: RedisTemplate<Any, Any>
+
+      @AfterAll
+      fun tearDown() {
+
+            redisTemplate.execute({ conn: RedisConnection? ->
+                  conn!!.flushDb()
+                  null
+            })
+
       }
 }

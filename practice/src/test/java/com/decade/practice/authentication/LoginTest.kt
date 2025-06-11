@@ -1,5 +1,6 @@
 package com.decade.practice.authentication
 
+import com.decade.practice.DevelopmentApplication
 import com.decade.practice.core.UserOperations
 import com.decade.practice.database.repository.UserRepository
 import com.decade.practice.database.transaction.create
@@ -19,6 +20,8 @@ import org.springframework.boot.test.system.OutputCaptureExtension
 import org.springframework.boot.test.web.server.LocalServerPort
 import org.springframework.http.MediaType
 import org.springframework.security.crypto.password.PasswordEncoder
+import org.springframework.test.context.ActiveProfiles
+import org.springframework.test.context.ContextConfiguration
 import org.springframework.util.LinkedMultiValueMap
 import org.springframework.util.MultiValueMap
 import org.springframework.web.client.HttpClientErrorException
@@ -26,10 +29,9 @@ import org.springframework.web.client.RestClient
 import kotlin.test.assertNotNull
 
 
-@SpringBootTest(
-      webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT,
-      properties = ["spring.jpa.database=H2"]
-)
+@SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
+@ActiveProfiles("development")
+@ContextConfiguration(classes = [DevelopmentApplication::class])
 @ExtendWith(
       OutputCaptureExtension::class
 )

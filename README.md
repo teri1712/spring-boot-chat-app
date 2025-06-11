@@ -29,12 +29,13 @@ A live version of this project is available at:
 * Maven 3.x
 * Docker & Docker Compose
 
-### Setup & Run
+### Setup
+* Please ensure you Redis server is available and there's no data in there, all the mocks during tests will be cleaned after the package process.
+### Run
 
 ```bash
 # 1. Package the backend (skip tests)
-mvn clean package -Dmaven.test.skip=true
-
+mvn clean package
 # 2. Launch services via Docker Compose
 docker-compose up --build
 ```

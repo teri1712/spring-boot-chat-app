@@ -107,8 +107,6 @@ class JwtCredentialService(
                   .setHeaderParam("typ", "JWT")
                   .setHeaderParam("alg", "HS256")
                   .setClaims(claims)
-                  .setIssuedAt(Date(at))
-                  .setExpiration(Date(at + expiration))
                   .signWith(SignatureAlgorithm.HS256, key)
                   .compact()
       }

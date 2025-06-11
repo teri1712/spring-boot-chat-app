@@ -1,19 +1,22 @@
 package com.decade.practice.authentication
 
+import com.decade.practice.DevelopmentApplication
 import com.decade.practice.MockEndpoints
+import com.decade.practice.core.ChatOperations
+import com.decade.practice.core.UserOperations
+import com.decade.practice.database.repository.AdminRepository
 import com.decade.practice.database.repository.UserRepository
-import com.decade.practice.database.transaction.ChatService
-import com.decade.practice.database.transaction.UserService
 import com.decade.practice.model.domain.entity.User
+import com.decade.practice.model.local.Account
 import com.decade.practice.security.DaoUserDetailsService
-import com.decade.practice.security.SaveOnLoadOauth2UserService
 import com.decade.practice.security.SecurityConfiguration
 import com.decade.practice.security.jwt.JwtCredentialService
 import com.decade.practice.security.jwt.JwtTokenFilter
 import com.decade.practice.security.strategy.LoginSuccessStrategy
 import com.decade.practice.security.strategy.LogoutStrategy
+import com.decade.practice.security.strategy.Oauth2LoginSuccessStrategy
 import com.decade.practice.session.SessionConfiguration
-import com.decade.practice.utils.ErrorMessageMatcher
+import com.decade.practice.utils.DummyRedisSetOps
 import com.decade.practice.utils.TokenUtils
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
@@ -27,13 +30,19 @@ import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest
 import org.springframework.boot.test.mock.mockito.MockBean
 import org.springframework.boot.test.system.OutputCaptureExtension
 import org.springframework.context.annotation.Import
+import org.springframework.data.redis.core.StringRedisTemplate
+import org.springframework.security.core.userdetails.UserDetails
 import org.springframework.security.crypto.password.PasswordEncoder
 import org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestBuilders
+import org.springframework.test.context.ActiveProfiles
+import org.springframework.test.context.ContextConfiguration
 import org.springframework.test.web.servlet.MockMvc
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders
 import org.springframework.test.web.servlet.result.MockMvcResultMatchers
 
 @WebMvcTest(controllers = [MockEndpoints::class])
+@ActiveProfiles("development")
+@ContextConfiguration(classes = [DevelopmentApplication::class])
 @ExtendWith(OutputCaptureExtension::class)
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
 @Import(
@@ -42,22 +51,25 @@ import org.springframework.test.web.servlet.result.MockMvcResultMatchers
       LoginSuccessStrategy::class,
       JwtTokenFilter::class,
       DaoUserDetailsService::class,
-      JwtCredentialService::class,
       MockEndpoints::class,
-      UserService::class,
       RedisAutoConfiguration::class,
+      Oauth2LoginSuccessStrategy::class,
       SessionAutoConfiguration::class,
-      SaveOnLoadOauth2UserService::class
+      JwtCredentialService::class,
 )
 class SecurityFilterTest {
+
       @MockBean
       lateinit var userRepo: UserRepository
 
       @MockBean
-      lateinit var userService: UserService
+      lateinit var adminRepository: AdminRepository
 
       @MockBean
-      lateinit var chatService: ChatService
+      lateinit var chatOperations: ChatOperations
+
+      @MockBean
+      lateinit var userService: UserOperations
 
       @MockBean
       lateinit var logoutHandler: LogoutStrategy
@@ -68,6 +80,9 @@ class SecurityFilterTest {
       @Autowired
       lateinit var encoder: PasswordEncoder
 
+      @MockBean
+      lateinit var redisTemplate: StringRedisTemplate
+
       @Autowired
       lateinit var credentialService: JwtCredentialService
 
@@ -75,6 +90,8 @@ class SecurityFilterTest {
       fun setUp() {
             val user = User(USERNAME, encoder.encode(PASSWORD))
             Mockito.`when`(userRepo.getByUsername(USERNAME)).thenReturn(user)
+            Mockito.`when`(userService.prepareAccount(Mockito.any<UserDetails>())).thenReturn(Account(user, null))
+            Mockito.`when`(redisTemplate.opsForSet()).thenReturn(DummyRedisSetOps<String, String>())
       }
 
       @Test
@@ -82,7 +99,7 @@ class SecurityFilterTest {
       fun given_nonExistentUsername_when_login_then_failsWithUnauthorized() {
             mockMvc.perform(SecurityMockMvcRequestBuilders.formLogin().user("vcl").password(PASSWORD))
                   .andExpect(MockMvcResultMatchers.status().isUnauthorized())
-                  .andExpect(ErrorMessageMatcher.errorMessage("Username not found"))
+                  .andExpect(MockMvcResultMatchers.content().string("Username not found"))
       }
 
       @Test
@@ -101,7 +118,7 @@ class SecurityFilterTest {
                         .password("vcl")
             )
                   .andExpect(MockMvcResultMatchers.status().isUnauthorized())
-                  .andExpect(ErrorMessageMatcher.errorMessage("Wrong password"))
+                  .andExpect(MockMvcResultMatchers.content().string("Wrong password"))
       }
 
       @Test
