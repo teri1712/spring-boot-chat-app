@@ -31,6 +31,7 @@ A live version of this project is available at:
 
 ### Setup
 * Please ensure you Redis server is available and there's no data in there, all the mocks during tests will be cleaned after the package process.
+* Please download all the images needed in docker-compose in order to containerize the app.
 ### Run
 
 ```bash
