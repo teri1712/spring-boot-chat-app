@@ -5,7 +5,7 @@ profiles, authenticate, and participate in live chat rooms.
 
 ## Demo
 
-A live version of this project is available at:
+A short live version of this project is available at:
 
 * Android: [https://youtu.be/E1SQVj2nTtw](https://youtu.be/E1SQVj2nTtw)
 * Web: [https://youtu.be/xm_pWF36_Uo](https://youtu.be/xm_pWF36_Uo)

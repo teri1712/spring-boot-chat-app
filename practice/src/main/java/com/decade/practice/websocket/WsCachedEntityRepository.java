@@ -11,8 +11,14 @@ import org.springframework.stereotype.Component;
 
 import java.util.UUID;
 
+import static com.decade.practice.websocket.CacheConfiguration.TYPE_REPOSITORY_CACHE_MANAGER;
+
 @Component
 public class WsCachedEntityRepository implements WsEntityRepository {
+
+      public static final String USER_KEYSPACE = "USER_ENTITIES_CACHE";
+      public static final String CHAT_KEYSPACE = "CHAT_ENTITIES_CACHE";
+      public static final String TYPE_KEYSPACE = "Typing";
 
       private final UserRepository userRepo;
       private final ChatOperations chatOperations;
@@ -26,7 +32,7 @@ public class WsCachedEntityRepository implements WsEntityRepository {
       }
 
       @Cacheable(
-            cacheNames = CacheConstants.USER_KEYSPACE,
+            cacheNames = USER_KEYSPACE,
             key = "#username"
       )
       @Override
@@ -35,7 +41,7 @@ public class WsCachedEntityRepository implements WsEntityRepository {
       }
 
       @Cacheable(
-            cacheNames = CacheConstants.CHAT_KEYSPACE,
+            cacheNames = CHAT_KEYSPACE,
             key = "#id.toString()"
       )
       @Override
@@ -44,9 +50,9 @@ public class WsCachedEntityRepository implements WsEntityRepository {
       }
 
       @Cacheable(
-            cacheNames = CacheConstants.TYPE_KEYSPACE,
+            cacheNames = TYPE_KEYSPACE,
             key = "T(com.decade.practice.model.domain.TypeEvent).determineKey(#from,#chat)",
-            cacheManager = CacheConstants.TYPE_REPOSITORY_CACHE_MANAGER,
+            cacheManager = TYPE_REPOSITORY_CACHE_MANAGER,
             unless = "#result == null"
       )
       @Override
