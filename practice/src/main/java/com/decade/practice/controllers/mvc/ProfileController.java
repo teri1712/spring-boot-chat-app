@@ -7,9 +7,7 @@ import com.decade.practice.image.ImageStore;
 import com.decade.practice.model.domain.embeddable.ImageSpec;
 import com.decade.practice.model.dto.Profile;
 import com.decade.practice.utils.ImageUtils;
-import com.decade.practice.utils.TokenUtils;
 import jakarta.persistence.OptimisticLockException;
-import jakarta.servlet.http.HttpServletRequest;
 import jakarta.validation.Valid;
 import org.springframework.security.access.AccessDeniedException;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
@@ -31,7 +29,7 @@ import static com.decade.practice.model.domain.embeddable.ImageSpec.DEFAULT_WIDT
 
 @Controller
 @RequestMapping("/profile")
-@SessionAttributes({"profile", "availableGenders"})
+@SessionAttributes({"profile"})
 public class ProfileController {
 
       private final ImageStore imageStore;
@@ -65,17 +63,6 @@ public class ProfileController {
             return "profile";
       }
 
-      /**
-       * Updates the user's profile information including name, birthday, gender and avatar
-       *
-       * @param profile Profile object containing updated user information
-       * @param id      Authenticated user's ID
-       * @param file    Optional avatar image file to update
-       * @return View name for profile page
-       * @throws IOException             If there are issues processing the image file
-       * @throws OptimisticLockException If there is a concurrent modification conflict
-       * @throws URISyntaxException      If the avatar URI is invalid
-       */
       @PostMapping("/information")
       public String updateProfile(
             @ModelAttribute("profile") @Valid Profile profile,
@@ -83,7 +70,6 @@ public class ProfileController {
             @RequestPart(name = "file", required = false) MultipartFile file
       ) throws IOException, OptimisticLockException, URISyntaxException {
             if (id == null) {
-                  // Only application's principals can modify the information
                   throw new AccessDeniedException("Operation not supported");
             }
 
@@ -92,17 +78,15 @@ public class ProfileController {
             Date birthday = profile.getBirthday();
 
 
-            // Process avatar image if submitted
             ImageSpec avatar = null;
             if (file != null && !file.isEmpty()) {
                   InputStream inputStream = file.getInputStream();
-                  BufferedImage cropped = ImageUtils.INSTANCE
+                  BufferedImage cropped = ImageUtils
                         .crop(inputStream, DEFAULT_WIDTH, DEFAULT_HEIGHT);
                   avatar = imageStore.save(cropped);
             }
 
             try {
-                  // Update user profile with or without new submitted avatar
                   if (avatar == null) {
                         userOperations.update(id, name, birthday, gender);
                   } else {
@@ -123,35 +107,18 @@ public class ProfileController {
             return "password";
       }
 
-      /**
-       * Changes the current user's password.
-       * Requires a valid modifier token (refreshToken) and user must be authenticated.
-       */
       @PostMapping("/password")
       public String changePassword(
             Model model,
-            HttpServletRequest request,
             @AuthenticationPrincipal(expression = "id") UUID id,
             @RequestParam(value = "password", required = false) String password,
             @StrongPassword @RequestParam("new_password") String newPassword
       ) {
             if (id == null) {
-                  // Only application's principals can modify the information
                   throw new AccessDeniedException("Operation not supported");
             }
-
-            // Must have a valid refresh_token/password to update the password
-            String modiferToken = password;
-            if (modiferToken == null) {
-                  modiferToken = TokenUtils.INSTANCE.extractRefreshToken(request);
-                  if (modiferToken == null) {
-                        throw new AccessDeniedException("Missing credentials");
-                  }
-            }
-
-            // Update the user's password
             try {
-                  userOperations.update(id, newPassword, modiferToken);
+                  userOperations.update(id, newPassword, password);
                   model.addAttribute("success", "Credentials updated");
             } catch (Exception e) {
                   e.printStackTrace();

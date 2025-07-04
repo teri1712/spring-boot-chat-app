@@ -1,0 +1,20 @@
+package com.decade.practice.core;
+
+import com.decade.practice.model.OnlineStatus;
+import com.decade.practice.model.domain.entity.User;
+
+import java.time.Instant;
+import java.util.List;
+
+public interface OnlineStatistic {
+
+      OnlineStatus set(User user, long at);
+
+      default OnlineStatus set(User user) {
+            return set(user, Instant.now().getEpochSecond());
+      }
+
+      OnlineStatus get(String username);
+
+      List<OnlineStatus> getOnlineList(String username);
+}

@@ -34,7 +34,7 @@
 <div class="card shadow-lg p-4" style="width: 100%; max-width: 400px;">
     <h1 class="fw-semibold text-center mb-4">Sign in</h1>
 
-    <div class="alert alert-danger" th:if="${error != null}" th:text="${error}"/>
+    <div class="alert alert-danger" th:if="${param.error != null}" th:text="${param.error}"/>
     <form method="post" th:action="@{/login}">
         <div class="mb-3">
             <label for="username" class="form-label">Username</label>

@@ -10,7 +10,6 @@ import org.springframework.security.core.userdetails.UserDetails;
 import java.util.Date;
 import java.util.UUID;
 
-// Java interface for Mockito mocking
 public interface UserOperations {
 
       User create(String username,
@@ -29,7 +28,7 @@ public interface UserOperations {
 
       User update(UUID id, ImageSpec avatar);
 
-      User update(UUID id, String password, String modifierToken) throws AccessDeniedException;
+      User update(UUID id, String newPassword, String password) throws AccessDeniedException;
 
       Account prepareAccount(UserDetails details);
 
