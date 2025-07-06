@@ -1,4 +1,4 @@
-package com.decade.practice.controllers.rest;
+package com.decade.practice.web.rest;
 
 import com.decade.practice.core.TokenCredentialService;
 import com.decade.practice.core.UserOperations;

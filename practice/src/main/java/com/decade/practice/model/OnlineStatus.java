@@ -12,65 +12,63 @@ import java.util.Objects;
 @JsonDeserialize
 @RedisHash(value = "ONLINE", timeToLive = 5 * 60L)
 public class OnlineStatus {
-    private static final long FIVE_MINUTES = 5 * 60L;
-    private static final String KEYSPACE = "ONLINE";
 
-    @Id
-    private final String username;
-    private final long at;
+      @Id
+      private String username;
+      private long at;
 
-    @Transient
-    private User user;
+      @Transient
+      private User user;
 
-    public OnlineStatus(String username, long at) {
-        this.username = username;
-        this.at = at;
-    }
+      public OnlineStatus(String username, long at) {
+            this.username = username;
+            this.at = at;
+      }
 
-    public OnlineStatus(User user, long at) {
-        this(user.getUsername(), at);
-        this.user = user;
-    }
+      public OnlineStatus(User user, long at) {
+            this(user.getUsername(), at);
+            this.user = user;
+      }
 
-    public OnlineStatus(User user) {
-        this(user, Instant.now().getEpochSecond());
-    }
+      public OnlineStatus(User user) {
+            this(user, Instant.now().getEpochSecond());
+      }
 
-    public String getUsername() {
-        return username;
-    }
+      public String getUsername() {
+            return username;
+      }
 
-    public long getAt() {
-        return at;
-    }
+      public long getAt() {
+            return at;
+      }
 
-    public User getUser() {
-        return user;
-    }
+      public User getUser() {
+            return user;
+      }
 
-    public void setUser(User user) {
-        this.user = user;
-    }
+      public void setUser(User user) {
+            this.user = user;
+      }
 
-    @Override
-    public boolean equals(Object o) {
-        if (this == o) return true;
-        if (o == null || getClass() != o.getClass()) return false;
-        OnlineStatus that = (OnlineStatus) o;
-        return at == that.at && Objects.equals(username, that.username);
-    }
+      @Override
+      public boolean equals(Object o) {
+            if (this == o) return true;
+            if (o == null || getClass() != o.getClass()) return false;
+            OnlineStatus that = (OnlineStatus) o;
+            return at == that.at && Objects.equals(username, that.username);
+      }
 
-    @Override
-    public int hashCode() {
-        return Objects.hash(username, at);
-    }
+      @Override
+      public int hashCode() {
+            return Objects.hash(username, at);
+      }
 
-    @Override
-    public String toString() {
-        return "OnlineStatus{" +
-                "username='" + username + '\'' +
-                ", at=" + at +
-                ", user=" + user +
-                '}';
-    }
+      @Override
+      public String toString() {
+            return "OnlineStatus{" +
+                  "username='" + username + '\'' +
+                  ", at=" + at +
+                  ", user=" + user +
+                  '}';
+      }
 }

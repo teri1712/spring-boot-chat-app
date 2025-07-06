@@ -1,15 +1,15 @@
-package com.decade.practice.controllers.mvc;
+package com.decade.practice.web.mvc;
 
-import com.decade.practice.controllers.validation.StrongPassword;
 import com.decade.practice.core.UserOperations;
 import com.decade.practice.database.repository.UserRepository;
 import com.decade.practice.image.ImageStore;
 import com.decade.practice.model.domain.embeddable.ImageSpec;
 import com.decade.practice.model.dto.Profile;
 import com.decade.practice.utils.ImageUtils;
+import com.decade.practice.web.validation.StrongPassword;
 import jakarta.persistence.OptimisticLockException;
 import jakarta.validation.Valid;
-import org.springframework.security.access.AccessDeniedException;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -63,15 +63,13 @@ public class ProfileController {
             return "profile";
       }
 
+      @PreAuthorize("authentication.authorities.?[authority.toLowerCase().contains('user')].size() > 0")
       @PostMapping("/information")
       public String updateProfile(
             @ModelAttribute("profile") @Valid Profile profile,
             @AuthenticationPrincipal(expression = "id") UUID id,
             @RequestPart(name = "file", required = false) MultipartFile file
       ) throws IOException, OptimisticLockException, URISyntaxException {
-            if (id == null) {
-                  throw new AccessDeniedException("Operation not supported");
-            }
 
             String name = profile.getName();
             String gender = profile.getGender();
@@ -107,6 +105,7 @@ public class ProfileController {
             return "password";
       }
 
+      @PreAuthorize("authentication.authorities.?[authority.toLowerCase().contains('user')].size() > 0")
       @PostMapping("/password")
       public String changePassword(
             Model model,
@@ -114,9 +113,6 @@ public class ProfileController {
             @RequestParam(value = "password", required = false) String password,
             @StrongPassword @RequestParam("new_password") String newPassword
       ) {
-            if (id == null) {
-                  throw new AccessDeniedException("Operation not supported");
-            }
             try {
                   userOperations.update(id, newPassword, password);
                   model.addAttribute("success", "Credentials updated");

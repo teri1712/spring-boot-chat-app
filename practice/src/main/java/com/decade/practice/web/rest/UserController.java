@@ -1,4 +1,4 @@
-package com.decade.practice.controllers.rest;
+package com.decade.practice.web.rest;
 
 import com.decade.practice.database.repository.UserRepository;
 import com.decade.practice.model.domain.embeddable.ChatIdentifier;

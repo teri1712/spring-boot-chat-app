@@ -1,14 +1,14 @@
 package com.decade.practice.authentication;
 
 import com.decade.practice.DevelopmentApplication;
-import com.decade.practice.controllers.advices.ExceptionControllerAdvice;
-import com.decade.practice.controllers.rest.AuthenticationController;
 import com.decade.practice.core.UserOperations;
 import com.decade.practice.image.ImageStore;
 import com.decade.practice.model.domain.DefaultAvatar;
 import com.decade.practice.model.domain.entity.User;
 import com.decade.practice.model.dto.SignUpRequest;
 import com.decade.practice.security.jwt.JwtCredentialService;
+import com.decade.practice.web.advices.ExceptionControllerAdvice;
+import com.decade.practice.web.rest.AuthenticationController;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.hamcrest.Matchers;
 import org.junit.jupiter.api.BeforeEach;

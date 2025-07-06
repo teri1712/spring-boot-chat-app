@@ -9,16 +9,32 @@ import java.util.Objects;
 import java.util.UUID;
 
 public class JwtUser implements AuthenticatedPrincipal, Serializable {
-      private final UUID id;
-      private final String _username;
 
-      public JwtUser(UUID id, String _username) {
+      private UUID id;
+      private String username;
+
+      public JwtUser(UUID id, String username) {
             this.id = id;
-            this._username = _username;
+            this.username = username;
+      }
+
+      protected JwtUser() {
       }
 
       public JwtUser(User user) {
             this(user.getId(), user.getUsername());
+      }
+
+      public void setId(UUID id) {
+            this.id = id;
+      }
+
+      public String getUsername() {
+            return username;
+      }
+
+      public void setUsername(String username) {
+            this.username = username;
       }
 
       public JwtUser(UserClaims userClaims) {
@@ -31,12 +47,12 @@ public class JwtUser implements AuthenticatedPrincipal, Serializable {
 
       @Override
       public String getName() {
-            return _username;
+            return username;
       }
 
       @Override
       public int hashCode() {
-            return Objects.hash(_username);
+            return Objects.hash(username);
       }
 
       @Override

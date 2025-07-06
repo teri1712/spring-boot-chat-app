@@ -7,17 +7,16 @@ import jakarta.persistence.Entity;
 @DiscriminatorValue("HELLO WORLD")
 public class WelcomeEvent extends TextEvent {
 
-    // No-arg constructor required by JPA
-    protected WelcomeEvent() {
-        super();
-    }
+      protected WelcomeEvent() {
+            super();
+      }
 
-    public WelcomeEvent(Chat chat, User admin, User user) {
-        super(chat, admin, welcomeMessage(user));
-        setOwner(user);
-    }
+      public WelcomeEvent(Chat chat, User admin, User user) {
+            super(chat, admin, welcomeMessage(user));
+            setOwner(user);
+      }
 
-    private static String welcomeMessage(User user) {
-        return "HELLO " + user.getUsername();
-    }
+      private static String welcomeMessage(User user) {
+            return "HELLO " + user.getUsername();
+      }
 }

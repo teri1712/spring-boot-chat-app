@@ -1,7 +1,7 @@
 package com.decade.practice.websocket.arguments;
 
-import com.decade.practice.controllers.converters.ChatIdentifierConverter;
 import com.decade.practice.model.domain.embeddable.ChatIdentifier;
+import com.decade.practice.web.converters.ChatIdentifierConverter;
 import org.springframework.core.MethodParameter;
 import org.springframework.messaging.Message;
 import org.springframework.messaging.handler.invocation.HandlerMethodArgumentResolver;

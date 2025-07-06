@@ -5,7 +5,7 @@ import com.decade.practice.core.TokenCredentialService;
 import com.decade.practice.core.UserOperations;
 import com.decade.practice.database.DatabaseConfiguration;
 import com.decade.practice.database.repository.UserRepository;
-import com.decade.practice.database.transaction.UserService;
+import com.decade.practice.usecases.UserService;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.TestInstance;
@@ -31,31 +31,31 @@ import java.util.Date;
 @Import({UserService.class, DatabaseConfiguration.class})
 public class SchemaTest {
 
-    @Autowired
-    private TestEntityManager entityManager;
+      @Autowired
+      private TestEntityManager entityManager;
 
-    @Autowired
-    private UserRepository userRepo;
+      @Autowired
+      private UserRepository userRepo;
 
-    @Autowired
-    private UserOperations userOperations;
+      @Autowired
+      private UserOperations userOperations;
 
-    @MockBean
-    private PasswordEncoder encoder;
+      @MockBean
+      private PasswordEncoder encoder;
 
-    @MockBean
-    private TokenCredentialService credentialService;
+      @MockBean
+      private TokenCredentialService credentialService;
 
-    @BeforeEach
-    public void setUp() {
-        Mockito.when(encoder.encode(Mockito.anyString())).thenAnswer(invocation -> 
-            invocation.getArgument(0, String.class)
-        );
-        // userRepo.saveAndFlush(mockUser());
-    }
+      @BeforeEach
+      public void setUp() {
+            Mockito.when(encoder.encode(Mockito.anyString())).thenAnswer(invocation ->
+                  invocation.getArgument(0, String.class)
+            );
+            // userRepo.saveAndFlush(mockUser());
+      }
 
-    @Test
-    public void testInsert() {
-        userOperations.create("first", "first", "first", new Date(), "male", null, true);
-    }
+      @Test
+      public void testInsert() {
+            userOperations.create("first", "first", "first", new Date(), "male", null, true);
+      }
 }

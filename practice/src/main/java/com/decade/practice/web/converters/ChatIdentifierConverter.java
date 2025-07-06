@@ -1,4 +1,4 @@
-package com.decade.practice.controllers.converters;
+package com.decade.practice.web.converters;
 
 import com.decade.practice.model.domain.embeddable.ChatIdentifier;
 import org.springframework.core.convert.converter.Converter;

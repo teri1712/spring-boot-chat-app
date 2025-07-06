@@ -1,4 +1,4 @@
-package com.decade.practice.database.transaction;
+package com.decade.practice.usecases;
 
 import com.decade.practice.core.EventStore;
 import com.decade.practice.database.repository.EdgeRepository;
@@ -48,7 +48,7 @@ public class UserEventStore implements EventStore {
                   if (head != null) {
                         Chat top = head.getFrom();
                         if (top != chat) {
-                              var headEdge = new Edge(
+                              Edge headEdge = new Edge(
                                     owner,
                                     chat,
                                     top,

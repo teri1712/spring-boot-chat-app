@@ -1,10 +1,13 @@
 package com.decade.practice.security.jwt;
 
+import com.decade.practice.security.model.UserClaims;
 import com.decade.practice.utils.TokenUtils;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContext;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 import org.springframework.web.filter.OncePerRequestFilter;
@@ -34,13 +37,13 @@ public class JwtTokenFilter extends OncePerRequestFilter {
             try {
                   String accessToken = TokenUtils.extractToken(request);
                   if (accessToken != null) {
-                        var claims = jwtCredentialService.decodeToken(accessToken);
-                        var principal = new JwtUser(claims);
-                        var context = SecurityContextHolder.createEmptyContext();
-                        var authentication = new JwtUserAuthentication(principal, accessToken);
+                        UserClaims claims = jwtCredentialService.decodeToken(accessToken);
+                        JwtUser principal = new JwtUser(claims);
+                        SecurityContext context = SecurityContextHolder.createEmptyContext();
+                        Authentication authentication = new JwtUserAuthentication(principal, accessToken);
                         context.setAuthentication(authentication);
                         SecurityContextHolder.setContext(context);
-                        // NOTE: For token-based authentication, will not be saved into security context repository
+                        // For token-based authentication, will not be saved into security context repository
                   }
                   filterChain.doFilter(request, response);
             } catch (Exception e) {

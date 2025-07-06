@@ -1,4 +1,4 @@
-package com.decade.practice.database.transaction;
+package com.decade.practice.usecases;
 
 import com.decade.practice.core.ChatOperations;
 import com.decade.practice.core.common.SelfAwareBean;
@@ -6,12 +6,15 @@ import com.decade.practice.database.repository.*;
 import com.decade.practice.model.domain.ChatSnapshot;
 import com.decade.practice.model.domain.embeddable.ChatIdentifier;
 import com.decade.practice.model.domain.entity.Chat;
+import com.decade.practice.model.domain.entity.ChatEvent;
+import com.decade.practice.model.domain.entity.Edge;
 import com.decade.practice.model.domain.entity.User;
 import com.decade.practice.model.local.Conversation;
 import com.decade.practice.utils.EventUtils;
 import jakarta.persistence.EntityManager;
 import jakarta.persistence.PersistenceContext;
 import org.hibernate.exception.ConstraintViolationException;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Isolation;
 import org.springframework.transaction.annotation.Propagation;
@@ -98,8 +101,8 @@ public class ChatService extends SelfAwareBean implements ChatOperations {
             chatList.add(currentChat);
 
             while (--count >= 0) {
-                  var edge = edgeRepo.getEdgeFrom(owner, currentChat, effectiveVersion);
-                  if (edge != null) {
+                  Edge edge = edgeRepo.getEdgeFrom(owner, currentChat, effectiveVersion);
+                  if (edge != null && edge.getDest() != null) {
                         currentChat = edge.getDest();
                         chatList.add(currentChat);
                   } else {
@@ -116,8 +119,8 @@ public class ChatService extends SelfAwareBean implements ChatOperations {
             User owner,
             int atVersion
       ) {
-            var page = EventUtils.pageEvent;
-            var eventList = eventRepo.findByOwnerAndChatAndEventVersionLessThanEqual(owner, chat, atVersion, page);
+            PageRequest page = EventUtils.pageEvent;
+            List<ChatEvent> eventList = eventRepo.findByOwnerAndChatAndEventVersionLessThanEqual(owner, chat, atVersion, page);
             return new ChatSnapshot(
                   new Conversation(chat, owner),
                   eventList,

@@ -1,7 +1,7 @@
-package com.decade.practice.controllers.advices;
+package com.decade.practice.web.advices;
 
-import com.decade.practice.controllers.validation.ChatIdentifierValidator;
 import com.decade.practice.model.domain.embeddable.ChatIdentifier;
+import com.decade.practice.web.validation.ChatIdentifierValidator;
 import org.springframework.web.bind.WebDataBinder;
 import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.InitBinder;

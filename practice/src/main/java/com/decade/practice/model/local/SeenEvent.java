@@ -3,33 +3,40 @@ package com.decade.practice.model.local;
 import java.util.Objects;
 
 public class SeenEvent {
-    private final long at;
+      private long at;
 
-    public SeenEvent(long at) {
-        this.at = at;
-    }
+      public SeenEvent(long at) {
+            this.at = at;
+      }
 
-    public long getAt() {
-        return at;
-    }
+      protected SeenEvent() {
+      }
 
-    @Override
-    public boolean equals(Object o) {
-        if (this == o) return true;
-        if (o == null || getClass() != o.getClass()) return false;
-        SeenEvent seenEvent = (SeenEvent) o;
-        return at == seenEvent.at;
-    }
+      public long getAt() {
+            return at;
+      }
 
-    @Override
-    public int hashCode() {
-        return Objects.hash(at);
-    }
+      public void setAt(long at) {
+            this.at = at;
+      }
 
-    @Override
-    public String toString() {
-        return "SeenEvent{" +
-                "at=" + at +
-                '}';
-    }
+      @Override
+      public boolean equals(Object o) {
+            if (this == o) return true;
+            if (o == null || getClass() != o.getClass()) return false;
+            SeenEvent seenEvent = (SeenEvent) o;
+            return at == seenEvent.at;
+      }
+
+      @Override
+      public int hashCode() {
+            return Objects.hash(at);
+      }
+
+      @Override
+      public String toString() {
+            return "SeenEvent{" +
+                  "at=" + at +
+                  '}';
+      }
 }

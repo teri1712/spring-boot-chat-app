@@ -1,4 +1,4 @@
-package com.decade.practice.controllers.advices;
+package com.decade.practice.web.advices;
 
 import jakarta.persistence.EntityNotFoundException;
 import jakarta.persistence.OptimisticLockException;

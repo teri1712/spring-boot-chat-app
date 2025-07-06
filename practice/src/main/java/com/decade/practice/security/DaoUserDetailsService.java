@@ -8,7 +8,7 @@ import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
 
 @Service
-class DaoUserDetailsService implements UserDetailsService {
+public class DaoUserDetailsService implements UserDetailsService {
 
       private final UserRepository userRepo;
 

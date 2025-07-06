@@ -22,7 +22,7 @@ public class LoginFailStrategy implements AuthenticationFailureHandler {
             String message = (exception instanceof UsernameNotFoundException)
                   ? "Username not found"
                   : "Wrong password";
-
+            exception.printStackTrace();
             if (!PlatformsUtils.isBrowserNavigation(request)) {
                   response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
                   response.setContentType("text/plain;charset=UTF-8");

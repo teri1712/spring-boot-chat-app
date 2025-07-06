@@ -4,7 +4,6 @@ import com.decade.practice.DevelopmentApplication;
 import com.decade.practice.core.UserOperations;
 import com.decade.practice.database.repository.UserRepository;
 import com.decade.practice.model.domain.entity.EventTypes;
-import com.decade.practice.model.domain.entity.User;
 import com.decade.practice.model.local.AccountEntry;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
@@ -36,68 +35,67 @@ import static org.junit.jupiter.api.Assertions.assertThrows;
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
 public class LoginTest {
 
-    @LocalServerPort
-    private int port = 0;
+      @LocalServerPort
+      private int port = 0;
 
-    @Autowired
-    private UserOperations userOperations;
+      @Autowired
+      private UserOperations userOperations;
 
-    @Autowired
-    private PasswordEncoder passwordEncoder;
+      @Autowired
+      private PasswordEncoder passwordEncoder;
 
-    @Autowired
-    private UserRepository userRepository;
+      @Autowired
+      private UserRepository userRepository;
 
-    private User user;
 
-    private RestClient client;
+      private RestClient client;
 
-    @BeforeAll
-    public void setUp() {
-        user = userOperations.create("abc", "abc", "abc", null, "male", null, true);
-    }
+      @BeforeAll
+      public void setUp() {
+            userOperations.create("abc", "abc", "abc", null, "male", null, true);
+      }
 
-    @Test
-    public void given_validCredentials_when_login_then_returnsAccountWithChatData() throws Exception {
-        client = RestClient.builder()
-                .baseUrl("http://localhost:" + port + "/login")
-                .build();
+      @Test
+      public void given_validCredentials_when_login_then_returnsAccountWithChatData() throws Exception {
+            client = RestClient.builder()
+                  .baseUrl("http://localhost:" + port + "/login")
+                  .build();
 
-        MultiValueMap<String, String> form = new LinkedMultiValueMap<>();
-        form.add("username", "abc");
-        form.add("password", "abc");
+            MultiValueMap<String, String> form = new LinkedMultiValueMap<>();
+            form.add("username", "abc");
+            form.add("password", "abc");
 
-        AccountEntry received = client.post()
-                .contentType(MediaType.APPLICATION_FORM_URLENCODED)
-                .body(form)
-                .retrieve()
-                .body(AccountEntry.class);
+            AccountEntry received = client.post()
+                  .contentType(MediaType.APPLICATION_FORM_URLENCODED)
+                  .body(form)
+                  .retrieve()
+                  .body(AccountEntry.class);
 
-        assertNotNull(received);
-        assertNotNull(received.getAccount());
-        assertNotNull(received.getChatSnapshots());
-        assertNotNull(received.getChatSnapshots().size() == 1);
-        assertNotNull(received.getChatSnapshots().get(0).getEventList().size() == 1);
-        assertNotNull(received.getChatSnapshots().get(0).getEventList().get(0).getEdges().size() == 1);
-        assertNotNull(received.getChatSnapshots().get(0).getEventList().get(0).getEventType().equals(EventTypes.WELCOME));
-    }
+            assertNotNull(received);
+            assertNotNull(received.getAccount());
+            assertNotNull(received.getChatSnapshots());
+            assertNotNull(received.getChatSnapshots().size() == 1);
+            assertNotNull(received.getChatSnapshots().get(0).getEventList().size() == 1);
+            assertNotNull(received.getChatSnapshots().get(0).getEventList().get(0).getEdges().size() == 1);
+            assertNotNull(received.getChatSnapshots().get(0).getEventList().get(0).getEventType().equals(EventTypes.WELCOME));
+      }
 
-    @Test
-    public void given_invalidCredentials_when_login_then_throwsUnauthorized() throws Exception {
-        client = RestClient.builder()
-                .baseUrl("http://localhost:" + port + "/login")
-                .build();
+      @Test
+      public void given_invalidCredentials_when_login_then_throwsUnauthorized() throws Exception {
+            client = RestClient.builder()
+                  .baseUrl("http://localhost:" + port + "/login")
+                  .build();
 
-        MultiValueMap<String, String> form = new LinkedMultiValueMap<>();
-        form.add("username", "abc");
-        form.add("password", "zzz");
+            MultiValueMap<String, String> form = new LinkedMultiValueMap<>();
+            form.add("username", "abc");
+            form.add("password", "zzz");
 
-        assertThrows(HttpClientErrorException.Unauthorized.class, () -> {
-            client.post()
-                    .contentType(MediaType.APPLICATION_FORM_URLENCODED)
-                    .body(form)
-                    .retrieve()
-                    .body(AccountEntry.class);
-        });
-    }
+            assertThrows(HttpClientErrorException.Unauthorized.class, () -> {
+                  client.post()
+                        .contentType(MediaType.APPLICATION_FORM_URLENCODED)
+                        .body(form)
+                        .retrieve()
+                        .body(AccountEntry.class);
+            });
+      }
 }

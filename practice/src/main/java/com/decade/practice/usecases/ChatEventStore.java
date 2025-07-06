@@ -1,4 +1,4 @@
-package com.decade.practice.database.transaction;
+package com.decade.practice.usecases;
 
 import com.decade.practice.core.ChatOperations;
 import com.decade.practice.core.EventStore;

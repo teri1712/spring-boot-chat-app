@@ -1,4 +1,4 @@
-package com.decade.practice.database.transaction;
+package com.decade.practice.usecases;
 
 import com.decade.practice.core.TokenCredentialService;
 import com.decade.practice.core.UserOperations;
@@ -37,8 +37,6 @@ import java.util.UUID;
 )
 public class UserService extends SelfAwareBean implements UserOperations {
 
-      private static final String MALE = "male";
-
       private final UserRepository userRepo;
       private final AdminRepository adminRepo;
       private final PasswordEncoder encoder;
@@ -75,7 +73,8 @@ public class UserService extends SelfAwareBean implements UserOperations {
             UUID id = usernameAsIdentifier ?
                   UUID.nameUUIDFromBytes(username.getBytes()) :
                   UUID.randomUUID();
-            User user = new User(username, encoder.encode(password), name, dob, "ROLE_USER", id);
+            User user = new User(username, encoder.encode(password),
+                  name, dob, "ROLE_USER", id);
             user.getGender().add(gender);
             user.setAvatar(avatar);
 
@@ -119,7 +118,7 @@ public class UserService extends SelfAwareBean implements UserOperations {
                   password,
                   name,
                   new Date(),
-                  MALE,
+                  User.MALE,
                   avatar,
                   false
             );

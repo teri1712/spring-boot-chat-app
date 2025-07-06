@@ -41,7 +41,7 @@ public class PasswordChangeSessionInvalidator implements AccountEventListener {
       }
 
       private static Authentication getCurrentAuthentication() {
-            return SecurityContextHolder.getContextHolderStrategy().getContext().getAuthentication();
+            return SecurityContextHolder.getContext().getAuthentication();
       }
 
       @Override
@@ -101,8 +101,7 @@ public class PasswordChangeSessionInvalidator implements AccountEventListener {
             if (refreshToken == null) {
                   return;
             }
-
-            // Re-add the current refresh token for continued use
+            // Re-add the current request's refresh token
             credentialService.add(username, refreshToken);
       }
 

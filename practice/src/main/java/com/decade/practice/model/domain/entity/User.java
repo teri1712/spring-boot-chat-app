@@ -18,11 +18,12 @@ import java.util.*;
 @DiscriminatorColumn(name = "role")
 @DiscriminatorValue("ROLE_USER")
 public class User {
+
       public static final String MALE = "male";
       public static final String FEMALE = "female";
 
       @Column(unique = true, nullable = false, updatable = false)
-      private final String username;
+      private String username;
 
       @JsonIgnore
       @Column(nullable = false)
@@ -34,7 +35,7 @@ public class User {
       private Date dob;
 
       @Column(insertable = false, updatable = false)
-      private final String role;
+      private String role;
 
       @Id
       private UUID id;

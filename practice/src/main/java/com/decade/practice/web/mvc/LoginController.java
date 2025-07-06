@@ -1,4 +1,4 @@
-package com.decade.practice.controllers.mvc;
+package com.decade.practice.web.mvc;
 
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;

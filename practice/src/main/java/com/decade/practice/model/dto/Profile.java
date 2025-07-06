@@ -12,7 +12,7 @@ import java.util.Date;
 
 public class Profile implements Serializable {
 
-      private final String username;
+      private String username;
 
       @Size(min = 4, max = 100, message = "Name length must be between 4-100")
       private String name;
@@ -32,6 +32,13 @@ public class Profile implements Serializable {
             this.gender = user.getGender().stream().findFirst().orElse(null);
             this.birthday = user.getDob();
             this.username = user.getUsername();
+      }
+
+      protected Profile() {
+      }
+
+      public void setUsername(String username) {
+            this.username = username;
       }
 
       public boolean isAllowToUpdate() {

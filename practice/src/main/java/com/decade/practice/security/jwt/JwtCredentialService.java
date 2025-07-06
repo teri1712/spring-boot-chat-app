@@ -34,7 +34,7 @@ public class JwtCredentialService implements TokenCredentialService {
             this.key = Base64.getEncoder().encodeToString(secret.getBytes());
       }
 
-      private String generateKey(String username) {
+      private static String generateKey(String username) {
             return TOKEN_KEY_SPACE + ":" + username;
       }
 

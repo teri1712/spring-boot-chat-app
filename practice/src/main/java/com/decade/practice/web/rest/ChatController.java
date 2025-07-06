@@ -1,4 +1,4 @@
-package com.decade.practice.controllers.rest;
+package com.decade.practice.web.rest;
 
 import com.decade.practice.core.ChatOperations;
 import com.decade.practice.database.repository.ChatRepository;

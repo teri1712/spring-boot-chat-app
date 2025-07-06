@@ -3,84 +3,109 @@ package com.decade.practice.model.local;
 import com.decade.practice.model.TokenCredential;
 import com.decade.practice.model.domain.SyncContext;
 import com.decade.practice.model.domain.entity.User;
-import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
-import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 
 import java.util.Objects;
 import java.util.UUID;
 
-@JsonDeserialize
-@JsonSerialize
 public class Account {
-    private final UUID id;
-    private final String username;
-    private final User user;
-    private final TokenCredential credential;
-    private final SyncContext syncContext;
 
-    public Account(UUID id, String username, User user, TokenCredential credential, SyncContext syncContext) {
-        this.id = id;
-        this.username = username;
-        this.user = user;
-        this.credential = credential;
-        this.syncContext = syncContext;
-    }
+      private UUID id;
+      private User user;
+      private String username;
+      private TokenCredential credential;
+      private SyncContext syncContext;
 
-    public Account(User user, TokenCredential credential) {
-        this(
-            user.getId(),
-            user.getUsername(),
-            user,
-            credential,
-            user.getSyncContext()
-        );
-    }
+      public Account(
+            UUID id,
+            String username,
+            User user,
+            TokenCredential credential,
+            SyncContext syncContext) {
+            this.id = id;
+            this.username = username;
+            this.user = user;
+            this.credential = credential;
+            this.syncContext = syncContext;
+      }
 
-    public UUID getId() {
-        return id;
-    }
+      protected Account() {
+      }
 
-    public String getUsername() {
-        return username;
-    }
+      public Account(User user, TokenCredential credential) {
+            this(
+                  user.getId(),
+                  user.getUsername(),
+                  user,
+                  credential,
+                  user.getSyncContext()
+            );
+      }
 
-    public User getUser() {
-        return user;
-    }
+      public UUID getId() {
+            return id;
+      }
 
-    public TokenCredential getCredential() {
-        return credential;
-    }
+      public String getUsername() {
+            return username;
+      }
 
-    public SyncContext getSyncContext() {
-        return syncContext;
-    }
+      public User getUser() {
+            return user;
+      }
 
-    @Override
-    public boolean equals(Object o) {
-        if (this == o) return true;
-        if (o == null || getClass() != o.getClass()) return false;
-        Account account = (Account) o;
-        return Objects.equals(id, account.id) &&
-                Objects.equals(username, account.username) &&
-                Objects.equals(user, account.user) &&
-                Objects.equals(credential, account.credential) &&
-                Objects.equals(syncContext, account.syncContext);
-    }
+      public TokenCredential getCredential() {
+            return credential;
+      }
 
-    @Override
-    public int hashCode() {
-        return Objects.hash(id, username, user, credential, syncContext);
-    }
+      public SyncContext getSyncContext() {
+            return syncContext;
+      }
 
-    @Override
-    public String toString() {
-        return "Account{" +
-                "id=" + id +
-                ", username='" + username + '\'' +
-                ", user=" + user +
-                ", credential=" + credential +
-                ", syncContext=" + syncContext +
-                '}';
-    }
+      @Override
+      public boolean equals(Object o) {
+            if (this == o) return true;
+            if (o == null || getClass() != o.getClass()) return false;
+            Account account = (Account) o;
+            return Objects.equals(id, account.id) &&
+                  Objects.equals(username, account.username) &&
+                  Objects.equals(user, account.user) &&
+                  Objects.equals(credential, account.credential) &&
+                  Objects.equals(syncContext, account.syncContext);
+      }
+
+      public void setId(UUID id) {
+            this.id = id;
+      }
+
+      public void setUser(User user) {
+            this.user = user;
+      }
+
+      public void setUsername(String username) {
+            this.username = username;
+      }
+
+      public void setCredential(TokenCredential credential) {
+            this.credential = credential;
+      }
+
+      public void setSyncContext(SyncContext syncContext) {
+            this.syncContext = syncContext;
+      }
+
+      @Override
+      public int hashCode() {
+            return Objects.hash(id, username, user, credential, syncContext);
+      }
+
+      @Override
+      public String toString() {
+            return "Account{" +
+                  "id=" + id +
+                  ", username='" + username + '\'' +
+                  ", user=" + user +
+                  ", credential=" + credential +
+                  ", syncContext=" + syncContext +
+                  '}';
+      }
 }

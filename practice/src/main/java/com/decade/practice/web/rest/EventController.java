@@ -1,14 +1,14 @@
-package com.decade.practice.controllers.rest;
+package com.decade.practice.web.rest;
 
 import com.decade.practice.core.ChatOperations;
 import com.decade.practice.core.OnlineStatistic;
 import com.decade.practice.database.repository.EventRepository;
 import com.decade.practice.database.repository.UserRepository;
-import com.decade.practice.database.transaction.ChatEventStore;
 import com.decade.practice.image.ImageStore;
 import com.decade.practice.model.domain.embeddable.ChatIdentifier;
 import com.decade.practice.model.domain.embeddable.ImageSpec;
 import com.decade.practice.model.domain.entity.*;
+import com.decade.practice.usecases.ChatEventStore;
 import com.decade.practice.utils.CacheUtils;
 import com.decade.practice.utils.ChatUtils;
 import com.decade.practice.utils.EventUtils;

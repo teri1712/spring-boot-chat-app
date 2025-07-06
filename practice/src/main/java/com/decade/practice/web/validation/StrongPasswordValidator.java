@@ -1,4 +1,4 @@
-package com.decade.practice.controllers.validation;
+package com.decade.practice.web.validation;
 
 import jakarta.validation.ConstraintValidator;
 import jakarta.validation.ConstraintValidatorContext;

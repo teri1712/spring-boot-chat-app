@@ -7,49 +7,65 @@ import java.util.List;
 import java.util.Objects;
 
 public class ChatSnapshot {
-    private final Conversation conversation;
-    private final List<ChatEvent> eventList;
-    private final int atVersion;
 
-    public ChatSnapshot(Conversation conversation, List<ChatEvent> eventList, int atVersion) {
-        this.conversation = conversation;
-        this.eventList = eventList;
-        this.atVersion = atVersion;
-    }
+      private Conversation conversation;
+      private List<ChatEvent> eventList;
+      private int atVersion;
 
-    public Conversation getConversation() {
-        return conversation;
-    }
+      public ChatSnapshot(Conversation conversation, List<ChatEvent> eventList, int atVersion) {
+            this.conversation = conversation;
+            this.eventList = eventList;
+            this.atVersion = atVersion;
+      }
 
-    public List<ChatEvent> getEventList() {
-        return eventList;
-    }
+      protected ChatSnapshot() {
+      }
 
-    public int getAtVersion() {
-        return atVersion;
-    }
+      public Conversation getConversation() {
+            return conversation;
+      }
 
-    @Override
-    public boolean equals(Object o) {
-        if (this == o) return true;
-        if (o == null || getClass() != o.getClass()) return false;
-        ChatSnapshot that = (ChatSnapshot) o;
-        return atVersion == that.atVersion &&
-                Objects.equals(conversation, that.conversation) &&
-                Objects.equals(eventList, that.eventList);
-    }
+      public void setConversation(Conversation conversation) {
+            this.conversation = conversation;
+      }
 
-    @Override
-    public int hashCode() {
-        return Objects.hash(conversation, eventList, atVersion);
-    }
+      public void setEventList(List<ChatEvent> eventList) {
+            this.eventList = eventList;
+      }
 
-    @Override
-    public String toString() {
-        return "ChatSnapshot{" +
-                "conversation=" + conversation +
-                ", eventList=" + eventList +
-                ", atVersion=" + atVersion +
-                '}';
-    }
+      public void setAtVersion(int atVersion) {
+            this.atVersion = atVersion;
+      }
+
+      public List<ChatEvent> getEventList() {
+            return eventList;
+      }
+
+      public int getAtVersion() {
+            return atVersion;
+      }
+
+      @Override
+      public boolean equals(Object o) {
+            if (this == o) return true;
+            if (o == null || getClass() != o.getClass()) return false;
+            ChatSnapshot that = (ChatSnapshot) o;
+            return atVersion == that.atVersion &&
+                  Objects.equals(conversation, that.conversation) &&
+                  Objects.equals(eventList, that.eventList);
+      }
+
+      @Override
+      public int hashCode() {
+            return Objects.hash(conversation, eventList, atVersion);
+      }
+
+      @Override
+      public String toString() {
+            return "ChatSnapshot{" +
+                  "conversation=" + conversation +
+                  ", eventList=" + eventList +
+                  ", atVersion=" + atVersion +
+                  '}';
+      }
 }

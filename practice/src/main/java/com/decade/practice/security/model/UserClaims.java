@@ -1,18 +1,16 @@
 package com.decade.practice.security.model;
 
 import com.decade.practice.model.domain.entity.User;
-import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 
 import java.util.Objects;
 import java.util.UUID;
 
-@JsonDeserialize
 public class UserClaims {
-      private final UUID id;
-      private final String username;
-      private final String name;
-      private final String role;
-      private final String gender;
+      private UUID id;
+      private String username;
+      private String name;
+      private String role;
+      private String gender;
 
       public UserClaims(UUID id, String username, String name, String role, String gender) {
             this.id = id;
@@ -20,6 +18,9 @@ public class UserClaims {
             this.name = name;
             this.role = role;
             this.gender = gender;
+      }
+
+      protected UserClaims() {
       }
 
       public UserClaims(User user) {
@@ -42,6 +43,26 @@ public class UserClaims {
 
       public String getName() {
             return name;
+      }
+
+      public void setId(UUID id) {
+            this.id = id;
+      }
+
+      public void setUsername(String username) {
+            this.username = username;
+      }
+
+      public void setName(String name) {
+            this.name = name;
+      }
+
+      public void setRole(String role) {
+            this.role = role;
+      }
+
+      public void setGender(String gender) {
+            this.gender = gender;
       }
 
       public String getRole() {
