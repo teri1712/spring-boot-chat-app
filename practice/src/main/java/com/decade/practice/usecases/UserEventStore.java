@@ -3,6 +3,7 @@ package com.decade.practice.usecases;
 import com.decade.practice.core.EventStore;
 import com.decade.practice.database.repository.EdgeRepository;
 import com.decade.practice.database.repository.EventRepository;
+import com.decade.practice.model.domain.SyncContext;
 import com.decade.practice.model.domain.entity.*;
 import jakarta.persistence.EntityManager;
 import jakarta.persistence.PersistenceContext;
@@ -40,7 +41,10 @@ public class UserEventStore implements EventStore {
             User owner = event.getOwner();
             Chat chat = event.getChat();
 
-            int version = owner.getSyncContext().incVersion();
+            SyncContext syncContext = owner.getSyncContext();
+            int version = syncContext.getEventVersion() + 1;
+            syncContext.setEventVersion(version);
+
             event.setEventVersion(version);
 
             if (MessageUtils.isMessage(event)) {
@@ -48,14 +52,14 @@ public class UserEventStore implements EventStore {
                   if (head != null) {
                         Chat top = head.getFrom();
                         if (top != chat) {
-                              Edge headEdge = new Edge(
+                              Edge newHead = new Edge(
                                     owner,
                                     chat,
                                     top,
                                     event,
                                     true
                               );
-                              event.getEdges().add(headEdge);
+                              event.getEdges().add(newHead);
 
                               Edge bridgeFrom = edgeRepo.getEdgeTo(owner, chat, version);
                               if (bridgeFrom != null) {

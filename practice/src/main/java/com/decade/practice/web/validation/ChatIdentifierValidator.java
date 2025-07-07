@@ -14,7 +14,7 @@ public class ChatIdentifierValidator implements Validator {
       @Override
       public void validate(Object target, Errors errors) {
             ChatIdentifier identifier = (ChatIdentifier) target;
-            if (identifier.getFirstUser().compareTo(identifier.getSecondUser()) >= 0) {
+            if (identifier.getFirstUser().compareTo(identifier.getSecondUser()) > 0) {
                   errors.reject("Invalid chat identifier");
             }
       }

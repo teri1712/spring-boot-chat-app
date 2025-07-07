@@ -122,8 +122,13 @@ public class ConversationTest {
       public void given_multipleMessages_when_queryingChats_then_ordersByLatestActivity() {
             Assertions.assertEquals(3, chatRepo.count());
 
-            sendEvent(first, second, "Hello");
-            sendEvent(third, first, "I'm fine");
+            Chat secondChat = sendEvent(first, second, "Hello").getChat();
+            Assertions.assertEquals(1, first.getSyncContext().getEventVersion());
+            Assertions.assertEquals(secondChat.getIdentifier(), edgeRepo.getHeadEdge(first, 1).getFrom().getIdentifier());
+            Chat thirdChat = sendEvent(third, first, "I'm fine").getChat();
+            Assertions.assertEquals(2, first.getSyncContext().getEventVersion());
+            Assertions.assertEquals(thirdChat.getIdentifier(), edgeRepo.getHeadEdge(first, 2).getFrom().getIdentifier());
+
             Assertions.assertEquals(3 + 2, chatRepo.count());
 
             Assertions.assertEquals(1 + 2, edgeRepo.findByOwner(first).size());
@@ -141,12 +146,8 @@ public class ConversationTest {
             Assertions.assertEquals(3 + 2 + 1 + 1, edgeRepo.count());
 
             sendEvent(second, first, "How are you");
-
-            Assertions.assertEquals(3 + 2, chatRepo.count());
-            Assertions.assertEquals(1 + 2 + 2, edgeRepo.findByOwner(first).size());
-            Assertions.assertEquals(1 + 1, edgeRepo.findByOwner(second).size());
-            Assertions.assertEquals(1 + 1, edgeRepo.findByOwner(third).size());
-
+            Assertions.assertEquals(3, first.getSyncContext().getEventVersion());
+            Assertions.assertEquals(secondChat.getIdentifier(), edgeRepo.getHeadEdge(first, 3).getFrom().getIdentifier());
             Assertions.assertEquals(3 + 2 + 1 + 1 + 2, edgeRepo.count());
 
             chats = chatOperations.listChat(first);
@@ -154,6 +155,12 @@ public class ConversationTest {
             Assertions.assertEquals(third, inspectPartner(chats.get(1), first));
             Assertions.assertEquals(second, inspectPartner(chats.get(0), first));
             Assertions.assertEquals(1 + 2, chats.size());
+
+            Assertions.assertEquals(3 + 2, chatRepo.count());
+            Assertions.assertEquals(1 + 2 + 2, edgeRepo.findByOwner(first).size());
+            Assertions.assertEquals(1 + 1, edgeRepo.findByOwner(second).size());
+            Assertions.assertEquals(1 + 1, edgeRepo.findByOwner(third).size());
+
 
             Assertions.assertEquals(3 + 2, chatRepo.count());
             Assertions.assertEquals(1 + 2 + 2, edgeRepo.findByOwner(first).size());

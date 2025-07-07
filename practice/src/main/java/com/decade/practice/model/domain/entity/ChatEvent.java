@@ -11,8 +11,9 @@ import jakarta.validation.constraints.NotNull;
 import org.hibernate.annotations.Cache;
 import org.hibernate.annotations.CacheConcurrencyStrategy;
 
-import java.util.HashSet;
-import java.util.Set;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.List;
 import java.util.UUID;
 
 @JsonTypeInfo(
@@ -55,9 +56,9 @@ public abstract class ChatEvent {
       @ManyToOne(cascade = CascadeType.PERSIST)
       private User owner;
 
-      @JsonDeserialize(as = HashSet.class)
+      @JsonDeserialize(as = List.class)
       @OneToMany(cascade = CascadeType.PERSIST, mappedBy = "event", fetch = FetchType.EAGER)
-      private Set<Edge> edges = new HashSet<>();
+      private Collection<Edge> edges = new ArrayList<>();
 
       @JsonIgnore
       @Id
@@ -144,7 +145,7 @@ public abstract class ChatEvent {
             this.owner = owner;
       }
 
-      public Set<Edge> getEdges() {
+      public Collection<Edge> getEdges() {
             return edges;
       }
 
