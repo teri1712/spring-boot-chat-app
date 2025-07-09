@@ -26,16 +26,17 @@ import java.util.Set;
 @EnableWebSocket
 @EnableWebSocketMessageBroker
 public class WsConfiguration implements WebSocketMessageBrokerConfigurer {
+
       public static final String HANDSHAKE_DESTINATION = "/handshake";
       public static final String USER_DESTINATION = "/user";
-      public static final String MQ_DESTINATION = "/queue/message";
-      public static final String MQ_CHAT_DESTINATION = "/queue/chat";
+      public static final String QUEUE_MESSAGE_DESTINATION = "/queue/message";
+      public static final String QUEUE_CHAT_DESTINATION = "/queue/chat";
       public static final String TYPING_DESTINATION = "/typing";
 
-      public static final String USER_QUEUE_DESTINATION = USER_DESTINATION + MQ_DESTINATION;
+      public static final String USER_QUEUE_DESTINATION = USER_DESTINATION + QUEUE_MESSAGE_DESTINATION;
       public static final Set<String> BROKER_DESTINATIONS = new HashSet<>() {{
-            add(MQ_CHAT_DESTINATION);
-            add(MQ_DESTINATION);
+            add(QUEUE_CHAT_DESTINATION);
+            add(QUEUE_MESSAGE_DESTINATION);
       }};
 
       private final WsEntityRepository entityRepo;

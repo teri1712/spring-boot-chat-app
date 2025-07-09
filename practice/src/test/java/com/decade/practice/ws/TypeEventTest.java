@@ -33,6 +33,7 @@ import java.util.concurrent.CompletableFuture;
 
 import static com.decade.practice.utils.TokenUtils.BEARER;
 import static com.decade.practice.utils.TokenUtils.HEADER_NAME;
+import static com.decade.practice.websocket.arguments.ChatIdentifierArgumentResolver.CHAT_HEADER;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 
@@ -45,10 +46,6 @@ import static org.junit.jupiter.api.Assertions.assertNotNull;
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
 @TestMethodOrder(MethodOrderer.OrderAnnotation.class)
 public class TypeEventTest {
-
-      private static final String HANDSHAKE_DESTINATION = "/handshake";
-      private static final String TYPING_DESTINATION = "/typing";
-      private static final String CHAT_HEADER = "chat_identifier";
 
       @LocalServerPort
       private int port = 0;
@@ -91,7 +88,7 @@ public class TypeEventTest {
             WebSocketHttpHeaders myHeaders = new WebSocketHttpHeaders();
             myHeaders.add(HEADER_NAME, BEARER + myToken);
             mySession = stompClient.connectAsync(
-                  "ws://localhost:" + port + HANDSHAKE_DESTINATION,
+                  "ws://localhost:" + port + "/handshake",
                   myHeaders,
                   new StompSessionHandlerAdapter() {
                   }).get();
@@ -99,7 +96,7 @@ public class TypeEventTest {
             WebSocketHttpHeaders yourHeaders = new WebSocketHttpHeaders();
             yourHeaders.add(HEADER_NAME, BEARER + yourToken);
             yourSession = stompClient.connectAsync(
-                  "ws://localhost:" + port + HANDSHAKE_DESTINATION,
+                  "ws://localhost:" + port + "/handshake",
                   yourHeaders,
                   new StompSessionHandlerAdapter() {
                   }).get();
@@ -118,11 +115,11 @@ public class TypeEventTest {
             CompletableFuture<TypeEvent> yourEvent = new CompletableFuture<>();
 
             StompHeaders myHeaders = new StompHeaders();
-            myHeaders.setDestination(TYPING_DESTINATION);
+            myHeaders.setDestination("/typing");
             myHeaders.set(CHAT_HEADER, chat.getIdentifier().toString());
 
             StompHeaders yourHeaders = new StompHeaders();
-            yourHeaders.setDestination(TYPING_DESTINATION);
+            yourHeaders.setDestination("/typing");
             yourHeaders.set(CHAT_HEADER, chat.getIdentifier().toString());
 
             mySession.subscribe(myHeaders, new StompFrameHandler() {
@@ -156,7 +153,7 @@ public class TypeEventTest {
 
             StompHeaders h = new StompHeaders();
             h.set(CHAT_HEADER, chat.getIdentifier().toString());
-            h.setDestination(TYPING_DESTINATION);
+            h.setDestination("/typing");
             yourSession.send(h, "Hello");
 
             assertNotNull(myEvent.get());

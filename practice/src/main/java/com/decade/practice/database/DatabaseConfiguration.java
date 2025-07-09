@@ -25,7 +25,7 @@ public class DatabaseConfiguration implements ApplicationContextAware {
       public Module hibernateJacksonModule() {
             return new Hibernate6Module();
       }
-      
+
       @Value("${admin.username}")
       private String adminUsername;
 

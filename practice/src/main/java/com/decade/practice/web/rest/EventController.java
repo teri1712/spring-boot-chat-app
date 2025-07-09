@@ -75,7 +75,7 @@ public class EventController {
                   for (ChatEvent it : saved) {
                         template.convertAndSendToUser(
                               it.getOwner().getUsername(),
-                              WsConfiguration.MQ_DESTINATION,
+                              WsConfiguration.QUEUE_MESSAGE_DESTINATION,
                               it
                         );
                   }

@@ -37,7 +37,7 @@ public class MessageController {
       }
 
       private String resolveDestination(Chat chat) {
-            return WsConfiguration.MQ_CHAT_DESTINATION + "-" + chat.getIdentifier();
+            return WsConfiguration.QUEUE_CHAT_DESTINATION + "-" + chat.getIdentifier();
       }
 
       @MessageMapping(WsConfiguration.TYPING_DESTINATION)

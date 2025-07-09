@@ -33,8 +33,11 @@ import java.util.Date;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.TimeUnit;
 
+import static com.decade.practice.model.domain.entity.MessageUtils.TEXT;
 import static com.decade.practice.utils.TokenUtils.BEARER;
 import static com.decade.practice.utils.TokenUtils.HEADER_NAME;
+import static com.decade.practice.websocket.WsConfiguration.HANDSHAKE_DESTINATION;
+import static com.decade.practice.websocket.WsConfiguration.USER_QUEUE_DESTINATION;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 
 @SpringBootTest(
@@ -47,9 +50,6 @@ import static org.junit.jupiter.api.Assertions.assertNotNull;
 @TestMethodOrder(MethodOrderer.OrderAnnotation.class)
 public class WsTest {
 
-      private static final String HANDSHAKE_DESTINATION = "/handshake";
-      private static final String USER_QUEUE_DESTINATION = "/user/queue/message";
-      private static final String TEXT = "TEXT";
 
       @LocalServerPort
       private int port = 0;
