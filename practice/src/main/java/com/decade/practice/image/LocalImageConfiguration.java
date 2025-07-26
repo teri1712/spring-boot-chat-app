@@ -58,7 +58,7 @@ public class LocalImageConfiguration {
                         String queryString = request.getQueryString();
                         URI uri = new URL(requestURL + "?" + queryString).toURI();
                         Resource resource = store.read(uri);
-                        var cacheControl = CacheUtils.DEFAULT_CACHE_CONTROL;
+                        var cacheControl = CacheUtils.CACHE_CONTROL;
 
                         return ResponseEntity.ok()
                               .cacheControl(cacheControl)

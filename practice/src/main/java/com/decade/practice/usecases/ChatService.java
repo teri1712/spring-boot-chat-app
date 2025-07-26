@@ -119,7 +119,7 @@ public class ChatService extends SelfAwareBean implements ChatOperations {
             User owner,
             int atVersion
       ) {
-            PageRequest page = EventUtils.pageEvent;
+            PageRequest page = EventUtils.EVENT_VERSION_LESS_THAN_EQUAL;
             List<ChatEvent> eventList = eventRepo.findByOwnerAndChatAndEventVersionLessThanEqual(owner, chat, atVersion, page);
             return new ChatSnapshot(
                   new Conversation(chat, owner),

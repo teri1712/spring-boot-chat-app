@@ -9,44 +9,38 @@ import com.decade.practice.model.domain.embeddable.ChatIdentifier;
 import com.decade.practice.model.domain.entity.Chat;
 import com.decade.practice.model.domain.entity.User;
 import com.decade.practice.utils.CacheUtils;
-import org.springframework.http.CacheControl;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
-import org.springframework.validation.annotation.Validated;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import java.util.ArrayList;
 import java.util.List;
 
 @RestController
-@RequestMapping("/chat")
+@RequestMapping("/chats")
 public class ChatController {
 
-      private final UserRepository userRepo;
-      private final ChatRepository chatRepo;
+      private final UserRepository userRepository;
+      private final ChatRepository chatRepository;
       private final ChatOperations chatOperations;
 
       public ChatController(
-            UserRepository userRepo,
-            ChatRepository chatRepo,
+            UserRepository userRepository,
+            ChatRepository chatRepository,
             ChatOperations chatOperations
       ) {
-            this.userRepo = userRepo;
-            this.chatRepo = chatRepo;
+            this.userRepository = userRepository;
+            this.chatRepository = chatRepository;
             this.chatOperations = chatOperations;
       }
 
-      @GetMapping("/snapshot")
+      @GetMapping("/{identifier}")
       public ResponseEntity<ChatSnapshot> get(
             @AuthenticationPrincipal(expression = "name") String username,
-            @RequestParam @Validated ChatIdentifier identifier,
+            @PathVariable ChatIdentifier identifier,
             @RequestParam(required = false) Integer atVersion
       ) {
-            CacheControl cacheControl = CacheUtils.DEFAULT_CACHE_CONTROL;
-            User me = userRepo.getByUsername(username);
+            User me = userRepository.getByUsername(username);
             Chat chat = chatOperations.getOrCreateChat(identifier);
             ChatSnapshot snapshot = chatOperations.getSnapshot(
                   chat,
@@ -55,7 +49,7 @@ public class ChatController {
             );
 
             return ResponseEntity.ok()
-                  .cacheControl(cacheControl)
+                  .cacheControl(CacheUtils.CACHE_CONTROL)
                   .header("Vary", "Cookie, Authorization")
                   .body(snapshot);
       }
@@ -63,20 +57,19 @@ public class ChatController {
       @GetMapping
       public ResponseEntity<List<ChatSnapshot>> list(
             @AuthenticationPrincipal(expression = "name") String username,
-            @RequestParam(required = false) @Validated ChatIdentifier startAt,
+            @RequestParam(required = false) ChatIdentifier startAt,
             @RequestParam int atVersion
       ) {
-            Chat chat = startAt == null ? null : EntityHelper.get(chatRepo, startAt);
-            User owner = userRepo.getByUsername(username);
+            Chat chat = startAt == null ? null : EntityHelper.get(chatRepository, startAt);
+            User owner = userRepository.getByUsername(username);
 
-            CacheControl cacheControl = CacheUtils.DEFAULT_CACHE_CONTROL;
             List<Chat> chatList = chatOperations.listChat(owner, atVersion, chat);
             List<ChatSnapshot> snapshotList = new ArrayList<>();
             for (Chat c : chatList) {
                   snapshotList.add(chatOperations.getSnapshot(c, owner, atVersion));
             }
             return ResponseEntity.ok()
-                  .cacheControl(cacheControl)
+                  .cacheControl(CacheUtils.CACHE_CONTROL)
                   .header("Vary", "Cookie, Authorization")
                   .body(snapshotList);
       }

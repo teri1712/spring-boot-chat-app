@@ -16,6 +16,7 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import java.security.Principal;
 import java.util.Collections;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -35,20 +36,18 @@ public class AccountController {
       }
 
       @PreAuthorize("authentication.authorities.?[authority.toLowerCase().contains('user')].size() > 0")
-      @GetMapping
-      public AccountEntry get(
-            @AuthenticationPrincipal(expression = "name") String username
-      ) {
+      @GetMapping("/principal")
+      public AccountEntry get(Principal principal) {
             return new AccountEntry(
                   new Account(
-                        userRepository.getByUsername(username),
+                        userRepository.getByUsername(principal.getName()),
                         null
                   ),
                   Collections.emptyList()
             );
       }
 
-      @PostMapping("/login")
+      @PostMapping("/authentication")
       public AccountEntry login(
             @AuthenticationPrincipal UserDetails userDetails
       ) {

@@ -7,7 +7,10 @@ import com.decade.practice.database.repository.UserRepository;
 import com.decade.practice.image.ImageStore;
 import com.decade.practice.model.domain.embeddable.ChatIdentifier;
 import com.decade.practice.model.domain.embeddable.ImageSpec;
-import com.decade.practice.model.domain.entity.*;
+import com.decade.practice.model.domain.entity.Chat;
+import com.decade.practice.model.domain.entity.ChatEvent;
+import com.decade.practice.model.domain.entity.ImageEvent;
+import com.decade.practice.model.domain.entity.User;
 import com.decade.practice.usecases.ChatEventStore;
 import com.decade.practice.utils.CacheUtils;
 import com.decade.practice.utils.ChatUtils;
@@ -17,10 +20,11 @@ import com.decade.practice.websocket.WsConfiguration;
 import jakarta.persistence.EntityNotFoundException;
 import jakarta.validation.Valid;
 import org.springframework.dao.DataIntegrityViolationException;
-import org.springframework.http.CacheControl;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.messaging.simp.SimpMessagingTemplate;
+import org.springframework.security.access.AccessDeniedException;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
@@ -31,11 +35,12 @@ import java.io.IOException;
 import java.net.URI;
 import java.util.Collection;
 import java.util.List;
+import java.util.UUID;
 
 import static java.lang.Math.min;
 
 @RestController
-@RequestMapping("/message")
+@RequestMapping
 public class EventController {
 
       private final ChatEventStore chatEventStore;
@@ -64,7 +69,7 @@ public class EventController {
             this.imageStore = imageStore;
       }
 
-      private <E extends ChatEvent> E pushEvent(
+      private <E extends ChatEvent> E createAndDeliver(
             User sender,
             E event
       ) throws EntityNotFoundException {
@@ -97,36 +102,18 @@ public class EventController {
             }
       }
 
-      @PostMapping("/seen")
+      @PostMapping(consumes = {MediaType.APPLICATION_JSON_VALUE})
       @ResponseStatus(HttpStatus.CREATED)
-      public SeenEvent pushEvent(
+      public ChatEvent createEvent(
             @AuthenticationPrincipal(expression = "name") String username,
-            @RequestBody @Valid SeenEvent record
-      ) throws EntityNotFoundException {
-            return pushEvent(userRepo.getByUsername(username), record);
+            @RequestBody @Valid ChatEvent event) {
+            return createAndDeliver(userRepo.getByUsername(username), event);
       }
 
-      @PostMapping("/text")
-      @ResponseStatus(HttpStatus.CREATED)
-      public TextEvent pushEvent(
-            @AuthenticationPrincipal(expression = "name") String username,
-            @RequestBody @Valid TextEvent event
-      ) throws EntityNotFoundException {
-            return pushEvent(userRepo.getByUsername(username), event);
-      }
 
-      @PostMapping("/icon")
+      @PostMapping(path = "/events", consumes = {MediaType.MULTIPART_FORM_DATA_VALUE})
       @ResponseStatus(HttpStatus.CREATED)
-      public IconEvent pushEvent(
-            @AuthenticationPrincipal(expression = "name") String username,
-            @RequestBody @Valid IconEvent event
-      ) throws EntityNotFoundException {
-            return pushEvent(userRepo.getByUsername(username), event);
-      }
-
-      @PostMapping("/image")
-      @ResponseStatus(HttpStatus.CREATED)
-      public ImageEvent pushEvent(
+      public ImageEvent createEvent(
             @AuthenticationPrincipal(expression = "name") String username,
             @RequestPart("event") @Valid ImageEvent event,
             @RequestPart("file") MultipartFile file
@@ -137,44 +124,46 @@ public class EventController {
 
             event.setImage(imageStore.save(image));
             try {
-                  return pushEvent(userRepo.getByUsername(username), event);
+                  return createAndDeliver(userRepo.getByUsername(username), event);
             } catch (Exception e) {
                   imageStore.remove(URI.create(event.getImage().getUri()));
                   throw e;
             }
       }
 
-      @GetMapping("/chat")
-      public ResponseEntity<List<ChatEvent>> pullEvents(
+      @GetMapping("/chats/{chatIdentifier}/events")
+      public ResponseEntity<List<ChatEvent>> listEvents(
             @AuthenticationPrincipal(expression = "name") String username,
-            @RequestParam @Validated ChatIdentifier identifier,
+            @PathVariable @Validated ChatIdentifier chatIdentifier,
             @RequestParam int atVersion
       ) throws EntityNotFoundException {
-            Chat chat = chatOperations.getOrCreateChat(identifier);
+            Chat chat = chatOperations.getOrCreateChat(chatIdentifier);
             User user = ChatUtils.inspectOwner(chat, username);
-            CacheControl cacheControl = CacheUtils.DEFAULT_CACHE_CONTROL;
             List<ChatEvent> events = evenRepo.findByOwnerAndChatAndEventVersionLessThanEqual(
-                  user, chat, atVersion, EventUtils.pageEvent);
+                  user, chat, atVersion, EventUtils.EVENT_VERSION_LESS_THAN_EQUAL);
 
             return ResponseEntity.ok()
                   .header("Vary", "Cookie, Authorization")
-                  .cacheControl(cacheControl)
+                  .cacheControl(CacheUtils.CACHE_CONTROL)
                   .body(events);
       }
 
-      @GetMapping
-      public ResponseEntity<List<ChatEvent>> pullEvents(
+      @GetMapping("/users/me/events")
+      public ResponseEntity<List<ChatEvent>> listEvents(
             @AuthenticationPrincipal(expression = "name") String username,
+            @PathVariable UUID userId,
             @RequestParam int atVersion
       ) throws EntityNotFoundException {
             User owner = userRepo.getByUsername(username);
-            CacheControl cacheControl = CacheUtils.DEFAULT_CACHE_CONTROL;
+            if (!owner.getId().equals(userId)) {
+                  throw new AccessDeniedException("You are not the owner");
+            }
             List<ChatEvent> eventList = evenRepo.findByOwnerAndEventVersionLessThanEqual(
-                  owner, atVersion, EventUtils.pageEvent);
+                  owner, atVersion, EventUtils.EVENT_VERSION_LESS_THAN_EQUAL);
 
             return ResponseEntity.ok()
                   .header("Vary", "Cookie, Authorization")
-                  .cacheControl(cacheControl)
+                  .cacheControl(CacheUtils.CACHE_CONTROL)
                   .body(eventList);
       }
 }

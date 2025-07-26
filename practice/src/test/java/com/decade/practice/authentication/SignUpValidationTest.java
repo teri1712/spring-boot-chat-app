@@ -8,7 +8,7 @@ import com.decade.practice.model.domain.entity.User;
 import com.decade.practice.model.dto.SignUpRequest;
 import com.decade.practice.security.jwt.JwtCredentialService;
 import com.decade.practice.web.advices.ExceptionControllerAdvice;
-import com.decade.practice.web.rest.AuthenticationController;
+import com.decade.practice.web.rest.TokenController;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.hamcrest.Matchers;
 import org.junit.jupiter.api.BeforeEach;
@@ -39,7 +39,7 @@ import java.util.Base64;
 import static com.decade.practice.model.dto.SignUpRequest.MAX_USERNAME_LENGTH;
 import static com.decade.practice.model.dto.SignUpRequest.MIN_USERNAME_LENGTH;
 
-@WebMvcTest(controllers = AuthenticationController.class)
+@WebMvcTest(controllers = TokenController.class)
 @ActiveProfiles("development")
 @ContextConfiguration(classes = DevelopmentApplication.class)
 @AutoConfigureMockMvc(addFilters = false)
