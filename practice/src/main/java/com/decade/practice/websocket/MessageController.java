@@ -1,10 +1,10 @@
 package com.decade.practice.websocket;
 
 import com.decade.practice.database.repository.EventRepository;
-import com.decade.practice.model.domain.TypeEvent;
-import com.decade.practice.model.domain.entity.Chat;
-import com.decade.practice.model.domain.entity.ChatEvent;
-import com.decade.practice.model.domain.entity.User;
+import com.decade.practice.entities.domain.TypeEvent;
+import com.decade.practice.entities.domain.entity.Chat;
+import com.decade.practice.entities.domain.entity.ChatEvent;
+import com.decade.practice.entities.domain.entity.User;
 import com.decade.practice.utils.ChatUtils;
 import org.springframework.messaging.Message;
 import org.springframework.messaging.handler.annotation.MessageMapping;

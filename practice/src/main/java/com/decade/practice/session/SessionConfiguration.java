@@ -1,6 +1,6 @@
 package com.decade.practice.session;
 
-import com.decade.practice.core.TokenCredentialService;
+import com.decade.practice.usecases.core.TokenCredentialService;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.event.GenericApplicationListenerAdapter;

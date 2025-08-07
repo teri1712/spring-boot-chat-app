@@ -1,6 +1,6 @@
 package com.decade.practice.security;
 
-import com.decade.practice.core.UserOperations;
+import com.decade.practice.usecases.core.UserOperations;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.security.oauth2.client.userinfo.OAuth2UserRequest;
 import org.springframework.security.oauth2.client.userinfo.OAuth2UserService;

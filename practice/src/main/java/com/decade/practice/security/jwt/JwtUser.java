@@ -1,6 +1,6 @@
 package com.decade.practice.security.jwt;
 
-import com.decade.practice.model.domain.entity.User;
+import com.decade.practice.entities.domain.entity.User;
 import com.decade.practice.security.model.UserClaims;
 import org.springframework.security.core.AuthenticatedPrincipal;
 

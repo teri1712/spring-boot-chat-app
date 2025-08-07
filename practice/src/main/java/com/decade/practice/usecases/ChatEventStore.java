@@ -1,11 +1,11 @@
 package com.decade.practice.usecases;
 
-import com.decade.practice.core.ChatOperations;
-import com.decade.practice.core.EventStore;
-import com.decade.practice.model.domain.entity.Chat;
-import com.decade.practice.model.domain.entity.ChatEvent;
-import com.decade.practice.model.domain.entity.MessageUtils;
-import com.decade.practice.model.domain.entity.User;
+import com.decade.practice.entities.domain.entity.Chat;
+import com.decade.practice.entities.domain.entity.ChatEvent;
+import com.decade.practice.entities.domain.entity.MessageEvent;
+import com.decade.practice.entities.domain.entity.User;
+import com.decade.practice.usecases.core.ChatOperations;
+import com.decade.practice.usecases.core.EventStore;
 import com.decade.practice.utils.ChatUtils;
 import jakarta.persistence.EntityManager;
 import jakarta.persistence.LockModeType;
@@ -40,7 +40,7 @@ public class ChatEventStore implements EventStore {
       public Collection<ChatEvent> save(ChatEvent event) throws NoSuchElementException, ConstraintViolationException {
             Chat chat = chatOperations.getOrCreateChat(event.getChatIdentifier());
             em.lock(chat, LockModeType.PESSIMISTIC_WRITE);
-            if (MessageUtils.isMessage(event)) {
+            if (event instanceof MessageEvent) {
                   chat.setMessageCount(chat.getMessageCount() + 1);
             }
             event.setChat(chat);

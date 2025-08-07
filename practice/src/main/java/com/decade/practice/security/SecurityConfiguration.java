@@ -1,8 +1,8 @@
 package com.decade.practice.security;
 
-import com.decade.practice.core.UserOperations;
 import com.decade.practice.security.jwt.JwtTokenFilter;
 import com.decade.practice.security.strategy.*;
+import com.decade.practice.usecases.core.UserOperations;
 import org.springframework.beans.BeansException;
 import org.springframework.beans.factory.config.BeanPostProcessor;
 import org.springframework.context.annotation.Bean;

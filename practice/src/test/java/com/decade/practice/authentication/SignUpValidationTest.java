@@ -1,12 +1,12 @@
 package com.decade.practice.authentication;
 
 import com.decade.practice.DevelopmentApplication;
-import com.decade.practice.core.UserOperations;
-import com.decade.practice.image.ImageStore;
-import com.decade.practice.model.domain.DefaultAvatar;
-import com.decade.practice.model.domain.entity.User;
-import com.decade.practice.model.dto.SignUpRequest;
+import com.decade.practice.entities.domain.DefaultAvatar;
+import com.decade.practice.entities.domain.entity.User;
+import com.decade.practice.entities.dto.SignUpRequest;
+import com.decade.practice.media.ImageStore;
 import com.decade.practice.security.jwt.JwtCredentialService;
+import com.decade.practice.usecases.core.UserOperations;
 import com.decade.practice.web.advices.ExceptionControllerAdvice;
 import com.decade.practice.web.rest.TokenController;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -36,8 +36,8 @@ import java.io.IOException;
 import java.text.SimpleDateFormat;
 import java.util.Base64;
 
-import static com.decade.practice.model.dto.SignUpRequest.MAX_USERNAME_LENGTH;
-import static com.decade.practice.model.dto.SignUpRequest.MIN_USERNAME_LENGTH;
+import static com.decade.practice.entities.dto.SignUpRequest.MAX_USERNAME_LENGTH;
+import static com.decade.practice.entities.dto.SignUpRequest.MIN_USERNAME_LENGTH;
 
 @WebMvcTest(controllers = TokenController.class)
 @ActiveProfiles("development")
@@ -86,7 +86,7 @@ public class SignUpValidationTest {
                   Mockito.anyBoolean()
             )).thenReturn(new User("123", "123"));
 
-            Mockito.when(imageStore.save(Mockito.any())).thenReturn(DefaultAvatar.INSTANCE);
+            Mockito.when(imageStore.save(Mockito.any())).thenReturn(DefaultAvatar.getInstance());
       }
 
       @Test

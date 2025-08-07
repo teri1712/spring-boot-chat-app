@@ -1,6 +1,6 @@
 package com.decade.practice.websocket.arguments;
 
-import com.decade.practice.model.domain.entity.Chat;
+import com.decade.practice.entities.domain.entity.Chat;
 import com.decade.practice.websocket.WsEntityRepository;
 import org.springframework.core.MethodParameter;
 import org.springframework.messaging.Message;

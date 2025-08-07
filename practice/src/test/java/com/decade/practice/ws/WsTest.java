@@ -1,12 +1,12 @@
 package com.decade.practice.ws;
 
 import com.decade.practice.DevelopmentApplication;
-import com.decade.practice.core.UserOperations;
-import com.decade.practice.model.domain.entity.Chat;
-import com.decade.practice.model.domain.entity.TextEvent;
-import com.decade.practice.model.domain.entity.User;
-import com.decade.practice.model.domain.entity.WelcomeEvent;
+import com.decade.practice.entities.domain.entity.Chat;
+import com.decade.practice.entities.domain.entity.TextEvent;
+import com.decade.practice.entities.domain.entity.User;
+import com.decade.practice.entities.domain.entity.WelcomeEvent;
 import com.decade.practice.security.jwt.JwtCredentialService;
+import com.decade.practice.usecases.core.UserOperations;
 import org.junit.jupiter.api.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.jdbc.EmbeddedDatabaseConnection;
@@ -33,7 +33,6 @@ import java.util.Date;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.TimeUnit;
 
-import static com.decade.practice.model.domain.entity.MessageUtils.TEXT;
 import static com.decade.practice.utils.TokenUtils.BEARER;
 import static com.decade.practice.utils.TokenUtils.HEADER_NAME;
 import static com.decade.practice.websocket.WsConfiguration.HANDSHAKE_DESTINATION;
@@ -210,7 +209,7 @@ public class WsTest {
             Assertions.assertNotNull(yourEcho.get().getContent());
 
             Assertions.assertEquals(myEvent.get().getChatIdentifier(), yourEvent.get().getChatIdentifier());
-            Assertions.assertEquals(TEXT, myEvent.get().getEventType());
+            Assertions.assertEquals("TEXT", myEvent.get().getEventType());
 
             Assertions.assertEquals(((TextEvent) myEvent.get()).getContent(), ((TextEvent) yourEvent.get()).getContent());
             Assertions.assertEquals("Hello how are you", ((TextEvent) myEvent.get()).getContent());

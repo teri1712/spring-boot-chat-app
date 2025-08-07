@@ -1,6 +1,6 @@
 package com.decade.practice.security.strategy;
 
-import com.decade.practice.core.TokenCredentialService;
+import com.decade.practice.usecases.core.TokenCredentialService;
 import com.decade.practice.utils.TokenUtils;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;

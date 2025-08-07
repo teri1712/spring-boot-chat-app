@@ -1,7 +1,7 @@
 package com.decade.practice.web.rest;
 
-import com.decade.practice.core.OnlineStatistic;
-import com.decade.practice.model.OnlineStatus;
+import com.decade.practice.entities.OnlineStatus;
+import com.decade.practice.usecases.core.OnlineStatistic;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;

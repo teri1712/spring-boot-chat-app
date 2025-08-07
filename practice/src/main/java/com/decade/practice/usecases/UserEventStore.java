@@ -1,10 +1,9 @@
 package com.decade.practice.usecases;
 
-import com.decade.practice.core.EventStore;
 import com.decade.practice.database.repository.EdgeRepository;
 import com.decade.practice.database.repository.EventRepository;
-import com.decade.practice.model.domain.SyncContext;
-import com.decade.practice.model.domain.entity.*;
+import com.decade.practice.entities.domain.entity.*;
+import com.decade.practice.usecases.core.EventStore;
 import jakarta.persistence.EntityManager;
 import jakarta.persistence.PersistenceContext;
 import org.springframework.stereotype.Service;
@@ -47,7 +46,7 @@ public class UserEventStore implements EventStore {
 
             event.setEventVersion(version);
 
-            if (MessageUtils.isMessage(event)) {
+            if (event instanceof MessageEvent) {
                   Edge head = edgeRepo.getHeadEdge(owner, version);
                   if (head != null) {
                         Chat top = head.getFrom();

@@ -1,10 +1,9 @@
 package com.decade.practice.authentication;
 
 import com.decade.practice.DevelopmentApplication;
-import com.decade.practice.core.UserOperations;
 import com.decade.practice.database.repository.UserRepository;
-import com.decade.practice.model.domain.entity.EventTypes;
-import com.decade.practice.model.local.AccountEntry;
+import com.decade.practice.entities.local.AccountEntry;
+import com.decade.practice.usecases.core.UserOperations;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.TestInstance;
@@ -77,7 +76,7 @@ public class LoginTest {
             assertNotNull(received.getChatSnapshots().size() == 1);
             assertNotNull(received.getChatSnapshots().get(0).getEventList().size() == 1);
             assertNotNull(received.getChatSnapshots().get(0).getEventList().get(0).getEdges().size() == 1);
-            assertNotNull(received.getChatSnapshots().get(0).getEventList().get(0).getEventType().equals(EventTypes.WELCOME));
+            assertNotNull(received.getChatSnapshots().get(0).getEventList().get(0).getEventType().equals("WELCOME"));
       }
 
       @Test

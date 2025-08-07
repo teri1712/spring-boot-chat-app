@@ -1,16 +1,13 @@
 package com.decade.practice.web.rest;
 
-import com.decade.practice.core.UserOperations;
 import com.decade.practice.database.repository.UserRepository;
-import com.decade.practice.image.ImageStore;
-import com.decade.practice.model.domain.DefaultAvatar;
-import com.decade.practice.model.domain.embeddable.ChatIdentifier;
-import com.decade.practice.model.domain.embeddable.ImageSpec;
-import com.decade.practice.model.domain.entity.User;
-import com.decade.practice.model.dto.SignUpRequest;
-import com.decade.practice.model.local.Conversation;
-import com.decade.practice.model.local.LocalChat;
+import com.decade.practice.entities.domain.DefaultAvatar;
+import com.decade.practice.entities.domain.embeddable.ImageSpec;
+import com.decade.practice.entities.domain.entity.User;
+import com.decade.practice.entities.dto.SignUpRequest;
+import com.decade.practice.media.ImageStore;
 import com.decade.practice.security.model.DaoUser;
+import com.decade.practice.usecases.core.UserOperations;
 import com.decade.practice.utils.ImageUtils;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
@@ -30,7 +27,6 @@ import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
 import java.net.URI;
-import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
@@ -55,20 +51,11 @@ public class UserController {
       }
 
       @GetMapping
-      public List<Conversation> findConversations(
+      public List<User> findConversations(
             @AuthenticationPrincipal(expression = "name") String username,
             @RequestParam(required = true) String query
       ) {
-            User user = userRepository.getByUsername(username);
-            List<User> partners = userRepository.findByNameContainingAndRole(query, "ROLE_USER");
-            List<Conversation> conversations = new ArrayList<>();
-
-            for (User partner : partners) {
-                  ChatIdentifier identifier = ChatIdentifier.from(user, partner);
-                  conversations.add(new Conversation(new LocalChat(identifier, user.getId()), partner, user));
-            }
-
-            return conversations;
+            return userRepository.findByNameContainingAndRole(query, "ROLE_USER");
       }
 
       @PostMapping
@@ -83,7 +70,7 @@ public class UserController {
             if (file != null) {
                   avatar = imageStore.save(ImageUtils.crop(file.getInputStream()));
             } else {
-                  avatar = DefaultAvatar.INSTANCE;
+                  avatar = DefaultAvatar.getInstance();
             }
 
             try {
@@ -108,7 +95,7 @@ public class UserController {
                   return ResponseEntity.status(HttpStatus.CREATED).build();
             } catch (Exception e) {
                   e.printStackTrace();
-                  if (avatar != DefaultAvatar.INSTANCE) {
+                  if (avatar != DefaultAvatar.getInstance()) {
                         imageStore.remove(URI.create(avatar.getUri()));
                   }
 

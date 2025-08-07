@@ -1,8 +1,8 @@
 package com.decade.practice.database.repository;
 
-import com.decade.practice.model.domain.entity.Chat;
-import com.decade.practice.model.domain.entity.ChatEvent;
-import com.decade.practice.model.domain.entity.User;
+import com.decade.practice.entities.domain.entity.Chat;
+import com.decade.practice.entities.domain.entity.ChatEvent;
+import com.decade.practice.entities.domain.entity.User;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.transaction.annotation.Isolation;

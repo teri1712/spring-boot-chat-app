@@ -1,13 +1,13 @@
 package com.decade.practice.web.rest;
 
-import com.decade.practice.core.ChatOperations;
-import com.decade.practice.core.UserOperations;
 import com.decade.practice.database.repository.UserRepository;
-import com.decade.practice.model.domain.ChatSnapshot;
-import com.decade.practice.model.domain.SyncContext;
-import com.decade.practice.model.domain.entity.User;
-import com.decade.practice.model.local.Account;
-import com.decade.practice.model.local.AccountEntry;
+import com.decade.practice.entities.domain.ChatSnapshot;
+import com.decade.practice.entities.domain.entity.SyncContext;
+import com.decade.practice.entities.domain.entity.User;
+import com.decade.practice.entities.local.Account;
+import com.decade.practice.entities.local.AccountEntry;
+import com.decade.practice.usecases.core.ChatOperations;
+import com.decade.practice.usecases.core.UserOperations;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.security.core.userdetails.UserDetails;

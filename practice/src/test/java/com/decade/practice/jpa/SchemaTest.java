@@ -1,11 +1,11 @@
 package com.decade.practice.jpa;
 
 import com.decade.practice.DevelopmentApplication;
-import com.decade.practice.core.TokenCredentialService;
-import com.decade.practice.core.UserOperations;
 import com.decade.practice.database.DatabaseConfiguration;
 import com.decade.practice.database.repository.UserRepository;
 import com.decade.practice.usecases.UserService;
+import com.decade.practice.usecases.core.TokenCredentialService;
+import com.decade.practice.usecases.core.UserOperations;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.TestInstance;

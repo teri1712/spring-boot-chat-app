@@ -2,10 +2,12 @@ package com.decade.practice.core;
 
 import com.decade.practice.DevelopmentApplication;
 import com.decade.practice.database.DatabaseConfiguration;
-import com.decade.practice.model.domain.entity.User;
+import com.decade.practice.entities.domain.entity.User;
 import com.decade.practice.security.jwt.JwtCredentialService;
 import com.decade.practice.usecases.ChatService;
 import com.decade.practice.usecases.UserService;
+import com.decade.practice.usecases.core.ChatOperations;
+import com.decade.practice.usecases.core.UserOperations;
 import org.junit.jupiter.api.*;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mockito;

@@ -1,6 +1,6 @@
 package com.decade.practice.online;
 
-import com.decade.practice.model.OnlineStatus;
+import com.decade.practice.entities.OnlineStatus;
 import org.springframework.data.repository.CrudRepository;
 
 /**

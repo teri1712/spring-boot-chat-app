@@ -1,8 +1,8 @@
 package com.decade.practice.web.validation;
 
 import com.decade.practice.database.repository.UserRepository;
-import com.decade.practice.model.domain.embeddable.ChatIdentifier;
-import com.decade.practice.model.domain.entity.User;
+import com.decade.practice.entities.domain.embeddable.ChatIdentifier;
+import com.decade.practice.entities.domain.entity.User;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.validation.Errors;

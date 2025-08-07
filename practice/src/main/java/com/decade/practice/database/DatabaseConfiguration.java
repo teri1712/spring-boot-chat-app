@@ -1,7 +1,7 @@
 package com.decade.practice.database;
 
 import com.decade.practice.database.repository.AdminRepository;
-import com.decade.practice.model.domain.entity.Admin;
+import com.decade.practice.entities.domain.entity.Admin;
 import com.fasterxml.jackson.databind.Module;
 import com.fasterxml.jackson.datatype.hibernate6.Hibernate6Module;
 import org.springframework.beans.factory.annotation.Value;
@@ -15,7 +15,7 @@ import org.springframework.context.event.EventListener;
 import org.springframework.data.jpa.repository.config.EnableJpaRepositories;
 
 @Configuration(proxyBeanMethods = false)
-@EntityScan("com.decade.practice.model")
+@EntityScan("com.decade.practice.entities")
 @EnableJpaRepositories(basePackages = {"com.decade.practice.database.repository"})
 public class DatabaseConfiguration implements ApplicationContextAware {
 

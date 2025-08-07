@@ -1,12 +1,12 @@
 package com.decade.practice;
 
-import com.decade.practice.core.EventStore;
-import com.decade.practice.core.OnlineStatistic;
-import com.decade.practice.core.UserOperations;
 import com.decade.practice.database.repository.UserRepository;
-import com.decade.practice.model.domain.embeddable.ImageSpec;
-import com.decade.practice.model.domain.entity.Chat;
-import com.decade.practice.model.domain.entity.TextEvent;
+import com.decade.practice.entities.domain.embeddable.ImageSpec;
+import com.decade.practice.entities.domain.entity.Chat;
+import com.decade.practice.entities.domain.entity.TextEvent;
+import com.decade.practice.usecases.core.EventStore;
+import com.decade.practice.usecases.core.OnlineStatistic;
+import com.decade.practice.usecases.core.UserOperations;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.context.ApplicationContext;

@@ -1,17 +1,17 @@
 package com.decade.practice.web.rest;
 
-import com.decade.practice.core.ChatOperations;
-import com.decade.practice.core.OnlineStatistic;
 import com.decade.practice.database.repository.EventRepository;
 import com.decade.practice.database.repository.UserRepository;
-import com.decade.practice.image.ImageStore;
-import com.decade.practice.model.domain.embeddable.ChatIdentifier;
-import com.decade.practice.model.domain.embeddable.ImageSpec;
-import com.decade.practice.model.domain.entity.Chat;
-import com.decade.practice.model.domain.entity.ChatEvent;
-import com.decade.practice.model.domain.entity.ImageEvent;
-import com.decade.practice.model.domain.entity.User;
+import com.decade.practice.entities.domain.embeddable.ChatIdentifier;
+import com.decade.practice.entities.domain.embeddable.ImageSpec;
+import com.decade.practice.entities.domain.entity.Chat;
+import com.decade.practice.entities.domain.entity.ChatEvent;
+import com.decade.practice.entities.domain.entity.ImageEvent;
+import com.decade.practice.entities.domain.entity.User;
+import com.decade.practice.media.ImageStore;
 import com.decade.practice.usecases.ChatEventStore;
+import com.decade.practice.usecases.core.ChatOperations;
+import com.decade.practice.usecases.core.OnlineStatistic;
 import com.decade.practice.utils.CacheUtils;
 import com.decade.practice.utils.ChatUtils;
 import com.decade.practice.utils.EventUtils;

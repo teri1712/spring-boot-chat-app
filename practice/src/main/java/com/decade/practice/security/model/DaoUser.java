@@ -1,6 +1,6 @@
 package com.decade.practice.security.model;
 
-import com.decade.practice.model.domain.entity.User;
+import com.decade.practice.entities.domain.entity.User;
 import org.springframework.security.core.AuthenticatedPrincipal;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;

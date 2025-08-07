@@ -1,7 +1,7 @@
 package com.decade.practice.security.strategy;
 
-import com.decade.practice.core.ChatOperations;
-import com.decade.practice.core.UserOperations;
+import com.decade.practice.usecases.core.ChatOperations;
+import com.decade.practice.usecases.core.UserOperations;
 import com.decade.practice.utils.PlatformsUtils;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;

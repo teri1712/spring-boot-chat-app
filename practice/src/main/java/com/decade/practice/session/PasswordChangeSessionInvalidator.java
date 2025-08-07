@@ -1,8 +1,8 @@
 package com.decade.practice.session;
 
-import com.decade.practice.core.TokenCredentialService;
-import com.decade.practice.event.AccountEventListener;
-import com.decade.practice.model.domain.entity.User;
+import com.decade.practice.entities.domain.entity.User;
+import com.decade.practice.events.AccountEventListener;
+import com.decade.practice.usecases.core.TokenCredentialService;
 import com.decade.practice.utils.TokenUtils;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpSession;

@@ -1,8 +1,8 @@
 package com.decade.practice;
 
 
-import com.decade.practice.core.UserOperations;
-import com.decade.practice.model.domain.DefaultAvatar;
+import com.decade.practice.entities.domain.DefaultAvatar;
+import com.decade.practice.usecases.core.UserOperations;
 import org.junit.jupiter.api.AfterAll;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.TestInstance;
@@ -34,7 +34,7 @@ public class BootstrapTest {
 
       @Test
       public void testBootstrappingApplication() {
-            userService.create("first", "first", "first", new Date(), "Be de", DefaultAvatar.INSTANCE, true);
+            userService.create("first", "first", "first", new Date(), "Be de", DefaultAvatar.getInstance(), true);
       }
 
 

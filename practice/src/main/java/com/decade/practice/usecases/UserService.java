@@ -1,16 +1,16 @@
 package com.decade.practice.usecases;
 
-import com.decade.practice.core.TokenCredentialService;
-import com.decade.practice.core.UserOperations;
-import com.decade.practice.core.common.SelfAwareBean;
+import com.decade.practice.common.SelfAwareBean;
 import com.decade.practice.database.repository.AdminRepository;
 import com.decade.practice.database.repository.UserRepository;
-import com.decade.practice.event.AccountEventListener;
-import com.decade.practice.model.TokenCredential;
-import com.decade.practice.model.domain.DefaultAvatar;
-import com.decade.practice.model.domain.embeddable.ImageSpec;
-import com.decade.practice.model.domain.entity.*;
-import com.decade.practice.model.local.Account;
+import com.decade.practice.entities.TokenCredential;
+import com.decade.practice.entities.domain.DefaultAvatar;
+import com.decade.practice.entities.domain.embeddable.ImageSpec;
+import com.decade.practice.entities.domain.entity.*;
+import com.decade.practice.entities.local.Account;
+import com.decade.practice.events.AccountEventListener;
+import com.decade.practice.usecases.core.TokenCredentialService;
+import com.decade.practice.usecases.core.UserOperations;
 import jakarta.persistence.EntityManager;
 import jakarta.persistence.OptimisticLockException;
 import jakarta.persistence.PersistenceContext;
@@ -111,7 +111,7 @@ public class UserService extends SelfAwareBean implements UserOperations {
             String password = UUID.randomUUID().toString();
             ImageSpec avatar = (picture != null)
                   ? new ImageSpec(picture, picture, ImageSpec.DEFAULT_WIDTH, ImageSpec.DEFAULT_HEIGHT, ImageSpec.DEFAULT_FORMAT)
-                  : DefaultAvatar.INSTANCE;
+                  : DefaultAvatar.getInstance();
 
             return ((UserService) getSelf()).create(
                   username,

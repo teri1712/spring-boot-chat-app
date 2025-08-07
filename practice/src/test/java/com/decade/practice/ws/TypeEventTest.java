@@ -1,13 +1,13 @@
 package com.decade.practice.ws;
 
 import com.decade.practice.DevelopmentApplication;
-import com.decade.practice.core.ChatOperations;
-import com.decade.practice.core.UserOperations;
-import com.decade.practice.model.domain.TypeEvent;
-import com.decade.practice.model.domain.embeddable.ChatIdentifier;
-import com.decade.practice.model.domain.entity.Chat;
-import com.decade.practice.model.domain.entity.User;
+import com.decade.practice.entities.domain.TypeEvent;
+import com.decade.practice.entities.domain.embeddable.ChatIdentifier;
+import com.decade.practice.entities.domain.entity.Chat;
+import com.decade.practice.entities.domain.entity.User;
 import com.decade.practice.security.jwt.JwtCredentialService;
+import com.decade.practice.usecases.core.ChatOperations;
+import com.decade.practice.usecases.core.UserOperations;
 import org.junit.jupiter.api.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.jdbc.EmbeddedDatabaseConnection;

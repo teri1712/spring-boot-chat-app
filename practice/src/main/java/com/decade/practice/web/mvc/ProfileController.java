@@ -1,10 +1,10 @@
 package com.decade.practice.web.mvc;
 
-import com.decade.practice.core.UserOperations;
 import com.decade.practice.database.repository.UserRepository;
-import com.decade.practice.image.ImageStore;
-import com.decade.practice.model.domain.embeddable.ImageSpec;
-import com.decade.practice.model.dto.Profile;
+import com.decade.practice.entities.domain.embeddable.ImageSpec;
+import com.decade.practice.entities.dto.Profile;
+import com.decade.practice.media.ImageStore;
+import com.decade.practice.usecases.core.UserOperations;
 import com.decade.practice.utils.ImageUtils;
 import com.decade.practice.web.validation.StrongPassword;
 import jakarta.persistence.OptimisticLockException;
@@ -24,8 +24,8 @@ import java.net.URISyntaxException;
 import java.util.Date;
 import java.util.UUID;
 
-import static com.decade.practice.model.domain.embeddable.ImageSpec.DEFAULT_HEIGHT;
-import static com.decade.practice.model.domain.embeddable.ImageSpec.DEFAULT_WIDTH;
+import static com.decade.practice.entities.domain.embeddable.ImageSpec.DEFAULT_HEIGHT;
+import static com.decade.practice.entities.domain.embeddable.ImageSpec.DEFAULT_WIDTH;
 
 @Controller
 @RequestMapping("/profile")

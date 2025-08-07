@@ -1,6 +1,6 @@
 package com.decade.practice.database.repository;
 
-import com.decade.practice.model.domain.entity.Admin;
+import com.decade.practice.entities.domain.entity.Admin;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 
