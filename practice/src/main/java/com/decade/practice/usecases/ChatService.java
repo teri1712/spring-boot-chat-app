@@ -1,7 +1,7 @@
 package com.decade.practice.usecases;
 
 import com.decade.practice.common.SelfAwareBean;
-import com.decade.practice.database.repository.*;
+import com.decade.practice.database.repositories.*;
 import com.decade.practice.entities.domain.ChatSnapshot;
 import com.decade.practice.entities.domain.embeddable.ChatIdentifier;
 import com.decade.practice.entities.domain.entity.Chat;

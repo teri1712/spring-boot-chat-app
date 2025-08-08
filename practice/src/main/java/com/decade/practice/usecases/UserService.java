@@ -1,8 +1,8 @@
 package com.decade.practice.usecases;
 
 import com.decade.practice.common.SelfAwareBean;
-import com.decade.practice.database.repository.AdminRepository;
-import com.decade.practice.database.repository.UserRepository;
+import com.decade.practice.database.repositories.AdminRepository;
+import com.decade.practice.database.repositories.UserRepository;
 import com.decade.practice.entities.TokenCredential;
 import com.decade.practice.entities.domain.DefaultAvatar;
 import com.decade.practice.entities.domain.embeddable.ImageSpec;

@@ -2,8 +2,8 @@ package com.decade.practice.authentication;
 
 import com.decade.practice.DevelopmentApplication;
 import com.decade.practice.MockEndpoints;
-import com.decade.practice.database.repository.AdminRepository;
-import com.decade.practice.database.repository.UserRepository;
+import com.decade.practice.database.repositories.AdminRepository;
+import com.decade.practice.database.repositories.UserRepository;
 import com.decade.practice.entities.domain.entity.User;
 import com.decade.practice.entities.local.Account;
 import com.decade.practice.security.DaoUserDetailsService;

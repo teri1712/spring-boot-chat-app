@@ -1,7 +1,7 @@
 package com.decade.practice.authentication;
 
 import com.decade.practice.DevelopmentApplication;
-import com.decade.practice.database.repository.UserRepository;
+import com.decade.practice.database.repositories.UserRepository;
 import com.decade.practice.entities.local.AccountEntry;
 import com.decade.practice.usecases.core.UserOperations;
 import org.junit.jupiter.api.BeforeAll;

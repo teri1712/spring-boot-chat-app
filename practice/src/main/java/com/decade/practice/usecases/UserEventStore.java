@@ -1,7 +1,7 @@
 package com.decade.practice.usecases;
 
-import com.decade.practice.database.repository.EdgeRepository;
-import com.decade.practice.database.repository.EventRepository;
+import com.decade.practice.database.repositories.EdgeRepository;
+import com.decade.practice.database.repositories.EventRepository;
 import com.decade.practice.entities.domain.entity.*;
 import com.decade.practice.usecases.core.EventStore;
 import jakarta.persistence.EntityManager;

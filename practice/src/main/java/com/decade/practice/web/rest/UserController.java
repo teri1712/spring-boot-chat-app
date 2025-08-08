@@ -1,11 +1,11 @@
 package com.decade.practice.web.rest;
 
-import com.decade.practice.database.repository.UserRepository;
+import com.decade.practice.database.repositories.UserRepository;
 import com.decade.practice.entities.domain.DefaultAvatar;
 import com.decade.practice.entities.domain.embeddable.ImageSpec;
 import com.decade.practice.entities.domain.entity.User;
 import com.decade.practice.entities.dto.SignUpRequest;
-import com.decade.practice.media.ImageStore;
+import com.decade.practice.medias.ImageStore;
 import com.decade.practice.security.model.DaoUser;
 import com.decade.practice.usecases.core.UserOperations;
 import com.decade.practice.utils.ImageUtils;
@@ -34,76 +34,76 @@ import java.util.List;
 @RequestMapping("/users")
 public class UserController {
 
-      private final UserRepository userRepository;
-      private final SecurityContextRepository contextRepo;
-      private final ImageStore imageStore;
-      private final UserOperations userOperations;
+        private final UserRepository userRepository;
+        private final SecurityContextRepository contextRepo;
+        private final ImageStore imageStore;
+        private final UserOperations userOperations;
 
-      public UserController(UserRepository userRepository,
-                            SecurityContextRepository contextRepo,
-                            ImageStore imageStore,
-                            UserOperations userOperations
-      ) {
-            this.userOperations = userOperations;
-            this.userRepository = userRepository;
-            this.contextRepo = contextRepo;
-            this.imageStore = imageStore;
-      }
+        public UserController(UserRepository userRepository,
+                              SecurityContextRepository contextRepo,
+                              ImageStore imageStore,
+                              UserOperations userOperations
+        ) {
+                this.userOperations = userOperations;
+                this.userRepository = userRepository;
+                this.contextRepo = contextRepo;
+                this.imageStore = imageStore;
+        }
 
-      @GetMapping
-      public List<User> findConversations(
-            @AuthenticationPrincipal(expression = "name") String username,
-            @RequestParam(required = true) String query
-      ) {
-            return userRepository.findByNameContainingAndRole(query, "ROLE_USER");
-      }
+        @GetMapping
+        public List<User> findConversations(
+                @AuthenticationPrincipal(expression = "name") String username,
+                @RequestParam(required = true) String query
+        ) {
+                return userRepository.findByNameContainingAndRole(query, "ROLE_USER");
+        }
 
-      @PostMapping
-      @PreAuthorize("isAnonymous()")
-      public ResponseEntity<String> registerUser(
-            HttpServletRequest request,
-            HttpServletResponse response,
-            @RequestPart("information") @Valid SignUpRequest information,
-            @RequestPart(value = "file", required = false) MultipartFile file
-      ) throws IOException {
-            ImageSpec avatar;
-            if (file != null) {
-                  avatar = imageStore.save(ImageUtils.crop(file.getInputStream()));
-            } else {
-                  avatar = DefaultAvatar.getInstance();
-            }
+        @PostMapping
+        @PreAuthorize("isAnonymous()")
+        public ResponseEntity<String> registerUser(
+                HttpServletRequest request,
+                HttpServletResponse response,
+                @RequestPart("information") @Valid SignUpRequest information,
+                @RequestPart(value = "file", required = false) MultipartFile file
+        ) throws IOException {
+                ImageSpec avatar;
+                if (file != null) {
+                        avatar = imageStore.save(ImageUtils.crop(file.getInputStream()));
+                } else {
+                        avatar = DefaultAvatar.getInstance();
+                }
 
-            try {
-                  User user = userOperations.create(
-                        information.getUsername(),
-                        information.getPassword(),
-                        information.getName(),
-                        information.getDob(),
-                        information.getGender(),
-                        avatar,
-                        true
-                  );
+                try {
+                        User user = userOperations.create(
+                                information.getUsername(),
+                                information.getPassword(),
+                                information.getName(),
+                                information.getDob(),
+                                information.getGender(),
+                                avatar,
+                                true
+                        );
 
-                  SecurityContext context = SecurityContextHolder.createEmptyContext();
-                  context.setAuthentication(new UsernamePasswordAuthenticationToken(
-                        new DaoUser(user), information.getPassword(),
-                        Collections.singletonList(new SimpleGrantedAuthority("ROLE_USER"))
-                  ));
-                  contextRepo.saveContext(context, request, response);
-                  SecurityContextHolder.setContext(context);
+                        SecurityContext context = SecurityContextHolder.createEmptyContext();
+                        context.setAuthentication(new UsernamePasswordAuthenticationToken(
+                                new DaoUser(user), information.getPassword(),
+                                Collections.singletonList(new SimpleGrantedAuthority("ROLE_USER"))
+                        ));
+                        contextRepo.saveContext(context, request, response);
+                        SecurityContextHolder.setContext(context);
 
-                  return ResponseEntity.status(HttpStatus.CREATED).build();
-            } catch (Exception e) {
-                  e.printStackTrace();
-                  if (avatar != DefaultAvatar.getInstance()) {
-                        imageStore.remove(URI.create(avatar.getUri()));
-                  }
+                        return ResponseEntity.status(HttpStatus.CREATED).build();
+                } catch (Exception e) {
+                        e.printStackTrace();
+                        if (avatar != DefaultAvatar.getInstance()) {
+                                imageStore.remove(URI.create(avatar.getUri()));
+                        }
 
-                  if (e instanceof DataIntegrityViolationException) {
-                        return ResponseEntity.status(HttpStatus.CONFLICT.value()).body("Username exists");
-                  } else {
-                        throw e;
-                  }
-            }
-      }
+                        if (e instanceof DataIntegrityViolationException) {
+                                return ResponseEntity.status(HttpStatus.CONFLICT.value()).body("Username exists");
+                        } else {
+                                throw e;
+                        }
+                }
+        }
 }

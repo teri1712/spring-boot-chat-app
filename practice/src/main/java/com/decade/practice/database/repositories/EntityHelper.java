@@ -1,4 +1,4 @@
-package com.decade.practice.database.repository;
+package com.decade.practice.database.repositories;
 
 import org.springframework.data.jpa.repository.JpaRepository;
 

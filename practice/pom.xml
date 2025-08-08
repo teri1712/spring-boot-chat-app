@@ -11,7 +11,7 @@
         <!-- lookup parent from repository -->
     </parent>
     <groupId>com.decade</groupId>
-    <artifactId>practice</artifactId>
+    <artifactId>server</artifactId>
     <version>0.0.1-SNAPSHOT</version>
     <name>practice</name>
     <description>Demo project for Spring Boot</description>

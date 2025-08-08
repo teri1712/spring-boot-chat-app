@@ -1,4 +1,4 @@
-package com.decade.practice.database.repository;
+package com.decade.practice.database.repositories;
 
 import com.decade.practice.entities.domain.entity.Chat;
 import com.decade.practice.entities.domain.entity.ChatEvent;

@@ -8,14 +8,15 @@ import com.decade.practice.entities.domain.entity.User;
 import java.util.UUID;
 
 public interface WsEntityRepository {
-      User getUser(String username);
 
-      Chat getChat(ChatIdentifier id);
+        User getUser(String username);
 
-      TypeEvent getType(ChatIdentifier chat, UUID from, boolean readOnly);
+        Chat getChat(ChatIdentifier id);
 
-      // Default method to replace Kotlin extension function
-      default TypeEvent getType(Chat chat, User from, boolean readOnly) {
-            return getType(chat.getIdentifier(), from.getId(), readOnly);
-      }
+        TypeEvent getType(ChatIdentifier chat, UUID from, boolean readOnly);
+
+        // Default method to replace Kotlin extension function
+        default TypeEvent getType(Chat chat, User from, boolean readOnly) {
+                return getType(chat.getIdentifier(), from.getId(), readOnly);
+        }
 }

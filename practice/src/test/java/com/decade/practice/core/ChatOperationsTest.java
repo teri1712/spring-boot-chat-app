@@ -32,53 +32,53 @@ import java.util.Date;
 @ExtendWith(OutputCaptureExtension.class)
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
 @Import({
-      RedisAutoConfiguration.class,
-      JwtCredentialService.class,
-      ChatService.class,
-      UserService.class,
-      DatabaseConfiguration.class
+        RedisAutoConfiguration.class,
+        JwtCredentialService.class,
+        ChatService.class,
+        UserService.class,
+        DatabaseConfiguration.class
 })
 public class ChatOperationsTest {
 
-      @Autowired
-      private ChatOperations chatOperations;
+        @Autowired
+        private ChatOperations chatOperations;
 
-      @Autowired
-      private UserOperations userOperations;
+        @Autowired
+        private UserOperations userOperations;
 
-      @MockBean
-      private PasswordEncoder encoder;
+        @MockBean
+        private PasswordEncoder encoder;
 
-      private User first;
-      private User second;
+        private User first;
+        private User second;
 
-      @Test
-      @Rollback(false)
-      @Order(1)
-      public void prepare() {
-            Mockito.when(encoder.encode(Mockito.anyString())).thenAnswer(invocation ->
-                  invocation.getArgument(0, String.class)
-            );
+        @Test
+        @Rollback(false)
+        @Order(1)
+        public void prepare() {
+                Mockito.when(encoder.encode(Mockito.anyString())).thenAnswer(invocation ->
+                        invocation.getArgument(0, String.class)
+                );
 
-            first = userOperations.create("first", "first", "first", new Date(), "male", null, true);
-            second = userOperations.create("second", "second", "second", new Date(), "male", null, true);
-      }
+                first = userOperations.create("first", "first", "first", new Date(), "male", null, true);
+                second = userOperations.create("second", "second", "second", new Date(), "male", null, true);
+        }
 
-      @Test
-      @Order(2)
-      public void given_twoUsers_when_getOrCreateChat_then_returnsChatInstance() {
-            var chat = chatOperations.getOrCreateChat(first.getId(), second.getId());
-            Assertions.assertNotNull(chat.getInteractTime());
-      }
+        @Test
+        @Order(2)
+        public void given_twoUsers_when_getOrCreateChat_then_returnsChatInstance() {
+                var chat = chatOperations.getOrCreateChat(first.getId(), second.getId());
+                Assertions.assertNotNull(chat.getInteractTime());
+        }
 
-      @Autowired
-      private RedisTemplate<Object, Object> redisTemplate;
+        @Autowired
+        private RedisTemplate<Object, Object> redisTemplate;
 
-      @AfterAll
-      public void tearDown() {
-            redisTemplate.execute((RedisConnection conn) -> {
-                  conn.flushDb();
-                  return null;
-            });
-      }
+        @AfterAll
+        public void tearDown() {
+                redisTemplate.execute((RedisConnection conn) -> {
+                        conn.flushDb();
+                        return null;
+                });
+        }
 }

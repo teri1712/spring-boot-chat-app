@@ -1,8 +1,8 @@
 <component name="ArtifactManager">
-  <artifact type="jar" name="spring-boot:jar">
+  <artifact type="jar" name="server:jar">
     <output-path>$PROJECT_DIR$/practice/target</output-path>
     <root id="archive" name="spring-boot.jar">
-      <element id="module-output" name="practice" />
+      <element id="module-output" name="server" />
       <element id="extracted-dir" path="$MAVEN_REPOSITORY$/org/thymeleaf/thymeleaf-spring6/3.1.2.RELEASE/thymeleaf-spring6-3.1.2.RELEASE.jar" path-in-jar="/" />
       <element id="extracted-dir" path="$MAVEN_REPOSITORY$/org/springframework/security/spring-security-core/6.3.1/spring-security-core-6.3.1.jar" path-in-jar="/" />
       <element id="extracted-dir" path="$MAVEN_REPOSITORY$/org/springframework/security/spring-security-oauth2-client/6.3.1/spring-security-oauth2-client-6.3.1.jar" path-in-jar="/" />

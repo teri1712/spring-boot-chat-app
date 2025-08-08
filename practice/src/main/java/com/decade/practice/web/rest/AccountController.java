@@ -1,6 +1,6 @@
 package com.decade.practice.web.rest;
 
-import com.decade.practice.database.repository.UserRepository;
+import com.decade.practice.database.repositories.UserRepository;
 import com.decade.practice.entities.domain.ChatSnapshot;
 import com.decade.practice.entities.domain.entity.SyncContext;
 import com.decade.practice.entities.domain.entity.User;

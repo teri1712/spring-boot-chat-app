@@ -1,8 +1,8 @@
 package com.decade.practice.web.rest;
 
-import com.decade.practice.database.repository.ChatRepository;
-import com.decade.practice.database.repository.EntityHelper;
-import com.decade.practice.database.repository.UserRepository;
+import com.decade.practice.database.repositories.ChatRepository;
+import com.decade.practice.database.repositories.EntityHelper;
+import com.decade.practice.database.repositories.UserRepository;
 import com.decade.practice.entities.domain.ChatSnapshot;
 import com.decade.practice.entities.domain.embeddable.ChatIdentifier;
 import com.decade.practice.entities.domain.entity.Chat;

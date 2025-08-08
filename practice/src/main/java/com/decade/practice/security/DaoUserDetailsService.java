@@ -1,6 +1,6 @@
 package com.decade.practice.security;
 
-import com.decade.practice.database.repository.UserRepository;
+import com.decade.practice.database.repositories.UserRepository;
 import com.decade.practice.security.model.DaoUser;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;

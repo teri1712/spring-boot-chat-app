@@ -1,6 +1,6 @@
 package com.decade.practice.websocket;
 
-import com.decade.practice.database.repository.UserRepository;
+import com.decade.practice.database.repositories.UserRepository;
 import com.decade.practice.entities.domain.TypeEvent;
 import com.decade.practice.entities.domain.embeddable.ChatIdentifier;
 import com.decade.practice.entities.domain.entity.Chat;
