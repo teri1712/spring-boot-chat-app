@@ -1,8 +1,8 @@
 package com.decade.practice;
 
 
-import com.decade.practice.entities.domain.DefaultAvatar;
-import com.decade.practice.usecases.core.UserOperations;
+import com.decade.practice.model.domain.DefaultAvatar;
+import com.decade.practice.usecases.UserOperations;
 import org.junit.jupiter.api.AfterAll;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.TestInstance;
@@ -21,28 +21,28 @@ import java.util.Date;
 @ActiveProfiles("development")
 @ContextConfiguration(classes = DevelopmentApplication.class)
 @AutoConfigureTestDatabase(
-      connection = EmbeddedDatabaseConnection.H2
+        connection = EmbeddedDatabaseConnection.H2
 ) // or using autoconfigured embedded datasource.
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
 public class BootstrapTest {
 
-      @Autowired
-      private UserOperations userService;
+        @Autowired
+        private UserOperations userService;
 
-      @Autowired
-      private RedisTemplate<Object, Object> redisTemplate;
+        @Autowired
+        private RedisTemplate<Object, Object> redisTemplate;
 
-      @Test
-      public void testBootstrappingApplication() {
-            userService.create("first", "first", "first", new Date(), "Be de", DefaultAvatar.getInstance(), true);
-      }
+        @Test
+        public void testBootstrappingApplication() {
+                userService.create("first", "first", "first", new Date(), "Be de", DefaultAvatar.getInstance(), true);
+        }
 
 
-      @AfterAll
-      public void tearDown() {
-            redisTemplate.execute((RedisConnection conn) -> {
-                  conn.flushDb();
-                  return null;
-            });
-      }
+        @AfterAll
+        public void tearDown() {
+                redisTemplate.execute((RedisConnection conn) -> {
+                        conn.flushDb();
+                        return null;
+                });
+        }
 }

@@ -1,11 +1,9 @@
 package com.decade.practice.usecases;
 
-import com.decade.practice.entities.domain.entity.Chat;
-import com.decade.practice.entities.domain.entity.ChatEvent;
-import com.decade.practice.entities.domain.entity.MessageEvent;
-import com.decade.practice.entities.domain.entity.User;
-import com.decade.practice.usecases.core.ChatOperations;
-import com.decade.practice.usecases.core.EventStore;
+import com.decade.practice.model.domain.entity.Chat;
+import com.decade.practice.model.domain.entity.ChatEvent;
+import com.decade.practice.model.domain.entity.MessageEvent;
+import com.decade.practice.model.domain.entity.User;
 import com.decade.practice.utils.ChatUtils;
 import jakarta.persistence.EntityManager;
 import jakarta.persistence.LockModeType;
@@ -24,41 +22,41 @@ import java.util.NoSuchElementException;
 @Primary
 public class ChatEventStore implements EventStore {
 
-      private final UserEventStore eventStore;
-      private final ChatOperations chatOperations;
+        private final UserEventStore eventStore;
+        private final ChatOperations chatOperations;
 
-      @PersistenceContext
-      private EntityManager em;
+        @PersistenceContext
+        private EntityManager em;
 
-      public ChatEventStore(UserEventStore eventStore, ChatOperations chatOperations) {
-            this.eventStore = eventStore;
-            this.chatOperations = chatOperations;
-      }
+        public ChatEventStore(UserEventStore eventStore, ChatOperations chatOperations) {
+                this.eventStore = eventStore;
+                this.chatOperations = chatOperations;
+        }
 
-      @Transactional(isolation = Isolation.READ_COMMITTED)
-      @Override
-      public Collection<ChatEvent> save(ChatEvent event) throws NoSuchElementException, ConstraintViolationException {
-            Chat chat = chatOperations.getOrCreateChat(event.getChatIdentifier());
-            em.lock(chat, LockModeType.PESSIMISTIC_WRITE);
-            if (event instanceof MessageEvent) {
-                  chat.setMessageCount(chat.getMessageCount() + 1);
-            }
-            event.setChat(chat);
+        @Transactional(isolation = Isolation.READ_COMMITTED)
+        @Override
+        public Collection<ChatEvent> save(ChatEvent event) throws NoSuchElementException, ConstraintViolationException {
+                Chat chat = chatOperations.getOrCreateChat(event.getChatIdentifier());
+                em.lock(chat, LockModeType.PESSIMISTIC_WRITE);
+                if (event instanceof MessageEvent) {
+                        chat.setMessageCount(chat.getMessageCount() + 1);
+                }
+                event.setChat(chat);
 
-            User me = ChatUtils.inspectOwner(chat, event.getSender());
-            User you = ChatUtils.inspectPartner(chat, me);
+                User me = ChatUtils.inspectOwner(chat, event.getSender());
+                User you = ChatUtils.inspectPartner(chat, me);
 
-            ChatEvent mine = event.copy();
-            mine.setLocalId(event.getLocalId());
+                ChatEvent mine = event.copy();
+                mine.setLocalId(event.getLocalId());
 
-            ChatEvent yours = event.copy();
+                ChatEvent yours = event.copy();
 
-            mine.setOwner(me);
-            yours.setOwner(you);
+                mine.setOwner(me);
+                yours.setOwner(you);
 
-            Collection<ChatEvent> result = new ArrayList<>();
-            result.addAll(eventStore.save(mine));
-            result.addAll(eventStore.save(yours));
-            return result;
-      }
+                Collection<ChatEvent> result = new ArrayList<>();
+                result.addAll(eventStore.save(mine));
+                result.addAll(eventStore.save(yours));
+                return result;
+        }
 }

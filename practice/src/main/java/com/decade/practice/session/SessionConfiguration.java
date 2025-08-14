@@ -1,6 +1,6 @@
 package com.decade.practice.session;
 
-import com.decade.practice.usecases.core.TokenCredentialService;
+import com.decade.practice.security.TokenCredentialService;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.event.GenericApplicationListenerAdapter;
@@ -19,28 +19,28 @@ public class SessionConfiguration {
 //        return new GenericJackson2JsonRedisSerializer();
 //    }
 
-      @Bean
-      public HttpSessionEventPublisher httpSessionEventPublisher() {
-            return new HttpSessionEventPublisher();
-      }
+        @Bean
+        public HttpSessionEventPublisher httpSessionEventPublisher() {
+                return new HttpSessionEventPublisher();
+        }
 
-      @Bean
-      public SessionRegistry sessionRegistry(DelegatingApplicationListener delegating) {
-            SessionRegistryImpl registry = new SessionRegistryImpl();
-            delegating.addListener(new GenericApplicationListenerAdapter(registry));
-            return registry;
-      }
+        @Bean
+        public SessionRegistry sessionRegistry(DelegatingApplicationListener delegating) {
+                SessionRegistryImpl registry = new SessionRegistryImpl();
+                delegating.addListener(new GenericApplicationListenerAdapter(registry));
+                return registry;
+        }
 
-      @Bean
-      public PasswordChangeSessionInvalidator passwordChangeRemoveSessionsAccountListener(
-            SessionRepository<? extends Session> sessionRepository,
-            SessionRegistry sessionRegistry,
-            TokenCredentialService credentialService
-      ) {
-            return new PasswordChangeSessionInvalidator(
-                  sessionRegistry,
-                  sessionRepository,
-                  credentialService
-            );
-      }
+        @Bean
+        public PasswordChangeSessionInvalidator passwordChangeRemoveSessionsAccountListener(
+                SessionRepository<? extends Session> sessionRepository,
+                SessionRegistry sessionRegistry,
+                TokenCredentialService credentialService
+        ) {
+                return new PasswordChangeSessionInvalidator(
+                        sessionRegistry,
+                        sessionRepository,
+                        credentialService
+                );
+        }
 }

@@ -1,9 +1,8 @@
 package com.decade.practice.usecases;
 
-import com.decade.practice.database.repositories.EdgeRepository;
-import com.decade.practice.database.repositories.EventRepository;
-import com.decade.practice.entities.domain.entity.*;
-import com.decade.practice.usecases.core.EventStore;
+import com.decade.practice.data.repositories.EdgeRepository;
+import com.decade.practice.data.repositories.EventRepository;
+import com.decade.practice.model.domain.entity.*;
 import jakarta.persistence.EntityManager;
 import jakarta.persistence.PersistenceContext;
 import org.springframework.stereotype.Service;
@@ -17,70 +16,70 @@ import java.util.Collections;
 @Service
 public class UserEventStore implements EventStore {
 
-      private final EdgeRepository edgeRepo;
-      private final EventRepository eventRepo;
+        private final EdgeRepository edgeRepo;
+        private final EventRepository eventRepo;
 
-      @PersistenceContext
-      private EntityManager em;
+        @PersistenceContext
+        private EntityManager em;
 
-      public UserEventStore(
-            EdgeRepository edgeRepo,
-            EventRepository eventRepo
-      ) {
-            this.edgeRepo = edgeRepo;
-            this.eventRepo = eventRepo;
-      }
+        public UserEventStore(
+                EdgeRepository edgeRepo,
+                EventRepository eventRepo
+        ) {
+                this.edgeRepo = edgeRepo;
+                this.eventRepo = eventRepo;
+        }
 
-      @Transactional(
-            propagation = Propagation.REQUIRED,
-            isolation = Isolation.READ_COMMITTED
-      )
-      @Override
-      public Collection<ChatEvent> save(ChatEvent event) {
-            User owner = event.getOwner();
-            Chat chat = event.getChat();
+        @Transactional(
+                propagation = Propagation.REQUIRED,
+                isolation = Isolation.READ_COMMITTED
+        )
+        @Override
+        public Collection<ChatEvent> save(ChatEvent event) {
+                User owner = event.getOwner();
+                Chat chat = event.getChat();
 
-            SyncContext syncContext = owner.getSyncContext();
-            int version = syncContext.getEventVersion() + 1;
-            syncContext.setEventVersion(version);
+                SyncContext syncContext = owner.getSyncContext();
+                int version = syncContext.getEventVersion() + 1;
+                syncContext.setEventVersion(version);
 
-            event.setEventVersion(version);
+                event.setEventVersion(version);
 
-            if (event instanceof MessageEvent) {
-                  Edge head = edgeRepo.getHeadEdge(owner, version);
-                  if (head != null) {
-                        Chat top = head.getFrom();
-                        if (top != chat) {
-                              Edge newHead = new Edge(
-                                    owner,
-                                    chat,
-                                    top,
-                                    event,
-                                    true
-                              );
-                              event.getEdges().add(newHead);
-
-                              Edge bridgeFrom = edgeRepo.getEdgeTo(owner, chat, version);
-                              if (bridgeFrom != null) {
-                                    Chat from = bridgeFrom.getFrom();
-                                    Edge bridgeTo = edgeRepo.getEdgeFrom(owner, chat, version);
-                                    if (bridgeTo != null) {
-                                          Chat dest = bridgeTo.getDest();
-                                          Edge bridgeEdge = new Edge(
+                if (event instanceof MessageEvent) {
+                        Edge head = edgeRepo.getHeadEdge(owner, version);
+                        if (head != null) {
+                                Chat top = head.getFrom();
+                                if (top != chat) {
+                                        Edge newHead = new Edge(
                                                 owner,
-                                                from,
-                                                dest,
+                                                chat,
+                                                top,
                                                 event,
-                                                false
-                                          );
-                                          event.getEdges().add(bridgeEdge);
-                                    }
-                              }
-                        }
-                  }
-            }
+                                                true
+                                        );
+                                        event.getEdges().add(newHead);
 
-            eventRepo.save(event);
-            return Collections.singletonList(event);
-      }
+                                        Edge bridgeFrom = edgeRepo.getEdgeTo(owner, chat, version);
+                                        if (bridgeFrom != null) {
+                                                Chat from = bridgeFrom.getFrom();
+                                                Edge bridgeTo = edgeRepo.getEdgeFrom(owner, chat, version);
+                                                if (bridgeTo != null) {
+                                                        Chat dest = bridgeTo.getDest();
+                                                        Edge bridgeEdge = new Edge(
+                                                                owner,
+                                                                from,
+                                                                dest,
+                                                                event,
+                                                                false
+                                                        );
+                                                        event.getEdges().add(bridgeEdge);
+                                                }
+                                        }
+                                }
+                        }
+                }
+
+                eventRepo.save(event);
+                return Collections.singletonList(event);
+        }
 }

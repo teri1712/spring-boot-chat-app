@@ -1,22 +1,22 @@
 package com.decade.practice.web.rest;
 
-import com.decade.practice.database.repositories.EventRepository;
-import com.decade.practice.database.repositories.UserRepository;
-import com.decade.practice.entities.domain.embeddable.ChatIdentifier;
-import com.decade.practice.entities.domain.embeddable.ImageSpec;
-import com.decade.practice.entities.domain.entity.Chat;
-import com.decade.practice.entities.domain.entity.ChatEvent;
-import com.decade.practice.entities.domain.entity.ImageEvent;
-import com.decade.practice.entities.domain.entity.User;
-import com.decade.practice.medias.ImageStore;
+import com.decade.practice.data.repositories.EventRepository;
+import com.decade.practice.data.repositories.UserRepository;
+import com.decade.practice.media.ImageStore;
+import com.decade.practice.model.domain.embeddable.ChatIdentifier;
+import com.decade.practice.model.domain.embeddable.ImageSpec;
+import com.decade.practice.model.domain.entity.Chat;
+import com.decade.practice.model.domain.entity.ChatEvent;
+import com.decade.practice.model.domain.entity.ImageEvent;
+import com.decade.practice.model.domain.entity.User;
+import com.decade.practice.presence.UserPresenceService;
 import com.decade.practice.usecases.ChatEventStore;
-import com.decade.practice.usecases.core.ChatOperations;
-import com.decade.practice.usecases.core.OnlineStatistic;
+import com.decade.practice.usecases.ChatOperations;
 import com.decade.practice.utils.CacheUtils;
 import com.decade.practice.utils.ChatUtils;
 import com.decade.practice.utils.EventUtils;
 import com.decade.practice.utils.ImageUtils;
-import com.decade.practice.websocket.WsConfiguration;
+import com.decade.practice.websocket.WebSocketConfiguration;
 import jakarta.persistence.EntityNotFoundException;
 import jakarta.validation.Valid;
 import org.springframework.dao.DataIntegrityViolationException;
@@ -45,7 +45,7 @@ public class EventController {
         private final SimpMessagingTemplate template;
         private final ChatOperations chatOperations;
         private final EventRepository evenRepo;
-        private final OnlineStatistic onlineStat;
+        private final UserPresenceService onlineStat;
         private final UserRepository userRepo;
         private final ImageStore imageStore;
 
@@ -54,7 +54,7 @@ public class EventController {
                 SimpMessagingTemplate template,
                 ChatOperations chatOperations,
                 EventRepository evenRepo,
-                OnlineStatistic onlineStat,
+                UserPresenceService onlineStat,
                 UserRepository userRepo,
                 ImageStore imageStore
         ) {
@@ -78,7 +78,7 @@ public class EventController {
                         for (ChatEvent it : saved) {
                                 template.convertAndSendToUser(
                                         it.getOwner().getUsername(),
-                                        WsConfiguration.QUEUE_MESSAGE_DESTINATION,
+                                        WebSocketConfiguration.QUEUE_MESSAGE_DESTINATION,
                                         it
                                 );
                         }

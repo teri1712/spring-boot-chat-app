@@ -1,8 +1,8 @@
 package com.decade.practice;
 
-import com.decade.practice.database.repositories.UserRepository;
-import com.decade.practice.entities.domain.entity.User;
-import com.decade.practice.usecases.core.OnlineStatistic;
+import com.decade.practice.data.repositories.UserRepository;
+import com.decade.practice.model.domain.entity.User;
+import com.decade.practice.presence.UserPresenceService;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.context.ApplicationContext;
@@ -34,7 +34,7 @@ public class Application {
 
         public static void initialize(ApplicationContext context) {
                 UserRepository userRepo = context.getBean(UserRepository.class);
-                OnlineStatistic onlineStat = context.getBean(OnlineStatistic.class);
+                UserPresenceService onlineStat = context.getBean(UserPresenceService.class);
 
                 User nami = userRepo.getByUsername("Nami");
                 User chopper = userRepo.getByUsername("Chopper");

@@ -1,7 +1,7 @@
 package com.decade.practice.web.rest;
 
-import com.decade.practice.entities.OnlineStatus;
-import com.decade.practice.usecases.core.OnlineStatistic;
+import com.decade.practice.model.OnlineStatus;
+import com.decade.practice.presence.UserPresenceService;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -14,19 +14,19 @@ import java.util.List;
 @RequestMapping("/onlines")
 public class OnlineController {
 
-      private final OnlineStatistic stat;
+        private final UserPresenceService stat;
 
-      public OnlineController(OnlineStatistic stat) {
-            this.stat = stat;
-      }
+        public OnlineController(UserPresenceService stat) {
+                this.stat = stat;
+        }
 
-      @GetMapping
-      public List<OnlineStatus> listOnline(Principal principal) {
-            return stat.getOnlineList(principal.getName());
-      }
+        @GetMapping
+        public List<OnlineStatus> listOnline(Principal principal) {
+                return stat.getOnlineList(principal.getName());
+        }
 
-      @GetMapping("/{username}")
-      public OnlineStatus get(@PathVariable String username) {
-            return stat.get(username);
-      }
+        @GetMapping("/{username}")
+        public OnlineStatus get(@PathVariable String username) {
+                return stat.get(username);
+        }
 }
