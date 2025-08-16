@@ -36,7 +36,7 @@ public class ChatController {
 
         @GetMapping("/{identifier}")
         public ResponseEntity<ChatSnapshot> get(
-                @AuthenticationPrincipal(expression = "name") String username,
+                @AuthenticationPrincipal(expression = "username") String username,
                 @PathVariable ChatIdentifier identifier,
                 @RequestParam(required = false) Integer atVersion
         ) {
@@ -56,7 +56,7 @@ public class ChatController {
 
         @GetMapping
         public ResponseEntity<List<ChatSnapshot>> list(
-                @AuthenticationPrincipal(expression = "name") String username,
+                @AuthenticationPrincipal(expression = "username") String username,
                 @RequestParam(required = false) ChatIdentifier startAt,
                 @RequestParam int atVersion
         ) {

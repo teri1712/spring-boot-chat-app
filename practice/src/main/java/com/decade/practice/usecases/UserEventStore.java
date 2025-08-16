@@ -5,7 +5,7 @@ import com.decade.practice.data.repositories.EventRepository;
 import com.decade.practice.model.domain.entity.*;
 import jakarta.persistence.EntityManager;
 import jakarta.persistence.PersistenceContext;
-import org.springframework.stereotype.Service;
+import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Isolation;
 import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
@@ -13,7 +13,7 @@ import org.springframework.transaction.annotation.Transactional;
 import java.util.Collection;
 import java.util.Collections;
 
-@Service
+@Component
 public class UserEventStore implements EventStore {
 
         private final EdgeRepository edgeRepo;

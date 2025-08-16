@@ -80,13 +80,15 @@ public class WsTest {
                 yourToken = credentialService.create(you, null).getAccessToken();
 
                 myClient = RestClient.builder()
-                        .baseUrl("http://localhost:" + port + "/message/text")
+                        .baseUrl("http://localhost:" + port + "/events")
                         .defaultHeader(HEADER_NAME, BEARER + myToken)
+                        .defaultHeader("Content-Type", MediaType.APPLICATION_JSON_VALUE)
                         .build();
 
                 yourClient = RestClient.builder()
-                        .baseUrl("http://localhost:" + port + "/message/text")
+                        .baseUrl("http://localhost:" + port + "/events")
                         .defaultHeader(HEADER_NAME, BEARER + yourToken)
+                        .defaultHeader("Content-Type", MediaType.APPLICATION_JSON_VALUE)
                         .build();
         }
 
@@ -121,7 +123,7 @@ public class WsTest {
         @Test
         @Timeout(value = 3, unit = TimeUnit.SECONDS)
         @Order(1)
-        public void subscribe_Expect_Echo_Welcome() throws Exception {
+        public void testSubscribeReceivesWelcomeEvent() throws Exception {
                 CompletableFuture<WelcomeEvent> myEvent = new CompletableFuture<>();
                 CompletableFuture<WelcomeEvent> yourEvent = new CompletableFuture<>();
 
@@ -156,7 +158,7 @@ public class WsTest {
         @Test
         @Timeout(value = 3, unit = TimeUnit.SECONDS)
         @Order(2)
-        public void Post_Record_Expect_Both_Receive_Record() throws Exception {
+        public void testPostMessageIsReceivedByBothUsers() throws Exception {
                 CompletableFuture<WelcomeEvent> myEcho = new CompletableFuture<>();
                 CompletableFuture<WelcomeEvent> yourEcho = new CompletableFuture<>();
                 CompletableFuture<TextEvent> myEvent = new CompletableFuture<>();

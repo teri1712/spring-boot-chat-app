@@ -55,7 +55,7 @@ public class LoginTest {
         }
 
         @Test
-        public void given_validCredentials_when_login_then_returnsAccountWithChatData() throws Exception {
+        public void testLoginWithValidCredentialsReturnsAccount() throws Exception {
                 client = RestClient.builder()
                         .baseUrl("http://localhost:" + port + "/login")
                         .build();
@@ -80,7 +80,7 @@ public class LoginTest {
         }
 
         @Test
-        public void given_invalidCredentials_when_login_then_throwsUnauthorized() throws Exception {
+        public void testLoginWithInvalidCredentialsThrowsUnauthorized() throws Exception {
                 client = RestClient.builder()
                         .baseUrl("http://localhost:" + port + "/login")
                         .build();

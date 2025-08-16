@@ -4,18 +4,16 @@ import com.decade.practice.DevelopmentApplication;
 import com.decade.practice.data.database.DatabaseConfiguration;
 import com.decade.practice.model.domain.entity.User;
 import com.decade.practice.security.jwt.JwtCredentialService;
+import com.decade.practice.utils.PrerequisiteBeans;
 import org.junit.jupiter.api.*;
 import org.junit.jupiter.api.extension.ExtendWith;
-import org.mockito.Mockito;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.autoconfigure.data.redis.RedisAutoConfiguration;
 import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
-import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.boot.test.system.OutputCaptureExtension;
 import org.springframework.context.annotation.Import;
 import org.springframework.data.redis.connection.RedisConnection;
 import org.springframework.data.redis.core.RedisTemplate;
-import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.test.annotation.Rollback;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.ContextConfiguration;
@@ -24,13 +22,16 @@ import java.util.Date;
 
 @DataJpaTest
 @ActiveProfiles("development")
-@ContextConfiguration(classes = DevelopmentApplication.class)
+@ContextConfiguration(classes = {DevelopmentApplication.class, PrerequisiteBeans.class})
 @ExtendWith(OutputCaptureExtension.class)
+@TestMethodOrder(MethodOrderer.OrderAnnotation.class)
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
 @Import({
         RedisAutoConfiguration.class,
         JwtCredentialService.class,
         ChatService.class,
+        ChatEventStore.class,
+        UserEventStore.class,
         UserService.class,
         DatabaseConfiguration.class
 })
@@ -42,8 +43,6 @@ public class ChatOperationsTest {
         @Autowired
         private UserOperations userOperations;
 
-        @MockBean
-        private PasswordEncoder encoder;
 
         private User first;
         private User second;
@@ -51,18 +50,14 @@ public class ChatOperationsTest {
         @Test
         @Rollback(false)
         @Order(1)
-        public void prepare() {
-                Mockito.when(encoder.encode(Mockito.anyString())).thenAnswer(invocation ->
-                        invocation.getArgument(0, String.class)
-                );
-
+        public void testPrepare() {
                 first = userOperations.create("first", "first", "first", new Date(), "male", null, true);
                 second = userOperations.create("second", "second", "second", new Date(), "male", null, true);
         }
 
         @Test
         @Order(2)
-        public void given_twoUsers_when_getOrCreateChat_then_returnsChatInstance() {
+        public void testGetOrCreateChat() {
                 var chat = chatOperations.getOrCreateChat(first.getId(), second.getId());
                 Assertions.assertNotNull(chat.getInteractTime());
         }

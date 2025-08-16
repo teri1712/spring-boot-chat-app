@@ -1,6 +1,7 @@
 package com.decade.practice.web;
 
 import com.decade.practice.DevelopmentApplication;
+import com.decade.practice.data.repositories.UserRepository;
 import com.decade.practice.media.ImageStore;
 import com.decade.practice.model.domain.DefaultAvatar;
 import com.decade.practice.model.domain.entity.User;
@@ -9,6 +10,7 @@ import com.decade.practice.security.jwt.JwtCredentialService;
 import com.decade.practice.usecases.UserOperations;
 import com.decade.practice.web.advices.ExceptionControllerAdvice;
 import com.decade.practice.web.rest.TokenController;
+import com.decade.practice.web.rest.UserController;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.hamcrest.Matchers;
 import org.junit.jupiter.api.BeforeEach;
@@ -34,25 +36,28 @@ import org.springframework.test.web.servlet.result.MockMvcResultMatchers;
 
 import java.io.IOException;
 import java.text.SimpleDateFormat;
-import java.util.Base64;
 
 import static com.decade.practice.model.dto.SignUpRequest.MAX_USERNAME_LENGTH;
 import static com.decade.practice.model.dto.SignUpRequest.MIN_USERNAME_LENGTH;
+import static com.decade.practice.utils.Media.ONE_PIXEL_BMP_BYTES;
 
-@WebMvcTest(controllers = TokenController.class)
+@WebMvcTest(controllers = {TokenController.class, UserController.class})
 @ActiveProfiles("development")
 @ContextConfiguration(classes = DevelopmentApplication.class)
 @AutoConfigureMockMvc(addFilters = false)
 @ExtendWith(OutputCaptureExtension.class)
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
 @Import(ExceptionControllerAdvice.class)
-public class SignUpValidationTest {
+public class SignUpTest {
 
         @Autowired
         private MockMvc mockMvc;
 
         @MockBean
         private UserOperations userOperations;
+
+        @MockBean
+        private UserRepository userRepo;
 
         @MockBean
         private PasswordEncoder encoder;
@@ -66,10 +71,6 @@ public class SignUpValidationTest {
         @MockBean
         private ImageStore imageStore;
 
-        private static final String ONE_PIXEL_BMP_BASE64 =
-                "Qk06AAAAAAAAADYAAAAoAAAAAQAAAAEAAAABABgAAAAAAAQAAAATCwAAEwsAAAAAAAAAAAD///8A";
-
-        private static final byte[] ONE_PIXEL_BMP_BYTES = Base64.getDecoder().decode(ONE_PIXEL_BMP_BASE64);
 
         @BeforeEach
         public void setUp() throws IOException {
@@ -90,7 +91,7 @@ public class SignUpValidationTest {
         }
 
         @Test
-        public void given_usernameWithSpaces_when_signUp_then_returnsValidationError() throws Exception {
+        public void testSignUpWithUsernameWithSpacesReturnsValidationError() throws Exception {
                 SignUpRequest dto = new SignUpRequest(
                         "user name",
                         "password",
@@ -107,7 +108,7 @@ public class SignUpValidationTest {
                 );
 
                 mockMvc.perform(
-                                MockMvcRequestBuilders.multipart("/authentication/sign-up")
+                                MockMvcRequestBuilders.multipart("/users")
                                         .file(new MockMultipartFile("file", "filename.txt", "text/plain", "file content".getBytes()))
                                         .file(informationPart)
                         )
@@ -119,7 +120,7 @@ public class SignUpValidationTest {
         }
 
         @Test
-        public void given_usernameTooShort_when_signUp_then_returnsLengthValidationError() throws Exception {
+        public void testSignUpWithUsernameTooShortReturnsLengthValidationError() throws Exception {
                 SignUpRequest dto = new SignUpRequest(
                         "user",
                         "password",
@@ -136,7 +137,7 @@ public class SignUpValidationTest {
                 );
 
                 mockMvc.perform(
-                                MockMvcRequestBuilders.multipart("/authentication/sign-up")
+                                MockMvcRequestBuilders.multipart("/users")
                                         .file(new MockMultipartFile("file", "filename.txt", "text/plain", "file content".getBytes()))
                                         .file(informationPart)
                         )
@@ -148,7 +149,7 @@ public class SignUpValidationTest {
         }
 
         @Test
-        public void given_weakPassword_when_signUp_then_returnsPasswordValidationError() throws Exception {
+        public void testSignUpWithWeakPasswordReturnsPasswordValidationError() throws Exception {
                 SignUpRequest dto = new SignUpRequest(
                         "username",
                         "pass",
@@ -165,7 +166,7 @@ public class SignUpValidationTest {
                 );
 
                 mockMvc.perform(
-                                MockMvcRequestBuilders.multipart("/authentication/sign-up")
+                                MockMvcRequestBuilders.multipart("/users")
                                         .file(new MockMultipartFile("file", "filename.txt", "text/plain", "file content".getBytes()))
                                         .file(informationPart)
                         )
@@ -174,7 +175,7 @@ public class SignUpValidationTest {
         }
 
         @Test
-        public void given_validSignupData_when_signUp_then_succeeds() throws Exception {
+        public void testSignUpWithValidDataSucceeds() throws Exception {
                 SignUpRequest dto = new SignUpRequest(
                         "username",
                         "password",
@@ -191,7 +192,7 @@ public class SignUpValidationTest {
                 );
 
                 mockMvc.perform(
-                                MockMvcRequestBuilders.multipart("/authentication/sign-up")
+                                MockMvcRequestBuilders.multipart("/users")
                                         .file(new MockMultipartFile("file", "avatar.bmp", "image/bmp", ONE_PIXEL_BMP_BYTES))
                                         .file(informationPart)
                         )

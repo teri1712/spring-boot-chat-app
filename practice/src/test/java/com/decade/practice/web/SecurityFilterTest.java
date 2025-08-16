@@ -98,20 +98,20 @@ public class SecurityFilterTest {
         }
 
         @Test
-        public void given_nonExistentUsername_when_login_then_failsWithUnauthorized() throws Exception {
+        public void testLoginWithNonExistentUsernameFails() throws Exception {
                 mockMvc.perform(SecurityMockMvcRequestBuilders.formLogin().user("vcl").password(PASSWORD))
                         .andExpect(MockMvcResultMatchers.status().isUnauthorized())
                         .andExpect(MockMvcResultMatchers.content().string("Username not found"));
         }
 
         @Test
-        public void given_validCredentials_when_login_then_succeeds() throws Exception {
+        public void testLoginWithValidCredentialsSucceeds() throws Exception {
                 mockMvc.perform(SecurityMockMvcRequestBuilders.formLogin().user(USERNAME).password(PASSWORD))
                         .andExpect(MockMvcResultMatchers.status().isOk());
         }
 
         @Test
-        public void given_validUsernameWithInvalidPassword_when_login_then_failsWithUnauthorized() throws Exception {
+        public void testLoginWithInvalidPasswordFails() throws Exception {
                 mockMvc.perform(
                                 SecurityMockMvcRequestBuilders.formLogin()
                                         .user(USERNAME)
@@ -122,7 +122,7 @@ public class SecurityFilterTest {
         }
 
         @Test
-        public void given_validJwtToken_when_requestProtectedResource_then_succeeds() throws Exception {
+        public void testAccessProtectedResourceWithValidTokenSucceeds() throws Exception {
                 User user = userRepo.getByUsername(USERNAME);
                 String accessToken = credentialService.create(user, null).getAccessToken();
 

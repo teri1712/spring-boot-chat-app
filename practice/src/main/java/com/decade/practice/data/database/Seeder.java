@@ -1,6 +1,5 @@
 package com.decade.practice.data.database;
 
-import com.decade.practice.common.SelfAwareBean;
 import com.decade.practice.data.repositories.AdminRepository;
 import com.decade.practice.data.repositories.UserRepository;
 import com.decade.practice.model.domain.embeddable.ImageSpec;
@@ -10,14 +9,24 @@ import com.decade.practice.model.domain.entity.TextEvent;
 import com.decade.practice.model.domain.entity.User;
 import com.decade.practice.usecases.EventStore;
 import com.decade.practice.usecases.UserOperations;
+import jakarta.persistence.EntityManager;
+import jakarta.persistence.PersistenceContext;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.transaction.annotation.Propagation;
+import org.springframework.core.env.Environment;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.Arrays;
 import java.util.Date;
 
-public class Seeder extends SelfAwareBean {
+@Transactional
+public class Seeder {
+
+        @PersistenceContext
+        private EntityManager em;
+
+        @Autowired
+        private Environment environment;
 
         @Autowired
         private AdminRepository adminRepo;
@@ -37,13 +46,18 @@ public class Seeder extends SelfAwareBean {
         @Value("${admin.password}")
         private String adminPassword;
 
-        @Transactional(propagation = Propagation.REQUIRES_NEW)
-        void initUsers() {
+        void run() {
                 if (adminRepo.getOrNull() != null) {
                         return;
                 }
+
                 adminRepo.save(new Admin(adminUsername, adminPassword));
                 adminRepo.flush();
+
+                if (Arrays.asList(environment.getActiveProfiles()).contains("development")) {
+                        return;
+                }
+
                 userOperations.create(
                         "Luffy",
                         "Luffy",
@@ -71,29 +85,28 @@ public class Seeder extends SelfAwareBean {
                         new ImageSpec("http://localhost:8080/image?filename=chopper.jpg", "chopper.jpg", 512, 512, "jpg"),
                         true
                 );
-        }
 
-        @Transactional
-        void initEvents() {
                 User luffy = userRepo.getByUsername("Luffy");
                 User nami = userRepo.getByUsername("Nami");
                 User chopper = userRepo.getByUsername("Chopper");
+                Chat luffyNamiChat = new Chat(luffy, nami);
+                em.persist(luffyNamiChat);
+                Chat luffyChopperChat = new Chat(luffy, chopper);
+                em.persist(luffyChopperChat);
+                Chat namiChopperChat = new Chat(nami, chopper);
+                em.persist(namiChopperChat);
+                em.flush();
 
-                TextEvent event1 = new TextEvent(new Chat(luffy, nami), nami, "Hello");
+                TextEvent event1 = new TextEvent(luffyNamiChat, nami, "Hello");
                 event1.setCreatedTime(System.currentTimeMillis() - 5 * 60 * 1000);
                 eventStore.save(event1);
 
-                TextEvent event2 = new TextEvent(new Chat(luffy, chopper), chopper, "Ekk");
+                TextEvent event2 = new TextEvent(luffyChopperChat, chopper, "Ekk");
                 event2.setCreatedTime(System.currentTimeMillis() - 10 * 60 * 1000);
                 eventStore.save(event2);
 
-                TextEvent event3 = new TextEvent(new Chat(luffy, chopper), chopper, "Vcl");
+                TextEvent event3 = new TextEvent(namiChopperChat, chopper, "Vcl");
                 event3.setCreatedTime(System.currentTimeMillis() - 5 * 60 * 1000);
                 eventStore.save(event3);
-        }
-
-        void run() {
-                ((Seeder) getSelf()).initUsers();
-                ((Seeder) getSelf()).initEvents();
         }
 }

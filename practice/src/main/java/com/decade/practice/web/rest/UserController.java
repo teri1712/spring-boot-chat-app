@@ -52,7 +52,7 @@ public class UserController {
 
         @GetMapping
         public List<User> findConversations(
-                @AuthenticationPrincipal(expression = "name") String username,
+                @AuthenticationPrincipal(expression = "username") String username,
                 @RequestParam(required = true) String query
         ) {
                 return userRepository.findByNameContainingAndRole(query, "ROLE_USER");

@@ -50,7 +50,7 @@ public class ProfileController {
 
         @ModelAttribute("profile")
         public Profile prepareProfile(
-                @AuthenticationPrincipal(expression = "name") String username,
+                @AuthenticationPrincipal(expression = "username") String username,
                 @AuthenticationPrincipal(expression = "id") UUID id
         ) {
                 Profile profile = new Profile(userRepository.getByUsername(username));

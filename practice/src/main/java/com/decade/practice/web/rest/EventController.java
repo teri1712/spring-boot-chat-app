@@ -100,10 +100,10 @@ public class EventController {
                 }
         }
 
-        @PostMapping(consumes = {MediaType.APPLICATION_JSON_VALUE})
+        @PostMapping(path = "/events", consumes = {MediaType.APPLICATION_JSON_VALUE})
         @ResponseStatus(HttpStatus.CREATED)
         public ChatEvent createEvent(
-                @AuthenticationPrincipal(expression = "name") String username,
+                @AuthenticationPrincipal(expression = "username") String username,
                 @RequestBody @Valid ChatEvent event) {
                 return createAndDeliver(userRepo.getByUsername(username), event);
         }
@@ -112,7 +112,7 @@ public class EventController {
         @PostMapping(path = "/events", consumes = {MediaType.MULTIPART_FORM_DATA_VALUE})
         @ResponseStatus(HttpStatus.CREATED)
         public ImageEvent createEvent(
-                @AuthenticationPrincipal(expression = "name") String username,
+                @AuthenticationPrincipal(expression = "username") String username,
                 @RequestPart("event") @Valid ImageEvent event,
                 @RequestPart("file") MultipartFile file
         ) throws EntityNotFoundException, IOException {
@@ -131,7 +131,7 @@ public class EventController {
 
         @GetMapping("/chats/{chatIdentifier}/events")
         public ResponseEntity<List<ChatEvent>> listEvents(
-                @AuthenticationPrincipal(expression = "name") String username,
+                @AuthenticationPrincipal(expression = "username") String username,
                 @PathVariable @Validated ChatIdentifier chatIdentifier,
                 @RequestParam int atVersion
         ) throws EntityNotFoundException {
@@ -148,7 +148,7 @@ public class EventController {
 
         @GetMapping("/users/me/events")
         public ResponseEntity<List<ChatEvent>> listEvents(
-                @AuthenticationPrincipal(expression = "name") String username,
+                @AuthenticationPrincipal(expression = "username") String username,
                 @RequestParam int atVersion
         ) throws EntityNotFoundException {
                 User owner = userRepo.getByUsername(username);

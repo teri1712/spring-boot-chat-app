@@ -110,7 +110,7 @@ public class TypeEventTest {
 
         @Test
         @Order(2)
-        public void Type_Expect_Both_Receive_Event() throws Exception {
+        public void testTypingEventIsReceivedByBothUsers() throws Exception {
                 CompletableFuture<TypeEvent> myEvent = new CompletableFuture<>();
                 CompletableFuture<TypeEvent> yourEvent = new CompletableFuture<>();
 

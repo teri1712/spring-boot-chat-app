@@ -20,7 +20,7 @@ public class ImageSpec implements Serializable {
         private String format;
 
         // No-arg constructor required by JPA
-        protected ImageSpec() {
+        public ImageSpec() {
                 this.uri = "";
                 this.filename = "";
                 this.width = DEFAULT_WIDTH;
