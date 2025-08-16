@@ -12,49 +12,50 @@ import java.util.UUID;
 
 public class JsonBodyTest {
 
-      @Test
-      public void testText() throws Exception {
-            User me = new User("Luffy", "Luffy");
-            me.setName("Luffy");
-            me.setId(UUID.nameUUIDFromBytes("Luffy".getBytes()));
+        @Test
+        public void testText() throws Exception {
 
-            User you = new User("Nami", "Nami");
-            you.setName("Nami");
-            you.setId(UUID.nameUUIDFromBytes("Nami".getBytes()));
+                User me = new User("Luffy", "Luffy");
+                me.setName("Luffy");
+                me.setId(UUID.nameUUIDFromBytes("Luffy".getBytes()));
 
-            System.out.println(
-                  new ObjectMapper()
-                        .enable(SerializationFeature.INDENT_OUTPUT)
-                        .writeValueAsString(
-                              new TextEvent(
-                                    me.getId().compareTo(you.getId()) < 0 ? new Chat(me, you) : new Chat(you, me),
-                                    you,
-                                    "It's cool"
-                              )
-                        )
-            );
-      }
+                User you = new User("Nami", "Nami");
+                you.setName("Nami");
+                you.setId(UUID.nameUUIDFromBytes("Nami".getBytes()));
 
-      @Test
-      public void testSeen() throws Exception {
-            User me = new User("Luffy", "Luffy");
-            me.setName("Luffy");
-            me.setId(UUID.nameUUIDFromBytes("Luffy".getBytes()));
+                System.out.println(
+                        new ObjectMapper()
+                                .enable(SerializationFeature.INDENT_OUTPUT)
+                                .writeValueAsString(
+                                        new TextEvent(
+                                                me.getId().compareTo(you.getId()) < 0 ? new Chat(me, you) : new Chat(you, me),
+                                                you,
+                                                "It's cool"
+                                        )
+                                )
+                );
+        }
 
-            User you = new User("Nami", "Nami");
-            you.setName("Nami");
-            you.setId(UUID.nameUUIDFromBytes("Nami".getBytes()));
+        @Test
+        public void testSeen() throws Exception {
+                User me = new User("Luffy", "Luffy");
+                me.setName("Luffy");
+                me.setId(UUID.nameUUIDFromBytes("Luffy".getBytes()));
 
-            System.out.println(
-                  new ObjectMapper()
-                        .enable(SerializationFeature.INDENT_OUTPUT)
-                        .writeValueAsString(
-                              new SeenEvent(
-                                    me.getId().compareTo(you.getId()) < 0 ? new Chat(me, you) : new Chat(you, me),
-                                    you,
-                                    System.currentTimeMillis()
-                              )
-                        )
-            );
-      }
+                User you = new User("Nami", "Nami");
+                you.setName("Nami");
+                you.setId(UUID.nameUUIDFromBytes("Nami".getBytes()));
+
+                System.out.println(
+                        new ObjectMapper()
+                                .enable(SerializationFeature.INDENT_OUTPUT)
+                                .writeValueAsString(
+                                        new SeenEvent(
+                                                me.getId().compareTo(you.getId()) < 0 ? new Chat(me, you) : new Chat(you, me),
+                                                you,
+                                                System.currentTimeMillis()
+                                        )
+                                )
+                );
+        }
 }

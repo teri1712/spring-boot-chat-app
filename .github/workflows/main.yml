@@ -59,7 +59,8 @@ jobs:
                 #                    SPRING_DATASOURCE_PASSWORD: root
                 #                    SPRING_REDIS_HOST: localhost # 'localhost' correctly resolves to the service container network
                 #                    SPRING_REDIS_PORT: ${{ job.services.redis.ports[6379] }}
-                run: mvn -B test
+                working-directory: ./practice
+                run: mvn -B clean package
 
 #    deploy:
 #        needs: build
