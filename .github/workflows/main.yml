@@ -57,7 +57,7 @@ jobs:
                     #                    SPRING_DATASOURCE_URL: jdbc:mysql://localhost:${{ job.services.mysql.ports[3306] }}/chatapp
                     #                    SPRING_DATASOURCE_USERNAME: root
                     #                    SPRING_DATASOURCE_PASSWORD: root
-                    SPRING_REDIS_HOST: localhost # 'localhost' correctly resolves to the service container network
+                    SPRING_REDIS_HOST: redis # 'localhost' correctly resolves to the service container network
                     SPRING_REDIS_PORT: ${{ job.services.redis.ports[6379] }}
                 working-directory: ./practice
                 run: mvn -B clean package
