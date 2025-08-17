@@ -20,24 +20,27 @@ public class PrerequisiteBeans {
                 return new BCryptPasswordEncoder();
         }
 
-
         @Bean
         public ClientRegistrationRepository clientRegistrationRepository() {
-                return new InMemoryClientRegistrationRepository(
-                        ClientRegistration.withRegistrationId("github")
-                                .clientId("dummy-client-id")
-                                .clientSecret("dummy-client-secret")
-                                .clientAuthenticationMethod(ClientAuthenticationMethod.CLIENT_SECRET_BASIC)
-                                .authorizationGrantType(AuthorizationGrantType.AUTHORIZATION_CODE)
-                                .redirectUri("{baseUrl}/login/oauth2/code/{registrationId}")
-                                .scope("read:user")
-                                .authorizationUri("https://github.com/login/oauth/authorize")
-                                .tokenUri("https://github.com/login/oauth/access_token")
-                                .userInfoUri("https://api.github.com/user")
-                                .userNameAttributeName("id")
-                                .clientName("GitHub")
-                                .build()
-                );
+                return new InMemoryClientRegistrationRepository(clientRegistration());
         }
 
+        @Bean
+        @ConditionalOnMissingBean
+        public ClientRegistration clientRegistration() {
+                return ClientRegistration.withRegistrationId("google")
+                        .clientId("vcl.apps.googleusercontent.com")
+                        .clientSecret("vcl")
+                        .clientAuthenticationMethod(ClientAuthenticationMethod.CLIENT_SECRET_BASIC)
+                        .authorizationGrantType(AuthorizationGrantType.AUTHORIZATION_CODE)
+                        .redirectUri("{baseUrl}/login/oauth2/code/{registrationId}")
+                        .scope("openid", "profile", "email")
+                        .authorizationUri("https://accounts.google.com/o/oauth2/v2/auth")
+                        .tokenUri("https://www.googleapis.com/oauth2/v4/token")
+                        .userInfoUri("https://www.googleapis.com/oauth2/v3/userinfo")
+                        .userNameAttributeName("sub")
+                        .jwkSetUri("https://www.googleapis.com/oauth2/v3/certs")
+                        .clientName("Google")
+                        .build();
+        }
 }
