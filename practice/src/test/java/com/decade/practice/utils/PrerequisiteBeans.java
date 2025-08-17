@@ -10,6 +10,8 @@ import org.springframework.security.oauth2.client.registration.ClientRegistratio
 import org.springframework.security.oauth2.client.registration.InMemoryClientRegistrationRepository;
 import org.springframework.security.oauth2.core.AuthorizationGrantType;
 import org.springframework.security.oauth2.core.ClientAuthenticationMethod;
+import org.springframework.security.oauth2.jwt.JwtDecoderFactory;
+import org.springframework.security.oauth2.jwt.JwtDecoders;
 
 @TestConfiguration
 public class PrerequisiteBeans {
@@ -43,4 +45,11 @@ public class PrerequisiteBeans {
                         .clientName("Google")
                         .build();
         }
+
+        @Bean
+        @ConditionalOnMissingBean
+        public JwtDecoderFactory<?> jwtDecoderFactory() {
+                return issuer -> JwtDecoders.fromIssuerLocation("https://accounts.google.com");
+        }
+
 }
