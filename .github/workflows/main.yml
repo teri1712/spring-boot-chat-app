@@ -22,6 +22,8 @@ jobs:
                     MYSQL_ROOT_PASSWORD: root
                     MYSQL_DATABASE: chatapp
                 # Health check to ensure the database is ready before tests run
+                ports:
+                    - 3306:3306
                 options: >-
                     --health-cmd "mysqladmin ping -h localhost"
                     --health-interval 10s
@@ -36,6 +38,8 @@ jobs:
                     --health-interval 10s
                     --health-timeout 5s
                     --health-retries 5
+                ports:
+                    - 6379:6379
 
         steps:
             # 1. Checks out repository under $GITHUB_WORKSPACE
@@ -54,11 +58,11 @@ jobs:
             # The env variables override application properties to connect to the service containers
             -   name: Build and test with Maven
                 env:
-                    #                    SPRING_DATASOURCE_URL: jdbc:mysql://localhost:${{ job.services.mysql.ports[3306] }}/chatapp
-                    #                    SPRING_DATASOURCE_USERNAME: root
-                    #                    SPRING_DATASOURCE_PASSWORD: root
-                    SPRING_REDIS_HOST: redis # 'localhost' correctly resolves to the service container network
-                    SPRING_REDIS_PORT: ${{ job.services.redis.ports[6379] }}
+                #                    SPRING_DATASOURCE_URL: jdbc:mysql://localhost:${{ job.services.mysql.ports[3306] }}/chatapp
+                #                    SPRING_DATASOURCE_USERNAME: root
+                #                    SPRING_DATASOURCE_PASSWORD: root
+                #                    SPRING_REDIS_HOST: redis # 'localhost' correctly resolves to the service container network
+                #                    SPRING_REDIS_PORT: ${{ job.services.redis.ports[6379] }}
                 working-directory: ./practice
                 run: mvn -B clean package
 
