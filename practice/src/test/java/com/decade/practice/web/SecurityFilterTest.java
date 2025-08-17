@@ -17,6 +17,7 @@ import com.decade.practice.session.SessionConfiguration;
 import com.decade.practice.usecases.ChatOperations;
 import com.decade.practice.usecases.UserOperations;
 import com.decade.practice.utils.DummyRedisSetOps;
+import com.decade.practice.utils.PrerequisiteBeans;
 import com.decade.practice.utils.TokenUtils;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -42,7 +43,7 @@ import org.springframework.test.web.servlet.result.MockMvcResultMatchers;
 
 @WebMvcTest(controllers = MockEndpoints.class)
 @ActiveProfiles("development")
-@ContextConfiguration(classes = DevelopmentApplication.class)
+@ContextConfiguration(classes = {DevelopmentApplication.class, PrerequisiteBeans.class})
 @ExtendWith(OutputCaptureExtension.class)
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
 @Import({

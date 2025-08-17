@@ -3,6 +3,7 @@ package com.decade.practice;
 
 import com.decade.practice.model.domain.DefaultAvatar;
 import com.decade.practice.usecases.UserOperations;
+import com.decade.practice.utils.PrerequisiteBeans;
 import org.junit.jupiter.api.AfterAll;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.TestInstance;
@@ -19,7 +20,7 @@ import java.util.Date;
 
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
 @ActiveProfiles("development")
-@ContextConfiguration(classes = DevelopmentApplication.class)
+@ContextConfiguration(classes = {DevelopmentApplication.class, PrerequisiteBeans.class})
 @AutoConfigureTestDatabase(
         connection = EmbeddedDatabaseConnection.H2
 ) // or using autoconfigured embedded datasource.

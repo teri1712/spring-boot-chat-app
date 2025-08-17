@@ -8,6 +8,7 @@ import com.decade.practice.model.domain.entity.User;
 import com.decade.practice.model.dto.SignUpRequest;
 import com.decade.practice.security.jwt.JwtCredentialService;
 import com.decade.practice.usecases.UserOperations;
+import com.decade.practice.utils.PrerequisiteBeans;
 import com.decade.practice.web.advices.ExceptionControllerAdvice;
 import com.decade.practice.web.rest.TokenController;
 import com.decade.practice.web.rest.UserController;
@@ -43,7 +44,7 @@ import static com.decade.practice.utils.Media.ONE_PIXEL_BMP_BYTES;
 
 @WebMvcTest(controllers = {TokenController.class, UserController.class})
 @ActiveProfiles("development")
-@ContextConfiguration(classes = DevelopmentApplication.class)
+@ContextConfiguration(classes = {DevelopmentApplication.class, PrerequisiteBeans.class})
 @AutoConfigureMockMvc(addFilters = false)
 @ExtendWith(OutputCaptureExtension.class)
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)

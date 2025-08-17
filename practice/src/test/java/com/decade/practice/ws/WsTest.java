@@ -7,6 +7,7 @@ import com.decade.practice.model.domain.entity.User;
 import com.decade.practice.model.domain.entity.WelcomeEvent;
 import com.decade.practice.security.jwt.JwtCredentialService;
 import com.decade.practice.usecases.UserOperations;
+import com.decade.practice.utils.PrerequisiteBeans;
 import org.junit.jupiter.api.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.jdbc.EmbeddedDatabaseConnection;
@@ -43,7 +44,7 @@ import static org.junit.jupiter.api.Assertions.assertNotNull;
         webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT
 )
 @ActiveProfiles("development")
-@ContextConfiguration(classes = DevelopmentApplication.class)
+@ContextConfiguration(classes = {DevelopmentApplication.class, PrerequisiteBeans.class})
 @AutoConfigureTestDatabase(connection = EmbeddedDatabaseConnection.H2)
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
 @TestMethodOrder(MethodOrderer.OrderAnnotation.class)

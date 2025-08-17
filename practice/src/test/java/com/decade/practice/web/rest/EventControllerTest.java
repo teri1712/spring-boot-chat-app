@@ -17,6 +17,7 @@ import com.decade.practice.security.strategy.Oauth2LoginSuccessStrategy;
 import com.decade.practice.usecases.ChatEventStore;
 import com.decade.practice.usecases.ChatOperations;
 import com.decade.practice.usecases.UserOperations;
+import com.decade.practice.utils.PrerequisiteBeans;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -43,7 +44,7 @@ import static org.springframework.test.web.servlet.request.MockMvcRequestBuilder
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 @WebMvcTest(EventController.class)
-@ContextConfiguration(classes = {DevelopmentApplication.class})
+@ContextConfiguration(classes = {DevelopmentApplication.class, PrerequisiteBeans.class})
 @Import({LocalMediaFileConfiguration.class, SecurityConfiguration.class})
 class EventControllerTest {
 

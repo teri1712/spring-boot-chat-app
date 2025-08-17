@@ -4,6 +4,7 @@ import com.decade.practice.DevelopmentApplication;
 import com.decade.practice.data.repositories.UserRepository;
 import com.decade.practice.model.local.AccountEntry;
 import com.decade.practice.usecases.UserOperations;
+import com.decade.practice.utils.PrerequisiteBeans;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.TestInstance;
@@ -28,7 +29,7 @@ import static org.junit.jupiter.api.Assertions.assertThrows;
 
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
 @ActiveProfiles("development")
-@ContextConfiguration(classes = {DevelopmentApplication.class})
+@ContextConfiguration(classes = {DevelopmentApplication.class, PrerequisiteBeans.class})
 @ExtendWith(OutputCaptureExtension.class)
 @AutoConfigureTestDatabase(connection = EmbeddedDatabaseConnection.H2)
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
