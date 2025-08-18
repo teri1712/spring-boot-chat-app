@@ -54,6 +54,7 @@ public class Chat {
                 this.firstUser = firstUser;
                 this.secondUser = secondUser;
                 this.identifier = new ChatIdentifier(firstUser.getId(), secondUser.getId());
+                this.preference = new Preference(firstUser, secondUser);
         }
 
         public User getFirstUser() {

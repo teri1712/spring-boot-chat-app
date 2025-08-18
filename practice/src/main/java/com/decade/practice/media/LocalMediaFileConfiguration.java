@@ -74,7 +74,7 @@ public class LocalMediaFileConfiguration {
                         try {
                                 String queryString = request.getQueryString();
                                 Resource resource = mediaStore.read(extractFile(queryString).toUri());
-                                var cacheControl = CacheUtils.CACHE_CONTROL;
+                                var cacheControl = CacheUtils.ONE_MONTHS;
 
                                 return ResponseEntity.ok()
                                         .cacheControl(cacheControl)
@@ -91,7 +91,7 @@ public class LocalMediaFileConfiguration {
                         try {
                                 String queryString = request.getQueryString();
                                 Resource resource = mediaStore.read(extractFile(queryString).toUri());
-                                var cacheControl = CacheUtils.CACHE_CONTROL;
+                                var cacheControl = CacheUtils.ONE_MONTHS;
 
                                 return ResponseEntity.ok()
                                         .cacheControl(cacheControl)

@@ -141,8 +141,8 @@ public class EventController {
                         user, chat, atVersion, EventUtils.EVENT_VERSION_LESS_THAN_EQUAL);
 
                 return ResponseEntity.ok()
-                        .header("Vary", "Cookie, Authorization")
-                        .cacheControl(CacheUtils.CACHE_CONTROL)
+                        .header("Vary", "Cookie", "Authorization")
+                        .cacheControl(CacheUtils.ONE_MONTHS)
                         .body(events);
         }
 
@@ -156,8 +156,8 @@ public class EventController {
                         owner, atVersion, EventUtils.EVENT_VERSION_LESS_THAN_EQUAL);
 
                 return ResponseEntity.ok()
-                        .header("Vary", "Cookie, Authorization")
-                        .cacheControl(CacheUtils.CACHE_CONTROL)
+                        .header("Vary", "Cookie", "Authorization")
+                        .cacheControl(CacheUtils.ONE_MONTHS)
                         .body(eventList);
         }
 }

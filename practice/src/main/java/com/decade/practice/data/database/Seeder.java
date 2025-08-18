@@ -1,12 +1,10 @@
 package com.decade.practice.data.database;
 
 import com.decade.practice.data.repositories.AdminRepository;
+import com.decade.practice.data.repositories.ThemeRepository;
 import com.decade.practice.data.repositories.UserRepository;
 import com.decade.practice.model.domain.embeddable.ImageSpec;
-import com.decade.practice.model.domain.entity.Admin;
-import com.decade.practice.model.domain.entity.Chat;
-import com.decade.practice.model.domain.entity.TextEvent;
-import com.decade.practice.model.domain.entity.User;
+import com.decade.practice.model.domain.entity.*;
 import com.decade.practice.usecases.EventStore;
 import com.decade.practice.usecases.UserOperations;
 import jakarta.persistence.EntityManager;
@@ -32,6 +30,9 @@ public class Seeder {
         private AdminRepository adminRepo;
 
         @Autowired
+        private ThemeRepository themeRepository;
+
+        @Autowired
         private UserOperations userOperations;
 
         @Autowired
@@ -53,7 +54,11 @@ public class Seeder {
 
                 adminRepo.save(new Admin(adminUsername, adminPassword));
                 adminRepo.flush();
-
+                themeRepository.save(new Theme(1, new ImageSpec("http://localhost:8080/theme/luffy-theme.jpg", "luffy.jpg", 512, 512, "jpg")));
+                themeRepository.save(new Theme(2, new ImageSpec("http://localhost:8080/theme/doflamingo-theme.jpg", "doflamingo.jpg", 512, 512, "jpg")));
+                themeRepository.save(new Theme(3, new ImageSpec("http://localhost:8080/theme/kid-theme.jpg", "kid.jpg", 512, 512, "jpg")));
+                themeRepository.save(new Theme(4, new ImageSpec("http://localhost:8080/theme/law-theme.jpg", "law.jpg", 512, 512, "jpg")));
+                themeRepository.save(new Theme(5, new ImageSpec("http://localhost:8080/theme/ace-theme.jpg", "ace.jpg", 512, 512, "jpg")));
                 if (Arrays.asList(environment.getActiveProfiles()).contains("development")) {
                         return;
                 }

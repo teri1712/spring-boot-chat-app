@@ -1,6 +1,7 @@
 package com.decade.practice.model.domain.embeddable;
 
 import com.decade.practice.model.domain.entity.Theme;
+import com.decade.practice.model.domain.entity.User;
 import jakarta.persistence.Embeddable;
 import jakarta.persistence.ManyToOne;
 
@@ -12,13 +13,12 @@ public class Preference {
         @ManyToOne(fetch = jakarta.persistence.FetchType.LAZY)
         private Theme theme;
 
-        public Preference(int resourceId, Theme theme) {
-                this.resourceId = resourceId;
-                this.theme = theme;
+        public Preference(User firstUser, User secondUser) {
+                this.resourceId = 1;
+                this.roomName = "Room " + firstUser.getUsername() + " and " + secondUser.getUsername();
         }
 
         public Preference() {
-                this(0, null);
         }
 
         public String getRoomName() {

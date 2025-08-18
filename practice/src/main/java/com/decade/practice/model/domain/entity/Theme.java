@@ -1,20 +1,21 @@
 package com.decade.practice.model.domain.entity;
 
 import com.decade.practice.model.domain.embeddable.ImageSpec;
-import jakarta.persistence.*;
+import jakarta.persistence.Cacheable;
+import jakarta.persistence.Embedded;
+import jakarta.persistence.Entity;
+import jakarta.persistence.Id;
 import org.hibernate.annotations.Cache;
 import org.hibernate.annotations.CacheConcurrencyStrategy;
-
-import java.util.UUID;
 
 @Cacheable
 @Cache(usage = CacheConcurrencyStrategy.READ_ONLY)
 /////////////////////////////////////////////
 @Entity
 public class Theme {
+
         @Id
-        @GeneratedValue(strategy = jakarta.persistence.GenerationType.UUID)
-        private UUID id;
+        private Integer id;
 
         @Embedded
         private ImageSpec background;
@@ -22,11 +23,16 @@ public class Theme {
         protected Theme() {
         }
 
-        public UUID getId() {
+        public Theme(Integer id, ImageSpec background) {
+                this.id = id;
+                this.background = background;
+        }
+
+        public Integer getId() {
                 return id;
         }
 
-        public void setId(UUID id) {
+        public void setId(Integer id) {
                 this.id = id;
         }
 
