@@ -13,7 +13,7 @@ public class TextEvent extends MessageEvent {
 
         @NotEmpty
         @Lob
-        @Column(updatable = false, columnDefinition = "TEXT")
+        @Column(updatable = false)
         private String content;
 
         protected TextEvent() {

@@ -11,12 +11,12 @@ import java.security.Principal;
 import java.util.List;
 
 @RestController
-@RequestMapping("/onlines")
-public class OnlineController {
+@RequestMapping("/presences")
+public class PresenceController {
 
         private final UserPresenceService stat;
 
-        public OnlineController(UserPresenceService stat) {
+        public PresenceController(UserPresenceService stat) {
                 this.stat = stat;
         }
 

@@ -51,7 +51,7 @@ public class UserController {
         }
 
         @GetMapping
-        public List<User> findConversations(
+        public List<User> findUsers(
                 @AuthenticationPrincipal(expression = "username") String username,
                 @RequestParam(required = true) String query
         ) {

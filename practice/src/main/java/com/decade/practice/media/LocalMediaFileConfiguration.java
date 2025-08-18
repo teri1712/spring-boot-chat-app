@@ -4,7 +4,6 @@ import com.decade.practice.model.domain.embeddable.ImageSpec;
 import com.decade.practice.utils.CacheUtils;
 import jakarta.servlet.http.HttpServletRequest;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
-import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.core.io.ByteArrayResource;
 import org.springframework.core.io.Resource;
@@ -102,11 +101,6 @@ public class LocalMediaFileConfiguration {
                                 return ResponseEntity.notFound().build();
                         }
                 }
-        }
-
-        @Bean
-        public File fileDirectory() {
-                return new File("./images/");
         }
 
         @Component
