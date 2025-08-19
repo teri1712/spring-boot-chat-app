@@ -18,8 +18,9 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.NoSuchElementException;
 
-@Component
+@Transactional(isolation = Isolation.READ_COMMITTED)
 @Primary
+@Component
 public class ChatEventStore implements EventStore {
 
         private final UserEventStore eventStore;
@@ -33,7 +34,6 @@ public class ChatEventStore implements EventStore {
                 this.chatOperations = chatOperations;
         }
 
-        @Transactional(isolation = Isolation.READ_COMMITTED)
         @Override
         public Collection<ChatEvent> save(ChatEvent event) throws NoSuchElementException, ConstraintViolationException {
                 Chat chat = chatOperations.getOrCreateChat(event.getChatIdentifier());

@@ -10,20 +10,17 @@ import com.decade.practice.model.domain.entity.ChatEvent;
 import com.decade.practice.model.domain.entity.ImageEvent;
 import com.decade.practice.model.domain.entity.User;
 import com.decade.practice.presence.UserPresenceService;
-import com.decade.practice.usecases.ChatEventStore;
 import com.decade.practice.usecases.ChatOperations;
+import com.decade.practice.usecases.EventOperations;
 import com.decade.practice.utils.CacheUtils;
 import com.decade.practice.utils.ChatUtils;
 import com.decade.practice.utils.EventUtils;
 import com.decade.practice.utils.ImageUtils;
-import com.decade.practice.websocket.WebSocketConfiguration;
 import jakarta.persistence.EntityNotFoundException;
 import jakarta.validation.Valid;
-import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
-import org.springframework.messaging.simp.SimpMessagingTemplate;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
@@ -32,7 +29,6 @@ import org.springframework.web.multipart.MultipartFile;
 import java.awt.image.BufferedImage;
 import java.io.IOException;
 import java.net.URI;
-import java.util.Collection;
 import java.util.List;
 
 import static java.lang.Math.min;
@@ -41,71 +37,37 @@ import static java.lang.Math.min;
 @RequestMapping
 public class EventController {
 
-        private final ChatEventStore chatEventStore;
-        private final SimpMessagingTemplate template;
+        private final EventOperations eventOperations;
         private final ChatOperations chatOperations;
         private final EventRepository evenRepo;
-        private final UserPresenceService onlineStat;
+        private final UserPresenceService presenceService;
         private final UserRepository userRepo;
         private final ImageStore imageStore;
 
         public EventController(
-                ChatEventStore chatEventStore,
-                SimpMessagingTemplate template,
+                EventOperations eventOperations,
                 ChatOperations chatOperations,
                 EventRepository evenRepo,
-                UserPresenceService onlineStat,
+                UserPresenceService presenceService,
                 UserRepository userRepo,
-                ImageStore imageStore
-        ) {
-                this.chatEventStore = chatEventStore;
-                this.template = template;
+                ImageStore imageStore) {
+                this.eventOperations = eventOperations;
                 this.chatOperations = chatOperations;
                 this.evenRepo = evenRepo;
-                this.onlineStat = onlineStat;
+                this.presenceService = presenceService;
                 this.userRepo = userRepo;
                 this.imageStore = imageStore;
         }
 
-        private <E extends ChatEvent> E createAndDeliver(
-                User sender,
-                E event
-        ) throws EntityNotFoundException {
-                onlineStat.set(sender);
-                event.setSender(sender);
-                try {
-                        Collection<ChatEvent> saved = chatEventStore.save(event);
-                        for (ChatEvent it : saved) {
-                                template.convertAndSendToUser(
-                                        it.getOwner().getUsername(),
-                                        WebSocketConfiguration.QUEUE_MESSAGE_DESTINATION,
-                                        it
-                                );
-                        }
-
-                        // Find the event with the same localId as the original event
-                        for (ChatEvent it : saved) {
-                                if (it.getLocalId().equals(event.getLocalId())) {
-                                        @SuppressWarnings("unchecked")
-                                        E result = (E) it;
-                                        return result;
-                                }
-                        }
-                        throw new EntityNotFoundException("Event not found after save");
-                } catch (DataIntegrityViolationException e) {
-                        // record already sent
-                        @SuppressWarnings("unchecked")
-                        E result = (E) evenRepo.getByLocalId(event.getLocalId());
-                        return result;
-                }
-        }
 
         @PostMapping(path = "/events", consumes = {MediaType.APPLICATION_JSON_VALUE})
         @ResponseStatus(HttpStatus.CREATED)
         public ChatEvent createEvent(
                 @AuthenticationPrincipal(expression = "username") String username,
                 @RequestBody @Valid ChatEvent event) {
-                return createAndDeliver(userRepo.getByUsername(username), event);
+                User user = userRepo.getByUsername(username);
+                presenceService.set(user);
+                return eventOperations.createAndSend(user, event);
         }
 
 
@@ -122,7 +84,9 @@ public class EventController {
 
                 event.setImage(imageStore.save(image));
                 try {
-                        return createAndDeliver(userRepo.getByUsername(username), event);
+                        User user = userRepo.getByUsername(username);
+                        presenceService.set(user);
+                        return eventOperations.createAndSend(user, event);
                 } catch (Exception e) {
                         imageStore.remove(URI.create(event.getImage().getUri()));
                         throw e;

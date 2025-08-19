@@ -37,7 +37,7 @@ public class ConversationController {
         }
 
         private String resolveDestination(Chat chat) {
-                return WebSocketConfiguration.QUEUE_CHAT_DESTINATION + "-" + chat.getIdentifier();
+                return WebSocketConfiguration.CHAT_DESTINATION + "-" + chat.getIdentifier();
         }
 
         @MessageMapping(WebSocketConfiguration.TYPING_DESTINATION)

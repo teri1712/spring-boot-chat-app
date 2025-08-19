@@ -4,7 +4,6 @@ import com.decade.practice.DevelopmentApplication;
 import com.decade.practice.data.repositories.EventRepository;
 import com.decade.practice.data.repositories.UserRepository;
 import com.decade.practice.media.ImageStore;
-import com.decade.practice.media.LocalMediaFileConfiguration;
 import com.decade.practice.model.domain.embeddable.ChatIdentifier;
 import com.decade.practice.model.domain.embeddable.ImageSpec;
 import com.decade.practice.model.domain.entity.*;
@@ -14,8 +13,8 @@ import com.decade.practice.security.jwt.JwtCredentialService;
 import com.decade.practice.security.strategy.LoginSuccessStrategy;
 import com.decade.practice.security.strategy.LogoutStrategy;
 import com.decade.practice.security.strategy.Oauth2LoginSuccessStrategy;
-import com.decade.practice.usecases.ChatEventStore;
 import com.decade.practice.usecases.ChatOperations;
+import com.decade.practice.usecases.EventOperations;
 import com.decade.practice.usecases.UserOperations;
 import com.decade.practice.utils.PrerequisiteBeans;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -26,13 +25,12 @@ import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.context.annotation.Import;
 import org.springframework.http.MediaType;
-import org.springframework.messaging.simp.SimpMessagingTemplate;
 import org.springframework.mock.web.MockMultipartFile;
 import org.springframework.security.test.context.support.WithMockUser;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.web.servlet.MockMvc;
 
-import java.util.Collections;
+import java.awt.image.BufferedImage;
 import java.util.List;
 import java.util.UUID;
 
@@ -45,17 +43,14 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 
 @WebMvcTest(EventController.class)
 @ContextConfiguration(classes = {DevelopmentApplication.class, PrerequisiteBeans.class})
-@Import({LocalMediaFileConfiguration.class, SecurityConfiguration.class})
+@Import({SecurityConfiguration.class})
 class EventControllerTest {
 
         @Autowired
         private MockMvc mockMvc;
 
         @MockBean
-        private ChatEventStore chatEventStore;
-
-        @MockBean
-        private SimpMessagingTemplate template;
+        private EventOperations eventOperations;
 
         @MockBean
         private ChatOperations chatOperations;
@@ -96,14 +91,21 @@ class EventControllerTest {
         void setUp() {
                 testUser = new User("testuser", " password");
                 when(userRepository.getByUsername("testuser")).thenReturn(testUser);
+                when(eventOperations.createAndSend(any(User.class), any(ChatEvent.class)))
+                        .thenAnswer(inv -> inv.getArgument(1));
         }
 
         @Test
         @WithMockUser("testuser")
         void createEvent_shouldReturnCreated_whenTextEventIsSent() throws Exception {
+                Chat chat = new Chat(testUser, testUser);
+
+                when(chatOperations.getOrCreateChat(any(ChatIdentifier.class))).thenReturn(chat);
                 TextEvent event = new TextEvent(new Chat(testUser, testUser), testUser, "test message");
 
-                when(chatEventStore.save(any(ChatEvent.class))).thenReturn(Collections.singleton(event));
+
+                when(eventOperations.createAndSend(any(User.class), any(ChatEvent.class)))
+                        .thenReturn(event);
 
                 event.setLocalId(UUID.randomUUID());
 
@@ -116,9 +118,17 @@ class EventControllerTest {
         @Test
         @WithMockUser("testuser")
         void createEvent_shouldReturnCreated_whenImageEventIsSent() throws Exception {
+                Chat chat = new Chat(testUser, testUser);
+
+                when(chatOperations.getOrCreateChat(any(ChatIdentifier.class))).thenReturn(chat);
                 ImageEvent event = new ImageEvent(new Chat(testUser, testUser), testUser, new ImageSpec());
                 event.setLocalId(UUID.randomUUID());
-                when(chatEventStore.save(any(ImageEvent.class))).thenReturn(Collections.singleton(event));
+
+                when(eventOperations.createAndSend(any(User.class), any(ChatEvent.class)))
+                        .thenReturn(event);
+
+                when(imageStore.save(any(BufferedImage.class)))
+                        .thenReturn(new ImageSpec("uri:", "file.jpg", 1, 1, "jpg"));
 
                 MockMultipartFile eventPart = new MockMultipartFile("event", "", "application/json", objectMapper.writeValueAsString(event).getBytes());
                 MockMultipartFile filePart = new MockMultipartFile("file", "test.jpg", "image/bmp", ONE_PIXEL_BMP_BYTES);

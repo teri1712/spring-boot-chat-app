@@ -3,9 +3,12 @@ package com.decade.practice.web.rest;
 import com.decade.practice.data.repositories.UserRepository;
 import com.decade.practice.media.ImageStore;
 import com.decade.practice.model.domain.DefaultAvatar;
+import com.decade.practice.model.domain.embeddable.ChatIdentifier;
 import com.decade.practice.model.domain.embeddable.ImageSpec;
 import com.decade.practice.model.domain.entity.User;
 import com.decade.practice.model.dto.SignUpRequest;
+import com.decade.practice.model.local.Chat;
+import com.decade.practice.model.local.Conversation;
 import com.decade.practice.security.model.DaoUser;
 import com.decade.practice.usecases.UserOperations;
 import com.decade.practice.utils.ImageUtils;
@@ -29,6 +32,7 @@ import java.io.IOException;
 import java.net.URI;
 import java.util.Collections;
 import java.util.List;
+import java.util.stream.Collectors;
 
 @RestController
 @RequestMapping("/users")
@@ -51,11 +55,18 @@ public class UserController {
         }
 
         @GetMapping
-        public List<User> findUsers(
+        public List<Conversation> findUsers(
                 @AuthenticationPrincipal(expression = "username") String username,
                 @RequestParam(required = true) String query
         ) {
-                return userRepository.findByNameContainingAndRole(query, "ROLE_USER");
+                User me = userRepository.getByUsername(username);
+                return userRepository.findByNameContainingAndRole(query, "ROLE_USER").stream().map(partner -> {
+                        Conversation conversation = new Conversation();
+                        conversation.setOwner(me);
+                        conversation.setPartner(partner);
+                        conversation.setChat(new Chat(ChatIdentifier.from(me, partner), partner.getId(), null));
+                        return conversation;
+                }).collect(Collectors.toList());
         }
 
         @PostMapping

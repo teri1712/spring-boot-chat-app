@@ -8,6 +8,7 @@ import com.decade.practice.model.domain.ChatSnapshot;
 import com.decade.practice.model.domain.embeddable.ChatIdentifier;
 import com.decade.practice.model.domain.embeddable.Preference;
 import com.decade.practice.model.domain.entity.Chat;
+import com.decade.practice.model.domain.entity.PreferenceChangeEvent;
 import com.decade.practice.model.domain.entity.SyncContext;
 import com.decade.practice.model.domain.entity.Theme;
 import com.decade.practice.model.domain.entity.User;
@@ -17,6 +18,7 @@ import com.decade.practice.security.strategy.LoginSuccessStrategy;
 import com.decade.practice.security.strategy.LogoutStrategy;
 import com.decade.practice.security.strategy.Oauth2LoginSuccessStrategy;
 import com.decade.practice.usecases.ChatOperations;
+import com.decade.practice.usecases.EventOperations;
 import com.decade.practice.usecases.UserOperations;
 import com.decade.practice.utils.PrerequisiteBeans;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -60,6 +62,9 @@ class ChatControllerTest {
         @MockBean
         private ThemeRepository themeRepository;
 
+        @MockBean
+        private EventOperations eventOperations;
+
         // Security-related mocks to satisfy the SecurityConfiguration
         @MockBean
         private JwtCredentialService jwtCredentialService;
@@ -89,6 +94,8 @@ class ChatControllerTest {
                 testUser.setSyncContext(new SyncContext(testUser));
                 testUser.getSyncContext().setEventVersion(43);
                 given(userRepository.getByUsername("alice")).willReturn(testUser);
+                given(eventOperations.createAndSend(any(User.class), any(PreferenceChangeEvent.class)))
+                        .willAnswer(inv -> inv.getArgument(1));
 
                 // Prepare a chat and its identifier
                 User u1 = new User("u1", "p1");
@@ -127,7 +134,6 @@ class ChatControllerTest {
                 given(chatOperations.getOrCreateChat(any(ChatIdentifier.class))).willReturn(chatEntity);
                 Theme theme = new Theme(5, null);
                 given(themeRepository.findById(5)).willReturn(Optional.of(theme));
-                given(chatRepository.save(any(Chat.class))).willAnswer(inv -> inv.getArgument(0));
 
                 Preference preference = new Preference();
                 preference.setResourceId(10);
@@ -139,12 +145,9 @@ class ChatControllerTest {
                                 .contentType(MediaType.APPLICATION_JSON)
                                 .content(objectMapper.writeValueAsString(preference)))
                         .andExpect(status().isOk())
-                        .andExpect(jsonPath("$.preference.resourceId").value(10))
-                        .andExpect(jsonPath("$.preference.roomName").value("Room A"))
-                        .andExpect(jsonPath("$.preference.theme.id").value(5))
-                        .andExpect(jsonPath("$.identifier.firstUser").value(identifier.getFirstUser().toString()))
-                        .andExpect(jsonPath("$.identifier.secondUser").value(identifier.getSecondUser().toString()))
-                ;
+                        .andExpect(jsonPath("$.resourceId").value(10))
+                        .andExpect(jsonPath("$.roomName").value("Room A"))
+                        .andExpect(jsonPath("$.theme.id").value(5));
         }
 
         @Test

@@ -8,9 +8,11 @@ import com.decade.practice.model.domain.ChatSnapshot;
 import com.decade.practice.model.domain.embeddable.ChatIdentifier;
 import com.decade.practice.model.domain.embeddable.Preference;
 import com.decade.practice.model.domain.entity.Chat;
+import com.decade.practice.model.domain.entity.PreferenceChangeEvent;
 import com.decade.practice.model.domain.entity.Theme;
 import com.decade.practice.model.domain.entity.User;
 import com.decade.practice.usecases.ChatOperations;
+import com.decade.practice.usecases.EventOperations;
 import com.decade.practice.utils.CacheUtils;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
@@ -18,6 +20,7 @@ import org.springframework.web.bind.annotation.*;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.UUID;
 
 @RestController
 @RequestMapping("/chats")
@@ -27,17 +30,20 @@ public class ChatController {
         private final ChatRepository chatRepository;
         private final ChatOperations chatOperations;
         private final ThemeRepository themeRepository;
+        private final EventOperations eventOperations;
 
         public ChatController(
                 UserRepository userRepository,
                 ChatRepository chatRepository,
                 ChatOperations chatOperations,
-                ThemeRepository themeRepository
+                ThemeRepository themeRepository,
+                EventOperations eventOperations
         ) {
                 this.userRepository = userRepository;
                 this.chatRepository = chatRepository;
                 this.chatOperations = chatOperations;
                 this.themeRepository = themeRepository;
+                this.eventOperations = eventOperations;
         }
 
         @GetMapping("/{identifier}")
@@ -60,20 +66,46 @@ public class ChatController {
                         .body(snapshot);
         }
 
+        @GetMapping("/partners/{partnerId}")
+        public ResponseEntity<ChatSnapshot> get(
+                @AuthenticationPrincipal(expression = "username") String username,
+                @PathVariable UUID partnerId,
+                @RequestParam(required = false) Integer atVersion
+        ) {
+                User me = userRepository.getByUsername(username);
+                ChatIdentifier identifier = ChatIdentifier.from(partnerId, me.getId());
+                Chat chat = chatOperations.getOrCreateChat(identifier);
+                ChatSnapshot snapshot = chatOperations.getSnapshot(
+                        chat,
+                        me,
+                        atVersion != null ? atVersion : me.getSyncContext().getEventVersion()
+                );
+
+                return ResponseEntity.ok()
+                        .cacheControl(CacheUtils.ONE_MONTHS)
+                        .header("Vary", "Cookie", "Authorization")
+                        .body(snapshot);
+        }
+
         @PatchMapping("/{identifier}/preference")
-        public com.decade.practice.model.local.Chat updatePreferences(
+        public Preference updatePreferences(
                 @AuthenticationPrincipal(expression = "username") String username,
                 @PathVariable ChatIdentifier identifier,
                 @RequestBody Preference preference) {
 
                 User me = userRepository.getByUsername(username);
-                Chat chat = chatOperations.getOrCreateChat(identifier);
 
-                preference.setTheme(themeRepository.findById(preference.getTheme().getId()).orElseThrow());
-                chat.setPreference(preference);
-                chatRepository.save(chat);
+                Theme theme = preference.getTheme();
+                if (theme != null) {
+                        preference.setTheme(themeRepository.findById(theme.getId()).orElseThrow());
+                }
+                PreferenceChangeEvent event = new PreferenceChangeEvent();
+                event.setChatIdentifier(identifier);
+                event.setSender(me);
+                event.setPreference(preference);
+                eventOperations.createAndSend(me, event);
 
-                return new com.decade.practice.model.local.Chat(chat, me);
+                return preference;
         }
 
         @GetMapping("/themes")

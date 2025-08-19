@@ -26,6 +26,7 @@ import java.util.UUID;
         @JsonSubTypes.Type(value = TextEvent.class, name = "TEXT"),
         @JsonSubTypes.Type(value = IconEvent.class, name = "ICON"),
         @JsonSubTypes.Type(value = ImageEvent.class, name = "IMAGE"),
+        @JsonSubTypes.Type(value = FileEvent.class, name = "FILE"),
         @JsonSubTypes.Type(value = WelcomeEvent.class, name = "HELLO WORLD")
 })
 ////////////////////////////////////////////////////////////////////

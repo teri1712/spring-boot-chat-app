@@ -29,14 +29,14 @@ public class WebSocketConfiguration implements WebSocketMessageBrokerConfigurer 
 
         public static final String HANDSHAKE_DESTINATION = "/handshake";
         public static final String USER_DESTINATION = "/user";
-        public static final String QUEUE_MESSAGE_DESTINATION = "/queue/message";
-        public static final String QUEUE_CHAT_DESTINATION = "/queue/chat";
+        public static final String QUEUE_DESTINATION = "/queue";
+        public static final String CHAT_DESTINATION = "/chat";
         public static final String TYPING_DESTINATION = "/typing";
 
-        public static final String USER_QUEUE_DESTINATION = USER_DESTINATION + QUEUE_MESSAGE_DESTINATION;
+        public static final String USER_QUEUE_DESTINATION = USER_DESTINATION + QUEUE_DESTINATION;
         public static final Set<String> BROKER_DESTINATIONS = new HashSet<>() {{
-                add(QUEUE_CHAT_DESTINATION);
-                add(QUEUE_MESSAGE_DESTINATION);
+                add(CHAT_DESTINATION);
+                add(QUEUE_DESTINATION);
         }};
 
         private final CachedEntityConversationRepository entityRepo;

@@ -16,7 +16,7 @@ public class Conversation {
                 this.owner = owner;
         }
 
-        protected Conversation() {
+        public Conversation() {
         }
 
         public Conversation(com.decade.practice.model.domain.entity.Chat chat, User owner) {
