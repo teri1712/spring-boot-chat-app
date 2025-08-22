@@ -67,30 +67,13 @@ public class LocalMediaFileConfiguration {
                         this.mediaStore = mediaStore;
                 }
 
-                @GetMapping("/images")
-                public ResponseEntity<Resource> getImage(HttpServletRequest request) {
-                        try {
-                                String queryString = request.getQueryString();
-                                Resource resource = mediaStore.read(extractFile(queryString).toUri());
-                                var cacheControl = CacheUtils.ONE_MONTHS;
-
-                                return ResponseEntity.ok()
-                                        .cacheControl(cacheControl)
-                                        .contentType(MediaType.IMAGE_JPEG)
-                                        .header("Content-Disposition", "inline; filename=" + resource.getFilename())
-                                        .body(resource);
-                        } catch (Exception e) {
-                                return ResponseEntity.notFound().build();
-                        }
-                }
-
-                @GetMapping("/files")
+                @GetMapping
                 public ResponseEntity<Resource> getFile(HttpServletRequest request) {
                         try {
                                 String queryString = request.getQueryString();
                                 Resource resource = mediaStore.read(extractFile(queryString).toUri());
                                 var cacheControl = CacheUtils.ONE_MONTHS;
-
+                                System.out.println("zzzzzzzzzzzzzz" + extractFile(queryString));
                                 return ResponseEntity.ok()
                                         .cacheControl(cacheControl)
                                         .contentType(MediaType.APPLICATION_OCTET_STREAM)
@@ -159,7 +142,7 @@ public class LocalMediaFileConfiguration {
                         ByteArrayResource resource = new ByteArrayResource(imageBytes);
                         mediaStore.save(resource, filename);
                         String base = scheme + "://" + server + ":" + port;
-                        String uri = new URL(base + "medias?filename=" + filename).toString();
+                        String uri = new URL(base + "/medias/" + filename).toString();
                         return new ImageSpec(uri, filename, image.getWidth(), image.getHeight(), ImageSpec.DEFAULT_FORMAT);
                 }
 

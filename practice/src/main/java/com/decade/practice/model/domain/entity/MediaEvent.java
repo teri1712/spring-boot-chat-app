@@ -6,6 +6,7 @@ import jakarta.persistence.Entity;
 public abstract class MediaEvent extends ChatEvent {
 
         private String mediaUrl;
+        private int size;
 
         protected MediaEvent(Chat chat, User sender, String eventType) {
                 super(chat, sender, eventType);
@@ -22,4 +23,13 @@ public abstract class MediaEvent extends ChatEvent {
         public void setMediaUrl(String mediaUrl) {
                 this.mediaUrl = mediaUrl;
         }
+
+        public int getSize() {
+                return size;
+        }
+
+        public void setSize(int size) {
+                this.size = size;
+        }
+
 }
