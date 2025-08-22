@@ -8,14 +8,13 @@ import com.decade.practice.model.domain.entity.WelcomeEvent;
 import com.decade.practice.security.jwt.JwtCredentialService;
 import com.decade.practice.usecases.UserOperations;
 import com.decade.practice.utils.PrerequisiteBeans;
+import com.decade.practice.utils.RedisTestContainerSupport;
 import org.junit.jupiter.api.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.jdbc.EmbeddedDatabaseConnection;
 import org.springframework.boot.test.autoconfigure.jdbc.AutoConfigureTestDatabase;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.web.server.LocalServerPort;
-import org.springframework.data.redis.connection.RedisConnection;
-import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.http.MediaType;
 import org.springframework.messaging.converter.MessageConverter;
 import org.springframework.messaging.simp.stomp.StompFrameHandler;
@@ -48,7 +47,7 @@ import static org.junit.jupiter.api.Assertions.assertNotNull;
 @AutoConfigureTestDatabase(connection = EmbeddedDatabaseConnection.H2)
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
 @TestMethodOrder(MethodOrderer.OrderAnnotation.class)
-public class WsTest {
+public class WsTest extends RedisTestContainerSupport {
 
 
         @LocalServerPort
@@ -217,15 +216,5 @@ public class WsTest {
                 Assertions.assertEquals(((TextEvent) myEvent.get()).getContent(), ((TextEvent) yourEvent.get()).getContent());
                 Assertions.assertEquals("Hello how are you", ((TextEvent) myEvent.get()).getContent());
         }
-
-        @Autowired
-        private RedisTemplate<Object, Object> redisTemplate;
-
-        @AfterAll
-        public void tearDown() {
-                redisTemplate.execute((RedisConnection conn) -> {
-                        conn.flushDb();
-                        return null;
-                });
-        }
+        
 }

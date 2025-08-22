@@ -5,6 +5,7 @@ import com.decade.practice.data.database.DatabaseConfiguration;
 import com.decade.practice.model.domain.entity.User;
 import com.decade.practice.security.jwt.JwtCredentialService;
 import com.decade.practice.utils.PrerequisiteBeans;
+import com.decade.practice.utils.RedisTestContainerSupport;
 import org.junit.jupiter.api.*;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -12,8 +13,6 @@ import org.springframework.boot.autoconfigure.data.redis.RedisAutoConfiguration;
 import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
 import org.springframework.boot.test.system.OutputCaptureExtension;
 import org.springframework.context.annotation.Import;
-import org.springframework.data.redis.connection.RedisConnection;
-import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.test.annotation.Rollback;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.ContextConfiguration;
@@ -35,7 +34,7 @@ import java.util.Date;
         UserService.class,
         DatabaseConfiguration.class
 })
-public class ChatOperationsTest {
+public class ChatOperationsTest extends RedisTestContainerSupport {
 
         @Autowired
         private ChatOperations chatOperations;
@@ -62,14 +61,5 @@ public class ChatOperationsTest {
                 Assertions.assertNotNull(chat.getInteractTime());
         }
 
-        @Autowired
-        private RedisTemplate<Object, Object> redisTemplate;
 
-        @AfterAll
-        public void tearDown() {
-                redisTemplate.execute((RedisConnection conn) -> {
-                        conn.flushDb();
-                        return null;
-                });
-        }
 }

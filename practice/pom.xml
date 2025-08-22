@@ -44,7 +44,7 @@
             <artifactId>hibernate-jcache</artifactId>
             <version>6.5.1.Final</version>
         </dependency>
-        
+
         <dependency>
             <groupId>com.fasterxml.jackson.datatype</groupId>
             <artifactId>jackson-datatype-hibernate6</artifactId>
@@ -166,6 +166,15 @@
             <artifactId>netty-all</artifactId>
             <version>4.1.68.Final</version>
         </dependency>
+
+        <!-- Testcontainers for integration tests -->
+        <dependency>
+            <groupId>org.testcontainers</groupId>
+            <artifactId>junit-jupiter</artifactId>
+            <version>1.20.2</version>
+            <scope>test</scope>
+        </dependency>
+
 
     </dependencies>
 
