@@ -8,7 +8,7 @@ import com.decade.practice.model.domain.ChatSnapshot;
 import com.decade.practice.model.domain.embeddable.ChatIdentifier;
 import com.decade.practice.model.domain.embeddable.Preference;
 import com.decade.practice.model.domain.entity.Chat;
-import com.decade.practice.model.domain.entity.PreferenceChangeEvent;
+import com.decade.practice.model.domain.entity.PreferenceEvent;
 import com.decade.practice.model.domain.entity.Theme;
 import com.decade.practice.model.domain.entity.User;
 import com.decade.practice.usecases.ChatOperations;
@@ -99,7 +99,7 @@ public class ChatController {
                 if (theme != null) {
                         preference.setTheme(themeRepository.findById(theme.getId()).orElseThrow());
                 }
-                PreferenceChangeEvent event = new PreferenceChangeEvent();
+                PreferenceEvent event = new PreferenceEvent();
                 event.setChatIdentifier(identifier);
                 event.setSender(me);
                 event.setPreference(preference);

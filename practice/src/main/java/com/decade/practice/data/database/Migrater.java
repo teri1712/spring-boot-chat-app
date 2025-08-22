@@ -9,6 +9,6 @@ public class Migrater {
         private JdbcTemplate jdbcTemplate;
 
         void run() {
-                jdbcTemplate.execute("CREATE INDEX IF NOT EXISTS user_username_idx ON UserMember(username) USING HASH;");
+//                jdbcTemplate.execute("CREATE INDEX IF NOT EXISTS user_username_idx ON UserMember(username) USING HASH;");
         }
 }

@@ -7,11 +7,7 @@ import com.decade.practice.data.repositories.UserRepository;
 import com.decade.practice.model.domain.ChatSnapshot;
 import com.decade.practice.model.domain.embeddable.ChatIdentifier;
 import com.decade.practice.model.domain.embeddable.Preference;
-import com.decade.practice.model.domain.entity.Chat;
-import com.decade.practice.model.domain.entity.PreferenceChangeEvent;
-import com.decade.practice.model.domain.entity.SyncContext;
-import com.decade.practice.model.domain.entity.Theme;
-import com.decade.practice.model.domain.entity.User;
+import com.decade.practice.model.domain.entity.*;
 import com.decade.practice.security.SecurityConfiguration;
 import com.decade.practice.security.jwt.JwtCredentialService;
 import com.decade.practice.security.strategy.LoginSuccessStrategy;
@@ -94,7 +90,7 @@ class ChatControllerTest {
                 testUser.setSyncContext(new SyncContext(testUser));
                 testUser.getSyncContext().setEventVersion(43);
                 given(userRepository.getByUsername("alice")).willReturn(testUser);
-                given(eventOperations.createAndSend(any(User.class), any(PreferenceChangeEvent.class)))
+                given(eventOperations.createAndSend(any(User.class), any(PreferenceEvent.class)))
                         .willAnswer(inv -> inv.getArgument(1));
 
                 // Prepare a chat and its identifier

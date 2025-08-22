@@ -58,7 +58,6 @@ public class LocalMediaFileConfiguration {
          * A REST controller for serving media files (images and generic files) from the local filesystem.
          * It's defined as a nested configuration to keep it co-located with the local storage logic.
          */
-        @Configuration
         @RestController
         @RequestMapping("/medias")
         public static class MediaController {

@@ -1,7 +1,6 @@
 package com.decade.practice.model;
 
 import com.decade.practice.model.domain.entity.User;
-import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import org.springframework.data.annotation.Id;
 import org.springframework.data.annotation.Transient;
 import org.springframework.data.redis.core.RedisHash;
@@ -9,7 +8,6 @@ import org.springframework.data.redis.core.RedisHash;
 import java.time.Instant;
 import java.util.Objects;
 
-@JsonDeserialize
 @RedisHash(value = "ONLINE", timeToLive = 5 * 60L)
 public class OnlineStatus {
 
@@ -23,6 +21,9 @@ public class OnlineStatus {
         public OnlineStatus(String username, long at) {
                 this.username = username;
                 this.at = at;
+        }
+
+        protected OnlineStatus() {
         }
 
         public OnlineStatus(User user, long at) {

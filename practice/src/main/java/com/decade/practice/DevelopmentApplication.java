@@ -10,6 +10,6 @@ public class DevelopmentApplication {
                 SpringApplication app = Application.createApp(DevelopmentApplication.class);
                 app.setAdditionalProfiles("development");
                 var context = app.run(args);
-                Application.initialize(context);
+                Application.seeding(context);
         }
 }

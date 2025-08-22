@@ -1,7 +1,6 @@
 package com.decade.practice.model.dto;
 
 import com.decade.practice.web.validation.StrongPassword;
-import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.Past;
 import jakarta.validation.constraints.Pattern;
@@ -11,7 +10,6 @@ import org.springframework.format.annotation.DateTimeFormat;
 import java.util.Date;
 import java.util.Objects;
 
-@JsonDeserialize
 public class SignUpRequest {
         // Constants moved from AuthenticationController.kt
         public static final int MAX_USERNAME_LENGTH = 20;

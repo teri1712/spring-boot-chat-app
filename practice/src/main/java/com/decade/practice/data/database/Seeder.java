@@ -69,7 +69,7 @@ public class Seeder {
                         "Luffy",
                         new Date(),
                         "MALE",
-                        new ImageSpec("http://localhost:8080/image?filename=luffy.jpg", "luffy.jpg", 512, 512, "jpg"),
+                        new ImageSpec("http://localhost:8080/medias/images?filename=luffy.jpeg", "luffy.jpeg", 512, 512, "jpeg"),
                         true
                 );
                 userOperations.create(
@@ -78,7 +78,7 @@ public class Seeder {
                         "Nami",
                         new Date(),
                         "MALE",
-                        new ImageSpec("http://localhost:8080/image?filename=nami.jpg", "nami.jpg", 512, 512, "jpg"),
+                        new ImageSpec("http://localhost:8080/medias/images?filename=nami.jpeg", "nami.jpeg", 512, 512, "jpeg"),
                         true
                 );
                 userOperations.create(
@@ -87,7 +87,7 @@ public class Seeder {
                         "Chopper",
                         new Date(),
                         "MALE",
-                        new ImageSpec("http://localhost:8080/image?filename=chopper.jpg", "chopper.jpg", 512, 512, "jpg"),
+                        new ImageSpec("http://localhost:8080/medias/images?filename=chopper.jpeg", "chopper.jpeg", 512, 512, "jpeg"),
                         true
                 );
 

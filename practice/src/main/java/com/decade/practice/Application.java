@@ -6,6 +6,7 @@ import com.decade.practice.presence.UserPresenceService;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.context.ApplicationContext;
+import org.springframework.data.redis.core.StringRedisTemplate;
 
 import java.time.Instant;
 
@@ -15,7 +16,7 @@ public class Application {
         public static void main(String[] args) {
                 SpringApplication app = createApp(Application.class);
                 ApplicationContext context = app.run(args);
-                initialize(context);
+                seeding(context);
         }
 
         private static boolean isRunningInContainer() {
@@ -32,7 +33,9 @@ public class Application {
                 return app;
         }
 
-        public static void initialize(ApplicationContext context) {
+        public static void seeding(ApplicationContext context) {
+                StringRedisTemplate redisTemplate = context.getBean(StringRedisTemplate.class);
+                redisTemplate.delete(redisTemplate.keys("*"));
                 UserRepository userRepo = context.getBean(UserRepository.class);
                 UserPresenceService onlineStat = context.getBean(UserPresenceService.class);
 

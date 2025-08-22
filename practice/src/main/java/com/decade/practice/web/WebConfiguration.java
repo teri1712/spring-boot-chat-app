@@ -42,7 +42,7 @@ public class WebConfiguration implements WebMvcConfigurer {
                 // They will be served directly without a version hash.
                 registry.addResourceHandler("/theme/**")
                         .addResourceLocations(
-                                "classpath:/static/"
+                                "classpath:/static/theme/"
                         )
                         .setCacheControl(CacheControl.maxAge(7, TimeUnit.DAYS));
         }
