@@ -3,12 +3,10 @@ package com.decade.practice.web.rest;
 import com.decade.practice.data.repositories.EventRepository;
 import com.decade.practice.data.repositories.UserRepository;
 import com.decade.practice.media.ImageStore;
+import com.decade.practice.media.MediaStore;
 import com.decade.practice.model.domain.embeddable.ChatIdentifier;
 import com.decade.practice.model.domain.embeddable.ImageSpec;
-import com.decade.practice.model.domain.entity.Chat;
-import com.decade.practice.model.domain.entity.ChatEvent;
-import com.decade.practice.model.domain.entity.ImageEvent;
-import com.decade.practice.model.domain.entity.User;
+import com.decade.practice.model.domain.entity.*;
 import com.decade.practice.presence.UserPresenceService;
 import com.decade.practice.usecases.ChatOperations;
 import com.decade.practice.usecases.EventOperations;
@@ -30,6 +28,7 @@ import java.awt.image.BufferedImage;
 import java.io.IOException;
 import java.net.URI;
 import java.util.List;
+import java.util.UUID;
 
 import static java.lang.Math.min;
 
@@ -43,6 +42,7 @@ public class EventController {
         private final UserPresenceService presenceService;
         private final UserRepository userRepo;
         private final ImageStore imageStore;
+        private final MediaStore mediaStore;
 
         public EventController(
                 EventOperations eventOperations,
@@ -50,13 +50,15 @@ public class EventController {
                 EventRepository evenRepo,
                 UserPresenceService presenceService,
                 UserRepository userRepo,
-                ImageStore imageStore) {
+                ImageStore imageStore,
+                MediaStore mediaStore) {
                 this.eventOperations = eventOperations;
                 this.chatOperations = chatOperations;
                 this.evenRepo = evenRepo;
                 this.presenceService = presenceService;
                 this.userRepo = userRepo;
                 this.imageStore = imageStore;
+                this.mediaStore = mediaStore;
         }
 
 
@@ -71,7 +73,7 @@ public class EventController {
         }
 
 
-        @PostMapping(path = "/events", consumes = {MediaType.MULTIPART_FORM_DATA_VALUE})
+        @PostMapping(path = "/events", consumes = {MediaType.MULTIPART_FORM_DATA_VALUE}, headers = "X-File-Type=image")
         @ResponseStatus(HttpStatus.CREATED)
         public ImageEvent createEvent(
                 @AuthenticationPrincipal(expression = "username") String username,
@@ -89,6 +91,25 @@ public class EventController {
                         return eventOperations.createAndSend(user, event);
                 } catch (Exception e) {
                         imageStore.remove(URI.create(event.getImage().getUri()));
+                        throw e;
+                }
+        }
+
+        @PostMapping(path = "/events", consumes = {MediaType.MULTIPART_FORM_DATA_VALUE}, headers = "X-File-Type=file")
+        @ResponseStatus(HttpStatus.CREATED)
+        public FileEvent createEvent(
+                @AuthenticationPrincipal(expression = "username") String username,
+                @RequestPart("event") @Valid FileEvent event,
+                @RequestPart("file") MultipartFile file
+        ) throws EntityNotFoundException, IOException {
+                URI uri = mediaStore.save(file.getResource(), UUID.randomUUID().toString());
+                event.setMediaUrl(uri.toString());
+                try {
+                        User user = userRepo.getByUsername(username);
+                        presenceService.set(user);
+                        return eventOperations.createAndSend(user, event);
+                } catch (Exception e) {
+                        mediaStore.remove(uri);
                         throw e;
                 }
         }

@@ -12,6 +12,7 @@ import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Component;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.context.request.RequestContextHolder;
@@ -24,9 +25,9 @@ import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.net.URI;
+import java.net.URISyntaxException;
 import java.net.URL;
 import java.nio.file.Files;
-import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.nio.file.StandardCopyOption;
 import java.util.UUID;
@@ -42,19 +43,6 @@ public class LocalMediaFileConfiguration {
 
 
         /**
-         * Extracts a filename from a query string.
-         * Note: This is a simplistic implementation that assumes the query string is in the format "filename=...".
-         *
-         * @param query The query string from the request.
-         * @return A {@link Path} to the file within the "medias" directory.
-         */
-        private static Path extractFile(String query) {
-                // A more robust implementation would use @RequestParam in the controller.
-                String filename = query.substring("filename=".length());
-                return Paths.get("./medias/").resolve(filename);
-        }
-
-        /**
          * A REST controller for serving media files (images and generic files) from the local filesystem.
          * It's defined as a nested configuration to keep it co-located with the local storage logic.
          */
@@ -67,19 +55,18 @@ public class LocalMediaFileConfiguration {
                         this.mediaStore = mediaStore;
                 }
 
-                @GetMapping
-                public ResponseEntity<Resource> getFile(HttpServletRequest request) {
+                @GetMapping("/{filename}")
+                public ResponseEntity<Resource> getFile(@PathVariable String filename) {
                         try {
-                                String queryString = request.getQueryString();
-                                Resource resource = mediaStore.read(extractFile(queryString).toUri());
+                                Resource resource = mediaStore.read(Paths.get("./medias/").resolve(filename).toUri());
                                 var cacheControl = CacheUtils.ONE_MONTHS;
-                                System.out.println("zzzzzzzzzzzzzz" + extractFile(queryString));
                                 return ResponseEntity.ok()
                                         .cacheControl(cacheControl)
                                         .contentType(MediaType.APPLICATION_OCTET_STREAM)
                                         .header("Content-Disposition", "attachment; filename=" + resource.getFilename())
                                         .body(resource);
                         } catch (Exception e) {
+                                e.printStackTrace();
                                 return ResponseEntity.notFound().build();
                         }
                 }
@@ -103,14 +90,25 @@ public class LocalMediaFileConfiguration {
 
                 @Override
                 public URI save(Resource resource, String name) throws IOException {
+                        HttpServletRequest httpRequest =
+                                ((ServletRequestAttributes) RequestContextHolder.getRequestAttributes()).getRequest();
+                        String scheme = httpRequest.getScheme();
+                        String server = httpRequest.getServerName();
+                        int port = httpRequest.getServerPort();
+                        String base = scheme + "://" + server + ":" + port;
+
                         File file = new File(fileDirectory, name);
                         Files.copy(resource.getInputStream(), file.toPath(), StandardCopyOption.REPLACE_EXISTING);
-                        return file.toURI();
+                        try {
+                                return new URL(base + "/medias/" + name).toURI();
+                        } catch (URISyntaxException e) {
+                                throw new IOException(e);
+                        }
                 }
 
                 @Override
                 public void remove(URI uri) throws IOException {
-                        File file = new File(uri.getPath());
+                        File file = new File("." + uri.getPath());
                         if (!file.isFile() || !file.delete()) {
                                 throw new FileNotFoundException("File not found: " + uri.getPath());
                         }
@@ -127,23 +125,17 @@ public class LocalMediaFileConfiguration {
 
                 @Override
                 public ImageSpec save(BufferedImage image) throws IOException {
-                        HttpServletRequest httpRequest =
-                                ((ServletRequestAttributes) RequestContextHolder.getRequestAttributes()).getRequest();
-                        String scheme = httpRequest.getScheme();
-                        String server = httpRequest.getServerName();
-                        int port = httpRequest.getServerPort();
+
                         String filename = UUID.randomUUID() + "." + ImageSpec.DEFAULT_FORMAT;
                         ByteArrayOutputStream baos = new ByteArrayOutputStream();
-                        ImageIO.write(image, ImageSpec.DEFAULT_FORMAT, baos);
+                        assert ImageIO.write(image, ImageSpec.DEFAULT_FORMAT, baos);
                         baos.flush();
-                        byte[] imageBytes = baos.toByteArray();
                         baos.close();
+                        byte[] imageBytes = baos.toByteArray();
 
                         ByteArrayResource resource = new ByteArrayResource(imageBytes);
-                        mediaStore.save(resource, filename);
-                        String base = scheme + "://" + server + ":" + port;
-                        String uri = new URL(base + "/medias/" + filename).toString();
-                        return new ImageSpec(uri, filename, image.getWidth(), image.getHeight(), ImageSpec.DEFAULT_FORMAT);
+                        URI uri = mediaStore.save(resource, filename);
+                        return new ImageSpec(uri.toString(), filename, image.getWidth(), image.getHeight(), ImageSpec.DEFAULT_FORMAT);
                 }
 
                 @Override

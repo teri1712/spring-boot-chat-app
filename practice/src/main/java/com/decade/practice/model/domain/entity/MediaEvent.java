@@ -3,7 +3,7 @@ package com.decade.practice.model.domain.entity;
 import jakarta.persistence.Entity;
 
 @Entity
-public abstract class MediaEvent extends ChatEvent {
+public abstract class MediaEvent extends MessageEvent {
 
         private String mediaUrl;
         private int size;

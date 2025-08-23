@@ -1,5 +1,6 @@
 package com.decade.practice.model.domain.entity;
 
+import com.fasterxml.jackson.annotation.JsonGetter;
 import jakarta.persistence.DiscriminatorValue;
 import jakarta.persistence.Entity;
 
@@ -7,11 +8,11 @@ import jakarta.persistence.Entity;
 @DiscriminatorValue("FILE")
 public class FileEvent extends MediaEvent {
         private String filename;
-        private int size;
 
-        public FileEvent(Chat chat, User sender, String url, String filename) {
+        public FileEvent(Chat chat, User sender, String mediaUrl, String filename, int size) {
                 super(chat, sender, "FILE");
-                setMediaUrl(url);
+                setMediaUrl(mediaUrl);
+                setSize(size);
                 this.filename = filename;
         }
 
@@ -22,13 +23,13 @@ public class FileEvent extends MediaEvent {
                 return filename;
         }
 
-        public int getSize() {
-                return size;
+        @JsonGetter
+        public com.decade.practice.model.local.FileEvent getFileEvent() {
+                return new com.decade.practice.model.local.FileEvent(filename, getSize(), getMediaUrl());
         }
-
 
         @Override
         public ChatEvent copy() {
-                return new FileEvent(getChat(), getSender(), getMediaUrl(), filename);
+                return new FileEvent(getChat(), getSender(), getMediaUrl(), filename, getSize());
         }
 }

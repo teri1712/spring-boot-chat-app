@@ -4,6 +4,7 @@ import com.decade.practice.DevelopmentApplication;
 import com.decade.practice.data.repositories.EventRepository;
 import com.decade.practice.data.repositories.UserRepository;
 import com.decade.practice.media.ImageStore;
+import com.decade.practice.media.MediaStore;
 import com.decade.practice.model.domain.embeddable.ChatIdentifier;
 import com.decade.practice.model.domain.embeddable.ImageSpec;
 import com.decade.practice.model.domain.entity.*;
@@ -71,6 +72,9 @@ class EventControllerTest {
         private ImageStore imageStore;
 
         @MockBean
+        private MediaStore mediaStore;
+
+        @MockBean
         private LoginSuccessStrategy loginSuccessStrategy;
 
         @MockBean
@@ -135,7 +139,7 @@ class EventControllerTest {
 
                 mockMvc.perform(multipart("/events")
                                 .file(eventPart)
-                                .file(filePart))
+                                .file(filePart).header("X-file-type", "image"))
                         .andExpect(status().isCreated());
         }
 

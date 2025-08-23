@@ -11,7 +11,7 @@ import jakarta.validation.constraints.NotNull;
 
 @Entity
 @DiscriminatorValue("IMAGE")
-public class ImageEvent extends MessageEvent {
+public class ImageEvent extends MediaEvent {
 
         @NotNull
         @Valid
@@ -26,6 +26,7 @@ public class ImageEvent extends MessageEvent {
         public ImageEvent(Chat chat, User sender, ImageSpec image) {
                 super(chat, sender, "IMAGE");
                 this.image = image;
+                setMediaUrl(image.getUri());
         }
 
         public ImageEvent(ImageEvent event) {
