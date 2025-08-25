@@ -90,6 +90,15 @@ public class Seeder {
                         new ImageSpec("http://localhost:8080/medias/chopper.jpeg", "chopper.jpeg", 512, 512, "jpeg"),
                         true
                 );
+                userOperations.create(
+                        "Zoro",
+                        "Zoro",
+                        "Zoro",
+                        new Date(),
+                        "MALE",
+                        new ImageSpec("http://localhost:8080/medias/zoro.jpg", "zoro.jpg", 512, 512, "jpg"),
+                        true
+                );
 
                 User luffy = userRepo.getByUsername("Luffy");
                 User nami = userRepo.getByUsername("Nami");

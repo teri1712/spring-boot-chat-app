@@ -41,8 +41,10 @@ public class Application {
 
                 User nami = userRepo.getByUsername("Nami");
                 User chopper = userRepo.getByUsername("Chopper");
+                User zoro = userRepo.getByUsername("Zoro");
 
                 onlineStat.set(nami, Instant.now().getEpochSecond() - 2 * 60);
                 onlineStat.set(chopper, Instant.now().getEpochSecond() - 10 * 60);
+                onlineStat.set(zoro, Instant.now().getEpochSecond());
         }
 }

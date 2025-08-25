@@ -51,7 +51,7 @@ public class ChatService extends SelfAwareBean implements ChatOperations {
                 try {
                         return EntityHelper.get(chatRepo, identifier);
                 } catch (NoSuchElementException e) {
-                        e.printStackTrace();
+//                        e.printStackTrace();
                         ensureExists(identifier);
                 }
                 return EntityHelper.get(chatRepo, identifier);
