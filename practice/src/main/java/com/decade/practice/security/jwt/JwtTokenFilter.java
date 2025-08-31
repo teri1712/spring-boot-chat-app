@@ -17,38 +17,38 @@ import java.io.IOException;
 @Service
 public class JwtTokenFilter extends OncePerRequestFilter {
 
-      private final JwtCredentialService jwtCredentialService;
+        private final JwtCredentialService jwtCredentialService;
 
-      public JwtTokenFilter(JwtCredentialService jwtCredentialService) {
-            this.jwtCredentialService = jwtCredentialService;
-      }
+        public JwtTokenFilter(JwtCredentialService jwtCredentialService) {
+                this.jwtCredentialService = jwtCredentialService;
+        }
 
-      @Override
-      protected void doFilterInternal(
-            HttpServletRequest request,
-            HttpServletResponse response,
-            FilterChain filterChain
-      ) throws ServletException, IOException {
-            if (SecurityContextHolder.getContext().getAuthentication() != null) {
-                  filterChain.doFilter(request, response);
-                  return;
-            }
+        @Override
+        protected void doFilterInternal(
+                HttpServletRequest request,
+                HttpServletResponse response,
+                FilterChain filterChain
+        ) throws ServletException, IOException {
+                if (SecurityContextHolder.getContext().getAuthentication() != null) {
+                        filterChain.doFilter(request, response);
+                        return;
+                }
 
-            try {
-                  String accessToken = TokenUtils.extractToken(request);
-                  if (accessToken != null) {
-                        UserClaims claims = jwtCredentialService.decodeToken(accessToken);
-                        JwtUser principal = new JwtUser(claims);
-                        SecurityContext context = SecurityContextHolder.createEmptyContext();
-                        Authentication authentication = new JwtUserAuthentication(principal, accessToken);
-                        context.setAuthentication(authentication);
-                        SecurityContextHolder.setContext(context);
-                        // For token-based authentication, will not be saved into security context repository
-                  }
-                  filterChain.doFilter(request, response);
-            } catch (Exception e) {
-                  e.printStackTrace();
-                  response.sendError(HttpServletResponse.SC_UNAUTHORIZED, e.getMessage());
-            }
-      }
+                try {
+                        String accessToken = TokenUtils.extractToken(request);
+                        if (accessToken != null) {
+                                UserClaims claims = jwtCredentialService.decodeToken(accessToken);
+                                JwtUser principal = new JwtUser(claims);
+                                SecurityContext context = SecurityContextHolder.createEmptyContext();
+                                Authentication authentication = new JwtUserAuthentication(principal, accessToken);
+                                context.setAuthentication(authentication);
+                                SecurityContextHolder.setContext(context);
+                                // For token-based authentication, will not be saved into security context repository
+                        }
+                        filterChain.doFilter(request, response);
+                } catch (Exception e) {
+                        e.printStackTrace();
+                        response.sendError(HttpServletResponse.SC_UNAUTHORIZED, e.getMessage());
+                }
+        }
 }

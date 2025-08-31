@@ -126,16 +126,23 @@ public class LocalMediaFileConfiguration {
                 @Override
                 public ImageSpec save(BufferedImage image) throws IOException {
 
-                        String filename = UUID.randomUUID() + "." + ImageSpec.DEFAULT_FORMAT;
+                        // Convert to JPG format
+                        BufferedImage jpgImage = new BufferedImage(
+                                image.getWidth(),
+                                image.getHeight(),
+                                BufferedImage.TYPE_INT_RGB);
+                        jpgImage.createGraphics().drawImage(image, 0, 0, null);
+
+                        String filename = UUID.randomUUID() + ".jpg";
                         ByteArrayOutputStream baos = new ByteArrayOutputStream();
-                        assert ImageIO.write(image, ImageSpec.DEFAULT_FORMAT, baos);
+                        ImageIO.write(jpgImage, "jpg", baos);
                         baos.flush();
                         baos.close();
                         byte[] imageBytes = baos.toByteArray();
 
                         ByteArrayResource resource = new ByteArrayResource(imageBytes);
                         URI uri = mediaStore.save(resource, filename);
-                        return new ImageSpec(uri.toString(), filename, image.getWidth(), image.getHeight(), ImageSpec.DEFAULT_FORMAT);
+                        return new ImageSpec(uri.toString(), filename, jpgImage.getWidth(), jpgImage.getHeight(), "jpg");
                 }
 
                 @Override

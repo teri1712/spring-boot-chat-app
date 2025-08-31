@@ -4,6 +4,7 @@ import com.decade.practice.model.domain.entity.Chat;
 import com.decade.practice.model.domain.entity.ChatEvent;
 import com.decade.practice.model.domain.entity.User;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.jpa.repository.EntityGraph;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.transaction.annotation.Isolation;
 import org.springframework.transaction.annotation.Propagation;
@@ -32,6 +33,7 @@ public interface EventRepository extends JpaRepository<ChatEvent, UUID> {
                 Pageable pageable
         );
 
+        @EntityGraph(attributePaths = {"chat", "chat.firstUser", "chat.secondUser", "edges"}, type = EntityGraph.EntityGraphType.FETCH)
         ChatEvent findFirstByOwnerOrderByEventVersionDesc(
                 User owner
         );

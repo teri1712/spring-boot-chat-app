@@ -87,8 +87,8 @@ public class UserController {
                                 new DaoUser(user), information.getPassword(),
                                 Collections.singletonList(new SimpleGrantedAuthority("ROLE_USER"))
                         ));
-                        contextRepo.saveContext(context, request, response);
                         SecurityContextHolder.setContext(context);
+                        contextRepo.saveContext(context, request, response);
 
                         return ResponseEntity.status(HttpStatus.CREATED).build();
                 } catch (Exception e) {

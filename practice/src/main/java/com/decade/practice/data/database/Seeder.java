@@ -12,8 +12,11 @@ import jakarta.persistence.PersistenceContext;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.core.env.Environment;
+import org.springframework.core.io.Resource;
+import org.springframework.core.io.support.PathMatchingResourcePatternResolver;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.io.IOException;
 import java.util.Arrays;
 import java.util.Date;
 
@@ -47,18 +50,22 @@ public class Seeder {
         @Value("${admin.password}")
         private String adminPassword;
 
-        void run() {
+        public void run() {
                 if (adminRepo.getOrNull() != null) {
                         return;
                 }
 
                 adminRepo.save(new Admin(adminUsername, adminPassword));
                 adminRepo.flush();
-                themeRepository.save(new Theme(1, new ImageSpec("http://localhost:8080/theme/luffy-theme.jpg", "luffy.jpg", 512, 512, "jpg")));
-                themeRepository.save(new Theme(2, new ImageSpec("http://localhost:8080/theme/doflamingo-theme.jpg", "doflamingo.jpg", 512, 512, "jpg")));
-                themeRepository.save(new Theme(3, new ImageSpec("http://localhost:8080/theme/kid-theme.jpg", "kid.jpg", 512, 512, "jpg")));
-                themeRepository.save(new Theme(4, new ImageSpec("http://localhost:8080/theme/law-theme.jpg", "law.jpg", 512, 512, "jpg")));
-                themeRepository.save(new Theme(5, new ImageSpec("http://localhost:8080/theme/ace-theme.jpg", "ace.jpg", 512, 512, "jpg")));
+                try {
+                        Resource[] resources = new PathMatchingResourcePatternResolver().getResources("classpath*:static/theme/*");
+                        for (int i = 0; i < resources.length; i++) {
+                                Resource resource = resources[i];
+                                themeRepository.save(new Theme(i + 1, new ImageSpec("http://localhost:8080/theme/" + resource.getFilename(), resource.getFilename(), 512, 512, "jpg")));
+                        }
+                } catch (IOException e) {
+                        throw new RuntimeException(e);
+                }
                 if (Arrays.asList(environment.getActiveProfiles()).contains("development")) {
                         return;
                 }

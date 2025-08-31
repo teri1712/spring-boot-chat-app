@@ -108,12 +108,12 @@ public abstract class ChatEvent {
 
         @JsonGetter("partner")
         public User getPartner() {
-                return ChatUtils.inspectPartner(chat, owner);
+                return ChatUtils.inspectPartner(getChat(), getOwner());
         }
 
         @JsonGetter("chat")
         public Chat getLocalChat() {
-                return new Chat(chat, owner);
+                return new Chat(getChat(), getOwner());
         }
 
         @JsonGetter("sender")
