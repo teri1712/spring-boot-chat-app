@@ -8,7 +8,7 @@ on:
         branches: [ "**" ]
 
 jobs:
-    build:
+    build-and-test:
         # The type of runner that the job will run on
         runs-on: ubuntu-latest
 
@@ -64,19 +64,47 @@ jobs:
                 #                    SPRING_REDIS_HOST: redis # 'localhost' correctly resolves to the service container network
                 #                    SPRING_REDIS_PORT: ${{ job.services.redis.ports[6379] }}
                 working-directory: ./practice
-                run: mvn -B clean package
-
-#    deploy:
-#        needs: build
+                run: mvn -B clean test
+#    containerize-and-push:
 #        runs-on: ubuntu-latest
 #        steps:
-#            -   name: Checkout repository
-#                uses: actions/checkout@v4
+#            -   name: Containerize and push to Docker Hub
 #
-#            -   name: Deploy to Heroku
-#                uses: akhileshns/heroku-deploy@v3.12.12
-#                with:
-#                    heroku_api_key: ${{ secrets.HEROKU_API_KEY }}
-#                    heroku_app_name: "messenger-clone-decade"
-#                    heroku_email: ""
-#                    usedocker: true
+#
+#            -   name: Build and push Docker image
+#                  uses: docker/build-push-action@v5
+#                  with:
+#                      context: .
+#                      push: true
+#                      tags: ${{ secrets.DOCKERHUB_USERNAME }}/your-app-name:${{ github.sha }}
+#
+#    deploy:
+#        # This job depends on the build-and-push job finishing first
+#        needs: build-and-push
+#        runs-on: ubuntu-latest
+#        steps:
+#            - name: Copy docker-compose file to VM
+#              uses: appleboy/scp-action@master
+#              with:
+#                  host: ${{ secrets.AZURE_HOST }}
+#                  username: ${{ secrets.AZURE_USER }}
+#                  key: ${{ secrets.AZURE_SSH_PRIVATE_KEY }}
+#                  source: "docker-compose.yml"
+#                  target: "~/app"
+#
+#            - name: Deploy to VM
+#              uses: appleboy/ssh-action@master
+#              with:
+#                  host: ${{ secrets.AZURE_HOST }}
+#                  username: ${{ secrets.AZURE_USER }}
+#                  key: ${{ secrets.AZURE_SSH_PRIVATE_KEY }}
+#                  script: |
+#                      cd ~/app
+#                      # Set the new image tag for the docker-compose command
+#                      export IMAGE_TAG=${{ github.sha }}
+#                      # Pull the latest images from Docker Hub
+#                      docker-compose pull
+#                      # Start the new containers
+#                      docker-compose up -d
+#                      # Clean up old images
+#                      docker image prune -af

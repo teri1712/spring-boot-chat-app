@@ -1,14 +1,11 @@
 package com.decade.practice.usecases;
 
 import com.decade.practice.DevelopmentApplication;
-import com.decade.practice.data.database.DatabaseConfiguration;
+import com.decade.practice.data.repositories.AdminRepository;
 import com.decade.practice.data.repositories.ChatRepository;
 import com.decade.practice.data.repositories.EdgeRepository;
 import com.decade.practice.data.repositories.UserRepository;
-import com.decade.practice.model.domain.entity.Chat;
-import com.decade.practice.model.domain.entity.ChatEvent;
-import com.decade.practice.model.domain.entity.TextEvent;
-import com.decade.practice.model.domain.entity.User;
+import com.decade.practice.model.domain.entity.*;
 import com.decade.practice.security.jwt.JwtCredentialService;
 import com.decade.practice.utils.PrerequisiteBeans;
 import com.decade.practice.utils.RedisTestContainerSupport;
@@ -38,7 +35,6 @@ import java.util.List;
         ChatEventStore.class,
         UserEventStore.class,
         UserService.class,
-        DatabaseConfiguration.class,
         PrerequisiteBeans.class
 })
 @TestMethodOrder(MethodOrderer.OrderAnnotation.class)
@@ -64,6 +60,8 @@ public class ConversationTest extends RedisTestContainerSupport {
 
         @Autowired
         private ChatOperations chatOperations;
+        @Autowired
+        private AdminRepository adminRepo;
 
         private ChatEvent sendEvent(User from, User to, String message) {
                 Chat chat = new Chat(from, to);
@@ -79,6 +77,8 @@ public class ConversationTest extends RedisTestContainerSupport {
         @BeforeAll
         public void setUp() {
                 template.executeWithoutResult(status -> {
+                        adminRepo.save(new Admin("admin", "admin"));
+                        adminRepo.flush();
                         first = userOperations.create("first", "first", "first", new Date(), "male", null, true);
                         second = userOperations.create("second", "second", "second", new Date(), "male", null, true);
                         third = userOperations.create("third", "third", "third", new Date(), "male", null, true);

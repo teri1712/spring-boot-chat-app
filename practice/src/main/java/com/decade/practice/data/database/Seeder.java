@@ -17,7 +17,6 @@ import org.springframework.core.io.support.PathMatchingResourcePatternResolver;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.io.IOException;
-import java.util.Arrays;
 import java.util.Date;
 
 @Transactional
@@ -65,9 +64,6 @@ public class Seeder {
                         }
                 } catch (IOException e) {
                         throw new RuntimeException(e);
-                }
-                if (Arrays.asList(environment.getActiveProfiles()).contains("development")) {
-                        return;
                 }
 
                 userOperations.create(
