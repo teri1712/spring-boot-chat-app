@@ -60,6 +60,8 @@ jobs:
         needs: containerize-and-push
         runs-on: ubuntu-latest
         steps:
+            -   name: Checkout repository
+                uses: actions/checkout@v4
             -   name: Copy docker-compose file to Azure VM
                 uses: appleboy/scp-action@master
                 with:
