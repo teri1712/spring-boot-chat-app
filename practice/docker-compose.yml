@@ -1,11 +1,11 @@
 version: '3.8'
 
 services:
-    spring-boot:
-        #        image: teri:decade-chat-app:latest
-        build:
-            context: .
-            dockerfile: Dockerfile
+    server:
+        image: teri1712/decade-chat-app:latest
+        #        build:
+        #            context: .
+        #            dockerfile: Dockerfile
         environment:
             - SPRING_PROFILES_ACTIVE=production
         ports:
