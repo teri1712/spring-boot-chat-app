@@ -4,6 +4,7 @@ import com.decade.practice.security.jwt.JwtTokenFilter;
 import com.decade.practice.security.strategy.*;
 import com.decade.practice.usecases.UserOperations;
 import org.springframework.beans.BeansException;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.beans.factory.config.BeanPostProcessor;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -39,6 +40,8 @@ import java.util.List;
 public class SecurityConfiguration extends GlobalAuthenticationConfigurerAdapter {
         public static final String FILTER_CHAIN_BEAN_NAME = "DECADE_FILTER_CHAIN";
 
+        @Value("${frontend.host.address}")
+        private String frontEndAddress;
 
         @Configuration(proxyBeanMethods = false)
         public static class ShowUserNotFoundConfiguration implements BeanPostProcessor {
@@ -78,7 +81,7 @@ public class SecurityConfiguration extends GlobalAuthenticationConfigurerAdapter
         @Bean
         public UrlBasedCorsConfigurationSource corsConfigurationSource() {
                 CorsConfiguration config = new CorsConfiguration();
-                config.setAllowedOrigins(List.of("http://localhost:4200"));
+                config.setAllowedOrigins(List.of(frontEndAddress));
                 config.setAllowedMethods(List.of("*"));
                 config.setAllowedHeaders(List.of("*"));
                 config.setAllowCredentials(true);

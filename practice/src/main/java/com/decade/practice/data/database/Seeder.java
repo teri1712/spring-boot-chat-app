@@ -49,6 +49,11 @@ public class Seeder {
         @Value("${admin.password}")
         private String adminPassword;
 
+
+        @Value("${app.host.address}")
+        private String hostAddress;
+
+
         public void run() {
                 if (adminRepo.getOrNull() != null) {
                         return;
@@ -60,7 +65,7 @@ public class Seeder {
                         Resource[] resources = new PathMatchingResourcePatternResolver().getResources("classpath*:static/theme/*");
                         for (int i = 0; i < resources.length; i++) {
                                 Resource resource = resources[i];
-                                themeRepository.save(new Theme(i + 1, new ImageSpec("http://localhost:8080/theme/" + resource.getFilename(), resource.getFilename(), 512, 512, "jpg")));
+                                themeRepository.save(new Theme(i + 1, new ImageSpec(hostAddress + "/theme/" + resource.getFilename(), resource.getFilename(), 512, 512, "jpg")));
                         }
                 } catch (IOException e) {
                         throw new RuntimeException(e);
@@ -72,7 +77,7 @@ public class Seeder {
                         "Luffy",
                         new Date(),
                         "MALE",
-                        new ImageSpec("http://localhost:8080/medias/luffy.jpeg", "luffy.jpeg", 512, 512, "jpeg"),
+                        new ImageSpec(hostAddress + "/medias/luffy.jpeg", "luffy.jpeg", 512, 512, "jpeg"),
                         true
                 );
                 userOperations.create(
@@ -81,7 +86,7 @@ public class Seeder {
                         "Nami",
                         new Date(),
                         "MALE",
-                        new ImageSpec("http://localhost:8080/medias/nami.jpeg", "nami.jpeg", 512, 512, "jpeg"),
+                        new ImageSpec(hostAddress + "/medias/nami.jpeg", "nami.jpeg", 512, 512, "jpeg"),
                         true
                 );
                 userOperations.create(
@@ -90,7 +95,7 @@ public class Seeder {
                         "Chopper",
                         new Date(),
                         "MALE",
-                        new ImageSpec("http://localhost:8080/medias/chopper.jpeg", "chopper.jpeg", 512, 512, "jpeg"),
+                        new ImageSpec(hostAddress + "/medias/chopper.jpeg", "chopper.jpeg", 512, 512, "jpeg"),
                         true
                 );
                 userOperations.create(
@@ -99,7 +104,7 @@ public class Seeder {
                         "Zoro",
                         new Date(),
                         "MALE",
-                        new ImageSpec("http://localhost:8080/medias/zoro.jpg", "zoro.jpg", 512, 512, "jpg"),
+                        new ImageSpec(hostAddress + "/medias/zoro.jpg", "zoro.jpg", 512, 512, "jpg"),
                         true
                 );
 

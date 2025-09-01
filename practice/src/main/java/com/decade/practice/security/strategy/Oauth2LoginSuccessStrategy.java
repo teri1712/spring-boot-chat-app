@@ -12,18 +12,18 @@ import java.io.IOException;
 @Service
 public class Oauth2LoginSuccessStrategy implements AuthenticationSuccessHandler {
 
-      private final String frontEnd;
+        private final String frontEndAddress;
 
-      public Oauth2LoginSuccessStrategy(@Value("${front-end}") String frontEnd) {
-            this.frontEnd = frontEnd;
-      }
+        public Oauth2LoginSuccessStrategy(@Value("${frontend.host.address}") String frontEndAddress) {
+                this.frontEndAddress = frontEndAddress;
+        }
 
-      @Override
-      public void onAuthenticationSuccess(
-            HttpServletRequest request,
-            HttpServletResponse response,
-            Authentication authentication
-      ) throws IOException {
-            response.sendRedirect(frontEnd);
-      }
+        @Override
+        public void onAuthenticationSuccess(
+                HttpServletRequest request,
+                HttpServletResponse response,
+                Authentication authentication
+        ) throws IOException {
+                response.sendRedirect(frontEndAddress);
+        }
 }

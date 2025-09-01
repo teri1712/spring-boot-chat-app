@@ -3,6 +3,7 @@ package com.decade.practice.websocket;
 import com.decade.practice.websocket.arguments.ChatArgumentResolver;
 import com.decade.practice.websocket.arguments.ChatIdentifierArgumentResolver;
 import com.decade.practice.websocket.arguments.UserArgumentResolver;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.http.server.ServerHttpRequest;
 import org.springframework.http.server.ServerHttpResponse;
@@ -38,6 +39,11 @@ public class WebSocketConfiguration implements WebSocketMessageBrokerConfigurer 
                 add(CHAT_DESTINATION);
                 add(QUEUE_DESTINATION);
         }};
+
+
+        @Value("${frontend.host.address}")
+        private String frontEndAddress;
+
 
         private final CachedEntityConversationRepository entityRepo;
         private final List<ChannelInterceptor> interceptors;
@@ -78,7 +84,7 @@ public class WebSocketConfiguration implements WebSocketMessageBrokerConfigurer 
                                 }
                         })
                         .addInterceptors(handShakeInterceptors.toArray(new HandshakeInterceptor[0]))
-                        .setAllowedOrigins("http://localhost:4200");
+                        .setAllowedOrigins(frontEndAddress);
                 // .withSockJS();
         }
 
