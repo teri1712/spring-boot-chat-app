@@ -85,9 +85,9 @@ jobs:
                         echo "SPRING_PROFILES_ACTIVE=production" > .env
                         echo "MYSQL_ROOT_PASSWORD=root" >> .env
                         echo "MYSQL_DATABASE=chatapp" >> .env
-                        echo "SPRING_SECURITY_OAUTH2_RESOURCESERVER_JWT_ISSUER_URI=${{ secrets.JWT_ISSUER_URI }}" >> .env
-                        echo "SPRING_SECURITY_OAUTH2_CLIENT_REGISTRATION_GOOGLE_CLIENTID=${{ secrets.GOOGLE_CLIENT_ID }}" >> .env
-                        echo "SPRING_SECURITY_OAUTH2_CLIENT_REGISTRATION_GOOGLE_CLIENTSECRET=${{ secrets.GOOGLE_CLIENT_SECRET }}" >> .env
+                        echo "SPRING_SECURITY_OAUTH2_RESOURCESERVER_JWT_ISSUER_URI=${{ secrets.SPRING_SECURITY_OAUTH2_RESOURCESERVER_JWT_ISSUER_URI }}" >> .env
+                        echo "SPRING_SECURITY_OAUTH2_CLIENT_REGISTRATION_GOOGLE_CLIENTID=${{ secrets.SPRING_SECURITY_OAUTH2_CLIENT_REGISTRATION_GOOGLE_CLIENTID }}" >> .env
+                        echo "SPRING_SECURITY_OAUTH2_CLIENT_REGISTRATION_GOOGLE_CLIENTSECRET=${{ secrets.SPRING_SECURITY_OAUTH2_CLIENT_REGISTRATION_GOOGLE_CLIENTSECRET }}" >> .env
                         
                         docker-compose pull
                         
