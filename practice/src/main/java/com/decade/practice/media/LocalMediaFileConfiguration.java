@@ -60,10 +60,11 @@ public class LocalMediaFileConfiguration {
                         try {
                                 Resource resource = mediaStore.read(Paths.get("./medias/").resolve(filename).toUri());
                                 var cacheControl = CacheUtils.ONE_MONTHS;
+                                var mediaType = org.springframework.http.MediaTypeFactory.getMediaType(filename)
+                                        .orElse(MediaType.APPLICATION_OCTET_STREAM);
                                 return ResponseEntity.ok()
                                         .cacheControl(cacheControl)
-                                        .contentType(MediaType.APPLICATION_OCTET_STREAM)
-                                        .header("Content-Disposition", "attachment; filename=" + resource.getFilename())
+                                        .contentType(mediaType)
                                         .body(resource);
                         } catch (Exception e) {
                                 e.printStackTrace();

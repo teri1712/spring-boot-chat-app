@@ -125,8 +125,8 @@ public class SecurityConfiguration extends GlobalAuthenticationConfigurerAdapter
                         )
                         .addFilterAfter(jwtAuthenticationFilter, UsernamePasswordAuthenticationFilter.class)
                         .authorizeHttpRequests(authorize ->
-                                authorize.requestMatchers("/image").permitAll()
-                                        .requestMatchers("/authentication/**").permitAll()
+                                authorize.requestMatchers("/medias/**").permitAll()
+                                        .requestMatchers("/users/**").permitAll()
                                         .requestMatchers(HttpMethod.GET, "/login").permitAll()
                                         .anyRequest().authenticated()
                         )

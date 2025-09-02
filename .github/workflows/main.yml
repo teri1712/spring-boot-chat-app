@@ -69,7 +69,7 @@ jobs:
                     username: ${{ secrets.AZURE_USER }}
                     key: ${{ secrets.AZURE_SSH_PRIVATE_KEY }}
                     source: "practice/docker-compose.yml"
-                    target: "~/app"
+                    target: "~/app/practice"
 
             -   name: Deploy to VM
                 uses: appleboy/ssh-action@master
@@ -78,13 +78,11 @@ jobs:
                     username: ${{ secrets.AZURE_USER }}
                     key: ${{ secrets.AZURE_SSH_PRIVATE_KEY }}
                     script: |
-                        cd ~/app
+                        cd ~/app/practice
                         
                         # Pull the latest images from Docker Hub
-                        docker-compose pull
+                        docker-compose pull ${{ secrets.DOCKERHUB_USERNAME }}/decade-chat-app:latest
                         
                         # Start the new containers
+                        docker-compose down
                         docker-compose up -d
-                        
-                        # Clean up old images
-                        docker image prune -af
