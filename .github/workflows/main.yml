@@ -69,7 +69,7 @@ jobs:
                     username: ${{ secrets.AZURE_USER }}
                     key: ${{ secrets.AZURE_SSH_PRIVATE_KEY }}
                     source: "practice/docker-compose.yml"
-                    target: "~/app/practice"
+                    target: "~/app/practice/docker-compose.yml"
 
             -   name: Deploy to VM
                 uses: appleboy/ssh-action@master
@@ -81,12 +81,15 @@ jobs:
                         cd ~/app/practice
                         
                         # Pull the latest images from Docker Hub
-                        docker pull ${{ secrets.DOCKERHUB_USERNAME }}/decade-chat-app:latest
                         
-                        echo "SPRING_SECURITY_OAUTH2_RESOURCESERVER_JWT_ISSUER_URI=${{ secrets.JWT_ISSUER_URI }}" > .env
+                        echo "SPRING_PROFILES_ACTIVE=production" > .env
+                        echo "MYSQL_ROOT_PASSWORD=root" >> .env
+                        echo "MYSQL_DATABASE=chatapp" >> .env
+                        echo "SPRING_SECURITY_OAUTH2_RESOURCESERVER_JWT_ISSUER_URI=${{ secrets.JWT_ISSUER_URI }}" >> .env
                         echo "SPRING_SECURITY_OAUTH2_CLIENT_REGISTRATION_GOOGLE_CLIENTID=${{ secrets.GOOGLE_CLIENT_ID }}" >> .env
                         echo "SPRING_SECURITY_OAUTH2_CLIENT_REGISTRATION_GOOGLE_CLIENTSECRET=${{ secrets.GOOGLE_CLIENT_SECRET }}" >> .env
                         
+                        docker-compose pull
                         
                         # Start the new containers
                         docker-compose down
