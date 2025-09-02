@@ -2,10 +2,10 @@ version: '3.8'
 
 services:
     server:
-        image: teri1712/decade-chat-app:latest
-        #    build:
-        #      context: .
-        #      dockerfile: Dockerfile
+        #        image: teri1712/decade-chat-app:latest
+        build:
+            context: .
+            dockerfile: Dockerfile
         env_file:
             - ./.env
         ports:
