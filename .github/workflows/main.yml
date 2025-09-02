@@ -83,6 +83,11 @@ jobs:
                         # Pull the latest images from Docker Hub
                         docker pull ${{ secrets.DOCKERHUB_USERNAME }}/decade-chat-app:latest
                         
+                        echo "SPRING_SECURITY_OAUTH2_RESOURCESERVER_JWT_ISSUER_URI=${{ secrets.JWT_ISSUER_URI }}" > .env
+                        echo "SPRING_SECURITY_OAUTH2_CLIENT_REGISTRATION_GOOGLE_CLIENTID=${{ secrets.GOOGLE_CLIENT_ID }}" >> .env
+                        echo "SPRING_SECURITY_OAUTH2_CLIENT_REGISTRATION_GOOGLE_CLIENTSECRET=${{ secrets.GOOGLE_CLIENT_SECRET }}" >> .env
+                        
+                        
                         # Start the new containers
                         docker-compose down
                         docker-compose up -d
