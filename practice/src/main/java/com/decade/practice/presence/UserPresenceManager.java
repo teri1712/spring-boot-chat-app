@@ -1,7 +1,7 @@
 package com.decade.practice.presence;
 
-import com.decade.practice.model.OnlineStatus;
-import com.decade.practice.model.domain.entity.User;
+import com.decade.practice.models.OnlineStatus;
+import com.decade.practice.models.domain.entity.User;
 import com.decade.practice.websocket.CachedEntityConversationRepository;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.data.redis.core.ZSetOperations;

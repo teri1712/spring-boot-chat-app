@@ -1,12 +1,11 @@
 package com.decade.practice.web.rest;
 
-import com.decade.practice.data.repositories.EventRepository;
 import com.decade.practice.data.repositories.UserRepository;
 import com.decade.practice.media.ImageStore;
 import com.decade.practice.media.MediaStore;
-import com.decade.practice.model.domain.embeddable.ChatIdentifier;
-import com.decade.practice.model.domain.embeddable.ImageSpec;
-import com.decade.practice.model.domain.entity.*;
+import com.decade.practice.models.domain.embeddable.ChatIdentifier;
+import com.decade.practice.models.domain.embeddable.ImageSpec;
+import com.decade.practice.models.domain.entity.*;
 import com.decade.practice.presence.UserPresenceService;
 import com.decade.practice.usecases.ChatOperations;
 import com.decade.practice.usecases.EventOperations;
@@ -19,7 +18,6 @@ import jakarta.validation.Valid;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
-import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
@@ -27,6 +25,7 @@ import org.springframework.web.multipart.MultipartFile;
 import java.awt.image.BufferedImage;
 import java.io.IOException;
 import java.net.URI;
+import java.security.Principal;
 import java.util.List;
 import java.util.UUID;
 
@@ -38,7 +37,6 @@ public class EventController {
 
         private final EventOperations eventOperations;
         private final ChatOperations chatOperations;
-        private final EventRepository evenRepo;
         private final UserPresenceService presenceService;
         private final UserRepository userRepo;
         private final ImageStore imageStore;
@@ -47,14 +45,12 @@ public class EventController {
         public EventController(
                 EventOperations eventOperations,
                 ChatOperations chatOperations,
-                EventRepository evenRepo,
                 UserPresenceService presenceService,
                 UserRepository userRepo,
                 ImageStore imageStore,
                 MediaStore mediaStore) {
                 this.eventOperations = eventOperations;
                 this.chatOperations = chatOperations;
-                this.evenRepo = evenRepo;
                 this.presenceService = presenceService;
                 this.userRepo = userRepo;
                 this.imageStore = imageStore;
@@ -65,9 +61,9 @@ public class EventController {
         @PostMapping(path = "/events", consumes = {MediaType.APPLICATION_JSON_VALUE})
         @ResponseStatus(HttpStatus.CREATED)
         public ChatEvent createEvent(
-                @AuthenticationPrincipal(expression = "username") String username,
+                Principal principal,
                 @RequestBody @Valid ChatEvent event) {
-                User user = userRepo.getByUsername(username);
+                User user = userRepo.getByUsername(principal.getName());
                 presenceService.set(user);
                 return eventOperations.createAndSend(user, event);
         }
@@ -76,7 +72,7 @@ public class EventController {
         @PostMapping(path = "/events", consumes = {MediaType.MULTIPART_FORM_DATA_VALUE}, headers = "X-File-Type=image")
         @ResponseStatus(HttpStatus.CREATED)
         public ImageEvent createEvent(
-                @AuthenticationPrincipal(expression = "username") String username,
+                Principal principal,
                 @RequestPart("event") @Valid ImageEvent event,
                 @RequestPart("file") MultipartFile file
         ) throws EntityNotFoundException, IOException {
@@ -86,7 +82,7 @@ public class EventController {
 
                 event.setImage(imageStore.save(image));
                 try {
-                        User user = userRepo.getByUsername(username);
+                        User user = userRepo.getByUsername(principal.getName());
                         presenceService.set(user);
                         return eventOperations.createAndSend(user, event);
                 } catch (Exception e) {
@@ -98,14 +94,14 @@ public class EventController {
         @PostMapping(path = "/events", consumes = {MediaType.MULTIPART_FORM_DATA_VALUE}, headers = "X-File-Type=file")
         @ResponseStatus(HttpStatus.CREATED)
         public FileEvent createEvent(
-                @AuthenticationPrincipal(expression = "username") String username,
+                Principal principal,
                 @RequestPart("event") @Valid FileEvent event,
                 @RequestPart("file") MultipartFile file
         ) throws EntityNotFoundException, IOException {
                 URI uri = mediaStore.save(file.getResource(), UUID.randomUUID().toString());
                 event.setMediaUrl(uri.toString());
                 try {
-                        User user = userRepo.getByUsername(username);
+                        User user = userRepo.getByUsername(principal.getName());
                         presenceService.set(user);
                         return eventOperations.createAndSend(user, event);
                 } catch (Exception e) {
@@ -116,13 +112,13 @@ public class EventController {
 
         @GetMapping("/chats/{chatIdentifier}/events")
         public ResponseEntity<List<ChatEvent>> listEvents(
-                @AuthenticationPrincipal(expression = "username") String username,
+                Principal principal,
                 @PathVariable @Validated ChatIdentifier chatIdentifier,
                 @RequestParam int atVersion
         ) throws EntityNotFoundException {
                 Chat chat = chatOperations.getOrCreateChat(chatIdentifier);
-                User user = ChatUtils.inspectOwner(chat, username);
-                List<ChatEvent> events = evenRepo.findByOwnerAndChatAndEventVersionLessThanEqual(
+                User user = ChatUtils.inspectOwner(chat, principal.getName());
+                List<ChatEvent> events = eventOperations.findByOwnerAndChatAndEventVersionLessThanEqual(
                         user, chat, atVersion, EventUtils.EVENT_VERSION_LESS_THAN_EQUAL);
 
                 return ResponseEntity.ok()
@@ -133,11 +129,11 @@ public class EventController {
 
         @GetMapping("/users/me/events")
         public ResponseEntity<List<ChatEvent>> listEvents(
-                @AuthenticationPrincipal(expression = "username") String username,
+                Principal principal,
                 @RequestParam int atVersion
         ) throws EntityNotFoundException {
-                User owner = userRepo.getByUsername(username);
-                List<ChatEvent> eventList = evenRepo.findByOwnerAndEventVersionLessThanEqual(
+                User owner = userRepo.getByUsername(principal.getName());
+                List<ChatEvent> eventList = eventOperations.findByOwnerAndEventVersionLessThanEqual(
                         owner, atVersion, EventUtils.EVENT_VERSION_LESS_THAN_EQUAL);
 
                 return ResponseEntity.ok()

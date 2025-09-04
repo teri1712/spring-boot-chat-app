@@ -1,9 +1,9 @@
 package com.decade.practice.usecases;
 
-import com.decade.practice.model.domain.entity.Chat;
-import com.decade.practice.model.domain.entity.ChatEvent;
-import com.decade.practice.model.domain.entity.MessageEvent;
-import com.decade.practice.model.domain.entity.User;
+import com.decade.practice.models.domain.entity.Chat;
+import com.decade.practice.models.domain.entity.ChatEvent;
+import com.decade.practice.models.domain.entity.MessageEvent;
+import com.decade.practice.models.domain.entity.User;
 import com.decade.practice.utils.ChatUtils;
 import jakarta.persistence.EntityManager;
 import jakarta.persistence.LockModeType;

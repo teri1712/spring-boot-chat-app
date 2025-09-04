@@ -4,20 +4,20 @@ import com.decade.practice.data.repositories.ChatRepository;
 import com.decade.practice.data.repositories.EntityHelper;
 import com.decade.practice.data.repositories.ThemeRepository;
 import com.decade.practice.data.repositories.UserRepository;
-import com.decade.practice.model.domain.ChatSnapshot;
-import com.decade.practice.model.domain.embeddable.ChatIdentifier;
-import com.decade.practice.model.domain.embeddable.Preference;
-import com.decade.practice.model.domain.entity.Chat;
-import com.decade.practice.model.domain.entity.PreferenceEvent;
-import com.decade.practice.model.domain.entity.Theme;
-import com.decade.practice.model.domain.entity.User;
+import com.decade.practice.models.domain.ChatSnapshot;
+import com.decade.practice.models.domain.embeddable.ChatIdentifier;
+import com.decade.practice.models.domain.embeddable.Preference;
+import com.decade.practice.models.domain.entity.Chat;
+import com.decade.practice.models.domain.entity.PreferenceEvent;
+import com.decade.practice.models.domain.entity.Theme;
+import com.decade.practice.models.domain.entity.User;
 import com.decade.practice.usecases.ChatOperations;
 import com.decade.practice.usecases.EventOperations;
 import com.decade.practice.utils.CacheUtils;
 import org.springframework.http.ResponseEntity;
-import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 
+import java.security.Principal;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
@@ -48,11 +48,11 @@ public class ChatController {
 
         @GetMapping("/{identifier}")
         public ResponseEntity<ChatSnapshot> get(
-                @AuthenticationPrincipal(expression = "username") String username,
+                Principal principal,
                 @PathVariable ChatIdentifier identifier,
                 @RequestParam(required = false) Integer atVersion
         ) {
-                User me = userRepository.getByUsername(username);
+                User me = userRepository.getByUsername(principal.getName());
                 Chat chat = chatOperations.getOrCreateChat(identifier);
                 ChatSnapshot snapshot = chatOperations.getSnapshot(
                         chat,
@@ -68,11 +68,11 @@ public class ChatController {
 
         @GetMapping("/partners/{partnerId}")
         public ResponseEntity<ChatSnapshot> get(
-                @AuthenticationPrincipal(expression = "username") String username,
+                Principal principal,
                 @PathVariable UUID partnerId,
                 @RequestParam(required = false) Integer atVersion
         ) {
-                User me = userRepository.getByUsername(username);
+                User me = userRepository.getByUsername(principal.getName());
                 ChatIdentifier identifier = ChatIdentifier.from(partnerId, me.getId());
                 Chat chat = chatOperations.getOrCreateChat(identifier);
                 ChatSnapshot snapshot = chatOperations.getSnapshot(
@@ -89,11 +89,11 @@ public class ChatController {
 
         @PatchMapping("/{identifier}/preference")
         public Preference updatePreferences(
-                @AuthenticationPrincipal(expression = "username") String username,
+                Principal principal,
                 @PathVariable ChatIdentifier identifier,
                 @RequestBody Preference preference) {
 
-                User me = userRepository.getByUsername(username);
+                User me = userRepository.getByUsername(principal.getName());
 
                 Theme theme = preference.getTheme();
                 if (theme != null) {
@@ -117,12 +117,12 @@ public class ChatController {
 
         @GetMapping
         public ResponseEntity<List<ChatSnapshot>> list(
-                @AuthenticationPrincipal(expression = "username") String username,
+                Principal principal,
                 @RequestParam(required = false) ChatIdentifier startAt,
                 @RequestParam int atVersion
         ) {
                 Chat chat = startAt == null ? null : EntityHelper.get(chatRepository, startAt);
-                User owner = userRepository.getByUsername(username);
+                User owner = userRepository.getByUsername(principal.getName());
 
                 List<Chat> chatList = chatOperations.listChat(owner, atVersion, chat);
                 List<ChatSnapshot> snapshotList = new ArrayList<>();

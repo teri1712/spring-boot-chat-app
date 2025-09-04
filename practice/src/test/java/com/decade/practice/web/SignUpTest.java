@@ -3,9 +3,9 @@ package com.decade.practice.web;
 import com.decade.practice.DevelopmentApplication;
 import com.decade.practice.data.repositories.UserRepository;
 import com.decade.practice.media.ImageStore;
-import com.decade.practice.model.domain.DefaultAvatar;
-import com.decade.practice.model.domain.entity.User;
-import com.decade.practice.model.dto.SignUpRequest;
+import com.decade.practice.models.domain.DefaultAvatar;
+import com.decade.practice.models.domain.entity.User;
+import com.decade.practice.models.dto.SignUpRequest;
 import com.decade.practice.security.jwt.JwtCredentialService;
 import com.decade.practice.usecases.UserOperations;
 import com.decade.practice.utils.PrerequisiteBeans;
@@ -38,8 +38,8 @@ import org.springframework.test.web.servlet.result.MockMvcResultMatchers;
 import java.io.IOException;
 import java.text.SimpleDateFormat;
 
-import static com.decade.practice.model.dto.SignUpRequest.MAX_USERNAME_LENGTH;
-import static com.decade.practice.model.dto.SignUpRequest.MIN_USERNAME_LENGTH;
+import static com.decade.practice.models.dto.SignUpRequest.MAX_USERNAME_LENGTH;
+import static com.decade.practice.models.dto.SignUpRequest.MIN_USERNAME_LENGTH;
 import static com.decade.practice.utils.Media.ONE_PIXEL_BMP_BYTES;
 
 @WebMvcTest(controllers = {TokenController.class, UserController.class})

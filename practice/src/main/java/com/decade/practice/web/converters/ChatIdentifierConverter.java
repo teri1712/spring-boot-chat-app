@@ -1,6 +1,6 @@
 package com.decade.practice.web.converters;
 
-import com.decade.practice.model.domain.embeddable.ChatIdentifier;
+import com.decade.practice.models.domain.embeddable.ChatIdentifier;
 import org.springframework.core.convert.converter.Converter;
 
 import java.util.NoSuchElementException;

@@ -2,11 +2,11 @@ package com.decade.practice.web.rest;
 
 import com.decade.practice.data.repositories.UserRepository;
 import com.decade.practice.media.ImageStore;
-import com.decade.practice.model.domain.DefaultAvatar;
-import com.decade.practice.model.domain.embeddable.ImageSpec;
-import com.decade.practice.model.domain.entity.User;
-import com.decade.practice.model.dto.SignUpRequest;
-import com.decade.practice.security.model.DaoUser;
+import com.decade.practice.models.domain.DefaultAvatar;
+import com.decade.practice.models.domain.embeddable.ImageSpec;
+import com.decade.practice.models.domain.entity.User;
+import com.decade.practice.models.dto.SignUpRequest;
+import com.decade.practice.security.models.DaoUser;
 import com.decade.practice.usecases.UserOperations;
 import com.decade.practice.utils.ImageUtils;
 import jakarta.servlet.http.HttpServletRequest;

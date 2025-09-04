@@ -2,9 +2,9 @@ name: Spring Boot Chat Application CI with Maven
 
 on:
     push:
-        branches: [ "**" ]
+        branches: [ main ]
     pull_request:
-        branches: [ "**" ]
+        branches: [ main ]
 
 jobs:
     clean-and-test:
@@ -82,7 +82,7 @@ jobs:
                         
                         # Pull the latest images from Docker Hub
                         
-                        echo "SPRING_PROFILES_ACTIVE=production" > .env
+                        echo "SPRING_PROFILES_ACTIVE=container,production" > .env
                         echo "MYSQL_ROOT_PASSWORD=root" >> .env
                         echo "MYSQL_DATABASE=chatapp" >> .env
                         echo "SPRING_SECURITY_OAUTH2_RESOURCESERVER_JWT_ISSUER_URI=${{ secrets.SPRING_SECURITY_OAUTH2_RESOURCESERVER_JWT_ISSUER_URI }}" >> .env

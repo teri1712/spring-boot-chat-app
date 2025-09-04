@@ -1,8 +1,8 @@
 package com.decade.practice.usecases;
 
-import com.decade.practice.model.domain.embeddable.ImageSpec;
-import com.decade.practice.model.domain.entity.User;
-import com.decade.practice.model.local.Account;
+import com.decade.practice.models.domain.embeddable.ImageSpec;
+import com.decade.practice.models.domain.entity.User;
+import com.decade.practice.models.local.Account;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.security.access.AccessDeniedException;
 import org.springframework.security.core.userdetails.UserDetails;

@@ -1,7 +1,7 @@
 package com.decade.practice;
 
 
-import com.decade.practice.model.domain.DefaultAvatar;
+import com.decade.practice.models.domain.DefaultAvatar;
 import com.decade.practice.usecases.UserOperations;
 import com.decade.practice.utils.PrerequisiteBeans;
 import com.decade.practice.utils.RedisTestContainerSupport;

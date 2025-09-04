@@ -1,6 +1,6 @@
 package com.decade.practice.web.rest;
 
-import com.decade.practice.model.OnlineStatus;
+import com.decade.practice.models.OnlineStatus;
 import com.decade.practice.presence.UserPresenceService;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;

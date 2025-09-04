@@ -1,15 +1,20 @@
 package com.decade.practice.usecases;
 
 import com.decade.practice.data.repositories.EventRepository;
-import com.decade.practice.model.domain.entity.ChatEvent;
-import com.decade.practice.model.domain.entity.User;
+import com.decade.practice.models.domain.entity.Chat;
+import com.decade.practice.models.domain.entity.ChatEvent;
+import com.decade.practice.models.domain.entity.User;
 import com.decade.practice.websocket.WebSocketConfiguration;
 import jakarta.persistence.EntityNotFoundException;
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.dao.DataIntegrityViolationException;
+import org.springframework.data.domain.Pageable;
 import org.springframework.messaging.simp.SimpMessagingTemplate;
 import org.springframework.stereotype.Service;
 
 import java.util.Collection;
+import java.util.List;
+import java.util.UUID;
 
 @Service
 public class EventService implements EventOperations {
@@ -22,7 +27,6 @@ public class EventService implements EventOperations {
                 this.evenRepo = evenRepo;
                 this.template = template;
         }
-
 
         @Override
         public <E extends ChatEvent> E createAndSend(User sender, E event) {
@@ -49,8 +53,30 @@ public class EventService implements EventOperations {
                 } catch (DataIntegrityViolationException e) {
                         // record already sent
                         @SuppressWarnings("unchecked")
-                        E result = (E) evenRepo.getByLocalId(event.getLocalId());
+                        E result = (E) evenRepo.findByLocalId(event.getLocalId());
                         return result;
                 }
+        }
+
+        @Override
+        @Cacheable(cacheNames = "events", key = "#owner.id + ':' + #chat.toString() + ':' + #eventVersion")
+        public List<ChatEvent> findByOwnerAndChatAndEventVersionLessThanEqual(User owner, Chat chat, int eventVersion, Pageable pageable) {
+                return evenRepo.findByOwnerAndChatAndEventVersionLessThanEqual(owner, chat, eventVersion, pageable);
+        }
+
+        @Override
+        @Cacheable(cacheNames = "events", key = "#owner.id + ':' + #eventVersion")
+        public List<ChatEvent> findByOwnerAndEventVersionLessThanEqual(User owner, int eventVersion, Pageable pageable) {
+                return evenRepo.findByOwnerAndEventVersionLessThanEqual(owner, eventVersion, pageable);
+        }
+
+        @Override
+        public ChatEvent findFirstByOwnerOrderByEventVersionDesc(User owner) {
+                return evenRepo.findFirstByOwnerOrderByEventVersionDesc(owner);
+        }
+
+        @Override
+        public ChatEvent findByLocalId(UUID localId) {
+                return evenRepo.findByLocalId(localId);
         }
 }

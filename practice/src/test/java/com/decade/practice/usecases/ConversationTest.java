@@ -5,7 +5,7 @@ import com.decade.practice.data.repositories.AdminRepository;
 import com.decade.practice.data.repositories.ChatRepository;
 import com.decade.practice.data.repositories.EdgeRepository;
 import com.decade.practice.data.repositories.UserRepository;
-import com.decade.practice.model.domain.entity.*;
+import com.decade.practice.models.domain.entity.*;
 import com.decade.practice.security.jwt.JwtCredentialService;
 import com.decade.practice.utils.PrerequisiteBeans;
 import com.decade.practice.utils.RedisTestContainerSupport;

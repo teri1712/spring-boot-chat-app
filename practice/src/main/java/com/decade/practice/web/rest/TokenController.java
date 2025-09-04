@@ -1,8 +1,8 @@
 package com.decade.practice.web.rest;
 
-import com.decade.practice.model.TokenCredential;
+import com.decade.practice.models.TokenCredential;
 import com.decade.practice.security.TokenCredentialService;
-import com.decade.practice.security.model.UserClaims;
+import com.decade.practice.security.models.UserClaims;
 import com.decade.practice.usecases.UserOperations;
 import com.decade.practice.utils.TokenUtils;
 import com.fasterxml.jackson.databind.ObjectMapper;

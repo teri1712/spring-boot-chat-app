@@ -2,7 +2,7 @@ package com.decade.practice.web;
 
 import com.decade.practice.DevelopmentApplication;
 import com.decade.practice.data.repositories.UserRepository;
-import com.decade.practice.model.local.AccountEntry;
+import com.decade.practice.models.local.AccountEntry;
 import com.decade.practice.usecases.UserOperations;
 import com.decade.practice.utils.PrerequisiteBeans;
 import org.junit.jupiter.api.BeforeAll;

@@ -1,7 +1,7 @@
 package com.decade.practice.security;
 
 import com.decade.practice.data.repositories.UserRepository;
-import com.decade.practice.security.model.DaoUser;
+import com.decade.practice.security.models.DaoUser;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;

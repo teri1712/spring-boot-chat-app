@@ -10,7 +10,7 @@ import org.springframework.core.annotation.Order;
 import org.springframework.data.jpa.repository.config.EnableJpaRepositories;
 
 @Configuration
-@EntityScan("com.decade.practice.model")
+@EntityScan("com.decade.practice.models")
 @EnableJpaRepositories(basePackages = {"com.decade.practice.data.repositories"})
 public class DatabaseConfiguration {
 

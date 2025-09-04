@@ -1,6 +1,6 @@
 package com.decade.practice.data.repositories;
 
-import com.decade.practice.model.domain.entity.User;
+import com.decade.practice.models.domain.entity.User;
 import jakarta.persistence.LockModeType;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Lock;

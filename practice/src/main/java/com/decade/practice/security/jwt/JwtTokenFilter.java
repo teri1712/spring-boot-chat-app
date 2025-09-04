@@ -1,6 +1,6 @@
 package com.decade.practice.security.jwt;
 
-import com.decade.practice.security.model.UserClaims;
+import com.decade.practice.security.models.UserClaims;
 import com.decade.practice.utils.TokenUtils;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;

@@ -1,6 +1,6 @@
 package com.decade.practice.event;
 
-import com.decade.practice.model.domain.entity.User;
+import com.decade.practice.models.domain.entity.User;
 
 /**
  * Interface for listening to account-related events.

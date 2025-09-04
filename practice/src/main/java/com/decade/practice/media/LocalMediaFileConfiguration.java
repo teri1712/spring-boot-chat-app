@@ -1,6 +1,6 @@
 package com.decade.practice.media;
 
-import com.decade.practice.model.domain.embeddable.ImageSpec;
+import com.decade.practice.models.domain.embeddable.ImageSpec;
 import com.decade.practice.utils.CacheUtils;
 import jakarta.servlet.http.HttpServletRequest;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;

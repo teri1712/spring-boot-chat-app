@@ -2,7 +2,7 @@ package com.decade.practice.usecases;
 
 import com.decade.practice.DevelopmentApplication;
 import com.decade.practice.data.database.DatabaseConfiguration;
-import com.decade.practice.model.domain.entity.User;
+import com.decade.practice.models.domain.entity.User;
 import com.decade.practice.security.jwt.JwtCredentialService;
 import com.decade.practice.utils.PrerequisiteBeans;
 import com.decade.practice.utils.RedisTestContainerSupport;

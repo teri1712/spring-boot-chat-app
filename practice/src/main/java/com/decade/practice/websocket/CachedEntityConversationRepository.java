@@ -1,10 +1,10 @@
 package com.decade.practice.websocket;
 
 import com.decade.practice.data.repositories.UserRepository;
-import com.decade.practice.model.domain.TypeEvent;
-import com.decade.practice.model.domain.embeddable.ChatIdentifier;
-import com.decade.practice.model.domain.entity.Chat;
-import com.decade.practice.model.domain.entity.User;
+import com.decade.practice.models.domain.TypeEvent;
+import com.decade.practice.models.domain.embeddable.ChatIdentifier;
+import com.decade.practice.models.domain.entity.Chat;
+import com.decade.practice.models.domain.entity.User;
 import com.decade.practice.usecases.ChatOperations;
 import org.springframework.cache.annotation.Cacheable;
 import org.springframework.stereotype.Component;
@@ -51,7 +51,7 @@ public class CachedEntityConversationRepository implements ConversationRepositor
 
         @Cacheable(
                 cacheNames = TYPE_KEYSPACE,
-                key = "T(com.decade.practice.model.domain.TypeEvent).determineKey(#from,#chat)",
+                key = "T(com.decade.practice.models.domain.TypeEvent).determineKey(#from,#chat)",
                 cacheManager = TYPE_REPOSITORY_CACHE_MANAGER,
                 unless = "#result == null"
         )

@@ -1,10 +1,10 @@
 package com.decade.practice.ws;
 
 import com.decade.practice.DevelopmentApplication;
-import com.decade.practice.model.domain.entity.Chat;
-import com.decade.practice.model.domain.entity.TextEvent;
-import com.decade.practice.model.domain.entity.User;
-import com.decade.practice.model.domain.entity.WelcomeEvent;
+import com.decade.practice.models.domain.entity.Chat;
+import com.decade.practice.models.domain.entity.TextEvent;
+import com.decade.practice.models.domain.entity.User;
+import com.decade.practice.models.domain.entity.WelcomeEvent;
 import com.decade.practice.security.jwt.JwtCredentialService;
 import com.decade.practice.usecases.UserOperations;
 import com.decade.practice.utils.PrerequisiteBeans;
@@ -216,5 +216,5 @@ public class WsTest extends RedisTestContainerSupport {
                 Assertions.assertEquals(((TextEvent) myEvent.get()).getContent(), ((TextEvent) yourEvent.get()).getContent());
                 Assertions.assertEquals("Hello how are you", ((TextEvent) myEvent.get()).getContent());
         }
-        
+
 }

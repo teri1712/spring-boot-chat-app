@@ -1,10 +1,10 @@
 package com.decade.practice.websocket;
 
-import com.decade.practice.data.repositories.EventRepository;
-import com.decade.practice.model.domain.TypeEvent;
-import com.decade.practice.model.domain.entity.Chat;
-import com.decade.practice.model.domain.entity.ChatEvent;
-import com.decade.practice.model.domain.entity.User;
+import com.decade.practice.models.domain.TypeEvent;
+import com.decade.practice.models.domain.entity.Chat;
+import com.decade.practice.models.domain.entity.ChatEvent;
+import com.decade.practice.models.domain.entity.User;
+import com.decade.practice.usecases.EventOperations;
 import com.decade.practice.utils.ChatUtils;
 import org.springframework.messaging.Message;
 import org.springframework.messaging.handler.annotation.MessageMapping;
@@ -18,22 +18,22 @@ import org.springframework.util.MimeTypeUtils;
 public class ConversationController {
 
         private final SimpMessagingTemplate brokerTemplate;
-        private final EventRepository eventRepo;
+        private final EventOperations eventOperations;
         private final CachedEntityConversationRepository entityRepo;
 
         public ConversationController(
                 SimpMessagingTemplate brokerTemplate,
-                EventRepository eventRepo,
+                EventOperations eventOperations,
                 CachedEntityConversationRepository entityRepo
         ) {
                 this.brokerTemplate = brokerTemplate;
-                this.eventRepo = eventRepo;
+                this.eventOperations = eventOperations;
                 this.entityRepo = entityRepo;
         }
 
         @SubscribeMapping(WebSocketConfiguration.USER_QUEUE_DESTINATION)
         public ChatEvent subsSelf(User user) {
-                return eventRepo.findFirstByOwnerOrderByEventVersionDesc(user);
+                return eventOperations.findFirstByOwnerOrderByEventVersionDesc(user);
         }
 
         private String resolveDestination(Chat chat) {

@@ -1,9 +1,9 @@
 package com.decade.practice.security.jwt;
 
-import com.decade.practice.model.TokenCredential;
-import com.decade.practice.model.domain.entity.User;
+import com.decade.practice.models.TokenCredential;
+import com.decade.practice.models.domain.entity.User;
 import com.decade.practice.security.TokenCredentialService;
-import com.decade.practice.security.model.UserClaims;
+import com.decade.practice.security.models.UserClaims;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import io.jsonwebtoken.*;

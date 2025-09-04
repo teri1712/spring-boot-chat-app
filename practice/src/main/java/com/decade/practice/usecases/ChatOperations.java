@@ -1,9 +1,9 @@
 package com.decade.practice.usecases;
 
-import com.decade.practice.model.domain.ChatSnapshot;
-import com.decade.practice.model.domain.embeddable.ChatIdentifier;
-import com.decade.practice.model.domain.entity.Chat;
-import com.decade.practice.model.domain.entity.User;
+import com.decade.practice.models.domain.ChatSnapshot;
+import com.decade.practice.models.domain.embeddable.ChatIdentifier;
+import com.decade.practice.models.domain.entity.Chat;
+import com.decade.practice.models.domain.entity.User;
 
 import java.util.List;
 import java.util.NoSuchElementException;

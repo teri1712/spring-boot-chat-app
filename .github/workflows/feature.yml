@@ -1,0 +1,40 @@
+name: Spring Boot Chat Application CI with Maven
+
+on:
+    push:
+        branches-ignore: [ main ]
+    pull_request:
+        branches-ignore: [ main ]
+
+jobs:
+    clean-and-test:
+        runs-on: ubuntu-latest
+
+        services:
+            mysql:
+                # Docker Hub image for MySQL
+                image: mysql:8.0
+                env:
+                    MYSQL_ROOT_PASSWORD: root
+                    MYSQL_DATABASE: chatapp
+                ports:
+                    - 3306:3306
+            redis:
+                image: redis/redis-stack:latest
+                ports:
+                    - 6379:6379
+
+        steps:
+            -   name: Checkout repository
+                uses: actions/checkout@v4
+
+            # Set up JDK 17 and cache Maven dependencies
+            -   name: Set up JDK 17
+                uses: actions/setup-java@v4
+                with:
+                    java-version: '17'
+                    distribution: 'temurin'
+                    cache: 'maven'
+            -   name: Build and test with Maven
+                working-directory: ./practice
+                run: mvn -B clean test

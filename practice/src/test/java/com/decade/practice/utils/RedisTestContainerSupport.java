@@ -21,6 +21,8 @@ public abstract class RedisTestContainerSupport {
         static void registerRedisProperties(DynamicPropertyRegistry registry) {
                 registry.add("spring.data.redis.host", REDIS::getHost);
                 registry.add("spring.data.redis.port", () -> REDIS.getMappedPort(6379));
+                registry.add("spring.jpa.properties.hibernate.cache.use_second_level_cache", () -> false);
+
                 // Keep client type default (lettuce) as defined in application.properties
         }
 }

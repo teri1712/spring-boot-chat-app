@@ -2,7 +2,7 @@ package com.decade.practice.usecases;
 
 import com.decade.practice.data.repositories.EdgeRepository;
 import com.decade.practice.data.repositories.EventRepository;
-import com.decade.practice.model.domain.entity.*;
+import com.decade.practice.models.domain.entity.*;
 import jakarta.persistence.EntityManager;
 import jakarta.persistence.PersistenceContext;
 import org.springframework.stereotype.Component;

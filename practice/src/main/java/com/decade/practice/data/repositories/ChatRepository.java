@@ -1,7 +1,7 @@
 package com.decade.practice.data.repositories;
 
-import com.decade.practice.model.domain.embeddable.ChatIdentifier;
-import com.decade.practice.model.domain.entity.Chat;
+import com.decade.practice.models.domain.embeddable.ChatIdentifier;
+import com.decade.practice.models.domain.entity.Chat;
 import org.springframework.data.jpa.repository.JpaRepository;
 
 /**

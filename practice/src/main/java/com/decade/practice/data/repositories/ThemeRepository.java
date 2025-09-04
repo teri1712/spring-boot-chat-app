@@ -1,6 +1,6 @@
 package com.decade.practice.data.repositories;
 
-import com.decade.practice.model.domain.entity.Theme;
+import com.decade.practice.models.domain.entity.Theme;
 import jakarta.persistence.QueryHint;
 import org.hibernate.jpa.HibernateHints;
 import org.springframework.data.jpa.repository.JpaRepository;

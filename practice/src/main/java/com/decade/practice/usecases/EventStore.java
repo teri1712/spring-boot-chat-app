@@ -1,6 +1,6 @@
 package com.decade.practice.usecases;
 
-import com.decade.practice.model.domain.entity.ChatEvent;
+import com.decade.practice.models.domain.entity.ChatEvent;
 
 import java.util.Collection;
 
