@@ -24,9 +24,6 @@ public class WebConfiguration implements WebMvcConfigurer {
 
         @Override
         public void addResourceHandlers(ResourceHandlerRegistry registry) {
-                // === 1. Handler for VERSIONED resources (your custom CSS/JS) ===
-                // These are files you expect to change. Spring will add a content hash to the URL.
-                // e.g., /css/main.css -> /css/main-a1b2c3d4e5f.css
                 VersionResourceResolver versionResolver = new VersionResourceResolver()
                         .addVersionStrategy(new ContentVersionStrategy(), "**/*.css", "**/*.js");
 
@@ -37,9 +34,6 @@ public class WebConfiguration implements WebMvcConfigurer {
                         .addResolver(versionResolver);
 
 
-                // === 2. Handler for NON-VERSIONED resources (e.g., libraries, images) ===
-                // These are files that are less likely to change or are third-party.
-                // They will be served directly without a version hash.
                 registry.addResourceHandler("/theme/**")
                         .addResourceLocations(
                                 "classpath:/static/theme/"

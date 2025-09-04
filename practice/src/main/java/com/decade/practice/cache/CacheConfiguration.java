@@ -34,4 +34,10 @@ public class CacheConfiguration {
         public CacheManager cacheManager(RedisConnectionFactory connectionFactory) {
                 return cacheManager(connectionFactory, 5 * 60L);
         }
+
+
+        @Bean("TYPE_EVENTS_CACHE_MANAGER")
+        public CacheManager typeRepoCacheManager(RedisConnectionFactory connectionFactory) {
+                return CacheConfiguration.cacheManager(connectionFactory, 2);
+        }
 }

@@ -10,8 +10,14 @@ public interface UserPresenceService {
 
         OnlineStatus set(User user, long at);
 
+        OnlineStatus set(String username, long at);
+
         default OnlineStatus set(User user) {
-                return set(user, Instant.now().getEpochSecond());
+                return set(user.getUsername(), Instant.now().getEpochSecond());
+        }
+
+        default OnlineStatus set(String username) {
+                return set(username, Instant.now().getEpochSecond());
         }
 
         OnlineStatus get(String username);

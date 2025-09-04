@@ -1,4 +1,4 @@
-package com.decade.practice.websocket;
+package com.decade.practice.usecases;
 
 import com.decade.practice.models.domain.TypeEvent;
 import com.decade.practice.models.domain.embeddable.ChatIdentifier;

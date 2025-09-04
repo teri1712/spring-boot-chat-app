@@ -1,7 +1,7 @@
 package com.decade.practice.websocket.arguments;
 
 import com.decade.practice.models.domain.entity.Chat;
-import com.decade.practice.websocket.CachedEntityConversationRepository;
+import com.decade.practice.usecases.CachedEntityConversationRepository;
 import org.springframework.core.MethodParameter;
 import org.springframework.messaging.Message;
 import org.springframework.messaging.handler.invocation.HandlerMethodArgumentResolver;

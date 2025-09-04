@@ -2,42 +2,33 @@ package com.decade.practice.presence;
 
 import com.decade.practice.models.OnlineStatus;
 import com.decade.practice.models.domain.entity.User;
-import com.decade.practice.websocket.CachedEntityConversationRepository;
+import com.decade.practice.usecases.ConversationRepository;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.data.redis.core.ZSetOperations;
-import org.springframework.http.server.ServerHttpRequest;
-import org.springframework.http.server.ServerHttpResponse;
-import org.springframework.messaging.Message;
-import org.springframework.messaging.MessageChannel;
-import org.springframework.messaging.simp.SimpMessageHeaderAccessor;
-import org.springframework.messaging.support.ChannelInterceptor;
 import org.springframework.stereotype.Component;
-import org.springframework.web.socket.WebSocketHandler;
-import org.springframework.web.socket.server.HandshakeInterceptor;
 
 import java.time.Instant;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Map;
 import java.util.Set;
 import java.util.stream.Collectors;
 
 @Component
-public class UserPresenceManager implements UserPresenceService, ChannelInterceptor, HandshakeInterceptor {
+public class UserPresenceManager implements UserPresenceService {
         private static final String KEYSPACE = "ONLINE_USERS";
         private static final int TTL = 5 * 60;
 
         private final OnlineRepository onlineRepo;
-        private final CachedEntityConversationRepository entityRepo;
+        private final ConversationRepository conversationRepository;
         private final ZSetOperations<Object, Object> zSet;
 
         public UserPresenceManager(
                 OnlineRepository onlineRepo,
-                CachedEntityConversationRepository entityRepo,
+                ConversationRepository conversationRepository,
                 RedisTemplate<Object, Object> redisTemplate
         ) {
                 this.onlineRepo = onlineRepo;
-                this.entityRepo = entityRepo;
+                this.conversationRepository = conversationRepository;
                 this.zSet = redisTemplate.opsForZSet();
         }
 
@@ -52,47 +43,22 @@ public class UserPresenceManager implements UserPresenceService, ChannelIntercep
 
         @Override
         public OnlineStatus set(User user, long at) {
+                return set(user.getUsername(), at);
+        }
+
+        @Override
+        public OnlineStatus set(String username, long at) {
                 evict();
-                OnlineStatus status = onlineRepo.save(new OnlineStatus(user, at));
+                OnlineStatus status = onlineRepo.save(new OnlineStatus(username, at));
                 zSet.add(KEYSPACE, status.getUsername(), (double) status.getAt());
                 return status;
         }
 
-        @Override
-        public Message<?> preSend(Message<?> message, MessageChannel channel) {
-                var principal = SimpMessageHeaderAccessor.getUser(message.getHeaders());
-                if (principal == null) {
-                        return message;
-                }
-                set(entityRepo.getUser(principal.getName()));
-                return message;
-        }
-
-        @Override
-        public boolean beforeHandshake(
-                ServerHttpRequest request,
-                ServerHttpResponse response,
-                WebSocketHandler wsHandler,
-                Map<String, Object> attributes
-        ) {
-                return true;
-        }
-
-        @Override
-        public void afterHandshake(
-                ServerHttpRequest request,
-                ServerHttpResponse response,
-                WebSocketHandler wsHandler,
-                Exception exception
-        ) {
-                String username = request.getPrincipal().getName();
-                set(entityRepo.getUser(username));
-        }
 
         @Override
         public OnlineStatus get(String username) {
                 OnlineStatus status = onlineRepo.findById(username).orElse(new OnlineStatus(username, 0));
-                status.setUser(entityRepo.getUser(username));
+                status.setUser(conversationRepository.getUser(username));
                 return status;
         }
 
@@ -110,7 +76,7 @@ public class UserPresenceManager implements UserPresenceService, ChannelIntercep
                                 String who = (String) tuple.getValue();
                                 long at = tuple.getScore().longValue();
                                 OnlineStatus status = new OnlineStatus(who, at);
-                                status.setUser(entityRepo.getUser(who));
+                                status.setUser(conversationRepository.getUser(who));
                                 return status;
                         })
                         .collect(Collectors.toList());

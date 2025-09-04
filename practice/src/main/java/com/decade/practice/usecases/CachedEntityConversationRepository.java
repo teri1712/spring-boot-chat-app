@@ -1,24 +1,18 @@
-package com.decade.practice.websocket;
+package com.decade.practice.usecases;
 
 import com.decade.practice.data.repositories.UserRepository;
 import com.decade.practice.models.domain.TypeEvent;
 import com.decade.practice.models.domain.embeddable.ChatIdentifier;
 import com.decade.practice.models.domain.entity.Chat;
 import com.decade.practice.models.domain.entity.User;
-import com.decade.practice.usecases.ChatOperations;
 import org.springframework.cache.annotation.Cacheable;
 import org.springframework.stereotype.Component;
 
 import java.util.UUID;
 
-import static com.decade.practice.websocket.TypeCacheConfiguration.TYPE_REPOSITORY_CACHE_MANAGER;
-
 @Component
 public class CachedEntityConversationRepository implements ConversationRepository {
 
-        public static final String USER_KEYSPACE = "USER_ENTITIES_CACHE";
-        public static final String CHAT_KEYSPACE = "CHAT_ENTITIES_CACHE";
-        public static final String TYPE_KEYSPACE = "Typing";
 
         private final UserRepository userRepo;
         private final ChatOperations chatOperations;
@@ -32,7 +26,7 @@ public class CachedEntityConversationRepository implements ConversationRepositor
         }
 
         @Cacheable(
-                cacheNames = USER_KEYSPACE,
+                cacheNames = "USER_ENTITIES_CACHE",
                 key = "#username"
         )
         @Override
@@ -41,7 +35,7 @@ public class CachedEntityConversationRepository implements ConversationRepositor
         }
 
         @Cacheable(
-                cacheNames = CHAT_KEYSPACE,
+                cacheNames = "CHAT_ENTITIES_CACHE",
                 key = "#id.toString()"
         )
         @Override
@@ -50,9 +44,9 @@ public class CachedEntityConversationRepository implements ConversationRepositor
         }
 
         @Cacheable(
-                cacheNames = TYPE_KEYSPACE,
+                cacheNames = "Typing",
                 key = "T(com.decade.practice.models.domain.TypeEvent).determineKey(#from,#chat)",
-                cacheManager = TYPE_REPOSITORY_CACHE_MANAGER,
+                cacheManager = "TYPE_EVENTS_CACHE_MANAGER",
                 unless = "#result == null"
         )
         @Override

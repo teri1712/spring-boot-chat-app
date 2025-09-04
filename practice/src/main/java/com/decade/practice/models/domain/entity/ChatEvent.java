@@ -36,7 +36,9 @@ import java.util.*;
 ////////////////////////////////////////////////////////////////////
 
 @Entity
-@Table(indexes = @Index(columnList = "event_version"))
+@Table(indexes = {@Index(columnList = "event_version"),
+        @Index(columnList = "event_version, owner_id"),
+        @Index(columnList = "event_version, owner_id, first_user, second_user")})
 
 public abstract class ChatEvent {
 

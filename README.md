@@ -25,10 +25,10 @@ A short version of the demo is available here:
 
 * Backend: [https://github.com/teri1712/spring-boot-chat-app.git](https://github.com/teri1712/spring-boot-chat-app.git)
 * Frontend: [https://github.com/teri1712/angular-chat-application.git](https://github.com/teri1712/angular-chat-application.git)
-
+* Android (older version): [https://github.com/teri1712/android-chat-app](https://github.com/teri1712/android-chat-app)
 ## Run Locally
 
-This repository contains the Spring Boot backend. You can run it either with Docker Compose (recommended) or directly with Maven/Java.
+This repository contains the Spring Boot backend. You can run it either with Docker Compose or directly with Maven/Java.
 
 ### Prerequisites
 
@@ -56,7 +56,7 @@ Key properties you may override via environment variables or JVM system properti
 - MYSQL_DATABASE (default: chatapp)
 
 2) Choose profile and domains:
-- Local development: remove or comment `SPRING_PROFILES_ACTIVE=production` in practice/.env (or set it empty). Defaults from application.properties will be used:
+- Local development: remove `SPRING_PROFILES_ACTIVE=production` in practice/.env (keep `container`). Defaults from application.properties will be used:
   - Backend: http://localhost:8080
   - Frontend origin: http://localhost:4200
   - MySQL: localhost:3306 (or the compose mysql service)
@@ -73,3 +73,16 @@ cd practice
 docker-compose up --build
 ```
 ## Refer to the frontend repository for detailed Angular setup and configuration.
+
+## Performance
+
+### Query Cache
+
+The query cache using redis on critical endpoints to minimize database load and accelerate response times. The following table summarizes the impact of this optimization based on the report in the `query cache stats` folder.
+
+**Endpoint-Specific Performance Gains**
+
+| Endpoint                       | Avg. Response Time (Before) | Avg. Response Time (After) | Reduction |
+| :----------------------------- | :-------------------------- | :------------------------- | :-------- |
+| `/users/me/events`             | 41ms                        | 23ms                       | ~43.9%    |
+| `/chats/{chatIdentifier}/events` | 38ms                        | 31ms                       | ~18.4%    |

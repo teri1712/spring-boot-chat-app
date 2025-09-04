@@ -1,5 +1,6 @@
 package com.decade.practice.websocket;
 
+import com.decade.practice.usecases.CachedEntityConversationRepository;
 import com.decade.practice.websocket.arguments.ChatArgumentResolver;
 import com.decade.practice.websocket.arguments.ChatIdentifierArgumentResolver;
 import com.decade.practice.websocket.arguments.UserArgumentResolver;

@@ -4,6 +4,7 @@ import com.decade.practice.models.domain.TypeEvent;
 import com.decade.practice.models.domain.entity.Chat;
 import com.decade.practice.models.domain.entity.ChatEvent;
 import com.decade.practice.models.domain.entity.User;
+import com.decade.practice.usecases.CachedEntityConversationRepository;
 import com.decade.practice.usecases.EventOperations;
 import com.decade.practice.utils.ChatUtils;
 import org.springframework.messaging.Message;
