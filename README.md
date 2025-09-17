@@ -10,8 +10,8 @@ https://angular-chat-application-psi.vercel.app
 ## Demo
 A short version of the demo is available here:
 
-* Android: [https://youtu.be/E1SQVj2nTtw](https://youtu.be/E1SQVj2nTtw)
 * Web: [https://youtu.be/xm_pWF36_Uo](https://youtu.be/xm_pWF36_Uo)
+* Android: [https://youtu.be/E1SQVj2nTtw](https://youtu.be/E1SQVj2nTtw)
 
 ### Tech Stack
 

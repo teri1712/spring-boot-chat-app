@@ -5,6 +5,7 @@ import com.decade.practice.websocket.arguments.ChatArgumentResolver;
 import com.decade.practice.websocket.arguments.ChatIdentifierArgumentResolver;
 import com.decade.practice.websocket.arguments.UserArgumentResolver;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.http.server.ServerHttpRequest;
 import org.springframework.http.server.ServerHttpResponse;
@@ -12,6 +13,8 @@ import org.springframework.messaging.handler.invocation.HandlerMethodArgumentRes
 import org.springframework.messaging.simp.config.ChannelRegistration;
 import org.springframework.messaging.simp.config.MessageBrokerRegistry;
 import org.springframework.messaging.support.ChannelInterceptor;
+import org.springframework.scheduling.TaskScheduler;
+import org.springframework.scheduling.concurrent.ThreadPoolTaskScheduler;
 import org.springframework.web.socket.WebSocketHandler;
 import org.springframework.web.socket.config.annotation.EnableWebSocket;
 import org.springframework.web.socket.config.annotation.EnableWebSocketMessageBroker;
@@ -103,9 +106,16 @@ public class WebSocketConfiguration implements WebSocketMessageBrokerConfigurer 
                 argumentResolvers.add(new ChatArgumentResolver(entityRepo));
         }
 
+        @Bean
+        public TaskScheduler heartBeatScheduler() {
+                return new ThreadPoolTaskScheduler();
+        }
+
         @Override
         public void configureMessageBroker(MessageBrokerRegistry registry) {
-                registry.enableSimpleBroker(BROKER_DESTINATIONS.toArray(new String[0]));
+                registry.enableSimpleBroker(BROKER_DESTINATIONS.toArray(new String[0]))
+                        .setTaskScheduler(heartBeatScheduler())
+                        .setHeartbeatValue(new long[]{5000L, 5000L});
                 registry.setUserDestinationPrefix(USER_DESTINATION);
         }
 }
