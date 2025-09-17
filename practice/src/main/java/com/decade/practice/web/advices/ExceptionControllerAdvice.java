@@ -20,50 +20,51 @@ import java.util.NoSuchElementException;
 @RestControllerAdvice
 public class ExceptionControllerAdvice extends ResponseEntityExceptionHandler {
 
-      @ExceptionHandler({
-            EntityNotFoundException.class,
-            NoSuchElementException.class,
-            NullPointerException.class
-      })
-      @ResponseStatus(value = HttpStatus.NOT_FOUND)
-      @MessageExceptionHandler({
-            EntityNotFoundException.class,
-            NoSuchElementException.class,
-            NullPointerException.class
-      })
-      public void handleNoElement(Exception e) {
-            e.printStackTrace();
-      }
+        @ExceptionHandler({
+                EntityNotFoundException.class,
+                NoSuchElementException.class,
+                NullPointerException.class
+        })
+        @ResponseStatus(value = HttpStatus.NOT_FOUND)
+        @MessageExceptionHandler({
+                EntityNotFoundException.class,
+                NoSuchElementException.class,
+                NullPointerException.class
+        })
+        public void handleNoElement(Exception e) {
+                e.printStackTrace();
+        }
 
-      @ExceptionHandler(OptimisticLockException.class)
-      @ResponseStatus(value = HttpStatus.CONFLICT)
-      public void handleLockException() {
-      }
+        @ExceptionHandler(OptimisticLockException.class)
+        @ResponseStatus(value = HttpStatus.CONFLICT)
+        public void handleLockException(Exception e) {
+                e.printStackTrace();
+        }
 
-      @Override
-      protected ResponseEntity<Object> handleHandlerMethodValidationException(
-            HandlerMethodValidationException ex,
-            HttpHeaders headers,
-            HttpStatusCode status,
-            WebRequest request
-      ) {
-            return ResponseEntity
-                  .badRequest()
-                  .body(
-                        ex.getAllErrors()
-                              .get(0).getDefaultMessage()
-                  );
-      }
+        @Override
+        protected ResponseEntity<Object> handleHandlerMethodValidationException(
+                HandlerMethodValidationException ex,
+                HttpHeaders headers,
+                HttpStatusCode status,
+                WebRequest request
+        ) {
+                return ResponseEntity
+                        .badRequest()
+                        .body(
+                                ex.getAllErrors()
+                                        .get(0).getDefaultMessage()
+                        );
+        }
 
-      @Override
-      protected ResponseEntity<Object> handleMethodArgumentNotValid(
-            MethodArgumentNotValidException ex,
-            HttpHeaders headers,
-            HttpStatusCode status,
-            WebRequest request
-      ) {
-            return ResponseEntity
-                  .badRequest()
-                  .body(ex.getMessage());
-      }
+        @Override
+        protected ResponseEntity<Object> handleMethodArgumentNotValid(
+                MethodArgumentNotValidException ex,
+                HttpHeaders headers,
+                HttpStatusCode status,
+                WebRequest request
+        ) {
+                return ResponseEntity
+                        .badRequest()
+                        .body(ex.getMessage());
+        }
 }
