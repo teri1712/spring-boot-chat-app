@@ -8,6 +8,7 @@ import com.decade.practice.models.domain.entity.User;
 import com.decade.practice.models.dto.SignUpRequest;
 import com.decade.practice.security.jwt.JwtCredentialService;
 import com.decade.practice.usecases.UserOperations;
+import com.decade.practice.usecases.ChatOperations;
 import com.decade.practice.utils.PrerequisiteBeans;
 import com.decade.practice.web.advices.ExceptionControllerAdvice;
 import com.decade.practice.web.rest.TokenController;
@@ -71,6 +72,9 @@ public class SignUpTest {
 
         @MockBean
         private ImageStore imageStore;
+
+        @MockBean
+        private ChatOperations chatOperations;
 
 
         @BeforeEach

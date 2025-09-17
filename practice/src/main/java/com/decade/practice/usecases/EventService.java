@@ -18,12 +18,12 @@ import java.util.UUID;
 
 @Service
 public class EventService implements EventOperations {
-        public final EventStore eventStore;
+        public final EventStore chatEventStore;
         public final EventRepository evenRepo;
         public final SimpMessagingTemplate template;
 
-        public EventService(EventStore eventStore, EventRepository evenRepo, SimpMessagingTemplate template) {
-                this.eventStore = eventStore;
+        public EventService(EventStore chatEventStore, EventRepository evenRepo, SimpMessagingTemplate template) {
+                this.chatEventStore = chatEventStore;
                 this.evenRepo = evenRepo;
                 this.template = template;
         }
@@ -32,7 +32,7 @@ public class EventService implements EventOperations {
         public <E extends ChatEvent> E createAndSend(User sender, E event) {
                 event.setSender(sender);
                 try {
-                        Collection<ChatEvent> saved = eventStore.save(event);
+                        Collection<ChatEvent> saved = chatEventStore.save(event);
                         for (ChatEvent it : saved) {
                                 template.convertAndSendToUser(
                                         it.getOwner().getUsername(),

@@ -69,6 +69,7 @@ public class ChatService extends SelfAwareBean implements ChatOperations {
                 propagation = Propagation.REQUIRES_NEW,
                 noRollbackFor = NoSuchElementException.class
         )
+        @Override
         public void createChat(ChatIdentifier identifier) throws NoSuchElementException {
                 Chat chat = new Chat(
                         EntityHelper.get(userRepo, identifier.getFirstUser()),

@@ -12,6 +12,8 @@ import java.util.UUID;
 public interface ChatOperations {
         int CONVERSATION_LIMIT = 20;
 
+        void createChat(ChatIdentifier identifier);
+
         Chat getOrCreateChat(ChatIdentifier identifier) throws NoSuchElementException;
 
         default Chat getOrCreateChat(UUID owner, UUID partner) throws NoSuchElementException {

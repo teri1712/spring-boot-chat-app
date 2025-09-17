@@ -41,7 +41,7 @@ public class Seeder {
         private UserRepository userRepo;
 
         @Autowired
-        private EventStore eventStore;
+        private EventStore chatEventStore;
 
         @Value("${admin.username}")
         private String adminUsername;
@@ -121,14 +121,14 @@ public class Seeder {
 
                 TextEvent event1 = new TextEvent(luffyNamiChat, nami, "Hello");
                 event1.setCreatedTime(System.currentTimeMillis() - 5 * 60 * 1000);
-                eventStore.save(event1);
+                chatEventStore.save(event1);
 
                 TextEvent event2 = new TextEvent(luffyChopperChat, chopper, "Ekk");
                 event2.setCreatedTime(System.currentTimeMillis() - 10 * 60 * 1000);
-                eventStore.save(event2);
+                chatEventStore.save(event2);
 
                 TextEvent event3 = new TextEvent(namiChopperChat, chopper, "Vcl");
                 event3.setCreatedTime(System.currentTimeMillis() - 5 * 60 * 1000);
-                eventStore.save(event3);
+                chatEventStore.save(event3);
         }
 }
