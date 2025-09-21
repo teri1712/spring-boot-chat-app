@@ -1,22 +1,17 @@
 package com.decade.practice.web.rest;
 
 import com.decade.practice.DevelopmentApplication;
-import com.decade.practice.data.repositories.EventRepository;
-import com.decade.practice.data.repositories.UserRepository;
-import com.decade.practice.media.ImageStore;
-import com.decade.practice.media.MediaStore;
-import com.decade.practice.models.domain.embeddable.ChatIdentifier;
-import com.decade.practice.models.domain.embeddable.ImageSpec;
-import com.decade.practice.models.domain.entity.*;
-import com.decade.practice.presence.UserPresenceService;
-import com.decade.practice.security.SecurityConfiguration;
-import com.decade.practice.security.jwt.JwtCredentialService;
-import com.decade.practice.security.strategy.LoginSuccessStrategy;
-import com.decade.practice.security.strategy.LogoutStrategy;
-import com.decade.practice.security.strategy.Oauth2LoginSuccessStrategy;
-import com.decade.practice.usecases.ChatOperations;
-import com.decade.practice.usecases.EventOperations;
-import com.decade.practice.usecases.UserOperations;
+import com.decade.practice.adapter.security.jwt.JwtService;
+import com.decade.practice.adapter.security.strategies.LoginSuccessStrategy;
+import com.decade.practice.adapter.security.strategies.LogoutStrategy;
+import com.decade.practice.adapter.security.strategies.Oauth2LoginSuccessStrategy;
+import com.decade.practice.adapter.web.rest.EventController;
+import com.decade.practice.application.usecases.*;
+import com.decade.practice.domain.embeddables.ChatIdentifier;
+import com.decade.practice.domain.embeddables.ImageSpec;
+import com.decade.practice.domain.entities.*;
+import com.decade.practice.domain.repositories.UserRepository;
+import com.decade.practice.infra.configs.SecurityConfiguration;
 import com.decade.practice.utils.PrerequisiteBeans;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.junit.jupiter.api.BeforeEach;
@@ -51,16 +46,16 @@ class EventControllerTest {
         private MockMvc mockMvc;
 
         @MockBean
-        private EventOperations eventOperations;
+        private DeliveryService deliveryService;
 
         @MockBean
-        private ChatOperations chatOperations;
+        private ChatService chatService;
 
         @MockBean
-        private EventRepository eventRepository;
+        private EventService eventService;
 
         @MockBean
-        private JwtCredentialService jwtCredentialService;
+        private JwtService jwtService;
 
         @MockBean
         private UserPresenceService userPresenceService;
@@ -84,7 +79,10 @@ class EventControllerTest {
         private LogoutStrategy logoutStrategy;
 
         @MockBean
-        private UserOperations userOperations;
+        private UserService userService;
+
+        @MockBean
+        private ConversationRepository conversationRepository;
 
         @Autowired
         private ObjectMapper objectMapper;
@@ -94,8 +92,8 @@ class EventControllerTest {
         @BeforeEach
         void setUp() {
                 testUser = new User("testuser", " password");
-                when(userRepository.getByUsername("testuser")).thenReturn(testUser);
-                when(eventOperations.createAndSend(any(User.class), any(ChatEvent.class)))
+                when(userRepository.findByUsername("testuser")).thenReturn(testUser);
+                when(deliveryService.createAndSend(any(User.class), any(ChatEvent.class)))
                         .thenAnswer(inv -> inv.getArgument(1));
         }
 
@@ -104,11 +102,12 @@ class EventControllerTest {
         void createEvent_shouldReturnCreated_whenTextEventIsSent() throws Exception {
                 Chat chat = new Chat(testUser, testUser);
 
-                when(chatOperations.getOrCreateChat(any(ChatIdentifier.class))).thenReturn(chat);
+                when(conversationRepository.getUser(any(String.class))).thenReturn(testUser);
+                when(chatService.getOrCreateChat(any(ChatIdentifier.class))).thenReturn(chat);
                 TextEvent event = new TextEvent(new Chat(testUser, testUser), testUser, "test message");
 
 
-                when(eventOperations.createAndSend(any(User.class), any(ChatEvent.class)))
+                when(deliveryService.createAndSend(any(User.class), any(ChatEvent.class)))
                         .thenReturn(event);
 
                 event.setLocalId(UUID.randomUUID());
@@ -124,11 +123,12 @@ class EventControllerTest {
         void createEvent_shouldReturnCreated_whenImageEventIsSent() throws Exception {
                 Chat chat = new Chat(testUser, testUser);
 
-                when(chatOperations.getOrCreateChat(any(ChatIdentifier.class))).thenReturn(chat);
+                when(conversationRepository.getUser(any(String.class))).thenReturn(testUser);
+                when(chatService.getOrCreateChat(any(ChatIdentifier.class))).thenReturn(chat);
                 ImageEvent event = new ImageEvent(new Chat(testUser, testUser), testUser, new ImageSpec());
                 event.setLocalId(UUID.randomUUID());
 
-                when(eventOperations.createAndSend(any(User.class), any(ChatEvent.class)))
+                when(deliveryService.createAndSend(any(User.class), any(ChatEvent.class)))
                         .thenReturn(event);
 
                 when(imageStore.save(any(BufferedImage.class)))
@@ -147,9 +147,10 @@ class EventControllerTest {
         @WithMockUser("testuser")
         void listEvents_forChat_shouldReturnOk() throws Exception {
                 Chat chat = new Chat(testUser, testUser);
+                when(conversationRepository.getUser(any(String.class))).thenReturn(testUser);
 
-                when(chatOperations.getOrCreateChat(any(ChatIdentifier.class))).thenReturn(chat);
-                when(eventRepository.findByOwnerAndChatAndEventVersionLessThanEqual(any(), any(), anyInt(), any()))
+                when(chatService.getOrCreateChat(any(ChatIdentifier.class))).thenReturn(chat);
+                when(eventService.findByOwnerAndChatAndEventVersionLessThanEqual(any(), any(), anyInt()))
                         .thenReturn(List.of());
                 String chatId = chat.getIdentifier().toString();
                 mockMvc.perform(get("/chats/{chatId}/events", chatId)
@@ -160,7 +161,7 @@ class EventControllerTest {
         @Test
         @WithMockUser("testuser")
         void listEvents_forUser_shouldReturnOk() throws Exception {
-                when(eventRepository.findByOwnerAndEventVersionLessThanEqual(any(), anyInt(), any()))
+                when(eventService.findByOwnerAndEventVersionLessThanEqual(any(), anyInt()))
                         .thenReturn(List.of());
 
                 mockMvc.perform(get("/users/me/events")

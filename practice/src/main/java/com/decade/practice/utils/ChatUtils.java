@@ -1,7 +1,7 @@
 package com.decade.practice.utils;
 
-import com.decade.practice.models.domain.entity.Chat;
-import com.decade.practice.models.domain.entity.User;
+import com.decade.practice.domain.entities.Chat;
+import com.decade.practice.domain.entities.User;
 
 import java.util.UUID;
 

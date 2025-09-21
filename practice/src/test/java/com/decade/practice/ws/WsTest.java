@@ -1,12 +1,12 @@
 package com.decade.practice.ws;
 
 import com.decade.practice.DevelopmentApplication;
-import com.decade.practice.models.domain.entity.Chat;
-import com.decade.practice.models.domain.entity.TextEvent;
-import com.decade.practice.models.domain.entity.User;
-import com.decade.practice.models.domain.entity.WelcomeEvent;
-import com.decade.practice.security.jwt.JwtCredentialService;
-import com.decade.practice.usecases.UserOperations;
+import com.decade.practice.adapter.security.jwt.JwtService;
+import com.decade.practice.application.usecases.UserService;
+import com.decade.practice.domain.entities.Chat;
+import com.decade.practice.domain.entities.TextEvent;
+import com.decade.practice.domain.entities.User;
+import com.decade.practice.domain.entities.WelcomeEvent;
 import com.decade.practice.utils.PrerequisiteBeans;
 import com.decade.practice.utils.RedisTestContainerSupport;
 import org.junit.jupiter.api.*;
@@ -33,10 +33,10 @@ import java.util.Date;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.TimeUnit;
 
+import static com.decade.practice.infra.configs.WebSocketConfiguration.HANDSHAKE_DESTINATION;
+import static com.decade.practice.infra.configs.WebSocketConfiguration.USER_QUEUE_DESTINATION;
 import static com.decade.practice.utils.TokenUtils.BEARER;
 import static com.decade.practice.utils.TokenUtils.HEADER_NAME;
-import static com.decade.practice.websocket.WebSocketConfiguration.HANDSHAKE_DESTINATION;
-import static com.decade.practice.websocket.WebSocketConfiguration.USER_QUEUE_DESTINATION;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 
 @SpringBootTest(
@@ -57,10 +57,10 @@ public class WsTest extends RedisTestContainerSupport {
         private MessageConverter converter;
 
         @Autowired
-        private UserOperations userOperations;
+        private UserService userService;
 
         @Autowired
-        private JwtCredentialService credentialService;
+        private JwtService credentialService;
 
         private User me;
         private User you;
@@ -73,8 +73,8 @@ public class WsTest extends RedisTestContainerSupport {
 
         @BeforeAll
         public void beforeAll() {
-                me = userOperations.create("first", "first", "first", new Date(), "male", null, true);
-                you = userOperations.create("second", "second", "second", new Date(), "male", null, true);
+                me = userService.create("first", "first", "first", new Date(), "male", null, true);
+                you = userService.create("second", "second", "second", new Date(), "male", null, true);
 
                 myToken = credentialService.create(me, null).getAccessToken();
                 yourToken = credentialService.create(you, null).getAccessToken();

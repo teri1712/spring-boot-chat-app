@@ -1,21 +1,23 @@
 package com.decade.practice.web.rest;
 
 import com.decade.practice.DevelopmentApplication;
-import com.decade.practice.data.repositories.ChatRepository;
-import com.decade.practice.data.repositories.ThemeRepository;
-import com.decade.practice.data.repositories.UserRepository;
-import com.decade.practice.models.domain.ChatSnapshot;
-import com.decade.practice.models.domain.embeddable.ChatIdentifier;
-import com.decade.practice.models.domain.embeddable.Preference;
-import com.decade.practice.models.domain.entity.*;
-import com.decade.practice.security.SecurityConfiguration;
-import com.decade.practice.security.jwt.JwtCredentialService;
-import com.decade.practice.security.strategy.LoginSuccessStrategy;
-import com.decade.practice.security.strategy.LogoutStrategy;
-import com.decade.practice.security.strategy.Oauth2LoginSuccessStrategy;
-import com.decade.practice.usecases.ChatOperations;
-import com.decade.practice.usecases.EventOperations;
-import com.decade.practice.usecases.UserOperations;
+import com.decade.practice.adapter.security.jwt.JwtService;
+import com.decade.practice.adapter.security.strategies.LoginSuccessStrategy;
+import com.decade.practice.adapter.security.strategies.LogoutStrategy;
+import com.decade.practice.adapter.security.strategies.Oauth2LoginSuccessStrategy;
+import com.decade.practice.adapter.web.rest.ChatController;
+import com.decade.practice.application.usecases.ChatService;
+import com.decade.practice.application.usecases.ConversationRepository;
+import com.decade.practice.application.usecases.DeliveryService;
+import com.decade.practice.application.usecases.UserService;
+import com.decade.practice.domain.ChatSnapshot;
+import com.decade.practice.domain.embeddables.ChatIdentifier;
+import com.decade.practice.domain.embeddables.Preference;
+import com.decade.practice.domain.entities.*;
+import com.decade.practice.domain.repositories.ChatRepository;
+import com.decade.practice.domain.repositories.ThemeRepository;
+import com.decade.practice.domain.repositories.UserRepository;
+import com.decade.practice.infra.configs.SecurityConfiguration;
 import com.decade.practice.utils.PrerequisiteBeans;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.junit.jupiter.api.BeforeEach;
@@ -34,6 +36,7 @@ import java.util.Optional;
 
 import static org.mockito.ArgumentMatchers.*;
 import static org.mockito.BDDMockito.given;
+import static org.mockito.Mockito.when;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.patch;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
@@ -53,17 +56,19 @@ class ChatControllerTest {
         private ChatRepository chatRepository;
 
         @MockBean
-        private ChatOperations chatOperations;
+        private ChatService chatService;
+        @MockBean
+        private ConversationRepository conversationRepository;
 
         @MockBean
         private ThemeRepository themeRepository;
 
         @MockBean
-        private EventOperations eventOperations;
+        private DeliveryService deliveryService;
 
         // Security-related mocks to satisfy the SecurityConfiguration
         @MockBean
-        private JwtCredentialService jwtCredentialService;
+        private JwtService jwtService;
 
         @MockBean
         private LoginSuccessStrategy loginSuccessStrategy;
@@ -75,7 +80,7 @@ class ChatControllerTest {
         private LogoutStrategy logoutStrategy;
 
         @MockBean
-        private UserOperations userOperations;
+        private UserService userService;
 
         @Autowired
         private ObjectMapper objectMapper;
@@ -89,8 +94,8 @@ class ChatControllerTest {
                 testUser = new User("alice", "pwd");
                 testUser.setSyncContext(new SyncContext(testUser));
                 testUser.getSyncContext().setEventVersion(43);
-                given(userRepository.getByUsername("alice")).willReturn(testUser);
-                given(eventOperations.createAndSend(any(User.class), any(PreferenceEvent.class)))
+                given(userRepository.findByUsername("alice")).willReturn(testUser);
+                given(deliveryService.createAndSend(any(User.class), any(PreferenceEvent.class)))
                         .willAnswer(inv -> inv.getArgument(1));
 
                 // Prepare a chat and its identifier
@@ -104,8 +109,9 @@ class ChatControllerTest {
         @WithMockUser("alice")
         void get_chat_shouldReturnOk_andUseDefaultAtVersion() throws Exception {
                 ChatSnapshot snapshot = new ChatSnapshot(null, null, 43);
-                given(chatOperations.getOrCreateChat(any(ChatIdentifier.class))).willReturn(chatEntity);
-                given(chatOperations.getSnapshot(eq(chatEntity), eq(testUser), eq(43))).willReturn(snapshot);
+                when(conversationRepository.getUser(any(String.class))).thenReturn(testUser);
+                given(chatService.getOrCreateChat(any(ChatIdentifier.class))).willReturn(chatEntity);
+                given(chatService.getSnapshot(eq(chatEntity), eq(testUser), eq(43))).willReturn(snapshot);
 
                 mockMvc.perform(get("/chats/{id}", identifier.toString()))
                         .andExpect(status().isOk())
@@ -116,8 +122,9 @@ class ChatControllerTest {
         @WithMockUser("alice")
         void get_chat_withExplicitVersion_shouldReturnOk() throws Exception {
                 ChatSnapshot snapshot = new ChatSnapshot(null, null, 7);
-                given(chatOperations.getOrCreateChat(any(ChatIdentifier.class))).willReturn(chatEntity);
-                given(chatOperations.getSnapshot(eq(chatEntity), eq(testUser), eq(7))).willReturn(snapshot);
+                when(conversationRepository.getUser(any(String.class))).thenReturn(testUser);
+                given(chatService.getOrCreateChat(any(ChatIdentifier.class))).willReturn(chatEntity);
+                given(chatService.getSnapshot(eq(chatEntity), eq(testUser), eq(7))).willReturn(snapshot);
 
                 mockMvc.perform(get("/chats/{id}", identifier.toString()).param("atVersion", "7"))
                         .andExpect(status().isOk())
@@ -127,7 +134,8 @@ class ChatControllerTest {
         @Test
         @WithMockUser("alice")
         void patch_preference_shouldPersistAndReturnLocalChat() throws Exception {
-                given(chatOperations.getOrCreateChat(any(ChatIdentifier.class))).willReturn(chatEntity);
+                when(conversationRepository.getUser(any(String.class))).thenReturn(testUser);
+                given(chatService.getOrCreateChat(any(ChatIdentifier.class))).willReturn(chatEntity);
                 Theme theme = new Theme(5, null);
                 given(themeRepository.findById(5)).willReturn(Optional.of(theme));
 
@@ -166,12 +174,12 @@ class ChatControllerTest {
 
                 Chat c1 = chatEntity;
                 Chat c2 = new Chat(new User("a", "p"), new User("b", "p"));
-                given(chatOperations.listChat(eq(testUser), anyInt(), any())).willReturn(List.of(c1, c2));
+                given(chatService.listChat(eq(testUser), anyInt(), any())).willReturn(List.of(c1, c2));
 
                 ChatSnapshot s1 = new ChatSnapshot(null, null, 100);
                 ChatSnapshot s2 = new ChatSnapshot(null, null, 100);
-                given(chatOperations.getSnapshot(eq(c1), eq(testUser), eq(100))).willReturn(s1);
-                given(chatOperations.getSnapshot(eq(c2), eq(testUser), eq(100))).willReturn(s2);
+                given(chatService.getSnapshot(eq(c1), eq(testUser), eq(100))).willReturn(s1);
+                given(chatService.getSnapshot(eq(c2), eq(testUser), eq(100))).willReturn(s2);
 
                 mockMvc.perform(get("/chats")
                                 .param("atVersion", "100")

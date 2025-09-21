@@ -1,8 +1,8 @@
 package com.decade.practice;
 
 
-import com.decade.practice.models.domain.DefaultAvatar;
-import com.decade.practice.usecases.UserOperations;
+import com.decade.practice.application.usecases.UserService;
+import com.decade.practice.domain.DefaultAvatar;
 import com.decade.practice.utils.PrerequisiteBeans;
 import com.decade.practice.utils.RedisTestContainerSupport;
 import org.junit.jupiter.api.Test;
@@ -26,7 +26,7 @@ import java.util.Date;
 public class BootstrapTest extends RedisTestContainerSupport {
 
         @Autowired
-        private UserOperations userService;
+        private UserService userService;
 
 
         @Test

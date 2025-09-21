@@ -1,6 +1,6 @@
 package com.decade.practice.utils;
 
-import com.decade.practice.models.domain.embeddable.ImageSpec;
+import com.decade.practice.domain.embeddables.ImageSpec;
 
 import javax.imageio.ImageIO;
 import java.awt.*;

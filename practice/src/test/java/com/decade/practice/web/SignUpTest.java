@@ -1,18 +1,18 @@
 package com.decade.practice.web;
 
 import com.decade.practice.DevelopmentApplication;
-import com.decade.practice.data.repositories.UserRepository;
-import com.decade.practice.media.ImageStore;
-import com.decade.practice.models.domain.DefaultAvatar;
-import com.decade.practice.models.domain.entity.User;
-import com.decade.practice.models.dto.SignUpRequest;
-import com.decade.practice.security.jwt.JwtCredentialService;
-import com.decade.practice.usecases.UserOperations;
-import com.decade.practice.usecases.ChatOperations;
+import com.decade.practice.adapter.security.jwt.JwtService;
+import com.decade.practice.adapter.web.advices.ExceptionControllerAdvice;
+import com.decade.practice.adapter.web.rest.TokenController;
+import com.decade.practice.adapter.web.rest.UserController;
+import com.decade.practice.application.dto.SignUpRequest;
+import com.decade.practice.application.usecases.ConversationRepository;
+import com.decade.practice.application.usecases.ImageStore;
+import com.decade.practice.application.usecases.UserService;
+import com.decade.practice.domain.DefaultAvatar;
+import com.decade.practice.domain.entities.User;
+import com.decade.practice.domain.repositories.UserRepository;
 import com.decade.practice.utils.PrerequisiteBeans;
-import com.decade.practice.web.advices.ExceptionControllerAdvice;
-import com.decade.practice.web.rest.TokenController;
-import com.decade.practice.web.rest.UserController;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.hamcrest.Matchers;
 import org.junit.jupiter.api.BeforeEach;
@@ -39,8 +39,8 @@ import org.springframework.test.web.servlet.result.MockMvcResultMatchers;
 import java.io.IOException;
 import java.text.SimpleDateFormat;
 
-import static com.decade.practice.models.dto.SignUpRequest.MAX_USERNAME_LENGTH;
-import static com.decade.practice.models.dto.SignUpRequest.MIN_USERNAME_LENGTH;
+import static com.decade.practice.application.dto.SignUpRequest.MAX_USERNAME_LENGTH;
+import static com.decade.practice.application.dto.SignUpRequest.MIN_USERNAME_LENGTH;
 import static com.decade.practice.utils.Media.ONE_PIXEL_BMP_BYTES;
 
 @WebMvcTest(controllers = {TokenController.class, UserController.class})
@@ -56,7 +56,7 @@ public class SignUpTest {
         private MockMvc mockMvc;
 
         @MockBean
-        private UserOperations userOperations;
+        private UserService userService;
 
         @MockBean
         private UserRepository userRepo;
@@ -65,7 +65,7 @@ public class SignUpTest {
         private PasswordEncoder encoder;
 
         @MockBean
-        private JwtCredentialService credentialService;
+        private JwtService credentialService;
 
         @MockBean
         private SecurityContextRepository securityContextRepository;
@@ -74,7 +74,7 @@ public class SignUpTest {
         private ImageStore imageStore;
 
         @MockBean
-        private ChatOperations chatOperations;
+        private ConversationRepository conversationRepository;
 
 
         @BeforeEach
@@ -82,7 +82,7 @@ public class SignUpTest {
                 Mockito.when(encoder.encode(Mockito.anyString())).thenAnswer(invocation ->
                         invocation.getArgument(0, String.class));
 
-                Mockito.when(userOperations.create(
+                Mockito.when(userService.create(
                         Mockito.anyString(),      // username
                         Mockito.anyString(),      // password
                         Mockito.anyString(),      // name

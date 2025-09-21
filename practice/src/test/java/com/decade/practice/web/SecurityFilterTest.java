@@ -2,20 +2,20 @@ package com.decade.practice.web;
 
 import com.decade.practice.DevelopmentApplication;
 import com.decade.practice.MockEndpoints;
-import com.decade.practice.data.repositories.AdminRepository;
-import com.decade.practice.data.repositories.UserRepository;
-import com.decade.practice.models.domain.entity.User;
-import com.decade.practice.models.local.Account;
-import com.decade.practice.security.DaoUserDetailsService;
-import com.decade.practice.security.SecurityConfiguration;
-import com.decade.practice.security.jwt.JwtCredentialService;
-import com.decade.practice.security.jwt.JwtTokenFilter;
-import com.decade.practice.security.strategy.LoginSuccessStrategy;
-import com.decade.practice.security.strategy.LogoutStrategy;
-import com.decade.practice.security.strategy.Oauth2LoginSuccessStrategy;
-import com.decade.practice.session.SessionConfiguration;
-import com.decade.practice.usecases.ChatOperations;
-import com.decade.practice.usecases.UserOperations;
+import com.decade.practice.adapter.security.DaoUserDetailsService;
+import com.decade.practice.adapter.security.jwt.JwtService;
+import com.decade.practice.adapter.security.jwt.JwtTokenFilter;
+import com.decade.practice.adapter.security.strategies.LoginSuccessStrategy;
+import com.decade.practice.adapter.security.strategies.LogoutStrategy;
+import com.decade.practice.adapter.security.strategies.Oauth2LoginSuccessStrategy;
+import com.decade.practice.application.usecases.ConversationRepository;
+import com.decade.practice.application.usecases.UserService;
+import com.decade.practice.domain.entities.User;
+import com.decade.practice.domain.locals.Account;
+import com.decade.practice.domain.repositories.AdminRepository;
+import com.decade.practice.domain.repositories.UserRepository;
+import com.decade.practice.infra.configs.SecurityConfiguration;
+import com.decade.practice.infra.configs.SessionConfiguration;
 import com.decade.practice.utils.DummyRedisSetOps;
 import com.decade.practice.utils.PrerequisiteBeans;
 import com.decade.practice.utils.TokenUtils;
@@ -55,7 +55,7 @@ import org.springframework.test.web.servlet.result.MockMvcResultMatchers;
         RedisAutoConfiguration.class,
         Oauth2LoginSuccessStrategy.class,
         SessionAutoConfiguration.class,
-        JwtCredentialService.class,
+        JwtService.class,
         DaoUserDetailsService.class,
 })
 public class SecurityFilterTest {
@@ -70,10 +70,10 @@ public class SecurityFilterTest {
         private AdminRepository adminRepository;
 
         @MockBean
-        private ChatOperations chatOperations;
+        private ConversationRepository conversationRepository;
 
         @MockBean
-        private UserOperations userService;
+        private UserService userService;
 
         @MockBean
         private LogoutStrategy logoutHandler;
@@ -88,12 +88,12 @@ public class SecurityFilterTest {
         private StringRedisTemplate redisTemplate;
 
         @Autowired
-        private JwtCredentialService credentialService;
+        private JwtService credentialService;
 
         @BeforeEach
         public void setUp() {
                 User user = new User(USERNAME, encoder.encode(PASSWORD));
-                Mockito.when(userRepo.getByUsername(USERNAME)).thenReturn(user);
+                Mockito.when(userRepo.findByUsername(USERNAME)).thenReturn(user);
                 Mockito.when(userService.prepareAccount(Mockito.any(UserDetails.class))).thenReturn(new Account(user, null));
                 Mockito.when(redisTemplate.opsForSet()).thenReturn(new DummyRedisSetOps<String, String>());
         }
@@ -124,7 +124,7 @@ public class SecurityFilterTest {
 
         @Test
         public void testAccessProtectedResourceWithValidTokenSucceeds() throws Exception {
-                User user = userRepo.getByUsername(USERNAME);
+                User user = userRepo.findByUsername(USERNAME);
                 String accessToken = credentialService.create(user, null).getAccessToken();
 
                 mockMvc.perform(

@@ -1,9 +1,9 @@
 package com.decade.practice.ws;
 
-import com.decade.practice.models.domain.entity.Chat;
-import com.decade.practice.models.domain.entity.SeenEvent;
-import com.decade.practice.models.domain.entity.TextEvent;
-import com.decade.practice.models.domain.entity.User;
+import com.decade.practice.domain.entities.Chat;
+import com.decade.practice.domain.entities.SeenEvent;
+import com.decade.practice.domain.entities.TextEvent;
+import com.decade.practice.domain.entities.User;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.SerializationFeature;
 import org.junit.jupiter.api.Test;

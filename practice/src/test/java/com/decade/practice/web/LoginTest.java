@@ -1,10 +1,11 @@
 package com.decade.practice.web;
 
 import com.decade.practice.DevelopmentApplication;
-import com.decade.practice.data.repositories.UserRepository;
-import com.decade.practice.models.local.AccountEntry;
-import com.decade.practice.usecases.UserOperations;
+import com.decade.practice.application.usecases.UserService;
+import com.decade.practice.domain.locals.AccountEntry;
+import com.decade.practice.domain.repositories.UserRepository;
 import com.decade.practice.utils.PrerequisiteBeans;
+import com.decade.practice.utils.RedisTestContainerSupport;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.TestInstance;
@@ -33,13 +34,13 @@ import static org.junit.jupiter.api.Assertions.assertThrows;
 @ExtendWith(OutputCaptureExtension.class)
 @AutoConfigureTestDatabase(connection = EmbeddedDatabaseConnection.H2)
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
-public class LoginTest {
+public class LoginTest extends RedisTestContainerSupport {
 
         @LocalServerPort
         private int port = 0;
 
         @Autowired
-        private UserOperations userOperations;
+        private UserService userService;
 
         @Autowired
         private PasswordEncoder passwordEncoder;
@@ -52,7 +53,7 @@ public class LoginTest {
 
         @BeforeAll
         public void setUp() {
-                userOperations.create("abc", "abc", "abc", null, "male", null, true);
+                userService.create("abc", "abc", "abc", null, "male", null, true);
         }
 
         @Test

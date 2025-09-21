@@ -1,13 +1,13 @@
 package com.decade.practice.ws;
 
 import com.decade.practice.DevelopmentApplication;
-import com.decade.practice.models.domain.TypeEvent;
-import com.decade.practice.models.domain.embeddable.ChatIdentifier;
-import com.decade.practice.models.domain.entity.Chat;
-import com.decade.practice.models.domain.entity.User;
-import com.decade.practice.security.jwt.JwtCredentialService;
-import com.decade.practice.usecases.ChatOperations;
-import com.decade.practice.usecases.UserOperations;
+import com.decade.practice.adapter.security.jwt.JwtService;
+import com.decade.practice.application.usecases.ChatService;
+import com.decade.practice.application.usecases.UserService;
+import com.decade.practice.domain.TypeEvent;
+import com.decade.practice.domain.embeddables.ChatIdentifier;
+import com.decade.practice.domain.entities.Chat;
+import com.decade.practice.domain.entities.User;
 import com.decade.practice.utils.PrerequisiteBeans;
 import com.decade.practice.utils.RedisTestContainerSupport;
 import org.junit.jupiter.api.*;
@@ -31,9 +31,9 @@ import java.lang.reflect.Type;
 import java.util.Date;
 import java.util.concurrent.CompletableFuture;
 
+import static com.decade.practice.adapter.websocket.arguments.ChatIdentifierArgumentResolver.CHAT_HEADER;
 import static com.decade.practice.utils.TokenUtils.BEARER;
 import static com.decade.practice.utils.TokenUtils.HEADER_NAME;
-import static com.decade.practice.websocket.arguments.ChatIdentifierArgumentResolver.CHAT_HEADER;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 
@@ -54,13 +54,13 @@ public class TypeEventTest extends RedisTestContainerSupport {
         private MessageConverter converter;
 
         @Autowired
-        private UserOperations userOperations;
+        private UserService userService;
 
         @Autowired
-        private ChatOperations chatOperations;
+        private ChatService chatService;
 
         @Autowired
-        private JwtCredentialService credentialService;
+        private JwtService credentialService;
 
         private User me;
         private User you;
@@ -72,9 +72,9 @@ public class TypeEventTest extends RedisTestContainerSupport {
 
         @BeforeAll
         public void beforeAll() {
-                me = userOperations.create("first", "first", "first", new Date(), "male", null, true);
-                you = userOperations.create("second", "second", "second", new Date(), "male", null, true);
-                chat = chatOperations.getOrCreateChat(ChatIdentifier.from(me, you));
+                me = userService.create("first", "first", "first", new Date(), "male", null, true);
+                you = userService.create("second", "second", "second", new Date(), "male", null, true);
+                chat = chatService.getOrCreateChat(ChatIdentifier.from(me, you));
 
                 myToken = credentialService.create(me, null).getAccessToken();
                 yourToken = credentialService.create(you, null).getAccessToken();

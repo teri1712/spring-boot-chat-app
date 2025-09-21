@@ -1,12 +1,20 @@
 package com.decade.practice.usecases;
 
 import com.decade.practice.DevelopmentApplication;
-import com.decade.practice.data.repositories.AdminRepository;
-import com.decade.practice.data.repositories.ChatRepository;
-import com.decade.practice.data.repositories.EdgeRepository;
-import com.decade.practice.data.repositories.UserRepository;
-import com.decade.practice.models.domain.entity.*;
-import com.decade.practice.security.jwt.JwtCredentialService;
+import com.decade.practice.adapter.repositories.JpaAdminRepository;
+import com.decade.practice.adapter.security.jwt.JwtService;
+import com.decade.practice.application.services.ChatEventStore;
+import com.decade.practice.application.services.ChatServiceImpl;
+import com.decade.practice.application.services.UserEventStore;
+import com.decade.practice.application.services.UserServiceImpl;
+import com.decade.practice.application.services.EventServiceImpl;
+import com.decade.practice.application.usecases.ChatService;
+import com.decade.practice.application.usecases.EventStore;
+import com.decade.practice.application.usecases.UserService;
+import com.decade.practice.domain.entities.*;
+import com.decade.practice.domain.repositories.ChatRepository;
+import com.decade.practice.domain.repositories.EdgeRepository;
+import com.decade.practice.domain.repositories.UserRepository;
 import com.decade.practice.utils.PrerequisiteBeans;
 import com.decade.practice.utils.RedisTestContainerSupport;
 import org.junit.jupiter.api.*;
@@ -30,11 +38,12 @@ import java.util.List;
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
 @Import({
         RedisAutoConfiguration.class,
-        JwtCredentialService.class,
-        ChatService.class,
+        JwtService.class,
+        ChatServiceImpl.class,
         ChatEventStore.class,
         UserEventStore.class,
-        UserService.class,
+        UserServiceImpl.class,
+        EventServiceImpl.class,
         PrerequisiteBeans.class
 })
 @TestMethodOrder(MethodOrderer.OrderAnnotation.class)
@@ -44,13 +53,14 @@ public class ConversationTest extends RedisTestContainerSupport {
         private EventStore eventStore;
 
         @Autowired
+
         private EdgeRepository edgeRepo;
 
         @Autowired
         private UserRepository userRepo;
 
         @Autowired
-        private UserOperations userOperations;
+        private UserService userService;
 
         @Autowired
         private TransactionOperations template;
@@ -59,9 +69,9 @@ public class ConversationTest extends RedisTestContainerSupport {
         private ChatRepository chatRepo;
 
         @Autowired
-        private ChatOperations chatOperations;
+        private ChatService chatService;
         @Autowired
-        private AdminRepository adminRepo;
+        private JpaAdminRepository adminRepo;
 
         private ChatEvent sendEvent(User from, User to, String message) {
                 Chat chat = new Chat(from, to);
@@ -79,17 +89,17 @@ public class ConversationTest extends RedisTestContainerSupport {
                 template.executeWithoutResult(status -> {
                         adminRepo.save(new Admin("admin", "admin"));
                         adminRepo.flush();
-                        first = userOperations.create("first", "first", "first", new Date(), "male", null, true);
-                        second = userOperations.create("second", "second", "second", new Date(), "male", null, true);
-                        third = userOperations.create("third", "third", "third", new Date(), "male", null, true);
+                        first = userService.create("first", "first", "first", new Date(), "male", null, true);
+                        second = userService.create("second", "second", "second", new Date(), "male", null, true);
+                        third = userService.create("third", "third", "third", new Date(), "male", null, true);
                 });
         }
 
         @BeforeEach
         public void prepare() {
-                first = userRepo.getByUsername(first.getUsername());
-                second = userRepo.getByUsername(second.getUsername());
-                third = userRepo.getByUsername(third.getUsername());
+                first = userRepo.findByUsername(first.getUsername());
+                second = userRepo.findByUsername(second.getUsername());
+                third = userRepo.findByUsername(third.getUsername());
         }
 
         @Test
@@ -110,10 +120,10 @@ public class ConversationTest extends RedisTestContainerSupport {
 
                 Chat secondChat = sendEvent(first, second, "Hello").getChat();
                 Assertions.assertEquals(1, first.getSyncContext().getEventVersion());
-                Assertions.assertEquals(secondChat.getIdentifier(), edgeRepo.getHeadEdge(first, 1).getFrom().getIdentifier());
+                Assertions.assertEquals(secondChat.getIdentifier(), edgeRepo.findHeadEdge(first, 1).getFrom().getIdentifier());
                 Chat thirdChat = sendEvent(third, first, "I'm fine").getChat();
                 Assertions.assertEquals(2, first.getSyncContext().getEventVersion());
-                Assertions.assertEquals(thirdChat.getIdentifier(), edgeRepo.getHeadEdge(first, 2).getFrom().getIdentifier());
+                Assertions.assertEquals(thirdChat.getIdentifier(), edgeRepo.findHeadEdge(first, 2).getFrom().getIdentifier());
 
                 Assertions.assertEquals(3 + 2, chatRepo.count());
 
@@ -123,7 +133,7 @@ public class ConversationTest extends RedisTestContainerSupport {
                 Assertions.assertEquals(2, first.getSyncContext().getEventVersion());
                 Assertions.assertEquals(1, second.getSyncContext().getEventVersion());
                 Assertions.assertEquals(1, third.getSyncContext().getEventVersion());
-                List<Chat> chats = chatOperations.listChat(first);
+                List<Chat> chats = chatService.listChat(first);
 
                 Assertions.assertEquals(1 + 2, chats.size());
                 Assertions.assertEquals(second, inspectPartner(chats.get(1), first));
@@ -133,10 +143,10 @@ public class ConversationTest extends RedisTestContainerSupport {
 
                 sendEvent(second, first, "How are you");
                 Assertions.assertEquals(3, first.getSyncContext().getEventVersion());
-                Assertions.assertEquals(secondChat.getIdentifier(), edgeRepo.getHeadEdge(first, 3).getFrom().getIdentifier());
+                Assertions.assertEquals(secondChat.getIdentifier(), edgeRepo.findHeadEdge(first, 3).getFrom().getIdentifier());
                 Assertions.assertEquals(3 + 2 + 1 + 1 + 2, edgeRepo.count());
 
-                chats = chatOperations.listChat(first);
+                chats = chatService.listChat(first);
 
                 Assertions.assertEquals(third, inspectPartner(chats.get(1), first));
                 Assertions.assertEquals(second, inspectPartner(chats.get(0), first));
