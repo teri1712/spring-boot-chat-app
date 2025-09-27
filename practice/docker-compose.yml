@@ -44,5 +44,7 @@ services:
 
     monitor:
         image: teri1712/monitor:latest
+        env_file:
+            - ./.env
         ports:
             - "9090:9090"
