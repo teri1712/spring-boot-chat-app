@@ -41,3 +41,8 @@ services:
             timeout: 3s
             retries: 20
             start_period: 5s
+
+    monitor:
+        image: teri1712/monitor:latest
+        ports:
+            - "9090:9090"
