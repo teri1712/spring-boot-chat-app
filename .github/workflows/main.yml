@@ -91,6 +91,7 @@ jobs:
                         echo "SPRING_SECURITY_USER_NAME=${{ secrets.SPRING_SECURITY_USER_NAME }}" >> .env
                         echo "SPRING_SECURITY_USER_PASSWORD=${{ secrets.SPRING_SECURITY_USER_PASSWORD }}" >> .env
                         echo "SPRING_BOOT_ADMIN_CLIENT_URL=http://monitor:9090" >> .env
+                        echo "SPRING_BOOT_ADMIN_CLIENT_INSTANCE_MANAGEMENT_BASE_URL=http://server:8081" >> .env
                         docker-compose pull
                         
                         # Start the new containers
