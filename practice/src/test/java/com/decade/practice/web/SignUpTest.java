@@ -13,6 +13,7 @@ import com.decade.practice.domain.DefaultAvatar;
 import com.decade.practice.domain.entities.User;
 import com.decade.practice.domain.repositories.UserRepository;
 import com.decade.practice.utils.PrerequisiteBeans;
+import com.decade.practice.utils.RedisTestContainerSupport;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.hamcrest.Matchers;
 import org.junit.jupiter.api.BeforeEach;
@@ -50,7 +51,7 @@ import static com.decade.practice.utils.Media.ONE_PIXEL_BMP_BYTES;
 @ExtendWith(OutputCaptureExtension.class)
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
 @Import(ExceptionControllerAdvice.class)
-public class SignUpTest {
+public class SignUpTest extends RedisTestContainerSupport {
 
         @Autowired
         private MockMvc mockMvc;

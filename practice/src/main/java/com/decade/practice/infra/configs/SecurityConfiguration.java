@@ -7,23 +7,29 @@ import com.decade.practice.application.usecases.UserService;
 import org.springframework.beans.BeansException;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.beans.factory.config.BeanPostProcessor;
+import org.springframework.boot.actuate.autoconfigure.security.servlet.EndpointRequest;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.core.annotation.Order;
 import org.springframework.http.HttpMethod;
 import org.springframework.http.HttpStatus;
 import org.springframework.security.authentication.ProviderManager;
 import org.springframework.security.authentication.dao.AbstractUserDetailsAuthenticationProvider;
+import org.springframework.security.authentication.dao.DaoAuthenticationProvider;
 import org.springframework.security.config.Customizer;
 import org.springframework.security.config.annotation.authentication.builders.AuthenticationManagerBuilder;
 import org.springframework.security.config.annotation.authentication.configuration.GlobalAuthenticationConfigurerAdapter;
 import org.springframework.security.config.annotation.method.configuration.EnableMethodSecurity;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.http.SessionCreationPolicy;
+import org.springframework.security.core.userdetails.User;
+import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.oauth2.client.oidc.userinfo.OidcUserService;
 import org.springframework.security.oauth2.client.userinfo.DefaultOAuth2UserService;
 import org.springframework.security.oauth2.server.resource.web.HeaderBearerTokenResolver;
+import org.springframework.security.provisioning.InMemoryUserDetailsManager;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 import org.springframework.security.web.authentication.logout.HttpStatusReturningLogoutSuccessHandler;
@@ -43,6 +49,15 @@ public class SecurityConfiguration extends GlobalAuthenticationConfigurerAdapter
 
         @Value("${frontend.host.address}")
         private String frontEndAddress;
+
+        @Value("${spring.security.user.name}")
+        private String actuatorUsername;
+
+        @Value("${spring.security.user.password}")
+        private String actuatorPassword;
+
+        @Value("${spring.security.user.roles}")
+        private String actuatorRoles;
 
         @Configuration(proxyBeanMethods = false)
         public static class ShowUserNotFoundConfiguration implements BeanPostProcessor {
@@ -71,6 +86,7 @@ public class SecurityConfiguration extends GlobalAuthenticationConfigurerAdapter
                 return new BCryptPasswordEncoder(10);
         }
 
+
         @Bean
         public SecurityContextRepository contextRepository() {
                 return new DelegatingSecurityContextRepository(
@@ -92,6 +108,30 @@ public class SecurityConfiguration extends GlobalAuthenticationConfigurerAdapter
                 source.registerCorsConfiguration("/**", config);
                 return source;
         }
+
+        @Bean
+        @Order(0)
+        public SecurityFilterChain actuatorSecurity(HttpSecurity http) throws Exception {
+                UserDetails actuator = User.builder()
+                        .username(actuatorUsername)
+                        .password(passwordEncoder().encode(actuatorPassword))
+                        .roles(actuatorRoles.split(","))
+                        .build();
+                DaoAuthenticationProvider adminProvider = new DaoAuthenticationProvider();
+                adminProvider.setUserDetailsService(new InMemoryUserDetailsManager(actuator));
+                adminProvider.setPasswordEncoder(passwordEncoder());
+                adminProvider.setHideUserNotFoundExceptions(false);
+
+                http
+                        .authenticationManager(new ProviderManager(adminProvider))
+                        .securityMatcher(EndpointRequest.toAnyEndpoint())
+                        .authorizeHttpRequests(
+                                a -> a.anyRequest().hasRole("ACTUATOR"))
+                        .httpBasic(Customizer.withDefaults())
+                        .csrf(csrf -> csrf.disable());
+                return http.build();
+        }
+
 
         @Bean(name = FILTER_CHAIN_BEAN_NAME)
         public SecurityFilterChain filterChain(

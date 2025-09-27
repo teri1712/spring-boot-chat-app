@@ -18,6 +18,7 @@ import com.decade.practice.infra.configs.SecurityConfiguration;
 import com.decade.practice.infra.configs.SessionConfiguration;
 import com.decade.practice.utils.DummyRedisSetOps;
 import com.decade.practice.utils.PrerequisiteBeans;
+import com.decade.practice.utils.RedisTestContainerSupport;
 import com.decade.practice.utils.TokenUtils;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -58,7 +59,7 @@ import org.springframework.test.web.servlet.result.MockMvcResultMatchers;
         JwtService.class,
         DaoUserDetailsService.class,
 })
-public class SecurityFilterTest {
+public class SecurityFilterTest extends RedisTestContainerSupport {
 
         private static final String USERNAME = "mock_username";
         private static final String PASSWORD = "mock_password";
