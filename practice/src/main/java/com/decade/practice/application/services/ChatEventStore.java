@@ -49,7 +49,7 @@ public class ChatEventStore implements EventStore {
                 User you = ChatUtils.inspectPartner(chat, me);
 
                 ChatEvent mine = event.copy();
-                mine.setLocalId(event.getLocalId());
+                mine.setReceipt(event.getReceipt());
 
                 ChatEvent yours = event.copy();
 

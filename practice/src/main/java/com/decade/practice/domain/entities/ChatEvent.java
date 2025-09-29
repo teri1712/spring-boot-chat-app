@@ -5,6 +5,7 @@ import com.decade.practice.domain.locals.Chat;
 import com.decade.practice.utils.ChatUtils;
 import com.fasterxml.jackson.annotation.*;
 import jakarta.persistence.*;
+import jakarta.validation.Valid;
 import jakarta.validation.constraints.NotNull;
 import org.hibernate.annotations.Cache;
 import org.hibernate.annotations.CacheConcurrencyStrategy;
@@ -70,10 +71,10 @@ public abstract class ChatEvent {
         @GeneratedValue(strategy = GenerationType.UUID)
         private UUID id;
 
-        @JsonProperty(value = "id")
-        @Column(nullable = false, unique = true)
         @NotNull
-        private UUID localId = UUID.randomUUID();
+        @Valid
+        @OneToOne(cascade = CascadeType.PERSIST)
+        private Receipt receipt = new Receipt();
 
         @Embedded
         @AttributeOverrides({
@@ -167,12 +168,20 @@ public abstract class ChatEvent {
                 this.id = id;
         }
 
-        public UUID getLocalId() {
-                return localId;
+        public Receipt getReceipt() {
+                return receipt;
         }
 
-        public void setLocalId(UUID localId) {
-                this.localId = localId;
+        public void setReceipt(Receipt receipt) {
+                this.receipt = receipt;
+        }
+
+        public void setEdges(Collection<Edge> edges) {
+                this.edges = edges;
+        }
+
+        public void setEventType(String eventType) {
+                this.eventType = eventType;
         }
 
         public ChatIdentifier getChatIdentifier() {

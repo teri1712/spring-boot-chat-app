@@ -11,7 +11,6 @@ import java.util.List;
 import java.util.UUID;
 
 @NoRepositoryBean
-
 public interface EventRepository extends CrudRepository<ChatEvent, UUID> {
 
         List<ChatEvent> findByOwnerAndChatAndEventVersionLessThanEqual(
@@ -30,6 +29,4 @@ public interface EventRepository extends CrudRepository<ChatEvent, UUID> {
         ChatEvent findFirstByOwnerOrderByEventVersionDesc(
                 User owner
         );
-
-        ChatEvent findByLocalId(UUID localId);
 }

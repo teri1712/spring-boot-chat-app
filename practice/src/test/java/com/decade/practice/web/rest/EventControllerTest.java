@@ -28,7 +28,6 @@ import org.springframework.test.web.servlet.MockMvc;
 
 import java.awt.image.BufferedImage;
 import java.util.List;
-import java.util.UUID;
 
 import static com.decade.practice.utils.Media.ONE_PIXEL_BMP_BYTES;
 import static org.mockito.ArgumentMatchers.any;
@@ -110,8 +109,6 @@ class EventControllerTest {
                 when(deliveryService.createAndSend(any(User.class), any(ChatEvent.class)))
                         .thenReturn(event);
 
-                event.setLocalId(UUID.randomUUID());
-
                 mockMvc.perform(post("/events")
                                 .contentType(MediaType.APPLICATION_JSON)
                                 .content(objectMapper.writeValueAsString(event)))
@@ -126,7 +123,6 @@ class EventControllerTest {
                 when(conversationRepository.getUser(any(String.class))).thenReturn(testUser);
                 when(chatService.getOrCreateChat(any(ChatIdentifier.class))).thenReturn(chat);
                 ImageEvent event = new ImageEvent(new Chat(testUser, testUser), testUser, new ImageSpec());
-                event.setLocalId(UUID.randomUUID());
 
                 when(deliveryService.createAndSend(any(User.class), any(ChatEvent.class)))
                         .thenReturn(event);

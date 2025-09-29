@@ -45,11 +45,9 @@ public interface JpaEventRepository extends EventRepository, JpaRepository<ChatE
         );
 
         @Override
-        @EntityGraph(attributePaths = {"chat", "chat.firstUser", "chat.secondUser", "edges"}, type = EntityGraph.EntityGraphType.FETCH)
+        @EntityGraph(attributePaths = {"chat", "chat.firstUser", "chat.secondUser", "edges", "receipt"}, type = EntityGraph.EntityGraphType.FETCH)
         ChatEvent findFirstByOwnerOrderByEventVersionDesc(
                 User owner
         );
 
-        @Override
-        ChatEvent findByLocalId(UUID localId);
 }
