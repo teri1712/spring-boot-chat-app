@@ -47,18 +47,19 @@ public class ChatEventStore implements EventStore {
 
                 User me = ChatUtils.inspectOwner(chat, event.getSender());
                 User you = ChatUtils.inspectPartner(chat, me);
+                Collection<ChatEvent> result = new ArrayList<>();
 
                 ChatEvent mine = event.copy();
                 mine.setReceipt(event.getReceipt());
-
-                ChatEvent yours = event.copy();
-
                 mine.setOwner(me);
-                yours.setOwner(you);
-
-                Collection<ChatEvent> result = new ArrayList<>();
                 result.addAll(userEventStore.save(mine));
-                result.addAll(userEventStore.save(yours));
+
+                if (me != you) {
+                        ChatEvent yours = event.copy();
+                        yours.setOwner(you);
+                        result.addAll(userEventStore.save(yours));
+                }
+
                 return result;
         }
 }
