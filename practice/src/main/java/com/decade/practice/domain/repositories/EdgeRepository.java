@@ -24,17 +24,17 @@ public interface EdgeRepository extends CrudRepository<Edge, UUID> {
         List<Edge> findEdgeFrom(User owner, int eventVersion, Chat from, Pageable pageable);
 
         default Edge findHeadEdge(User owner, int version) {
-                List<Edge> edges = findHeadEdge(owner, version, EventUtils.headEvent);
+                List<Edge> edges = findHeadEdge(owner, version, EventUtils.HEAD_EVENT);
                 return edges.isEmpty() ? null : edges.get(0);
         }
 
         default Edge findEdgeFrom(User owner, Chat from, int version) {
-                List<Edge> edges = findEdgeFrom(owner, version, from, EventUtils.headEvent);
+                List<Edge> edges = findEdgeFrom(owner, version, from, EventUtils.HEAD_EVENT);
                 return edges.isEmpty() ? null : edges.get(0);
         }
 
         default Edge findEdgeTo(User owner, Chat to, int version) {
-                List<Edge> edges = findEdgeTo(owner, version, to, EventUtils.headEvent);
+                List<Edge> edges = findEdgeTo(owner, version, to, EventUtils.HEAD_EVENT);
                 return edges.isEmpty() ? null : edges.get(0);
         }
 }

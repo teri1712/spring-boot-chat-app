@@ -13,20 +13,23 @@ import java.util.UUID;
 @NoRepositoryBean
 public interface EventRepository extends CrudRepository<ChatEvent, UUID> {
 
-        List<ChatEvent> findByOwnerAndChatAndEventVersionLessThanEqual(
+        List<ChatEvent> findByOwnerAndChatAndReceipt_EventVersionLessThanEqual(
                 User owner,
                 Chat chat,
                 int eventVersion,
                 Pageable pageable
         );
 
-        List<ChatEvent> findByOwnerAndEventVersionLessThanEqual(
+        List<ChatEvent> findByOwnerAndReceipt_EventVersionLessThanEqual(
                 User owner,
                 int eventVersion,
                 Pageable pageable
         );
 
-        ChatEvent findFirstByOwnerOrderByEventVersionDesc(
+        ChatEvent findFirstByOwnerOrderByReceipt_EventVersionDesc(
                 User owner
         );
+
+        ChatEvent findByReceipt_LocalId(UUID localId);
+
 }

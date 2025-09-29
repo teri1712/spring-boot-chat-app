@@ -5,11 +5,8 @@ import org.springframework.data.domain.Sort;
 
 public class EventUtils {
 
-      private static final int EVENT_LIMIT = 20;
-      private static final Sort VERSION_SORT_ASC = Sort.by(Sort.Direction.ASC, "eventVersion");
-      private static final Sort VERSION_SORT_DESC = Sort.by(Sort.Direction.DESC, "eventVersion");
-
-      public static final PageRequest EVENT_VERSION_LESS_THAN_EQUAL = PageRequest.of(0, EVENT_LIMIT, VERSION_SORT_DESC);
-      public static final PageRequest headEvent = PageRequest.of(0, 1, VERSION_SORT_DESC);
+        private static final int EVENT_LIMIT = 20;
+        public static final PageRequest EVENT_VERSION_LESS_THAN_EQUAL = PageRequest.of(0, EVENT_LIMIT, Sort.by(Sort.Direction.DESC, "receipt.eventVersion"));
+        public static final PageRequest HEAD_EVENT = PageRequest.of(0, 1, Sort.by(Sort.Direction.DESC, "eventVersion"));
 
 }

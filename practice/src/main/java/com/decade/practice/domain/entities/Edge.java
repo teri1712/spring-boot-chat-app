@@ -62,7 +62,7 @@ public class Edge {
                 this.dest = dest;
                 this.event = event;
                 this.head = head;
-                this.eventVersion = event.getEventVersion();
+                this.eventVersion = event.getReceipt().getEventVersion();
         }
 
         public User getOwner() {

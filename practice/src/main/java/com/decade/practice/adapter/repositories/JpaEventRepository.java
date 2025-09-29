@@ -27,7 +27,7 @@ public interface JpaEventRepository extends EventRepository, JpaRepository<ChatE
         @QueryHints({
                 @QueryHint(name = "org.hibernate.cacheable", value = "true")
         })
-        List<ChatEvent> findByOwnerAndChatAndEventVersionLessThanEqual(
+        List<ChatEvent> findByOwnerAndChatAndReceipt_EventVersionLessThanEqual(
                 User owner,
                 Chat chat,
                 int eventVersion,
@@ -38,7 +38,7 @@ public interface JpaEventRepository extends EventRepository, JpaRepository<ChatE
         @QueryHints({
                 @QueryHint(name = "org.hibernate.cacheable", value = "true")
         })
-        List<ChatEvent> findByOwnerAndEventVersionLessThanEqual(
+        List<ChatEvent> findByOwnerAndReceipt_EventVersionLessThanEqual(
                 User owner,
                 int eventVersion,
                 Pageable pageable
@@ -46,7 +46,7 @@ public interface JpaEventRepository extends EventRepository, JpaRepository<ChatE
 
         @Override
         @EntityGraph(attributePaths = {"chat", "chat.firstUser", "chat.secondUser", "edges", "receipt"}, type = EntityGraph.EntityGraphType.FETCH)
-        ChatEvent findFirstByOwnerOrderByEventVersionDesc(
+        ChatEvent findFirstByOwnerOrderByReceipt_EventVersionDesc(
                 User owner
         );
 

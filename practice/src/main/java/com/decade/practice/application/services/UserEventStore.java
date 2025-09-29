@@ -39,7 +39,7 @@ public class UserEventStore implements EventStore {
                 int version = syncContext.getEventVersion() + 1;
                 syncContext.setEventVersion(version);
 
-                event.setEventVersion(version);
+                event.getReceipt().setEventVersion(version);
 
                 if (event instanceof MessageEvent) {
                         Edge head = edgeRepo.findHeadEdge(owner, version);

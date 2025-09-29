@@ -73,7 +73,7 @@ public abstract class ChatEvent {
 
         @NotNull
         @Valid
-        @OneToOne(cascade = CascadeType.PERSIST)
+        @Embedded
         private Receipt receipt = new Receipt();
 
         @Embedded
@@ -89,7 +89,6 @@ public abstract class ChatEvent {
         })
         private ChatIdentifier chatIdentifier;
 
-        private int eventVersion = SyncContext.STARTING_VERSION;
         private long createdTime = System.currentTimeMillis();
 
         protected ChatEvent(com.decade.practice.domain.entities.Chat chat, User sender, String eventType) {
@@ -188,16 +187,9 @@ public abstract class ChatEvent {
                 return chatIdentifier;
         }
 
-        public int getEventVersion() {
-                return eventVersion;
-        }
 
         public void setChatIdentifier(ChatIdentifier chatIdentifier) {
                 this.chatIdentifier = chatIdentifier;
-        }
-
-        public void setEventVersion(int eventVersion) {
-                this.eventVersion = eventVersion;
         }
 
         public long getCreatedTime() {

@@ -23,18 +23,18 @@ public class EventServiceImpl implements EventService {
         @Override
         @Cacheable(cacheNames = "events", key = "#owner.id + ':' + #chat.toString() + ':' + #eventVersion")
         public List<ChatEvent> findByOwnerAndChatAndEventVersionLessThanEqual(User owner, Chat chat, int eventVersion) {
-                return evenRepo.findByOwnerAndChatAndEventVersionLessThanEqual(owner, chat, eventVersion, EventUtils.EVENT_VERSION_LESS_THAN_EQUAL);
+                return evenRepo.findByOwnerAndChatAndReceipt_EventVersionLessThanEqual(owner, chat, eventVersion, EventUtils.EVENT_VERSION_LESS_THAN_EQUAL);
         }
 
         @Override
         @Cacheable(cacheNames = "events", key = "#owner.id + ':' + #eventVersion")
         public List<ChatEvent> findByOwnerAndEventVersionLessThanEqual(User owner, int eventVersion) {
-                return evenRepo.findByOwnerAndEventVersionLessThanEqual(owner, eventVersion, EventUtils.EVENT_VERSION_LESS_THAN_EQUAL);
+                return evenRepo.findByOwnerAndReceipt_EventVersionLessThanEqual(owner, eventVersion, EventUtils.EVENT_VERSION_LESS_THAN_EQUAL);
         }
 
         @Override
         public ChatEvent findFirstByOwnerOrderByEventVersionDesc(User owner) {
-                return evenRepo.findFirstByOwnerOrderByEventVersionDesc(owner);
+                return evenRepo.findFirstByOwnerOrderByReceipt_EventVersionDesc(owner);
         }
 
 }

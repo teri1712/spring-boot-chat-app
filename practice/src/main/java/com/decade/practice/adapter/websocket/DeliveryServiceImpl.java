@@ -4,7 +4,7 @@ import com.decade.practice.application.usecases.DeliveryService;
 import com.decade.practice.application.usecases.EventStore;
 import com.decade.practice.domain.entities.ChatEvent;
 import com.decade.practice.domain.entities.User;
-import com.decade.practice.domain.repositories.ReceiptRepository;
+import com.decade.practice.domain.repositories.EventRepository;
 import com.decade.practice.infra.configs.WebSocketConfiguration;
 import jakarta.persistence.EntityNotFoundException;
 import org.springframework.dao.DataIntegrityViolationException;
@@ -18,12 +18,12 @@ import java.util.UUID;
 public class DeliveryServiceImpl implements DeliveryService {
 
         public final EventStore chatEventStore;
-        public final ReceiptRepository receiptRepository;
+        public final EventRepository eventRepository;
         public final SimpMessagingTemplate template;
 
-        public DeliveryServiceImpl(EventStore chatEventStore, ReceiptRepository receiptRepository, SimpMessagingTemplate template) {
+        public DeliveryServiceImpl(EventStore chatEventStore, EventRepository eventRepository, SimpMessagingTemplate template) {
                 this.chatEventStore = chatEventStore;
-                this.receiptRepository = receiptRepository;
+                this.eventRepository = eventRepository;
                 this.template = template;
         }
 
@@ -48,7 +48,7 @@ public class DeliveryServiceImpl implements DeliveryService {
                         }
                         throw new EntityNotFoundException("Event not found after save");
                 } catch (DataIntegrityViolationException e) {
-                        E result = (E) receiptRepository.findByLocalId(localId).getEvent();
+                        E result = (E) eventRepository.findByReceipt_LocalId(localId);
                         return result;
                 }
         }
