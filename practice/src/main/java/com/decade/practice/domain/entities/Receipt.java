@@ -8,6 +8,8 @@ import java.util.UUID;
 
 @Embeddable
 public class Receipt {
+
+        // for idempotency
         @Column(unique = true)
         @NotNull
         private UUID localId = UUID.randomUUID();
