@@ -10,20 +10,6 @@ jobs:
     clean-and-test:
         runs-on: ubuntu-latest
 
-        services:
-            mysql:
-                # Docker Hub image for MySQL
-                image: mysql:8.0
-                env:
-                    MYSQL_ROOT_PASSWORD: root
-                    MYSQL_DATABASE: chatapp
-                ports:
-                    - 3306:3306
-            redis:
-                image: redis/redis-stack:latest
-                ports:
-                    - 6379:6379
-
         steps:
             -   name: Checkout repository
                 uses: actions/checkout@v4
