@@ -1,81 +1,64 @@
 package com.decade.practice.application.services;
 
 import com.decade.practice.application.usecases.EventStore;
-import com.decade.practice.domain.entities.*;
-import com.decade.practice.domain.repositories.EdgeRepository;
-import com.decade.practice.domain.repositories.EventRepository;
+import com.decade.practice.persistence.jpa.embeddables.ChatIdentifier;
+import com.decade.practice.persistence.jpa.entities.*;
+import com.decade.practice.persistence.jpa.repositories.ChatOrderRepository;
+import com.decade.practice.persistence.jpa.repositories.EventRepository;
+import com.decade.practice.persistence.jpa.repositories.UserRepository;
+import lombok.AllArgsConstructor;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Isolation;
 import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.util.Collection;
-import java.util.Collections;
+import java.util.UUID;
+import java.util.function.Supplier;
 
-@Component
+@Component("eventStore")
+@AllArgsConstructor
 public class UserEventStore implements EventStore {
 
-        private final EdgeRepository edgeRepo;
-        private final EventRepository eventRepo;
+    private final ChatOrderRepository chatOrderRepository;
+    private final UserRepository userRepository;
+    private final EventRepository eventRepository;
 
-        public UserEventStore(
-                EdgeRepository edgeRepo,
-                EventRepository eventRepo
-        ) {
-                this.edgeRepo = edgeRepo;
-                this.eventRepo = eventRepo;
-        }
+    @Override
+    public boolean isAllowed(ChatIdentifier chatIdentifier, UUID userId) {
+        return chatIdentifier.getFirstUser().equals(userId) || chatIdentifier.getSecondUser().equals(userId);
+    }
 
-        @Transactional(
-                propagation = Propagation.REQUIRED,
-                isolation = Isolation.READ_COMMITTED
-        )
-        @Override
-        public Collection<ChatEvent> save(ChatEvent event) {
-                User owner = event.getOwner();
-                Chat chat = event.getChat();
+    @Transactional(
+            propagation = Propagation.REQUIRED,
+            isolation = Isolation.READ_COMMITTED
+    )
+    @Override
+    public void save(UUID senderId, UUID ownerId, ChatEvent event) {
+        User owner = userRepository.findByIdWithPessimisticWrite(ownerId).orElseThrow();
+        owner.getSyncContext().incVersion();
+        User sender = userRepository.findById(senderId).orElseThrow();
+        event.setSender(sender);
+        event.setOwner(owner);
 
-                SyncContext syncContext = owner.getSyncContext();
-                int version = syncContext.getEventVersion() + 1;
-                syncContext.setEventVersion(version);
+        Chat chat = event.getChat();
 
-                event.setEventVersion(version);
-
-                if (event instanceof MessageEvent) {
-                        Edge head = edgeRepo.findHeadEdge(owner, version);
-                        if (head != null) {
-                                Chat top = head.getFrom();
-                                if (top != chat) {
-                                        Edge newHead = new Edge(
-                                                owner,
-                                                chat,
-                                                top,
-                                                event,
-                                                true
-                                        );
-                                        event.getEdges().add(newHead);
-
-                                        Edge bridgeFrom = edgeRepo.findEdgeTo(owner, chat, version);
-                                        if (bridgeFrom != null) {
-                                                Chat from = bridgeFrom.getFrom();
-                                                Edge bridgeTo = edgeRepo.findEdgeFrom(owner, chat, version);
-                                                if (bridgeTo != null) {
-                                                        Chat dest = bridgeTo.getDest();
-                                                        Edge bridgeEdge = new Edge(
-                                                                owner,
-                                                                from,
-                                                                dest,
-                                                                event,
-                                                                false
-                                                        );
-                                                        event.getEdges().add(bridgeEdge);
-                                                }
-                                        }
-                                }
-                        }
+        SyncContext syncContext = owner.getSyncContext();
+        event.setEventVersion(syncContext.getEventVersion());
+        eventRepository.save(event);
+        if (event instanceof MessageEvent) {
+            ChatOrder order = chatOrderRepository.findByChatAndOwner(chat, owner).orElseGet(new Supplier<ChatOrder>() {
+                @Override
+                public ChatOrder get() {
+                    ChatOrder chatOrder = new ChatOrder();
+                    chatOrder.setChat(chat);
+                    chatOrder.setOwner(owner);
+                    return chatOrder;
                 }
+            });
+            order.setCurrentVersion(event.getEventVersion());
+            order.setCurrentEvent(event);
 
-                eventRepo.save(event);
-                return Collections.singletonList(event);
+            chatOrderRepository.save(order);
         }
+    }
 }

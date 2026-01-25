@@ -1,25 +1,25 @@
 package com.decade.practice.application.usecases;
 
-import com.decade.practice.domain.entities.Chat;
-import com.decade.practice.domain.entities.ChatEvent;
-import com.decade.practice.domain.entities.User;
+import com.decade.practice.api.dto.EventDto;
+import com.decade.practice.persistence.jpa.embeddables.ChatIdentifier;
 
 import java.util.List;
+import java.util.UUID;
 
 public interface EventService {
 
-        List<ChatEvent> findByOwnerAndChatAndEventVersionLessThanEqual(
-                User owner,
-                Chat chat,
-                int eventVersion
-        );
+    List<EventDto> findByOwnerAndChatAndEventVersionLessThanEqual(
+            UUID owner,
+            ChatIdentifier chat,
+            int eventVersion
+    );
 
-        List<ChatEvent> findByOwnerAndEventVersionLessThanEqual(
-                User owner,
-                int eventVersion
-        );
+    List<EventDto> findByOwnerAndEventVersionLessThanEqual(
+            UUID owner,
+            int eventVersion
+    );
 
-        ChatEvent findFirstByOwnerOrderByEventVersionDesc(
-                User owner
-        );
+    EventDto findFirstByOwnerOrderByEventVersionDesc(
+            UUID owner
+    );
 }

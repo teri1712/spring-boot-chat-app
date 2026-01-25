@@ -1,36 +1,48 @@
 package com.decade.practice.infra.bootstrap;
 
 import com.decade.practice.application.usecases.UserPresenceService;
-import com.decade.practice.domain.entities.User;
-import com.decade.practice.domain.repositories.UserRepository;
+import com.decade.practice.infra.security.jwt.JwtUser;
+import com.decade.practice.infra.security.models.UserClaims;
+import com.decade.practice.persistence.jpa.entities.User;
+import com.decade.practice.persistence.jpa.repositories.UserRepository;
+import lombok.RequiredArgsConstructor;
 import org.springframework.boot.ApplicationArguments;
 import org.springframework.boot.ApplicationRunner;
 import org.springframework.context.annotation.Configuration;
-import org.springframework.core.annotation.Order;
 
 import java.time.Instant;
+import java.util.function.Consumer;
 
 @Configuration
-@Order(2)
+@RequiredArgsConstructor
 public class PresencesInitializer implements ApplicationRunner {
 
-        private final UserRepository userRepo;
-        private final UserPresenceService onlineStat;
+    private final UserPresenceService presenceService;
+    private final UserRepository userRepository;
 
-        public PresencesInitializer(UserRepository userRepo, UserPresenceService onlineStat) {
-                this.userRepo = userRepo;
-                this.onlineStat = onlineStat;
-        }
-
-        @Override
-        public void run(ApplicationArguments args) throws Exception {
-                User nami = userRepo.findByUsername("Nami");
-                User chopper = userRepo.findByUsername("Chopper");
-                User zoro = userRepo.findByUsername("Zoro");
-
-                onlineStat.set(nami, Instant.now().getEpochSecond() - 2 * 60);
-                onlineStat.set(chopper, Instant.now().getEpochSecond() - 10 * 60);
-                onlineStat.set(zoro, Instant.now().getEpochSecond());
-        }
+    @Override
+    public void run(ApplicationArguments args) throws Exception {
+        userRepository.findByUsername("Nami").ifPresent(new Consumer<User>() {
+            @Override
+            public void accept(User user) {
+                JwtUser jwtUser = new JwtUser(UserClaims.from(user));
+                presenceService.set(jwtUser, Instant.ofEpochSecond(Instant.now().getEpochSecond() - 2 * 60));
+            }
+        });
+        userRepository.findByUsername("Chopper").ifPresent(new Consumer<User>() {
+            @Override
+            public void accept(User user) {
+                JwtUser jwtUser = new JwtUser(UserClaims.from(user));
+                presenceService.set(jwtUser, Instant.ofEpochSecond(Instant.now().getEpochSecond() - 10 * 60));
+            }
+        });
+        userRepository.findByUsername("Zoro").ifPresent(new Consumer<User>() {
+            @Override
+            public void accept(User user) {
+                JwtUser jwtUser = new JwtUser(UserClaims.from(user));
+                presenceService.set(jwtUser, Instant.ofEpochSecond(Instant.now().getEpochSecond()));
+            }
+        });
+    }
 
 }

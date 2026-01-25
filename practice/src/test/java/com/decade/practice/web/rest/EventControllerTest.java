@@ -1,171 +1,231 @@
 package com.decade.practice.web.rest;
 
-import com.decade.practice.DevelopmentApplication;
-import com.decade.practice.adapter.security.jwt.JwtService;
-import com.decade.practice.adapter.security.strategies.LoginSuccessStrategy;
-import com.decade.practice.adapter.security.strategies.LogoutStrategy;
-import com.decade.practice.adapter.security.strategies.Oauth2LoginSuccessStrategy;
-import com.decade.practice.adapter.web.rest.EventController;
-import com.decade.practice.application.usecases.*;
-import com.decade.practice.domain.embeddables.ChatIdentifier;
-import com.decade.practice.domain.embeddables.ImageSpec;
-import com.decade.practice.domain.entities.*;
-import com.decade.practice.domain.repositories.UserRepository;
-import com.decade.practice.infra.configs.SecurityConfiguration;
-import com.decade.practice.utils.PrerequisiteBeans;
-import com.fasterxml.jackson.databind.ObjectMapper;
-import org.junit.jupiter.api.BeforeEach;
+import com.decade.practice.common.BaseTestClass;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
-import org.springframework.boot.test.mock.mockito.MockBean;
-import org.springframework.context.annotation.Import;
 import org.springframework.http.MediaType;
-import org.springframework.mock.web.MockMultipartFile;
-import org.springframework.security.test.context.support.WithMockUser;
-import org.springframework.test.context.ContextConfiguration;
+import org.springframework.security.test.context.support.WithUserDetails;
+import org.springframework.test.context.jdbc.Sql;
 import org.springframework.test.web.servlet.MockMvc;
 
-import java.awt.image.BufferedImage;
-import java.util.List;
 import java.util.UUID;
 
-import static com.decade.practice.utils.Media.ONE_PIXEL_BMP_BYTES;
-import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.ArgumentMatchers.anyInt;
-import static org.mockito.Mockito.when;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
-@WebMvcTest(EventController.class)
-@ContextConfiguration(classes = {DevelopmentApplication.class, PrerequisiteBeans.class})
-@Import({SecurityConfiguration.class})
-class EventControllerTest {
+@Sql(scripts = "/sql/clean.sql", executionPhase = Sql.ExecutionPhase.AFTER_TEST_METHOD)
+class EventControllerTest extends BaseTestClass {
 
-        @Autowired
-        private MockMvc mockMvc;
+    @Autowired
+    private MockMvc mockMvc;
 
-        @MockBean
-        private DeliveryService deliveryService;
 
-        @MockBean
-        private ChatService chatService;
+    @Test
+    @Sql(scripts = {"/sql/clean.sql", "/sql/seed_users.sql", "/sql/seed_chats.sql"})
+    @WithUserDetails("alice")
+    void givenValidTextEvent_whenAliceSendsToBob_thenStatusCreated() throws Exception {
+        // Given
+        String chatIdentifier = "11111111-1111-1111-1111-111111111111+22222222-2222-2222-2222-222222222222";
+        String eventJson = """
+                {
+                    "content": "Hello Bob"
+                }
+                """;
 
-        @MockBean
-        private EventService eventService;
+        // When & Then
+        mockMvc.perform(post("/chats/{chatIdentifier}/text-events", chatIdentifier)
+                        .header("Idempotency-key", UUID.randomUUID())
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(eventJson))
+                .andExpect(status().isCreated())
+                .andExpect(jsonPath("$.textEvent.content").value("Hello Bob"));
+    }
 
-        @MockBean
-        private JwtService jwtService;
+    @Test
+    @Sql(scripts = {"/sql/clean.sql", "/sql/seed_users.sql", "/sql/seed_chats.sql"})
+    @WithUserDetails("alice")
+    void givenValidImageEvent_whenAliceSendsToBob_thenStatusCreated() throws Exception {
+        // Given
+        String chatIdentifier = "11111111-1111-1111-1111-111111111111+22222222-2222-2222-2222-222222222222";
+        String eventJson = """
+                {
+                    "uri": "http://example.com/image.jpg",
+                    "width": 100,
+                    "height": 100,
+                    "filename": "vcl.jpg",
+                    "format": "jpg"
+                }
+                """;
 
-        @MockBean
-        private UserPresenceService userPresenceService;
+        // When & Then
+        mockMvc.perform(post("/chats/{chatIdentifier}/image-events", chatIdentifier)
+                        .header("Idempotency-key", UUID.randomUUID())
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(eventJson))
+                .andExpect(status().isCreated())
+                .andExpect(jsonPath("$.imageEvent.uri").value("http://example.com/image.jpg"));
+    }
 
-        @MockBean
-        private UserRepository userRepository;
+    @Test
+    @Sql(scripts = {"/sql/clean.sql", "/sql/seed_users.sql", "/sql/seed_chats.sql"})
+    @WithUserDetails("alice")
+    void givenValidIconEvent_whenAliceSendsToBob_thenStatusCreated() throws Exception {
+        // Given
+        String chatIdentifier = "11111111-1111-1111-1111-111111111111+22222222-2222-2222-2222-222222222222";
+        String eventJson = """
+                {
+                    "resourceId": 5
+                }
+                """;
+        // When & Then
+        mockMvc.perform(post("/chats/{chatIdentifier}/icon-events", chatIdentifier)
+                        .header("Idempotency-key", UUID.randomUUID())
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(eventJson))
+                .andExpect(status().isCreated())
+                .andExpect(jsonPath("$.iconEvent.resourceId").value(5));
+    }
 
-        @MockBean
-        private ImageStore imageStore;
+    @Test
+    @Sql(scripts = {"/sql/clean.sql", "/sql/seed_users.sql", "/sql/seed_chats.sql"})
+    @WithUserDetails("alice")
+    void givenValidSeenEvent_whenAliceSendsToBob_thenStatusCreated() throws Exception {
+        // Given
+        String chatIdentifier = "11111111-1111-1111-1111-111111111111+22222222-2222-2222-2222-222222222222";
+        String eventJson = """
+                {
+                    "at": "2016-01-24T10:15:30Z"
+                }
+                """;
 
-        @MockBean
-        private MediaStore mediaStore;
+        // When & Then
+        mockMvc.perform(post("/chats/{chatIdentifier}/seen-events", chatIdentifier)
+                        .header("Idempotency-key", UUID.randomUUID())
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(eventJson))
+                .andExpect(status().isCreated())
+                .andExpect(jsonPath("$.seenEvent.at").value("2016-01-24T10:15:30Z"));
+    }
 
-        @MockBean
-        private LoginSuccessStrategy loginSuccessStrategy;
+    @Test
+    @Sql(scripts = {"/sql/clean.sql", "/sql/seed_users.sql", "/sql/seed_chats.sql"})
+    @WithUserDetails("alice")
+    void givenValidFileEvent_whenAliceSendsToBob_thenStatusCreated() throws Exception {
+        // Given
+        String chatIdentifier = "11111111-1111-1111-1111-111111111111+22222222-2222-2222-2222-222222222222";
+        String eventJson = """
+                {
+                    "filename": "test.txt",
+                    "size": 1024,
+                    "mediaUrl": "http://example.com/test.txt"
+                }
+                """;
+        // When & Then
+        mockMvc.perform(post("/chats/{chatIdentifier}/file-events", chatIdentifier)
+                        .header("Idempotency-key", UUID.randomUUID())
 
-        @MockBean
-        private Oauth2LoginSuccessStrategy oauth2LoginSuccessStrategy;
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(eventJson))
+                .andExpect(status().isCreated())
+                .andExpect(jsonPath("$.fileEvent.filename").value("test.txt"))
+                .andExpect(jsonPath("$.fileEvent.size").value(1024));
+    }
 
-        @MockBean
-        private LogoutStrategy logoutStrategy;
+    @Test
+    @Sql(scripts = {"/sql/clean.sql", "/sql/seed_users.sql", "/sql/seed_chats.sql"})
+    @WithUserDetails("alice")
+    void givenChatHasEvents_whenAliceListsEventsForChat_thenReturnsEventsOrderedByVersionDesc() throws Exception {
+        // Given
+        String chatId = "11111111-1111-1111-1111-111111111111+22222222-2222-2222-2222-222222222222";
 
-        @MockBean
-        private UserService userService;
-
-        @MockBean
-        private ConversationRepository conversationRepository;
-
-        @Autowired
-        private ObjectMapper objectMapper;
-
-        private User testUser;
-
-        @BeforeEach
-        void setUp() {
-                testUser = new User("testuser", " password");
-                when(userRepository.findByUsername("testuser")).thenReturn(testUser);
-                when(deliveryService.createAndSend(any(User.class), any(ChatEvent.class)))
-                        .thenAnswer(inv -> inv.getArgument(1));
+        // Alice sends 2 messages to Bob to have some events
+        for (int i = 1; i <= 2; i++) {
+            String eventJson = """
+                    {
+                        "content": "Message %d"
+                    }
+                    """.formatted(i);
+            mockMvc.perform(post("/chats/{chatIdentifier}/text-events", chatId)
+                            .header("Idempotency-key", UUID.randomUUID())
+                            .contentType(MediaType.APPLICATION_JSON)
+                            .content(eventJson))
+                    .andExpect(status().isCreated());
         }
 
-        @Test
-        @WithMockUser("testuser")
-        void createEvent_shouldReturnCreated_whenTextEventIsSent() throws Exception {
-                Chat chat = new Chat(testUser, testUser);
+        // When & Then
+        // After 2 messages, Alice's eventVersion should be 2 (if it started at 0 and incVersion was called twice)
+        mockMvc.perform(get("/chats/{chatId}/events", chatId)
+                        .param("atVersion", "3"))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.length()").value(2))
+                .andExpect(jsonPath("$[0].textEvent.content").value("Message 2"))
+                .andExpect(jsonPath("$[1].textEvent.content").value("Message 1"));
+    }
 
-                when(conversationRepository.getUser(any(String.class))).thenReturn(testUser);
-                when(chatService.getOrCreateChat(any(ChatIdentifier.class))).thenReturn(chat);
-                TextEvent event = new TextEvent(new Chat(testUser, testUser), testUser, "test message");
+    @Test
+    @Sql(scripts = {"/sql/clean.sql", "/sql/seed_users.sql", "/sql/seed_chats.sql"})
+    @WithUserDetails("alice")
+    void givenUserHasEvents_whenAliceListsEventsForMe_thenReturnsAllHerEvents() throws Exception {
+        // Given
+        String bobChatId = "11111111-1111-1111-1111-111111111111+22222222-2222-2222-2222-222222222222";
+        String charlieChatId = "11111111-1111-1111-1111-111111111111+33333333-3333-3333-3333-333333333333";
 
+        // Alice sends message to Bob
+        mockMvc.perform(post("/chats/{chatIdentifier}/text-events", bobChatId)
+                        .header("Idempotency-key", UUID.randomUUID())
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content("{ \"content\": \"To Bob\" }"))
+                .andExpect(status().isCreated());
 
-                when(deliveryService.createAndSend(any(User.class), any(ChatEvent.class)))
-                        .thenReturn(event);
+        // Alice sends message to Charlie
+        mockMvc.perform(post("/chats/{chatIdentifier}/text-events", charlieChatId)
+                        .header("Idempotency-key", UUID.randomUUID())
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content("{ \"content\": \"To Charlie\" }"))
+                .andExpect(status().isCreated());
 
-                event.setLocalId(UUID.randomUUID());
+        // When & Then
+        mockMvc.perform(get("/users/me/events")
+                        .param("atVersion", "3"))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.length()").value(2));
+    }
 
-                mockMvc.perform(post("/events")
-                                .contentType(MediaType.APPLICATION_JSON)
-                                .content(objectMapper.writeValueAsString(event)))
-                        .andExpect(status().isCreated());
-        }
+    @Test
+    @Sql(scripts = {"/sql/clean.sql", "/sql/seed_users.sql", "/sql/seed_chats.sql"})
+    @WithUserDetails("charlie")
+    void givenCharlieSendsToAliceBobChat_whenCreateTextEvent_thenReturnsForbidden() throws Exception {
+        // Given: Charlie is not part of Alice-Bob chat
+        String chatIdentifier = "11111111-1111-1111-1111-111111111111+22222222-2222-2222-2222-222222222222";
+        String eventJson = """
+                {
+                    "content": "Intruding message"
+                }
+                """;
 
-        @Test
-        @WithMockUser("testuser")
-        void createEvent_shouldReturnCreated_whenImageEventIsSent() throws Exception {
-                Chat chat = new Chat(testUser, testUser);
+        // When & Then
+        mockMvc.perform(post("/chats/{chatIdentifier}/text-events", chatIdentifier)
+                        .header("Idempotency-key", UUID.randomUUID())
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(eventJson))
+                .andExpect(status().isForbidden());
+    }
 
-                when(conversationRepository.getUser(any(String.class))).thenReturn(testUser);
-                when(chatService.getOrCreateChat(any(ChatIdentifier.class))).thenReturn(chat);
-                ImageEvent event = new ImageEvent(new Chat(testUser, testUser), testUser, new ImageSpec());
-                event.setLocalId(UUID.randomUUID());
+    @Test
+    @Sql(scripts = {"/sql/clean.sql", "/sql/seed_users.sql", "/sql/seed_chats.sql"})
+    @WithUserDetails("alice")
+    void givenMalformedJson_whenCreateTextEvent_thenReturnsBadRequest() throws Exception {
+        // Given
+        String chatIdentifier = "11111111-1111-1111-1111-111111111111+22222222-2222-2222-2222-222222222222";
+        String malformedJson = "{ \"textEvent\": { ... } }";
 
-                when(deliveryService.createAndSend(any(User.class), any(ChatEvent.class)))
-                        .thenReturn(event);
-
-                when(imageStore.save(any(BufferedImage.class)))
-                        .thenReturn(new ImageSpec("uri:", "file.jpg", 1, 1, "jpg"));
-
-                MockMultipartFile eventPart = new MockMultipartFile("event", "", "application/json", objectMapper.writeValueAsString(event).getBytes());
-                MockMultipartFile filePart = new MockMultipartFile("file", "test.jpg", "image/bmp", ONE_PIXEL_BMP_BYTES);
-
-                mockMvc.perform(multipart("/events")
-                                .file(eventPart)
-                                .file(filePart).header("X-file-type", "image"))
-                        .andExpect(status().isCreated());
-        }
-
-        @Test
-        @WithMockUser("testuser")
-        void listEvents_forChat_shouldReturnOk() throws Exception {
-                Chat chat = new Chat(testUser, testUser);
-                when(conversationRepository.getUser(any(String.class))).thenReturn(testUser);
-
-                when(chatService.getOrCreateChat(any(ChatIdentifier.class))).thenReturn(chat);
-                when(eventService.findByOwnerAndChatAndEventVersionLessThanEqual(any(), any(), anyInt()))
-                        .thenReturn(List.of());
-                String chatId = chat.getIdentifier().toString();
-                mockMvc.perform(get("/chats/{chatId}/events", chatId)
-                                .param("atVersion", "0"))
-                        .andExpect(status().isOk());
-        }
-
-        @Test
-        @WithMockUser("testuser")
-        void listEvents_forUser_shouldReturnOk() throws Exception {
-                when(eventService.findByOwnerAndEventVersionLessThanEqual(any(), anyInt()))
-                        .thenReturn(List.of());
-
-                mockMvc.perform(get("/users/me/events")
-                                .param("atVersion", "0"))
-                        .andExpect(status().isOk());
-        }
+        // When & Then
+        mockMvc.perform(post("/chats/{chatIdentifier}/text-events", chatIdentifier)
+                        .header("Idempotency-key", UUID.randomUUID())
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(malformedJson))
+                .andExpect(status().isBadRequest());
+    }
 }

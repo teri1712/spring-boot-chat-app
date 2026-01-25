@@ -1,35 +1,22 @@
 package com.decade.practice.application.usecases;
 
-import com.decade.practice.domain.embeddables.ImageSpec;
-import com.decade.practice.domain.entities.User;
-import com.decade.practice.domain.locals.Account;
+import com.decade.practice.api.dto.AccountResponse;
+import com.decade.practice.api.dto.ProfileRequest;
+import com.decade.practice.api.dto.SignUpRequest;
+import com.decade.practice.persistence.jpa.entities.User;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.security.access.AccessDeniedException;
-import org.springframework.security.core.userdetails.UserDetails;
 
-import java.util.Date;
 import java.util.UUID;
 
 public interface UserService {
 
-        User create(String username,
-                    String password,
-                    String name,
-                    Date dob,
-                    String gender,
-                    ImageSpec avatar,
-                    boolean usernameAsIdentifier) throws DataIntegrityViolationException;
+    User create(SignUpRequest signUpRequest, boolean usernameAsIdentifier) throws DataIntegrityViolationException;
+    
+    User changeProfile(UUID id, ProfileRequest profileRequest);
 
-        User createOauth2User(String username, String name, String picture) throws DataIntegrityViolationException;
+    User changePassword(UUID id, String newPassword, String password) throws AccessDeniedException;
 
-        User update(UUID id, String name, Date birthday, String gender);
-
-        User update(UUID id, String name, Date birthday, String gender, ImageSpec avatar);
-
-        User update(UUID id, ImageSpec avatar);
-
-        User update(UUID id, String newPassword, String password) throws AccessDeniedException;
-
-        Account prepareAccount(UserDetails details);
+    AccountResponse prepareAccount(String username);
 
 }

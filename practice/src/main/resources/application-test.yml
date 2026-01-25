@@ -1,0 +1,9 @@
+server:
+  cache:
+    events: false
+
+logging:
+  level:
+    root: INFO
+    com.decade.practice: TRACE
+    org.springframework: INFO

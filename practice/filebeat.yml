@@ -1,0 +1,27 @@
+filebeat.inputs:
+  - type: filestream
+    id: messenger-clone-logs
+    paths:
+      - /logs/*.log
+    parsers:
+      - ndjson:
+          overwrite_keys: true
+          add_error_key: true
+
+processors:
+  - add_host_metadata: { }
+  - add_docker_metadata: { }
+  - timestamp:
+      field: "@timestamp"
+      layouts:
+        - ISO8601
+
+output.elasticsearch:
+  hosts: [ "http://elasticsearch:9200" ]
+  index: "messenger-clone-%{+yyyy.MM.dd}"
+
+setup.template.enabled: true
+setup.template.name: "messenger-clone"
+setup.template.pattern: "messenger-clone-*"
+
+logging.level: info

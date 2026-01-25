@@ -1,19 +1,15 @@
 package com.decade.practice.ws;
 
-import com.decade.practice.DevelopmentApplication;
-import com.decade.practice.adapter.security.jwt.JwtService;
-import com.decade.practice.application.usecases.ChatService;
-import com.decade.practice.application.usecases.UserService;
-import com.decade.practice.domain.TypeEvent;
-import com.decade.practice.domain.embeddables.ChatIdentifier;
-import com.decade.practice.domain.entities.Chat;
-import com.decade.practice.domain.entities.User;
-import com.decade.practice.utils.PrerequisiteBeans;
-import com.decade.practice.utils.RedisTestContainerSupport;
-import org.junit.jupiter.api.*;
+import com.decade.practice.api.web.converters.ChatIdentifierConverter;
+import com.decade.practice.common.BaseTestClass;
+import com.decade.practice.infra.security.UserClaimsTokenService;
+import com.decade.practice.infra.security.models.UserClaims;
+import com.decade.practice.persistence.jpa.embeddables.ChatIdentifier;
+import com.decade.practice.persistence.jpa.entities.User;
+import com.decade.practice.persistence.redis.TypeEvent;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.Timeout;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.jdbc.EmbeddedDatabaseConnection;
-import org.springframework.boot.test.autoconfigure.jdbc.AutoConfigureTestDatabase;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.web.server.LocalServerPort;
 import org.springframework.messaging.converter.MessageConverter;
@@ -21,145 +17,146 @@ import org.springframework.messaging.simp.stomp.StompFrameHandler;
 import org.springframework.messaging.simp.stomp.StompHeaders;
 import org.springframework.messaging.simp.stomp.StompSession;
 import org.springframework.messaging.simp.stomp.StompSessionHandlerAdapter;
-import org.springframework.test.context.ActiveProfiles;
-import org.springframework.test.context.ContextConfiguration;
+import org.springframework.test.context.jdbc.Sql;
 import org.springframework.web.socket.WebSocketHttpHeaders;
 import org.springframework.web.socket.client.standard.StandardWebSocketClient;
 import org.springframework.web.socket.messaging.WebSocketStompClient;
 
 import java.lang.reflect.Type;
-import java.util.Date;
+import java.util.UUID;
 import java.util.concurrent.CompletableFuture;
+import java.util.concurrent.TimeUnit;
 
-import static com.decade.practice.adapter.websocket.arguments.ChatIdentifierArgumentResolver.CHAT_HEADER;
+import static com.decade.practice.api.websocket.arguments.ChatIdentifierArgumentResolver.CHAT_HEADER;
 import static com.decade.practice.utils.TokenUtils.BEARER;
 import static com.decade.practice.utils.TokenUtils.HEADER_NAME;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 
-@SpringBootTest(
-        webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT
-)
-@ActiveProfiles("development")
-@ContextConfiguration(classes = {DevelopmentApplication.class, PrerequisiteBeans.class})
-@AutoConfigureTestDatabase(connection = EmbeddedDatabaseConnection.H2)
-@TestInstance(TestInstance.Lifecycle.PER_CLASS)
-@TestMethodOrder(MethodOrderer.OrderAnnotation.class)
-public class TypeEventTest extends RedisTestContainerSupport {
+@SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
+@Sql(value = "/sql/clean.sql", executionPhase = Sql.ExecutionPhase.AFTER_TEST_METHOD)
+public class TypeEventTest extends BaseTestClass {
 
-        @LocalServerPort
-        private int port = 0;
+    @LocalServerPort
+    private int port = 0;
 
-        @Autowired
-        private MessageConverter converter;
+    @Autowired
+    private MessageConverter converter;
 
-        @Autowired
-        private UserService userService;
+    @Autowired
+    private UserClaimsTokenService tokenService;
 
-        @Autowired
-        private ChatService chatService;
+    @Test
+    @Timeout(5)
+    @Sql(value = {"/sql/clean.sql", "/sql/seed_users.sql", "/sql/seed_chats.sql"}, executionPhase = Sql.ExecutionPhase.BEFORE_TEST_METHOD)
+    public void givenAliceAndBobIsOnline_whenAliceTypeSth_thenBobReceiveTheTypeEvent() throws Exception {
 
-        @Autowired
-        private JwtService credentialService;
 
-        private User me;
-        private User you;
-        private Chat chat;
-        private String myToken;
-        private String yourToken;
-        private StompSession mySession;
-        private StompSession yourSession;
+        StompSession aliceSession = null;
+        StompSession bobSession = null;
+        WebSocketStompClient stompClient = null;
 
-        @BeforeAll
-        public void beforeAll() {
-                me = userService.create("first", "first", "first", new Date(), "male", null, true);
-                you = userService.create("second", "second", "second", new Date(), "male", null, true);
-                chat = chatService.getOrCreateChat(ChatIdentifier.from(me, you));
+        try {
 
-                myToken = credentialService.create(me, null).getAccessToken();
-                yourToken = credentialService.create(you, null).getAccessToken();
+            UserClaims alice = UserClaims.builder()
+                    .id(UUID.fromString("11111111-1111-1111-1111-111111111111"))
+                    .username("alice")
+                    .role("ROLE_USER")
+                    .gender(User.FEMALE)
+                    .build();
+
+            UserClaims bob = UserClaims.builder()
+                    .id(UUID.fromString("22222222-2222-2222-2222-222222222222"))
+                    .username("bob")
+                    .role("ROLE_USER")
+                    .gender(User.MALE)
+                    .build();
+
+            String aliceToken = tokenService.create(alice, null).getAccessToken();
+            String bobToken = tokenService.create(bob, null).getAccessToken();
+
+            CompletableFuture<TypeEvent> aliceEvent = new CompletableFuture<>();
+            CompletableFuture<TypeEvent> bobEvent = new CompletableFuture<>();
+
+            stompClient = new WebSocketStompClient(new StandardWebSocketClient());
+            stompClient.setMessageConverter(converter);
+
+
+            WebSocketHttpHeaders aliceHttpHeaders = new WebSocketHttpHeaders();
+            aliceHttpHeaders.add(HEADER_NAME, BEARER + aliceToken);
+            aliceSession = stompClient.connectAsync(
+                    "ws://localhost:" + port + "/handshake",
+                    aliceHttpHeaders,
+                    new StompSessionHandlerAdapter() {
+                    }).get(2, TimeUnit.SECONDS);
+
+            WebSocketHttpHeaders bobHttpHeaders = new WebSocketHttpHeaders();
+            bobHttpHeaders.add(HEADER_NAME, BEARER + bobToken);
+            bobSession = stompClient.connectAsync(
+                    "ws://localhost:" + port + "/handshake",
+                    bobHttpHeaders,
+                    new StompSessionHandlerAdapter() {
+                    }).get(2, TimeUnit.SECONDS);
+
+            ChatIdentifier aliceBobChat = ChatIdentifier.from(UUID.fromString("11111111-1111-1111-1111-111111111111"), UUID.fromString("22222222-2222-2222-2222-222222222222"));
+
+            StompHeaders aliceStompHeaders = new StompHeaders();
+            aliceStompHeaders.setDestination("/typing");
+            aliceStompHeaders.set(CHAT_HEADER, ChatIdentifierConverter.toString(aliceBobChat));
+
+            StompHeaders bobStompHeaders = new StompHeaders();
+            bobStompHeaders.setDestination("/typing");
+            bobStompHeaders.set(CHAT_HEADER, ChatIdentifierConverter.toString(aliceBobChat));
+
+            aliceSession.subscribe(aliceStompHeaders, new StompFrameHandler() {
+                @Override
+                public Type getPayloadType(StompHeaders headers) {
+                    return TypeEvent.class;
+                }
+
+                @Override
+                public void handleFrame(StompHeaders headers, Object payload) {
+                    aliceEvent.complete((TypeEvent) payload);
+                }
+            });
+
+            bobSession.subscribe(bobStompHeaders, new StompFrameHandler() {
+                @Override
+                public Type getPayloadType(StompHeaders headers) {
+                    return TypeEvent.class;
+                }
+
+                @Override
+                public void handleFrame(StompHeaders headers, Object payload) {
+                    bobEvent.complete((TypeEvent) payload);
+                }
+            });
+
+            StompHeaders chatStompHeaders = new StompHeaders();
+            chatStompHeaders.set(CHAT_HEADER, aliceBobChat.toString());
+            chatStompHeaders.setDestination("/typing");
+            bobSession.send(chatStompHeaders, "Hello");
+
+            assertNotNull(aliceEvent.get(2, TimeUnit.SECONDS));
+            assertNotNull(bobEvent.get(2, TimeUnit.SECONDS));
+            assertEquals(bobEvent.get(2, TimeUnit.SECONDS), aliceEvent.get(2, TimeUnit.SECONDS));
+
+
+        } finally {
+
+            if (aliceSession != null && aliceSession.isConnected()) {
+                aliceSession.disconnect();
+            }
+            if (bobSession != null && bobSession.isConnected()) {
+                bobSession.disconnect();
+            }
+            if (stompClient != null) {
+                stompClient.stop();
+            }
         }
 
-        @BeforeEach
-        public void setUp() throws Exception {
-                WebSocketStompClient stompClient = new WebSocketStompClient(new StandardWebSocketClient());
-                stompClient.setMessageConverter(converter);
 
-                WebSocketHttpHeaders myHeaders = new WebSocketHttpHeaders();
-                myHeaders.add(HEADER_NAME, BEARER + myToken);
-                mySession = stompClient.connectAsync(
-                        "ws://localhost:" + port + "/handshake",
-                        myHeaders,
-                        new StompSessionHandlerAdapter() {
-                        }).get();
-
-                WebSocketHttpHeaders yourHeaders = new WebSocketHttpHeaders();
-                yourHeaders.add(HEADER_NAME, BEARER + yourToken);
-                yourSession = stompClient.connectAsync(
-                        "ws://localhost:" + port + "/handshake",
-                        yourHeaders,
-                        new StompSessionHandlerAdapter() {
-                        }).get();
-        }
-
-        @AfterEach
-        public void cleanUp() {
-                mySession.disconnect();
-                yourSession.disconnect();
-        }
-
-        @Test
-        @Order(2)
-        public void testTypingEventIsReceivedByBothUsers() throws Exception {
-                CompletableFuture<TypeEvent> myEvent = new CompletableFuture<>();
-                CompletableFuture<TypeEvent> yourEvent = new CompletableFuture<>();
-
-                StompHeaders myHeaders = new StompHeaders();
-                myHeaders.setDestination("/typing");
-                myHeaders.set(CHAT_HEADER, chat.getIdentifier().toString());
-
-                StompHeaders yourHeaders = new StompHeaders();
-                yourHeaders.setDestination("/typing");
-                yourHeaders.set(CHAT_HEADER, chat.getIdentifier().toString());
-
-                mySession.subscribe(myHeaders, new StompFrameHandler() {
-                        @Override
-                        public Type getPayloadType(StompHeaders headers) {
-                                return TypeEvent.class;
-                        }
-
-                        @Override
-                        public void handleFrame(StompHeaders headers, Object payload) {
-                                if (payload == null)
-                                        return;
-                                myEvent.complete((TypeEvent) payload);
-                        }
-                });
-
-                yourSession.subscribe(yourHeaders, new StompFrameHandler() {
-                        @Override
-                        public Type getPayloadType(StompHeaders headers) {
-                                return TypeEvent.class;
-                        }
-
-                        @Override
-                        public void handleFrame(StompHeaders headers, Object payload) {
-                                if (payload == null)
-                                        return;
-                                yourEvent.complete((TypeEvent) payload);
-                        }
-                });
-                Thread.sleep(200);
-
-                StompHeaders h = new StompHeaders();
-                h.set(CHAT_HEADER, chat.getIdentifier().toString());
-                h.setDestination("/typing");
-                yourSession.send(h, "Hello");
-
-                assertNotNull(myEvent.get());
-                assertNotNull(yourEvent.get());
-                assertEquals(yourEvent.get(), myEvent.get());
-        }
+    }
 
 
 }

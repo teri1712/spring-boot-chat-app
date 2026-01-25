@@ -1,6 +1,6 @@
 package com.decade.practice.application.usecases;
 
-import com.decade.practice.domain.embeddables.ImageSpec;
+import com.decade.practice.persistence.jpa.embeddables.ImageSpec;
 import org.springframework.core.io.Resource;
 
 import java.awt.image.BufferedImage;
@@ -9,9 +9,9 @@ import java.net.URI;
 
 public interface ImageStore {
 
-        ImageSpec save(BufferedImage image) throws IOException;
+    ImageSpec save(BufferedImage image) throws IOException;
 
-        Resource read(URI uri) throws IOException;
+    Resource read(URI uri) throws IOException;
 
-        void remove(URI uri) throws IOException;
+    void remove(URI uri) throws IOException;
 }

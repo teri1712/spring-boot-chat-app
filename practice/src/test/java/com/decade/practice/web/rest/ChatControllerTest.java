@@ -1,192 +1,176 @@
 package com.decade.practice.web.rest;
 
-import com.decade.practice.DevelopmentApplication;
-import com.decade.practice.adapter.security.jwt.JwtService;
-import com.decade.practice.adapter.security.strategies.LoginSuccessStrategy;
-import com.decade.practice.adapter.security.strategies.LogoutStrategy;
-import com.decade.practice.adapter.security.strategies.Oauth2LoginSuccessStrategy;
-import com.decade.practice.adapter.web.rest.ChatController;
-import com.decade.practice.application.usecases.ChatService;
-import com.decade.practice.application.usecases.ConversationRepository;
-import com.decade.practice.application.usecases.DeliveryService;
-import com.decade.practice.application.usecases.UserService;
-import com.decade.practice.domain.ChatSnapshot;
-import com.decade.practice.domain.embeddables.ChatIdentifier;
-import com.decade.practice.domain.embeddables.Preference;
-import com.decade.practice.domain.entities.*;
-import com.decade.practice.domain.repositories.ChatRepository;
-import com.decade.practice.domain.repositories.ThemeRepository;
-import com.decade.practice.domain.repositories.UserRepository;
-import com.decade.practice.infra.configs.SecurityConfiguration;
-import com.decade.practice.utils.PrerequisiteBeans;
+import com.decade.practice.api.dto.PreferenceDto;
+import com.decade.practice.common.BaseTestClass;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
-import org.springframework.boot.test.mock.mockito.MockBean;
-import org.springframework.context.annotation.Import;
 import org.springframework.http.MediaType;
-import org.springframework.security.test.context.support.WithMockUser;
-import org.springframework.test.context.ContextConfiguration;
+import org.springframework.security.test.context.support.WithUserDetails;
+import org.springframework.test.context.jdbc.Sql;
 import org.springframework.test.web.servlet.MockMvc;
 
-import java.util.List;
-import java.util.Optional;
+import java.util.UUID;
 
-import static org.mockito.ArgumentMatchers.*;
-import static org.mockito.BDDMockito.given;
-import static org.mockito.Mockito.when;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.patch;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
-@WebMvcTest(ChatController.class)
-@ContextConfiguration(classes = {DevelopmentApplication.class, PrerequisiteBeans.class})
-@Import({SecurityConfiguration.class})
-class ChatControllerTest {
+@Sql(scripts = "/sql/clean.sql", executionPhase = Sql.ExecutionPhase.AFTER_TEST_METHOD)
+class ChatControllerTest extends BaseTestClass {
 
-        @Autowired
-        private MockMvc mockMvc;
+    @Autowired
+    private MockMvc mockMvc;
 
-        @MockBean
-        private UserRepository userRepository;
+    @Autowired
+    private ObjectMapper objectMapper;
 
-        @MockBean
-        private ChatRepository chatRepository;
+    @Test
+    @Sql(scripts = {"/sql/clean.sql", "/sql/seed_users.sql", "/sql/seed_chats.sql"})
+    @WithUserDetails("alice")
+    void givenAliceHasChats_whenAliceListsChats_thenReturnsAllAliceChats() throws Exception {
+        // Given: Alice has 2 chats (with Bob and Charlie) from seed_chats.sql
 
-        @MockBean
-        private ChatService chatService;
-        @MockBean
-        private ConversationRepository conversationRepository;
+        // When & Then
+        mockMvc.perform(get("/chats")
+                        .param("atVersion", "1")
+                        .accept(MediaType.APPLICATION_JSON))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.length()").value(2))
+                .andExpect(jsonPath("$[0].conversation.partner.username").value("bob"))
+                .andExpect(jsonPath("$[1].conversation.partner.username").value("charlie"))
+        ;
+    }
 
-        @MockBean
-        private ThemeRepository themeRepository;
+    @Test
+    @Sql(scripts = {"/sql/clean.sql", "/sql/seed_users.sql", "/sql/seed_chats.sql"})
+    @WithUserDetails("bob")
+    void givenBobHasOneChat_whenBobListsChats_thenReturnsOnlyBobChat() throws Exception {
+        // Given: Bob has 1 chat (with Alice) from seed_chats.sql
 
-        @MockBean
-        private DeliveryService deliveryService;
+        // When & Then
+        mockMvc.perform(get("/chats")
+                        .param("atVersion", "0")
+                        .accept(MediaType.APPLICATION_JSON))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.length()").value(1))
+                .andExpect(jsonPath("$[0].conversation.chat.preference.roomName").value("Room alice and bob"))
+                .andExpect(jsonPath("$[0].conversation.partner.username").value("alice"))
 
-        // Security-related mocks to satisfy the SecurityConfiguration
-        @MockBean
-        private JwtService jwtService;
+        ;
+    }
 
-        @MockBean
-        private LoginSuccessStrategy loginSuccessStrategy;
+    @Test
+    @Sql(scripts = {"/sql/clean.sql", "/sql/seed_users.sql", "/sql/seed_themes.sql", "/sql/seed_chats.sql"})
+    @WithUserDetails("alice")
+    void givenExistingChat_whenAliceUpdatesPreference_thenPreferenceIsStored() throws Exception {
+        // Given
+        // Correct order: 1111... < 2222...
+        String chatId = "11111111-1111-1111-1111-111111111111+22222222-2222-2222-2222-222222222222";
+        PreferenceDto preference = new PreferenceDto();
+        preference.setRoomName("My pookie bob");
+        preference.setResourceId(99);
 
-        @MockBean
-        private Oauth2LoginSuccessStrategy oauth2LoginSuccessStrategy;
+        // When
+        mockMvc.perform(put("/chats/{id}/preference", chatId)
+                        .header("Idempotency-key", UUID.randomUUID())
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(objectMapper.writeValueAsString(preference)))
+                .andExpect(status().isNoContent());
 
-        @MockBean
-        private LogoutStrategy logoutStrategy;
+        // Then
+        mockMvc.perform(get("/chats/{id}", chatId)
+                        .param("atVersion", "1"))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.conversation.chat.preference.roomName").value("My pookie bob"))
+                .andExpect(jsonPath("$.conversation.chat.preference.resourceId").value(99));
+    }
 
-        @MockBean
-        private UserService userService;
+    @Test
+    @Sql(scripts = {"/sql/clean.sql", "/sql/seed_users.sql", "/sql/seed_chats.sql"})
+    @WithUserDetails("alice")
+    void givenAliceHasMultipleChats_whenAliceSendsMessageToOlderChat_thenThatChatMovesToTop() throws Exception {
+        // Given
+        // Alice has chats with Bob (ID: ...2222) and Charlie (ID: ...3333)
+        // From seed_chats.sql:
+        // Bob chat is created first (current_version 0)
+        // Charlie chat is created second (current_version 0)
+        String charlieChatId = "11111111-1111-1111-1111-111111111111+33333333-3333-3333-3333-333333333333";
 
-        @Autowired
-        private ObjectMapper objectMapper;
+        // When: Alice sends a message to Charlie
+        String eventJson = """
+                {
+                    "content": "New message to Charlie"
+                }
+                """;
 
-        private User testUser;
-        private Chat chatEntity;
-        private ChatIdentifier identifier;
+        mockMvc.perform(post("/chats/{chatIdentifier}/text-events", charlieChatId)
+                        .header("Idempotency-key", UUID.randomUUID())
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(eventJson))
+                .andExpect(status().isCreated());
 
-        @BeforeEach
-        void setUp() {
-                testUser = new User("alice", "pwd");
-                testUser.setSyncContext(new SyncContext(testUser));
-                testUser.getSyncContext().setEventVersion(43);
-                given(userRepository.findByUsername("alice")).willReturn(testUser);
-                given(deliveryService.createAndSend(any(User.class), any(PreferenceEvent.class)))
-                        .willAnswer(inv -> inv.getArgument(1));
+        // Then: Charlie's chat should be the first in the list
+        // Alice's event version should now be 1
+        mockMvc.perform(get("/chats")
+                        .param("atVersion", "2")
+                        .accept(MediaType.APPLICATION_JSON))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.size()").value(2))
+                .andExpect(jsonPath("$[0].conversation.partner.username").value("charlie"))
+                .andExpect(jsonPath("$[1].conversation.partner.username").value("bob"))
+        ;
+    }
 
-                // Prepare a chat and its identifier
-                User u1 = new User("u1", "p1");
-                User u2 = new User("u2", "p2");
-                chatEntity = new Chat(u1, u2);
-                identifier = chatEntity.getIdentifier();
-        }
+    @Test
+    @Sql(scripts = {"/sql/clean.sql", "/sql/seed_users.sql", "/sql/seed_chats.sql"})
+    @WithUserDetails("alice")
+    void givenUserListsChatsWithWrongVersion_whenListChats_thenReturnsBadRequestError() throws Exception {
+        // Given: Alice's current version is 0
 
-        @Test
-        @WithMockUser("alice")
-        void get_chat_shouldReturnOk_andUseDefaultAtVersion() throws Exception {
-                ChatSnapshot snapshot = new ChatSnapshot(null, null, 43);
-                when(conversationRepository.getUser(any(String.class))).thenReturn(testUser);
-                given(chatService.getOrCreateChat(any(ChatIdentifier.class))).willReturn(chatEntity);
-                given(chatService.getSnapshot(eq(chatEntity), eq(testUser), eq(43))).willReturn(snapshot);
+        // When & Then: Request with version 1 should fail
+        mockMvc.perform(get("/chats")
+                        .param("atVersion", "2")
+                        .accept(MediaType.APPLICATION_JSON))
+                .andExpect(status().isConflict());
+    }
 
-                mockMvc.perform(get("/chats/{id}", identifier.toString()))
-                        .andExpect(status().isOk())
-                        .andExpect(jsonPath("$.atVersion").value(43));
-        }
+    @Test
+    @Sql(scripts = {"/sql/clean.sql", "/sql/seed_users.sql", "/sql/seed_themes.sql"})
+    @WithUserDetails("alice")
+    void givenThemesExist_whenRequestThemes_thenReturnsAllThemes() throws Exception {
+        mockMvc.perform(get("/chats/themes"))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.length()").value(3));
+    }
 
-        @Test
-        @WithMockUser("alice")
-        void get_chat_withExplicitVersion_shouldReturnOk() throws Exception {
-                ChatSnapshot snapshot = new ChatSnapshot(null, null, 7);
-                when(conversationRepository.getUser(any(String.class))).thenReturn(testUser);
-                given(chatService.getOrCreateChat(any(ChatIdentifier.class))).willReturn(chatEntity);
-                given(chatService.getSnapshot(eq(chatEntity), eq(testUser), eq(7))).willReturn(snapshot);
 
-                mockMvc.perform(get("/chats/{id}", identifier.toString()).param("atVersion", "7"))
-                        .andExpect(status().isOk())
-                        .andExpect(jsonPath("$.atVersion").value(7));
-        }
+    @Test
+    @Sql(scripts = {"/sql/clean.sql", "/sql/seed_users.sql"})
+    @WithUserDetails("alice")
+    void givenAliceRequestChatWithNonExistentUser_whenGetChat_thenReturnsNotFoundError() throws Exception {
+        // Given: Alice exists, but we request a chat with a random UUID
+        String randomUser = UUID.randomUUID().toString();
+        String chatId = "11111111-1111-1111-1111-111111111111+" + randomUser;
 
-        @Test
-        @WithMockUser("alice")
-        void patch_preference_shouldPersistAndReturnLocalChat() throws Exception {
-                when(conversationRepository.getUser(any(String.class))).thenReturn(testUser);
-                given(chatService.getOrCreateChat(any(ChatIdentifier.class))).willReturn(chatEntity);
-                Theme theme = new Theme(5, null);
-                given(themeRepository.findById(5)).willReturn(Optional.of(theme));
+        // When & Then: getOrCreateChat will fail to find the second user
+        mockMvc.perform(get("/chats/{id}", chatId)
+                        .param("atVersion", "0"))
+                .andExpect(status().isNotFound());
+    }
 
-                Preference preference = new Preference();
-                preference.setResourceId(10);
-                preference.setRoomName("Room A");
-                Theme prefTheme = new Theme(5, null);
-                preference.setTheme(prefTheme);
+    @Test
+    @Sql(scripts = {"/sql/clean.sql", "/sql/seed_users.sql", "/sql/seed_chats.sql"})
+    @WithUserDetails("alice")
+    void givenUserNotPartOfChat_whenGetChat_thenReturnsForbidden() throws Exception {
+        // Given: Alice is not part of Bob-Charlie chat
+        // Wait, seed_chats only has Alice-Bob and Alice-Charlie.
+        // Let's assume Bob-Charlie chat is created.
+        String bobCharlieChat = "22222222-2222-2222-2222-222222222222+33333333-3333-3333-3333-333333333333";
 
-                mockMvc.perform(patch("/chats/{id}/preference", identifier.toString())
-                                .contentType(MediaType.APPLICATION_JSON)
-                                .content(objectMapper.writeValueAsString(preference)))
-                        .andExpect(status().isOk())
-                        .andExpect(jsonPath("$.resourceId").value(10))
-                        .andExpect(jsonPath("$.roomName").value("Room A"))
-                        .andExpect(jsonPath("$.theme.id").value(5));
-        }
-
-        @Test
-        @WithMockUser("alice")
-        void get_themes_shouldReturnOk_andPublicCache() throws Exception {
-                given(themeRepository.findAll()).willReturn(List.of(new Theme(1, null), new Theme(2, null)));
-
-                mockMvc.perform(get("/chats/themes"))
-                        .andExpect(status().isOk())
-                        .andExpect(header().string(org.springframework.http.HttpHeaders.CACHE_CONTROL, org.hamcrest.Matchers.containsString("public")))
-                        .andExpect(jsonPath("$[0].id").value(1))
-                        .andExpect(jsonPath("$[1].id").value(2));
-        }
-
-        @Test
-        @WithMockUser("alice")
-        void list_chats_shouldReturnOk_andSnapshots() throws Exception {
-                // startAt optional; still pass it to exercise converter
-                given(chatRepository.findById(any(ChatIdentifier.class))).willReturn(Optional.of(chatEntity));
-
-                Chat c1 = chatEntity;
-                Chat c2 = new Chat(new User("a", "p"), new User("b", "p"));
-                given(chatService.listChat(eq(testUser), anyInt(), any())).willReturn(List.of(c1, c2));
-
-                ChatSnapshot s1 = new ChatSnapshot(null, null, 100);
-                ChatSnapshot s2 = new ChatSnapshot(null, null, 100);
-                given(chatService.getSnapshot(eq(c1), eq(testUser), eq(100))).willReturn(s1);
-                given(chatService.getSnapshot(eq(c2), eq(testUser), eq(100))).willReturn(s2);
-
-                mockMvc.perform(get("/chats")
-                                .param("atVersion", "100")
-                                .param("startAt", identifier.toString()))
-                        .andExpect(status().isOk())
-                        .andExpect(header().string(org.springframework.http.HttpHeaders.CACHE_CONTROL, org.hamcrest.Matchers.containsString("max-age")))
-                        .andExpect(jsonPath("$[0].atVersion").value(100))
-                        .andExpect(jsonPath("$[1].atVersion").value(100));
-        }
+        // When & Then: Alice can still request it (current implementation has no check)
+        mockMvc.perform(get("/chats/{id}", bobCharlieChat)
+                        .param("atVersion", "0"))
+                .andExpect(status().isForbidden());
+    }
 }

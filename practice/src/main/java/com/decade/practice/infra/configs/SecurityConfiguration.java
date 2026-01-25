@@ -1,9 +1,10 @@
 package com.decade.practice.infra.configs;
 
-import com.decade.practice.adapter.security.SaveOnLoadOauth2UserService;
-import com.decade.practice.adapter.security.jwt.JwtTokenFilter;
-import com.decade.practice.adapter.security.strategies.*;
-import com.decade.practice.application.usecases.UserService;
+import com.decade.practice.infra.security.jwt.JwtTokenFilter;
+import com.decade.practice.infra.security.strategies.EntryPointStrategy;
+import com.decade.practice.infra.security.strategies.LoginFailStrategy;
+import com.decade.practice.infra.security.strategies.LoginSuccessStrategy;
+import com.decade.practice.infra.security.strategies.LogoutStrategy;
 import org.springframework.beans.BeansException;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.beans.factory.config.BeanPostProcessor;
@@ -26,15 +27,11 @@ import org.springframework.security.core.userdetails.User;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
-import org.springframework.security.oauth2.client.oidc.userinfo.OidcUserService;
-import org.springframework.security.oauth2.client.userinfo.DefaultOAuth2UserService;
 import org.springframework.security.oauth2.server.resource.web.HeaderBearerTokenResolver;
 import org.springframework.security.provisioning.InMemoryUserDetailsManager;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 import org.springframework.security.web.authentication.logout.HttpStatusReturningLogoutSuccessHandler;
-import org.springframework.security.web.context.DelegatingSecurityContextRepository;
-import org.springframework.security.web.context.HttpSessionSecurityContextRepository;
 import org.springframework.security.web.context.RequestAttributeSecurityContextRepository;
 import org.springframework.security.web.context.SecurityContextRepository;
 import org.springframework.web.cors.CorsConfiguration;
@@ -45,159 +42,138 @@ import java.util.List;
 @EnableMethodSecurity
 @Configuration
 public class SecurityConfiguration extends GlobalAuthenticationConfigurerAdapter {
-        public static final String FILTER_CHAIN_BEAN_NAME = "DECADE_FILTER_CHAIN";
+    public static final String FILTER_CHAIN_BEAN_NAME = "DECADE_FILTER_CHAIN";
 
-        @Value("${frontend.host.address}")
-        private String frontEndAddress;
+    @Value("${frontend.host.address}")
+    private String frontEndAddress;
 
-        @Value("${spring.security.user.name}")
-        private String actuatorUsername;
+    @Value("${actuator.user.name}")
+    private String actuatorUsername;
 
-        @Value("${spring.security.user.password}")
-        private String actuatorPassword;
+    @Value("${actuator.user.password}")
+    private String actuatorPassword;
 
-        @Value("${spring.security.user.roles}")
-        private String actuatorRoles;
+    @Value("${actuator.user.roles}")
+    private String actuatorRoles;
 
-        @Configuration(proxyBeanMethods = false)
-        public static class ShowUserNotFoundConfiguration implements BeanPostProcessor {
-                // for debugging
-                @Override
-                public Object postProcessAfterInitialization(Object bean, String beanName) throws BeansException {
-                        if (bean instanceof ProviderManager) {
-                                ProviderManager providerManager = (ProviderManager) bean;
-                                for (var authProvider : providerManager.getProviders()) {
-                                        if (authProvider instanceof AbstractUserDetailsAuthenticationProvider) {
-                                                ((AbstractUserDetailsAuthenticationProvider) authProvider).setHideUserNotFoundExceptions(false);
-                                        }
-                                }
-                        }
-                        return bean;
-                }
-        }
-
+    @Configuration(proxyBeanMethods = false)
+    public static class ShowUserNotFoundConfiguration implements BeanPostProcessor {
+        // TODO: Will be removed latter
         @Override
-        public void configure(AuthenticationManagerBuilder auth) throws Exception {
-                auth.eraseCredentials(false);
+        public Object postProcessAfterInitialization(Object bean, String beanName) throws BeansException {
+            if (bean instanceof ProviderManager) {
+                ProviderManager providerManager = (ProviderManager) bean;
+                for (var authProvider : providerManager.getProviders()) {
+                    if (authProvider instanceof AbstractUserDetailsAuthenticationProvider) {
+                        ((AbstractUserDetailsAuthenticationProvider) authProvider).setHideUserNotFoundExceptions(false);
+                    }
+                }
+            }
+            return bean;
         }
+    }
 
-        @Bean
-        public PasswordEncoder passwordEncoder() {
-                return new BCryptPasswordEncoder(10);
-        }
+    @Override
+    public void configure(AuthenticationManagerBuilder auth) throws Exception {
+        auth.eraseCredentials(false);
+    }
+
+    @Bean
+    public PasswordEncoder passwordEncoder() {
+        return new BCryptPasswordEncoder(10);
+    }
 
 
-        @Bean
-        public SecurityContextRepository contextRepository() {
-                return new DelegatingSecurityContextRepository(
-                        new HttpSessionSecurityContextRepository(),
-                        new RequestAttributeSecurityContextRepository()
+    @Bean
+    public SecurityContextRepository contextRepository() {
+        return new RequestAttributeSecurityContextRepository();
+    }
+
+    @Bean
+    public UrlBasedCorsConfigurationSource corsConfigurationSource() {
+        CorsConfiguration config = new CorsConfiguration();
+        config.setAllowedOrigins(List.of(frontEndAddress));
+        config.setAllowedMethods(List.of("*"));
+        config.setAllowedHeaders(List.of("*"));
+        config.setAllowCredentials(true);
+        config.setMaxAge(3600L);
+
+        UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
+        source.registerCorsConfiguration("/**", config);
+        return source;
+    }
+
+    @Bean
+    @Order(0)
+    public SecurityFilterChain actuatorSecurity(HttpSecurity http) throws Exception {
+        UserDetails actuator = User.builder()
+                .username(actuatorUsername)
+                .password(passwordEncoder().encode(actuatorPassword))
+                .roles(actuatorRoles.split(","))
+                .build();
+        DaoAuthenticationProvider adminProvider = new DaoAuthenticationProvider();
+        adminProvider.setUserDetailsService(new InMemoryUserDetailsManager(actuator));
+        adminProvider.setPasswordEncoder(passwordEncoder());
+
+        http
+                .authenticationManager(new ProviderManager(adminProvider))
+                .securityMatcher(EndpointRequest.toAnyEndpoint())
+                .authorizeHttpRequests(
+                        auth -> auth
+                                .requestMatchers(EndpointRequest.to("health", "info")).permitAll()
+                                .requestMatchers(EndpointRequest.to("prometheus")).hasRole("OPS")
+                                .anyRequest().denyAll()
+                )
+                .httpBasic(Customizer.withDefaults())
+                .csrf(csrf -> csrf.disable());
+        return http.build();
+    }
+
+
+    @Bean(name = FILTER_CHAIN_BEAN_NAME)
+    public SecurityFilterChain filterChain(
+            HttpSecurity http,
+            LoginSuccessStrategy strategy,
+            LogoutStrategy logoutHandler,
+            JwtTokenFilter jwtAuthenticationFilter
+    ) throws Exception {
+        http
+                .requestCache(Customizer.withDefaults())
+                .securityContext(context ->
+                        context.securityContextRepository(contextRepository())
+                )
+                .cors(Customizer.withDefaults())
+                .csrf(csrf -> csrf.disable())
+                .formLogin(login ->
+                        login.successHandler(strategy)
+                                .failureHandler(new LoginFailStrategy())
+                                .loginPage("/login")
+                                .permitAll()
+                )
+                .exceptionHandling(exceptionHandling ->
+                        exceptionHandling.accessDeniedPage(null)
+                                .authenticationEntryPoint(new EntryPointStrategy())
+                )
+                .logout(logout ->
+                        logout.logoutSuccessHandler(new HttpStatusReturningLogoutSuccessHandler(HttpStatus.OK))
+                                .addLogoutHandler(logoutHandler)
+                                .permitAll()
+                )
+                .addFilterAfter(jwtAuthenticationFilter, UsernamePasswordAuthenticationFilter.class)
+                .authorizeHttpRequests(authorize ->
+                        authorize.requestMatchers("/medias/**").permitAll()
+                                .requestMatchers("/users/**").permitAll()
+                                .requestMatchers(HttpMethod.GET, "/login").permitAll()
+                                .anyRequest().authenticated()
+                )
+                .oauth2ResourceServer(oauth2 -> {
+                    oauth2.bearerTokenResolver(new HeaderBearerTokenResolver("Oauth2-Token"));
+                    oauth2.jwt(Customizer.withDefaults());
+                })
+                .sessionManagement(session ->
+                        session
+                                .sessionCreationPolicy(SessionCreationPolicy.STATELESS)
                 );
-        }
-
-        @Bean
-        public UrlBasedCorsConfigurationSource corsConfigurationSource() {
-                CorsConfiguration config = new CorsConfiguration();
-                config.setAllowedOrigins(List.of(frontEndAddress));
-                config.setAllowedMethods(List.of("*"));
-                config.setAllowedHeaders(List.of("*"));
-                config.setAllowCredentials(true);
-                config.setMaxAge(3600L);
-
-                UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
-                source.registerCorsConfiguration("/**", config);
-                return source;
-        }
-
-        @Bean
-        @Order(0)
-        public SecurityFilterChain actuatorSecurity(HttpSecurity http) throws Exception {
-                UserDetails actuator = User.builder()
-                        .username(actuatorUsername)
-                        .password(passwordEncoder().encode(actuatorPassword))
-                        .roles(actuatorRoles.split(","))
-                        .build();
-                DaoAuthenticationProvider adminProvider = new DaoAuthenticationProvider();
-                adminProvider.setUserDetailsService(new InMemoryUserDetailsManager(actuator));
-                adminProvider.setPasswordEncoder(passwordEncoder());
-                adminProvider.setHideUserNotFoundExceptions(false);
-
-                http
-                        .authenticationManager(new ProviderManager(adminProvider))
-                        .securityMatcher(EndpointRequest.toAnyEndpoint())
-                        .authorizeHttpRequests(
-                                a -> a.anyRequest().hasRole("ACTUATOR"))
-                        .httpBasic(Customizer.withDefaults())
-                        .csrf(csrf -> csrf.disable());
-                return http.build();
-        }
-
-
-        @Bean(name = FILTER_CHAIN_BEAN_NAME)
-        public SecurityFilterChain filterChain(
-                HttpSecurity http,
-                LoginSuccessStrategy strategy,
-                Oauth2LoginSuccessStrategy oauth2Strategy,
-                LogoutStrategy logoutHandler,
-                JwtTokenFilter jwtAuthenticationFilter,
-                UserService userService
-        ) throws Exception {
-                http
-                        .requestCache(Customizer.withDefaults())
-                        .securityContext(context ->
-                                context.securityContextRepository(contextRepository())
-                        )
-                        .cors(Customizer.withDefaults())
-                        .csrf(csrf -> csrf.disable())
-                        .formLogin(login ->
-                                login.successHandler(strategy)
-                                        .failureHandler(new LoginFailStrategy())
-                                        .loginPage("/login")
-                                        .permitAll()
-                        )
-                        .exceptionHandling(exceptionHandling ->
-                                exceptionHandling.accessDeniedPage(null)
-                                        .authenticationEntryPoint(new EntryPointStrategy())
-                        )
-                        .logout(logout ->
-                                logout.logoutSuccessHandler(new HttpStatusReturningLogoutSuccessHandler(HttpStatus.OK))
-                                        .addLogoutHandler(logoutHandler)
-                                        .permitAll()
-                        )
-                        .addFilterAfter(jwtAuthenticationFilter, UsernamePasswordAuthenticationFilter.class)
-                        .authorizeHttpRequests(authorize ->
-                                authorize.requestMatchers("/medias/**").permitAll()
-                                        .requestMatchers("/users/**").permitAll()
-                                        .requestMatchers(HttpMethod.GET, "/login").permitAll()
-                                        .anyRequest().authenticated()
-                        )
-                        .oauth2Login(oauth2 -> {
-                                oauth2.successHandler(oauth2Strategy);
-                                oauth2.userInfoEndpoint(userInfoEndpoint -> {
-                                        userInfoEndpoint.userService(
-                                                new SaveOnLoadOauth2UserService(
-                                                        userService,
-                                                        new DefaultOAuth2UserService()
-                                                )
-                                        );
-                                        userInfoEndpoint.oidcUserService(
-                                                new SaveOnLoadOauth2UserService(
-                                                        userService,
-                                                        new OidcUserService()
-                                                )
-                                        );
-                                });
-                        })
-                        .oauth2Client(Customizer.withDefaults())
-                        .oauth2ResourceServer(oauth2 -> {
-                                oauth2.bearerTokenResolver(new HeaderBearerTokenResolver("Oauth2-Token"));
-                                oauth2.jwt(Customizer.withDefaults());
-                        })
-                        .sessionManagement(session ->
-                                session
-                                        .sessionCreationPolicy(SessionCreationPolicy.IF_REQUIRED)
-                                        .maximumSessions(-1)
-                        );
-                return http.build();
-        }
+        return http.build();
+    }
 }
