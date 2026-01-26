@@ -20,7 +20,7 @@ public class ImageEventFactory extends AbstractEventFactory<ImageEvent> {
         ImageEvent imageEvent = new ImageEvent();
         imageEvent.setChatIdentifier(eventRequest.getChatIdentifier());
         ImageSpec imageSpec = new ImageSpec();
-        imageSpec.setUri(eventRequest.getImageEvent().getUri());
+        imageSpec.setUri(eventRequest.getImageEvent().getDownloadUrl());
         imageSpec.setFilename(eventRequest.getImageEvent().getFilename());
         imageSpec.setWidth(eventRequest.getImageEvent().getWidth());
         imageSpec.setHeight(eventRequest.getImageEvent().getHeight());
@@ -35,7 +35,7 @@ public class ImageEventFactory extends AbstractEventFactory<ImageEvent> {
         ImageEventDto imageEventDto = new ImageEventDto();
         if (event.getImage() != null) {
             imageEventDto.setFilename(event.getImage().getFilename());
-            imageEventDto.setUri(event.getImage().getUri());
+            imageEventDto.setDownloadUrl(event.getImage().getUri());
             imageEventDto.setFormat(event.getImage().getFormat());
             imageEventDto.setWidth(event.getImage().getWidth());
             imageEventDto.setHeight(event.getImage().getHeight());

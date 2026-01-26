@@ -84,6 +84,7 @@ services:
       - elasticsearch
     environment:
       - ELASTICSEARCH_HOSTS=http://elasticsearch:9200
+
   filebeat:
     image: docker.elastic.co/beats/filebeat:8.12.2
     user: root
@@ -92,5 +93,19 @@ services:
       - ./logs:/logs:ro
     depends_on:
       - elasticsearch
+
+  s3:
+    image: localstack/localstack:latest
+    ports:
+      - "4566:4566"
+    environment:
+      - SERVICES=s3
+      - AWS_DEFAULT_REGION=ap-southeast-1
+    volumes:
+      - ./localstack:/var/lib/localstack
+      - /var/run/docker.sock:/var/run/docker.sock
+      - ./s3/init:/etc/localstack/init/ready.d
+
+
 volumes:
   grafana-data:

@@ -51,7 +51,7 @@ class EventControllerTest extends BaseTestClass {
         String chatIdentifier = "11111111-1111-1111-1111-111111111111+22222222-2222-2222-2222-222222222222";
         String eventJson = """
                 {
-                    "uri": "http://example.com/image.jpg",
+                    "downloadUrl": "http://example.com/image.jpg",
                     "width": 100,
                     "height": 100,
                     "filename": "vcl.jpg",
@@ -65,7 +65,7 @@ class EventControllerTest extends BaseTestClass {
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(eventJson))
                 .andExpect(status().isCreated())
-                .andExpect(jsonPath("$.imageEvent.uri").value("http://example.com/image.jpg"));
+                .andExpect(jsonPath("$.imageEvent.downloadUrl").value("http://example.com/image.jpg"));
     }
 
     @Test

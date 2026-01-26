@@ -11,7 +11,7 @@ import lombok.NoArgsConstructor;
 public class ImageEventDto {
 
     @NotNull
-    private String uri;
+    private String downloadUrl;
 
     @NotNull
     private String filename;
