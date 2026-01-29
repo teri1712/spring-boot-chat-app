@@ -1,6 +1,6 @@
 CREATE TABLE chat
 (
-    interact_time TIMESTAMP WITHOUT TIME ZONE,
+    interact_time TIMESTAMP WITH TIME ZONE,
     message_count INTEGER NOT NULL,
     version       INTEGER,
     first_user    UUID    NOT NULL,
@@ -13,13 +13,13 @@ CREATE TABLE chat
 
 CREATE TABLE chat_event
 (
-    id             UUID      NOT NULL,
+    id             UUID                     NOT NULL,
     sender_id      UUID,
     event_type     VARCHAR(255),
     owner_id       UUID,
-    idempotent_key UUID      NOT NULL UNIQUE,
-    event_version  INTEGER   NOT NULL,
-    created_time   TIMESTAMP NOT NULL,
+    idempotent_key UUID                     NOT NULL UNIQUE,
+    event_version  INTEGER                  NOT NULL,
+    created_time   TIMESTAMP WITH TIME ZONE NOT NULL,
     first_user     UUID,
     second_user    UUID,
     at             TIMESTAMP,
@@ -73,7 +73,7 @@ CREATE TABLE user_member
     username VARCHAR(255) NOT NULL UNIQUE,
     password VARCHAR(255) NOT NULL,
     name     VARCHAR(255),
-    dob      TIMESTAMP WITHOUT TIME ZONE,
+    dob      TIMESTAMP WITH TIME ZONE,
     role     VARCHAR(255),
     version  INTEGER,
     gender   real,

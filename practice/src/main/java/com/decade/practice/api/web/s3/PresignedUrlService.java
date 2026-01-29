@@ -4,10 +4,12 @@ import com.decade.practice.api.dto.S3PresignedDto;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
+import org.springframework.web.util.UriUtils;
 import software.amazon.awssdk.services.s3.model.PutObjectRequest;
 import software.amazon.awssdk.services.s3.presigner.S3Presigner;
 import software.amazon.awssdk.services.s3.presigner.model.PutObjectPresignRequest;
 
+import java.nio.charset.StandardCharsets;
 import java.time.Duration;
 
 @Service
@@ -26,8 +28,8 @@ public class PresignedUrlService {
         return username + "/" + filename;
     }
 
-    public String getDownloadUrl(String key) {
-        return s3Endpoint + "/" + bucket + "/" + key;
+    public String getDownloadUrl(String username, String filename) {
+        return s3Endpoint + "/" + bucket + "/" + UriUtils.encodePath(username, StandardCharsets.UTF_8) + "/" + UriUtils.encodePath(filename, StandardCharsets.UTF_8);
     }
 
     public S3PresignedDto generateUploadUrl(String filename, String username) {
@@ -52,7 +54,7 @@ public class PresignedUrlService {
                 .bucket(bucket)
                 .presignedUploadUrl(uploadUrl)
                 .filename(filename)
-                .downloadUrl(getDownloadUrl(key))
+                .downloadUrl(getDownloadUrl(username, filename))
                 .build();
     }
 

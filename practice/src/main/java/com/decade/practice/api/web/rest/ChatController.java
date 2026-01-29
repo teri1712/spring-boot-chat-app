@@ -38,12 +38,12 @@ public class ChatController {
     public ChatSnapshot getChat(
             @AuthenticationPrincipal(expression = "id") UUID userId,
             @PathVariable ChatIdentifier identifier,
-            @RequestParam(required = false) Integer atVersion
+            @RequestParam Optional<Integer> atVersion
     ) {
         return chatService.getSnapshot(
                 identifier,
                 userId,
-                atVersion
+                atVersion.orElse(Integer.MAX_VALUE)
         );
     }
 

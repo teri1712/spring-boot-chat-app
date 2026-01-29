@@ -42,6 +42,8 @@ public class JwtTokenFilter extends OncePerRequestFilter {
                 Authentication authentication = new JwtUserAuthentication(principal, accessToken);
                 context.setAuthentication(authentication);
                 SecurityContextHolder.setContext(context);
+            } else {
+                logger.debug("No access token found in request " + request.getRequestURI());
             }
             filterChain.doFilter(request, response);
         } catch (JwtException e) {

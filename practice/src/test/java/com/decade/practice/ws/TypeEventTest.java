@@ -82,19 +82,21 @@ public class TypeEventTest extends BaseTestClass {
             stompClient.setMessageConverter(converter);
 
 
-            WebSocketHttpHeaders aliceHttpHeaders = new WebSocketHttpHeaders();
-            aliceHttpHeaders.add(HEADER_NAME, BEARER + aliceToken);
+            StompHeaders aliceHeaders = new StompHeaders();
+            aliceHeaders.add(HEADER_NAME, BEARER + aliceToken);
             aliceSession = stompClient.connectAsync(
                     "ws://localhost:" + port + "/handshake",
-                    aliceHttpHeaders,
+                    new WebSocketHttpHeaders(),
+                    aliceHeaders,
                     new StompSessionHandlerAdapter() {
                     }).get(2, TimeUnit.SECONDS);
 
-            WebSocketHttpHeaders bobHttpHeaders = new WebSocketHttpHeaders();
-            bobHttpHeaders.add(HEADER_NAME, BEARER + bobToken);
+            StompHeaders bobHeaders = new StompHeaders();
+            bobHeaders.add(HEADER_NAME, BEARER + bobToken);
             bobSession = stompClient.connectAsync(
                     "ws://localhost:" + port + "/handshake",
-                    bobHttpHeaders,
+                    new WebSocketHttpHeaders(),
+                    bobHeaders,
                     new StompSessionHandlerAdapter() {
                     }).get(2, TimeUnit.SECONDS);
 

@@ -19,4 +19,17 @@ awslocal s3api put-bucket-policy \
     ]
   }'
 
+awslocal s3api put-bucket-cors \
+  --bucket decade-bucket \
+  --cors-configuration '{
+    "CORSRules": [
+      {
+        "AllowedOrigins": ["*"],
+        "AllowedMethods": ["GET","PUT","POST","DELETE","HEAD"],
+        "AllowedHeaders": ["*"],
+        "ExposeHeaders": ["ETag"]
+      }
+    ]
+  }'
+
 echo "S3 bucket initialized"

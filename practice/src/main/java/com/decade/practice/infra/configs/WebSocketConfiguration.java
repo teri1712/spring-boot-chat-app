@@ -5,15 +5,12 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
-import org.springframework.http.server.ServerHttpRequest;
-import org.springframework.http.server.ServerHttpResponse;
 import org.springframework.messaging.handler.invocation.HandlerMethodArgumentResolver;
 import org.springframework.messaging.simp.config.ChannelRegistration;
 import org.springframework.messaging.simp.config.MessageBrokerRegistry;
 import org.springframework.messaging.support.ChannelInterceptor;
 import org.springframework.scheduling.TaskScheduler;
 import org.springframework.scheduling.concurrent.ThreadPoolTaskScheduler;
-import org.springframework.web.socket.WebSocketHandler;
 import org.springframework.web.socket.config.annotation.EnableWebSocket;
 import org.springframework.web.socket.config.annotation.EnableWebSocketMessageBroker;
 import org.springframework.web.socket.config.annotation.StompEndpointRegistry;
@@ -22,7 +19,6 @@ import org.springframework.web.socket.server.HandshakeInterceptor;
 
 import java.util.HashSet;
 import java.util.List;
-import java.util.Map;
 import java.util.Set;
 
 @Configuration
@@ -55,27 +51,6 @@ public class WebSocketConfiguration implements WebSocketMessageBrokerConfigurer 
     @Override
     public void registerStompEndpoints(StompEndpointRegistry registry) {
         registry.addEndpoint(HANDSHAKE_DESTINATION)
-                .addInterceptors(new HandshakeInterceptor() {
-                    @Override
-                    public boolean beforeHandshake(
-                            ServerHttpRequest request,
-                            ServerHttpResponse response,
-                            WebSocketHandler wsHandler,
-                            Map<String, Object> attributes
-                    ) throws Exception {
-                        return request.getPrincipal() != null;
-                    }
-
-                    @Override
-                    public void afterHandshake(
-                            ServerHttpRequest request,
-                            ServerHttpResponse response,
-                            WebSocketHandler wsHandler,
-                            Exception exception
-                    ) {
-                        // Empty implementation
-                    }
-                })
                 .addInterceptors(handShakeInterceptors.toArray(new HandshakeInterceptor[0]))
                 .setAllowedOrigins(frontEndAddress);
         // .withSockJS();

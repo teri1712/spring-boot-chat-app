@@ -163,6 +163,7 @@ public class SecurityConfiguration extends GlobalAuthenticationConfigurerAdapter
                 .authorizeHttpRequests(authorize ->
                         authorize.requestMatchers("/medias/**").permitAll()
                                 .requestMatchers("/users/**").permitAll()
+                                .requestMatchers(WebSocketConfiguration.HANDSHAKE_DESTINATION).permitAll()
                                 .requestMatchers(HttpMethod.GET, "/login").permitAll()
                                 .anyRequest().authenticated()
                 )

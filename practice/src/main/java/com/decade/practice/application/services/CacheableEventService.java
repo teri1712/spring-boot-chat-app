@@ -2,6 +2,7 @@ package com.decade.practice.application.services;
 
 import com.decade.practice.api.dto.EventDto;
 import com.decade.practice.application.usecases.EventService;
+import com.decade.practice.application.usecases.EventStore;
 import com.decade.practice.persistence.jpa.embeddables.ChatIdentifier;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -21,7 +22,7 @@ import java.util.UUID;
 @ConditionalOnProperty(name = "server.cache.events", havingValue = "true", matchIfMissing = true)
 public class CacheableEventService implements EventService {
 
-    public final EventServiceImpl eventService;
+    public final EventStore eventService;
 
     @Override
     @Cacheable(cacheNames = "events", key = "#owner + ':' + #chat + ':' + #eventVersion")

@@ -36,6 +36,7 @@ public class LoginSuccessStrategy implements AuthenticationSuccessHandler {
         TokenCredential tokenCredential = tokenService.create(UserClaims.builder()
                 .id(userDto.getId())
                 .username(userDto.getUsername())
+                .name(userDto.getName())
                 .role(userDto.getRole())
                 .gender(userDto.getGender())
                 .avatar(userDto.getAvatar())
