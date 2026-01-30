@@ -12,10 +12,8 @@ import com.decade.practice.persistence.jpa.entities.Chat;
 import com.decade.practice.persistence.jpa.entities.PreferenceEvent;
 import com.decade.practice.persistence.jpa.entities.Theme;
 import com.decade.practice.persistence.jpa.repositories.ThemeRepository;
-import com.decade.practice.utils.WebCacheUtils;
 import lombok.AllArgsConstructor;
 import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 
@@ -79,10 +77,8 @@ public class ChatController {
     }
 
     @GetMapping("/themes")
-    public ResponseEntity<List<Theme>> getThemes() {
-        return ResponseEntity.ok().cacheControl(
-                        WebCacheUtils.ONE_MONTHS.cachePublic())
-                .body(themeRepository.findAll());
+    public List<Theme> getThemes() {
+        return themeRepository.findAll();
     }
 
     @GetMapping
