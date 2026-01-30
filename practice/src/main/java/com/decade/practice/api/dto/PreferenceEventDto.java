@@ -6,9 +6,9 @@ import lombok.Setter;
 @Setter
 @Getter
 public class PreferenceEventDto {
-    private PreferenceDto preference;
+    private PreferenceResponse preference;
 
-    public PreferenceEventDto(PreferenceDto preference) {
+    public PreferenceEventDto(PreferenceResponse preference) {
         this.preference = preference;
     }
 

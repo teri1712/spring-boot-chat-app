@@ -1,18 +1,11 @@
 package com.decade.practice.application.usecases;
 
-import com.decade.practice.api.dto.EventDto;
-import com.decade.practice.api.dto.EventRequest;
-import com.decade.practice.api.dto.PreferenceDto;
-import com.decade.practice.api.dto.PreferenceEventDto;
+import com.decade.practice.api.dto.*;
 import com.decade.practice.persistence.jpa.embeddables.Preference;
 import com.decade.practice.persistence.jpa.entities.PreferenceEvent;
-import com.decade.practice.persistence.jpa.entities.Theme;
 import com.decade.practice.persistence.jpa.repositories.ThemeRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
-
-import java.util.Optional;
-import java.util.function.Function;
 
 @Component
 @RequiredArgsConstructor
@@ -22,10 +15,11 @@ public class PreferenceEventFactory extends AbstractEventFactory<PreferenceEvent
 
     @Override
     protected EventDto postInitEventResponse(PreferenceEvent chatEvent, EventDto res) {
-        PreferenceDto preference = new PreferenceDto();
+        PreferenceResponse preference = new PreferenceResponse();
         preference.setRoomName(chatEvent.getPreference().getRoomName());
-        preference.setResourceId(chatEvent.getPreference().getResourceId());
-        preference.setThemeId(Optional.ofNullable(chatEvent.getPreference().getTheme()).map(Theme::getId).orElse(null));
+        preference.setIconId(chatEvent.getPreference().getIconId());
+        if (chatEvent.getPreference().getTheme() != null)
+            preference.setTheme(ThemeDto.from(chatEvent.getPreference().getTheme()));
         res.setPreferenceEvent(new PreferenceEventDto(preference));
         return res;
     }
@@ -37,16 +31,13 @@ public class PreferenceEventFactory extends AbstractEventFactory<PreferenceEvent
 
     @Override
     public PreferenceEvent createEvent(EventRequest eventRequest) {
-        PreferenceDto preferenceDto = eventRequest.getPreferenceEvent().getPreference();
+        PreferenceRequest preferenceReq = eventRequest.getPreferenceEvent();
         Preference preference = new Preference();
-        preference.setRoomName(preferenceDto.getRoomName());
-        preference.setResourceId(preferenceDto.getResourceId());
-        preference.setTheme(Optional.ofNullable(preferenceDto.getThemeId()).flatMap(new Function<Integer, Optional<Theme>>() {
-            @Override
-            public Optional<Theme> apply(Integer integer) {
-                return themeRepository.findById(integer);
-            }
-        }).orElse(null));
+        preference.setRoomName(preferenceReq.getRoomName());
+        preference.setIconId(preferenceReq.getIconId());
+        if (preferenceReq.getThemeId() != null)
+            preference.setTheme(themeRepository.findById(preferenceReq.getThemeId()).orElseThrow());
+
         PreferenceEvent preferenceEvent = new PreferenceEvent();
         preferenceEvent.setChatIdentifier(eventRequest.getChatIdentifier());
         preferenceEvent.setPreference(preference);

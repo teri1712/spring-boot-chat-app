@@ -1,5 +1,6 @@
 package com.decade.practice.application.services;
 
+import com.decade.practice.api.dto.ChatDetailsDto;
 import com.decade.practice.api.dto.ChatSnapshot;
 import com.decade.practice.api.dto.Conversation;
 import com.decade.practice.api.dto.EventDto;
@@ -22,6 +23,7 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.hibernate.exception.ConstraintViolationException;
 import org.springframework.data.domain.PageRequest;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Isolation;
 import org.springframework.transaction.annotation.Propagation;
@@ -122,14 +124,24 @@ public class ChatServiceImpl extends SelfAwareBean implements ChatService {
 
     @Override
     @Transactional
+    @PreAuthorize("@eventStore.isAllowed(#chatIdentifier,#userId)")
     public ChatSnapshot getSnapshot(ChatIdentifier chatIdentifier, UUID userId, int atVersion) {
         User owner = userRepo.findById(userId).orElseThrow();
-        Chat chat = getOrCreateChat(chatIdentifier);
+        Chat chat = chatRepo.findById(chatIdentifier).orElseThrow();
         List<EventDto> eventList = eventService.findByOwnerAndChatAndEventVersionLessThanEqual(userId, chatIdentifier, atVersion);
         return new ChatSnapshot(
                 new Conversation(chat, owner),
                 eventList,
                 atVersion
         );
+    }
+
+    @Override
+    @PreAuthorize("@eventStore.isAllowed(#chatIdentifier,#userId)")
+    @Transactional
+    public ChatDetailsDto getDetails(ChatIdentifier chatIdentifier, UUID userId) {
+        User owner = userRepo.findById(userId).orElseThrow();
+        Chat chat = getOrCreateChat(chatIdentifier);
+        return ChatDetailsDto.from(chat, owner);
     }
 }

@@ -1,17 +1,16 @@
 package com.decade.practice.api.web.rest;
 
+import com.decade.practice.api.dto.ChatDetailsDto;
 import com.decade.practice.api.dto.ChatSnapshot;
 import com.decade.practice.api.dto.EventRequest;
-import com.decade.practice.api.dto.PreferenceDto;
-import com.decade.practice.api.dto.PreferenceEventDto;
+import com.decade.practice.api.dto.PreferenceRequest;
 import com.decade.practice.application.usecases.ChatService;
 import com.decade.practice.application.usecases.DeliveryService;
 import com.decade.practice.application.usecases.EventFactoryResolution;
 import com.decade.practice.persistence.jpa.embeddables.ChatIdentifier;
 import com.decade.practice.persistence.jpa.entities.Chat;
 import com.decade.practice.persistence.jpa.entities.PreferenceEvent;
-import com.decade.practice.persistence.jpa.entities.Theme;
-import com.decade.practice.persistence.jpa.repositories.ThemeRepository;
+import jakarta.validation.Valid;
 import lombok.AllArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
@@ -29,33 +28,16 @@ public class ChatController {
 
     private final EventFactoryResolution factoryResolution;
     private final ChatService chatService;
-    private final ThemeRepository themeRepository;
     private final DeliveryService deliveryService;
 
     @GetMapping("/{identifier}")
-    public ChatSnapshot getChat(
+    public ChatDetailsDto getChat(
             @AuthenticationPrincipal(expression = "id") UUID userId,
-            @PathVariable ChatIdentifier identifier,
-            @RequestParam Optional<Integer> atVersion
+            @PathVariable ChatIdentifier identifier
     ) {
-        return chatService.getSnapshot(
+        return chatService.getDetails(
                 identifier,
-                userId,
-                atVersion.orElse(Integer.MAX_VALUE)
-        );
-    }
-
-    @GetMapping("/partners/{partnerId}")
-    public ChatSnapshot getChat(
-            @AuthenticationPrincipal(expression = "id") UUID userId,
-            @PathVariable UUID partnerId,
-            @RequestParam(required = false) Integer atVersion
-    ) {
-        ChatIdentifier identifier = ChatIdentifier.from(partnerId, userId);
-        return chatService.getSnapshot(
-                identifier,
-                userId,
-                atVersion
+                userId
         );
     }
 
@@ -66,20 +48,15 @@ public class ChatController {
             @AuthenticationPrincipal(expression = "id") UUID userId,
             @PathVariable ChatIdentifier identifier,
             @RequestHeader("Idempotency-key") UUID key,
-            @RequestBody PreferenceDto preference) {
+            @Valid @RequestBody PreferenceRequest preference) {
 
-        PreferenceEventDto event = new PreferenceEventDto(preference);
         EventRequest eventRequest = new EventRequest();
         eventRequest.setSender(userId);
-        eventRequest.setPreferenceEvent(event);
+        eventRequest.setPreferenceEvent(preference);
         eventRequest.setChatIdentifier(identifier);
         deliveryService.createAndSend(key, eventRequest, factoryResolution.getFactory(PreferenceEvent.class));
     }
 
-    @GetMapping("/themes")
-    public List<Theme> getThemes() {
-        return themeRepository.findAll();
-    }
 
     @GetMapping
     public List<ChatSnapshot> listChat(

@@ -14,7 +14,7 @@ public class EventRequest {
     private TextEventDto textEvent;
     private ImageEventDto imageEvent;
     private IconEventDto iconEvent;
-    private PreferenceEventDto preferenceEvent;
+    private PreferenceRequest preferenceEvent;
     private FileEventDto fileEvent;
     private SeenEventDto seenEvent;
 

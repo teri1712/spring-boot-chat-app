@@ -1,6 +1,6 @@
 package com.decade.practice.web.rest;
 
-import com.decade.practice.api.dto.PreferenceDto;
+import com.decade.practice.api.dto.PreferenceResponse;
 import com.decade.practice.common.BaseTestClass;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.junit.jupiter.api.Test;
@@ -67,9 +67,9 @@ class ChatControllerTest extends BaseTestClass {
         // Given
         // Correct order: 1111... < 2222...
         String chatId = "11111111-1111-1111-1111-111111111111+22222222-2222-2222-2222-222222222222";
-        PreferenceDto preference = new PreferenceDto();
+        PreferenceResponse preference = new PreferenceResponse();
         preference.setRoomName("My pookie bob");
-        preference.setResourceId(99);
+        preference.setIconId(99);
 
         // When
         mockMvc.perform(put("/chats/{id}/preference", chatId)
@@ -83,7 +83,7 @@ class ChatControllerTest extends BaseTestClass {
                         .param("atVersion", "1"))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.conversation.chat.preference.roomName").value("My pookie bob"))
-                .andExpect(jsonPath("$.conversation.chat.preference.resourceId").value(99));
+                .andExpect(jsonPath("$.conversation.chat.preference.iconId").value(99));
     }
 
     @Test
@@ -139,7 +139,7 @@ class ChatControllerTest extends BaseTestClass {
     @Sql(scripts = {"/sql/clean.sql", "/sql/seed_users.sql", "/sql/seed_themes.sql"})
     @WithUserDetails("alice")
     void givenThemesExist_whenRequestThemes_thenReturnsAllThemes() throws Exception {
-        mockMvc.perform(get("/chats/themes"))
+        mockMvc.perform(get("/themes"))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.length()").value(3));
     }

@@ -11,6 +11,6 @@ import lombok.NoArgsConstructor;
 public class IconEventDto {
 
     @NotNull
-    private int resourceId;
+    private int iconId;
 
 }

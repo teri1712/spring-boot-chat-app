@@ -28,7 +28,7 @@ public class EventDto {
 
     private UserResponse owner;
     private UserResponse partner;
-    private ChatResponse chat;
+    private ChatDto chat;
 
 
 }

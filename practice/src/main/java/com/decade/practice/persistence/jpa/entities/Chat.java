@@ -3,6 +3,7 @@ package com.decade.practice.persistence.jpa.entities;
 import com.decade.practice.persistence.jpa.embeddables.ChatIdentifier;
 import com.decade.practice.persistence.jpa.embeddables.Preference;
 import jakarta.persistence.*;
+import jakarta.validation.constraints.NotNull;
 import lombok.Data;
 import org.hibernate.annotations.CurrentTimestamp;
 import org.hibernate.annotations.SourceType;
@@ -28,6 +29,7 @@ public class Chat {
     private ChatIdentifier identifier;
 
     @Embedded
+    @NotNull
     private Preference preference;
 
     @CurrentTimestamp(event = EventType.INSERT, source = SourceType.VM)

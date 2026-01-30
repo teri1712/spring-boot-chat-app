@@ -11,7 +11,7 @@ public class IconEventFactory extends AbstractEventFactory<IconEvent> {
 
     @Override
     protected EventDto postInitEventResponse(IconEvent event, EventDto res) {
-        res.setIconEvent(new IconEventDto(event.getResourceId()));
+        res.setIconEvent(new IconEventDto(event.getIconId()));
         return res;
     }
 
@@ -24,7 +24,7 @@ public class IconEventFactory extends AbstractEventFactory<IconEvent> {
     public IconEvent createEvent(EventRequest eventRequest) {
         IconEvent iconEvent = new IconEvent();
         iconEvent.setChatIdentifier(eventRequest.getChatIdentifier());
-        iconEvent.setResourceId(eventRequest.getIconEvent().getResourceId());
+        iconEvent.setIconId(eventRequest.getIconEvent().getIconId());
         iconEvent.setEventType("ICON");
         return iconEvent;
     }

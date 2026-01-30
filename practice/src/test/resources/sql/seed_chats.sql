@@ -1,7 +1,7 @@
 -- Alice (1111...) and Bob (2222...)
 -- Alice (1111...) and Charlie (3333...)
 
-INSERT INTO chat (first_user, second_user, resource_id, room_name, interact_time, message_count)
+INSERT INTO chat (first_user, second_user, icon_id, room_name, interact_time, message_count)
 VALUES ('11111111-1111-1111-1111-111111111111', '22222222-2222-2222-2222-222222222222', 1, 'Room alice and bob', NOW(),
         0),
        ('11111111-1111-1111-1111-111111111111', '33333333-3333-3333-3333-333333333333', 1, 'Room alice and charlie',

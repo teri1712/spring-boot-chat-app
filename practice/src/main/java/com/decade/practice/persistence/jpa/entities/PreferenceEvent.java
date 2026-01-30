@@ -1,9 +1,7 @@
 package com.decade.practice.persistence.jpa.entities;
 
 import com.decade.practice.persistence.jpa.embeddables.Preference;
-import jakarta.persistence.DiscriminatorValue;
-import jakarta.persistence.Embedded;
-import jakarta.persistence.Entity;
+import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.Setter;
 
@@ -14,6 +12,7 @@ import lombok.Setter;
 public class PreferenceEvent extends ChatEvent {
 
     @Embedded
+    @AttributeOverride(name = "iconId", column = @Column(name = "preference_icon_id"))
     private Preference preference;
 
     public PreferenceEvent() {

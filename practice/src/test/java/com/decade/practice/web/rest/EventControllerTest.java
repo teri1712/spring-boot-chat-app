@@ -76,7 +76,7 @@ class EventControllerTest extends BaseTestClass {
         String chatIdentifier = "11111111-1111-1111-1111-111111111111+22222222-2222-2222-2222-222222222222";
         String eventJson = """
                 {
-                    "resourceId": 5
+                    "iconId": 5
                 }
                 """;
         // When & Then
@@ -85,7 +85,7 @@ class EventControllerTest extends BaseTestClass {
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(eventJson))
                 .andExpect(status().isCreated())
-                .andExpect(jsonPath("$.iconEvent.resourceId").value(5));
+                .andExpect(jsonPath("$.iconEvent.iconId").value(5));
     }
 
     @Test

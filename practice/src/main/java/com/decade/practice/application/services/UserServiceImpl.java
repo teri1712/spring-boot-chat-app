@@ -71,11 +71,15 @@ public class UserServiceImpl extends SelfAwareBean implements UserService {
 
     @Override
     public User changeProfile(UUID id, ProfileRequest profileRequest) throws OptimisticLockException {
-        User user = userRepo.findById(id).get();
-        user.setName(profileRequest.getName());
-        user.setDob(profileRequest.getDob());
-        user.setGender(profileRequest.getGender());
-        user.setAvatar(profileRequest.getAvatar());
+        User user = userRepo.findById(id).orElseThrow();
+        if (profileRequest.getName() != null)
+            user.setName(profileRequest.getName());
+        if (profileRequest.getDob() != null)
+            user.setDob(profileRequest.getDob());
+        if (profileRequest.getGender() != null)
+            user.setGender(profileRequest.getGender());
+        if (profileRequest.getAvatar() != null)
+            user.setAvatar(profileRequest.getAvatar());
         return user;
     }
 

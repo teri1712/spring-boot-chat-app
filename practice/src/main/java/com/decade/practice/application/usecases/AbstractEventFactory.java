@@ -1,6 +1,6 @@
 package com.decade.practice.application.usecases;
 
-import com.decade.practice.api.dto.ChatResponse;
+import com.decade.practice.api.dto.ChatDto;
 import com.decade.practice.api.dto.EventDto;
 import com.decade.practice.api.dto.UserResponse;
 import com.decade.practice.persistence.jpa.entities.ChatEvent;
@@ -32,7 +32,7 @@ public abstract class AbstractEventFactory<E extends ChatEvent> implements Event
         event.setMessage(chatEvent instanceof MessageEvent);
         event.setOwner(UserResponse.from(chatEvent.getOwner()));
         event.setPartner(UserResponse.from(ChatUtils.inspectPartner(chatEvent.getChat(), chatEvent.getOwner())));
-        event.setChat(new ChatResponse(chatEvent.getChat(), chatEvent.getOwner()));
+        event.setChat(new ChatDto(chatEvent.getChat(), chatEvent.getOwner()));
         event.setSender(chatEvent.getSender().getId());
         event.setCreatedTime(chatEvent.getCreatedTime());
         return postInitEventResponse((E) chatEvent, event);

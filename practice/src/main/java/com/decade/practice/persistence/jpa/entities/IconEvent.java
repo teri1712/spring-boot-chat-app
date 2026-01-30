@@ -17,16 +17,16 @@ public class IconEvent extends MessageEvent {
 
     @NotNull
     @Column(updatable = false)
-    private int resourceId;
+    private int iconId;
 
 
-    public IconEvent(Chat chat, User sender, int resourceId) {
+    public IconEvent(Chat chat, User sender, int iconId) {
         super(chat, sender, "ICON");
-        this.resourceId = resourceId;
+        this.iconId = iconId;
     }
 
     public IconEvent(IconEvent event) {
-        this(event.getChat(), event.getSender(), event.getResourceId());
+        this(event.getChat(), event.getSender(), event.getIconId());
     }
 
 
