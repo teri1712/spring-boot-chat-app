@@ -3,13 +3,15 @@ package com.decade.practice.api.dto;
 import com.decade.practice.persistence.jpa.embeddables.ImageSpec;
 import com.decade.practice.persistence.jpa.entities.User;
 import lombok.Builder;
-import lombok.Data;
+import lombok.Getter;
+import lombok.Setter;
 
 import java.util.Date;
 import java.util.UUID;
 
 @Builder
-@Data
+@Getter
+@Setter
 public class UserResponse {
 
     private String username;

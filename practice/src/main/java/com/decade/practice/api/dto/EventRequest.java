@@ -1,13 +1,14 @@
 package com.decade.practice.api.dto;
 
 import com.decade.practice.persistence.jpa.embeddables.ChatIdentifier;
-import lombok.Data;
+import lombok.Getter;
 import lombok.NoArgsConstructor;
+import lombok.Setter;
 
 import java.util.UUID;
 
-// TODO: re-implement client
-@Data
+@Getter
+@Setter
 @NoArgsConstructor
 public class EventRequest {
 

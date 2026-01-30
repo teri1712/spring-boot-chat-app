@@ -4,7 +4,8 @@ import com.decade.practice.persistence.jpa.embeddables.ChatIdentifier;
 import com.decade.practice.persistence.jpa.embeddables.Preference;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotNull;
-import lombok.Data;
+import lombok.Getter;
+import lombok.Setter;
 import org.hibernate.annotations.CurrentTimestamp;
 import org.hibernate.annotations.SourceType;
 import org.hibernate.generator.EventType;
@@ -12,7 +13,8 @@ import org.hibernate.generator.EventType;
 import java.util.Date;
 
 @Entity
-@Data
+@Getter
+@Setter
 public class Chat {
 
     @ManyToOne(cascade = CascadeType.PERSIST)

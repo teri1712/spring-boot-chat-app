@@ -1,10 +1,12 @@
 package com.decade.practice.persistence.jpa.entities;
 
 import jakarta.persistence.*;
-import lombok.Data;
+import lombok.Getter;
+import lombok.Setter;
 
 @Entity
-@Data
+@Getter
+@Setter
 public class ChatOrder {
 
     @Id
@@ -16,7 +18,7 @@ public class ChatOrder {
 
     @ManyToOne(fetch = FetchType.LAZY)
     private User owner;
-    
+
     @OneToOne(cascade = CascadeType.PERSIST, fetch = FetchType.LAZY)
     private ChatEvent currentEvent;
 

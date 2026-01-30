@@ -2,17 +2,15 @@ package com.decade.practice.infra.security.models;
 
 import com.decade.practice.persistence.jpa.embeddables.ImageSpec;
 import com.decade.practice.persistence.jpa.entities.User;
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.Data;
-import lombok.NoArgsConstructor;
+import lombok.*;
 
 import java.util.UUID;
 
 @AllArgsConstructor
 @Builder
 @NoArgsConstructor
-@Data
+@Getter
+@Setter
 public class UserClaims {
 
     private UUID id;

@@ -141,7 +141,7 @@ public class TypeEventTest extends BaseTestClass {
 
             assertNotNull(aliceEvent.get(2, TimeUnit.SECONDS));
             assertNotNull(bobEvent.get(2, TimeUnit.SECONDS));
-            assertEquals(bobEvent.get(2, TimeUnit.SECONDS), aliceEvent.get(2, TimeUnit.SECONDS));
+            assertEquals(bobEvent.get(2, TimeUnit.SECONDS).getKey(), aliceEvent.get(2, TimeUnit.SECONDS).getKey());
 
 
         } finally {

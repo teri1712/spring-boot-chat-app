@@ -3,9 +3,11 @@ package com.decade.practice.api.dto;
 import com.decade.practice.persistence.jpa.entities.Chat;
 import com.decade.practice.persistence.jpa.entities.User;
 import com.decade.practice.utils.ChatUtils;
-import lombok.Data;
+import lombok.Getter;
+import lombok.Setter;
 
-@Data
+@Getter
+@Setter
 public class Conversation {
     private ChatDto chat;
     private UserResponse partner;
@@ -15,9 +17,6 @@ public class Conversation {
         this.chat = chat;
         this.partner = UserResponse.from(partner);
         this.owner = UserResponse.from(owner);
-    }
-
-    public Conversation() {
     }
 
     public Conversation(Chat chat, User owner) {

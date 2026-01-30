@@ -4,14 +4,14 @@ import com.decade.practice.persistence.jpa.embeddables.ImageSpec;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Past;
-import lombok.Data;
-import lombok.NoArgsConstructor;
+import lombok.Getter;
+import lombok.Setter;
 import org.springframework.format.annotation.DateTimeFormat;
 
 import java.util.Date;
 
-@Data
-@NoArgsConstructor
+@Getter
+@Setter
 public class ProfileRequest {
 
     @NotBlank

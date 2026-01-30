@@ -32,17 +32,12 @@ public class UserEventStore implements EventStore {
     private final EventRepository eventRepository;
     private EventFactoryResolution factoryResolution;
 
-    @Override
-    public boolean isAllowed(ChatIdentifier chatIdentifier, UUID userId) {
-        return chatIdentifier.getFirstUser().equals(userId) || chatIdentifier.getSecondUser().equals(userId);
-    }
-
     @Transactional(
             propagation = Propagation.REQUIRED,
             isolation = Isolation.READ_COMMITTED
     )
     @Override
-    @PreAuthorize("@eventStore.isAllowed(#event.chatIdentifier,#ownerId)")
+    @PreAuthorize("@accessPolicy.isAllowed(#event.chatIdentifier,#ownerId)")
     public void save(UUID senderId, UUID ownerId, ChatEvent event) {
         User owner = userRepository.findByIdWithPessimisticWrite(ownerId).orElseThrow();
         owner.getSyncContext().incVersion();
@@ -73,7 +68,7 @@ public class UserEventStore implements EventStore {
     }
 
     @Override
-    @PreAuthorize("@eventStore.isAllowed(#chatIdentifier,#userId)")
+    @PreAuthorize("@accessPolicy.isAllowed(#chatIdentifier,#userId)")
     public List<EventDto> findByOwnerAndChatAndEventVersionLessThanEqual(UUID userId, ChatIdentifier chatIdentifier, int eventVersion) {
         log.trace("Finding events for owner '{}' and chat '{}'", userId, chatIdentifier);
         return eventRepository.findByOwner_IdAndChat_IdentifierAndEventVersionLessThanEqual(userId, chatIdentifier, eventVersion, EventUtils.EVENT_VERSION_LESS_THAN_EQUAL)

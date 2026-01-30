@@ -1,11 +1,12 @@
 package com.decade.practice.api.dto;
 
 import lombok.AllArgsConstructor;
-import lombok.Data;
+import lombok.Getter;
+import lombok.Setter;
 
 @AllArgsConstructor
-@Data
-//TODO: Adjust client
+@Getter
+@Setter
 public class AccountEntryResponse {
     private AccountResponse account;
     private TokenCredential tokenCredential;

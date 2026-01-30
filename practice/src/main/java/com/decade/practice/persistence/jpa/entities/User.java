@@ -3,14 +3,14 @@ package com.decade.practice.persistence.jpa.entities;
 import com.decade.practice.persistence.jpa.embeddables.ImageSpec;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
-import lombok.Data;
-import lombok.NoArgsConstructor;
+import lombok.Getter;
+import lombok.Setter;
 
 import java.util.Date;
 import java.util.UUID;
 
-@Data
-@NoArgsConstructor
+@Getter
+@Setter
 @Entity
 @Table(name = "user_member")
 @Inheritance(strategy = InheritanceType.SINGLE_TABLE)

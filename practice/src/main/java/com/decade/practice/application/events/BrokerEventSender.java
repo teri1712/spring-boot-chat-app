@@ -1,7 +1,7 @@
 package com.decade.practice.application.events;
 
 import com.decade.practice.api.dto.EventDto;
-import com.decade.practice.persistence.redis.TypeEvent;
+import com.decade.practice.api.dto.TypeEventDto;
 import lombok.AllArgsConstructor;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.data.redis.listener.ChannelTopic;
@@ -21,7 +21,7 @@ public class BrokerEventSender implements EventSender {
     }
 
     @Override
-    public void send(TypeEvent typeEvent) {
+    public void send(TypeEventDto typeEvent) {
         // accessor.getMessageHeaders()
         redisTemplate.convertAndSend(chatTopic.getTopic(), typeEvent);
     }

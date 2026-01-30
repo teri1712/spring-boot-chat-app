@@ -5,12 +5,16 @@ import jakarta.persistence.Entity;
 import jakarta.persistence.Id;
 import jakarta.persistence.MapsId;
 import jakarta.persistence.OneToOne;
-import lombok.Data;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
 
 import java.util.UUID;
 
 @Entity
-@Data
+@Getter
+@Setter
+@NoArgsConstructor
 public class SyncContext {
     public static final int STARTING_VERSION = 0;
 
@@ -23,10 +27,6 @@ public class SyncContext {
     private UUID id;
 
     private int eventVersion = STARTING_VERSION;
-
-    // No-arg constructor required by JPA
-    protected SyncContext() {
-    }
 
     public SyncContext(User owner) {
         this.owner = owner;

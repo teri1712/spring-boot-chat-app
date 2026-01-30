@@ -54,7 +54,6 @@ class ChatControllerTest extends BaseTestClass {
                         .accept(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.length()").value(1))
-                .andExpect(jsonPath("$[0].conversation.chat.preference.roomName").value("Room alice and bob"))
                 .andExpect(jsonPath("$[0].conversation.partner.username").value("alice"))
 
         ;
@@ -82,8 +81,8 @@ class ChatControllerTest extends BaseTestClass {
         mockMvc.perform(get("/chats/{id}", chatId)
                         .param("atVersion", "1"))
                 .andExpect(status().isOk())
-                .andExpect(jsonPath("$.conversation.chat.preference.roomName").value("My pookie bob"))
-                .andExpect(jsonPath("$.conversation.chat.preference.iconId").value(99));
+                .andExpect(jsonPath("$.preference.roomName").value("My pookie bob"))
+                .andExpect(jsonPath("$.preference.iconId").value(99));
     }
 
     @Test

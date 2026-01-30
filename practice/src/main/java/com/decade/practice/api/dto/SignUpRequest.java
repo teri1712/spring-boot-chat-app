@@ -4,14 +4,14 @@ import com.decade.practice.api.web.validation.StrongPassword;
 import com.decade.practice.persistence.jpa.DefaultAvatar;
 import com.decade.practice.persistence.jpa.embeddables.ImageSpec;
 import jakarta.validation.constraints.*;
-import lombok.Data;
-import lombok.NoArgsConstructor;
+import lombok.Getter;
+import lombok.Setter;
 import org.springframework.format.annotation.DateTimeFormat;
 
 import java.util.Date;
 
-@Data
-@NoArgsConstructor
+@Getter
+@Setter
 public class SignUpRequest {
 
     public static final int MAX_USERNAME_LENGTH = 20;

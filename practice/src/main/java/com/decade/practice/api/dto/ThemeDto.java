@@ -2,11 +2,11 @@ package com.decade.practice.api.dto;
 
 import com.decade.practice.persistence.jpa.embeddables.ImageSpec;
 import com.decade.practice.persistence.jpa.entities.Theme;
-import lombok.Data;
-import lombok.NoArgsConstructor;
+import lombok.Getter;
+import lombok.Setter;
 
-@Data
-@NoArgsConstructor
+@Getter
+@Setter
 public class ThemeDto {
     private Integer id;
     private ImageSpec background;

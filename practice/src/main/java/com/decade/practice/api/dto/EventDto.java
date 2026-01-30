@@ -1,13 +1,13 @@
 package com.decade.practice.api.dto;
 
-import lombok.Data;
-import lombok.NoArgsConstructor;
+import lombok.Getter;
+import lombok.Setter;
 
 import java.time.Instant;
 import java.util.UUID;
 
-@Data
-@NoArgsConstructor
+@Getter
+@Setter
 public class EventDto {
 
     private UUID id;

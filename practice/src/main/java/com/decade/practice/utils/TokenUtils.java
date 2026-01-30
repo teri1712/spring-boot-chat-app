@@ -28,13 +28,8 @@ public class TokenUtils {
         return null;
     }
 
-    public static boolean hasToken(HttpServletRequest request) {
-        return extractToken(request) != null || extractRefreshToken(request) != null;
-    }
 
     public static String extractRefreshToken(HttpServletRequest request) {
         return request.getParameter(REFRESH_PARAM);
-        // Commented out in original:
-        // ?: request.cookies?.find { cookie -> cookie.name == REFRESH_PARAM }?.value
     }
 }

@@ -1,32 +1,6 @@
 version: '2.40.3'
 
 services:
-  #  server:
-  #    #        image: teri1712/decade-chat-app:latest
-  #    build:
-  #      context: .
-  #      dockerfile: Dockerfile
-  #    environment:
-  #      SPRING_DATASOURCE_USERNAME: root
-  #      SPRING_DATASOURCE_PASSWORD: root
-  #
-  #      ACTUATOR_USER_NAME: admin
-  #      ACTUATOR_USER_PASSWORD: admin
-  #      ACTUATOR_USER_ROLES: OPS
-  #      SPRING_DATA_REDIS_HOST: redis
-  #      SPRING_DATASOURCE_URL: jdbc:postgresql://postgres:5432/chatapp
-  #
-  #    ports:
-  #      - "8080:8080"
-  #      - "8081:8081"
-  #    depends_on:
-  #      postgres:
-  #        condition: service_healthy
-  #      redis:
-  #        condition: service_healthy
-  #    volumes:
-  #      - ./logs:/app/logs
-
   postgres:
     image: postgres:16
     environment:
@@ -82,7 +56,7 @@ services:
     ports:
       - "9200:9200"
     cpus: 1
-    mem_limit: 2g
+    mem_limit: 1g
 
   kibana:
     image: docker.elastic.co/kibana/kibana:8.12.2
@@ -118,7 +92,7 @@ services:
       - /var/run/docker.sock:/var/run/docker.sock
       - ./s3/init:/etc/localstack/init/ready.d
     cpus: 1
-    mem_limit: 2g
+    mem_limit: 1g
 
 volumes:
   grafana-data:

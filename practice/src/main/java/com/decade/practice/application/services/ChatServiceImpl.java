@@ -124,7 +124,7 @@ public class ChatServiceImpl extends SelfAwareBean implements ChatService {
 
     @Override
     @Transactional
-    @PreAuthorize("@eventStore.isAllowed(#chatIdentifier,#userId)")
+    @PreAuthorize("@accessPolicy.isAllowed(#chatIdentifier,#userId)")
     public ChatSnapshot getSnapshot(ChatIdentifier chatIdentifier, UUID userId, int atVersion) {
         User owner = userRepo.findById(userId).orElseThrow();
         Chat chat = chatRepo.findById(chatIdentifier).orElseThrow();
@@ -137,7 +137,7 @@ public class ChatServiceImpl extends SelfAwareBean implements ChatService {
     }
 
     @Override
-    @PreAuthorize("@eventStore.isAllowed(#chatIdentifier,#userId)")
+    @PreAuthorize("@accessPolicy.isAllowed(#chatIdentifier,#userId)")
     @Transactional
     public ChatDetailsDto getDetails(ChatIdentifier chatIdentifier, UUID userId) {
         User owner = userRepo.findById(userId).orElseThrow();
