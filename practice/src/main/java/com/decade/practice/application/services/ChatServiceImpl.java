@@ -138,7 +138,6 @@ public class ChatServiceImpl extends SelfAwareBean implements ChatService {
 
     @Override
     @PreAuthorize("@accessPolicy.isAllowed(#chatIdentifier,#userId)")
-    @Transactional
     public ChatDetailsDto getDetails(ChatIdentifier chatIdentifier, UUID userId) {
         User owner = userRepo.findById(userId).orElseThrow();
         Chat chat = getOrCreateChat(chatIdentifier);

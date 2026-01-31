@@ -3,6 +3,7 @@ package com.decade.practice.unit;
 import com.decade.practice.api.dto.AccountResponse;
 import com.decade.practice.api.dto.ProfileRequest;
 import com.decade.practice.api.dto.SignUpRequest;
+import com.decade.practice.api.dto.UserResponse;
 import com.decade.practice.application.events.AccountEventListener;
 import com.decade.practice.application.services.UserServiceImpl;
 import com.decade.practice.persistence.jpa.entities.SyncContext;
@@ -53,11 +54,10 @@ class UserServiceImplTest {
 
             given(encoder.encode(any())).willReturn("encodedPassword");
 
-            User result = userService.create(request, false);
+            UserResponse result = userService.create(request, false);
 
             assertNotNull(result);
             assertEquals("testuser", result.getUsername());
-            assertEquals("encodedPassword", result.getPassword());
             verify(userRepo).save(any(User.class));
         } finally {
             TransactionSynchronizationManager.clearSynchronization();
@@ -76,7 +76,7 @@ class UserServiceImplTest {
 
         given(userRepo.findById(userId)).willReturn(Optional.of(user));
 
-        User result = userService.changeProfile(userId, request);
+        UserResponse result = userService.changeProfile(userId, request);
 
         assertEquals("New Name", result.getName());
     }
@@ -94,9 +94,9 @@ class UserServiceImplTest {
             given(encoder.matches("oldPassword", "oldEncodedPassword")).willReturn(true);
             given(encoder.encode("newPassword")).willReturn("newEncodedPassword");
 
-            User result = userService.changePassword(userId, "newPassword", "oldPassword");
+            userService.changePassword(userId, "newPassword", "oldPassword");
 
-            assertEquals("newEncodedPassword", result.getPassword());
+            assertEquals("newEncodedPassword", user.getPassword());
         } finally {
             TransactionSynchronizationManager.clearSynchronization();
         }

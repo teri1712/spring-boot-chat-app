@@ -40,9 +40,8 @@ public abstract class ChatEvent {
     @GeneratedValue(strategy = GenerationType.UUID)
     private UUID id;
 
-    @Column(nullable = false, unique = true)
+    @Column(nullable = false, unique = true, updatable = false)
     @NotNull
-    // TODO: Modify client
     private UUID idempotentKey = UUID.randomUUID();
 
     @Embedded

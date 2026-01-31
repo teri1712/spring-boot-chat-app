@@ -25,9 +25,4 @@ public interface ChatService {
 
     List<Chat> listChat(UUID userId, Integer version, Optional<ChatIdentifier> offset, int limit);
 
-    default Chat getOrCreateChat(UUID owner, UUID partner) throws NoSuchElementException {
-        return getOrCreateChat(ChatIdentifier.from(owner, partner));
-    }
-
-
 }

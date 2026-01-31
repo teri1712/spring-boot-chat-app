@@ -13,6 +13,7 @@ import org.springframework.test.context.DynamicPropertySource;
 import org.testcontainers.containers.GenericContainer;
 import org.testcontainers.containers.PostgreSQLContainer;
 import org.testcontainers.containers.localstack.LocalStackContainer;
+import org.testcontainers.elasticsearch.ElasticsearchContainer;
 import org.testcontainers.utility.DockerImageName;
 import software.amazon.awssdk.auth.credentials.AwsBasicCredentials;
 import software.amazon.awssdk.auth.credentials.StaticCredentialsProvider;
@@ -44,10 +45,16 @@ public abstract class BaseTestClass {
             )
                     .withServices(LocalStackContainer.Service.S3);
 
+    static ElasticsearchContainer ELASTICSEARCH =
+            new ElasticsearchContainer("docker.elastic.co/elasticsearch/elasticsearch:8.12.2")
+                    .withEnv("xpack.security.enabled", "false")
+                    .withEnv("discovery.type", "single-node");
+
     static {
         POSTGRES.start();
         REDIS.start();
         LOCALSTACK.start();
+        ELASTICSEARCH.start();
 
 
     }
@@ -65,8 +72,8 @@ public abstract class BaseTestClass {
         registry.add("aws.s3.access.id", () -> LOCALSTACK.getAccessKey());
         registry.add("aws.s3.access.secret", () -> LOCALSTACK.getSecretKey());
         registry.add("aws.s3.region", () -> LOCALSTACK.getRegion());
-
-
+//
+        registry.add("spring.elasticsearch.uris", ELASTICSEARCH::getHttpHostAddress);
     }
 
 

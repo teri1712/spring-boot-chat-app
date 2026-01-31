@@ -36,7 +36,7 @@ public class UserServiceImpl extends SelfAwareBean implements UserService {
     private EntityManager em;
 
     @Override
-    public User create(SignUpRequest signUpRequest, boolean usernameAsIdentifier) {
+    public UserResponse create(SignUpRequest signUpRequest, boolean usernameAsIdentifier) {
         UUID id = usernameAsIdentifier ?
                 UUID.nameUUIDFromBytes(signUpRequest.getUsername().getBytes()) :
                 UUID.randomUUID();
@@ -66,11 +66,11 @@ public class UserServiceImpl extends SelfAwareBean implements UserService {
                     }
                 });
 
-        return user;
+        return UserResponse.from(user);
     }
 
     @Override
-    public User changeProfile(UUID id, ProfileRequest profileRequest) throws OptimisticLockException {
+    public UserResponse changeProfile(UUID id, ProfileRequest profileRequest) throws OptimisticLockException {
         User user = userRepo.findById(id).orElseThrow();
         if (profileRequest.getName() != null)
             user.setName(profileRequest.getName());
@@ -80,12 +80,12 @@ public class UserServiceImpl extends SelfAwareBean implements UserService {
             user.setGender(profileRequest.getGender());
         if (profileRequest.getAvatar() != null)
             user.setAvatar(profileRequest.getAvatar());
-        return user;
+        return UserResponse.from(user);
     }
 
 
     @Override
-    public User changePassword(UUID id, String newPassword, String password) throws AccessDeniedException, OptimisticLockException {
+    public UserResponse changePassword(UUID id, String newPassword, String password) throws AccessDeniedException, OptimisticLockException {
         User user = userRepo.findByIdWithPessimisticWrite(id).orElseThrow();
 
         if (!encoder.matches(password, user.getPassword())) {
@@ -108,7 +108,7 @@ public class UserServiceImpl extends SelfAwareBean implements UserService {
                     }
                 });
 
-        return user;
+        return UserResponse.from(user);
     }
 
     @Override

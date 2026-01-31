@@ -2,7 +2,7 @@ version: '2.40.3'
 
 services:
   server:
-    #        image: teri1712/decade-chat-app:latest
+    image: teri1712/decade-chat-app:latest
     build:
       context: .
       dockerfile: Dockerfile
@@ -15,6 +15,7 @@ services:
       ACTUATOR_USER_ROLES: OPS
       SPRING_DATA_REDIS_HOST: redis
       SPRING_DATASOURCE_URL: jdbc:postgresql://postgres:5432/chatapp
+      SPRING_ELASTICSEARCH_URIS: http://elasticsearch:9200
 
     ports:
       - "8080:8080"

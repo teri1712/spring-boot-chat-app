@@ -19,7 +19,7 @@ import static com.decade.practice.api.websocket.ConversationController.resolveCh
 @Slf4j
 @Component
 @AllArgsConstructor
-public class EventSubscriber implements MessageListener {
+public class RealtimeSubscriber implements MessageListener {
 
     private final ObjectMapper objectMapper;
     private final ChannelTopic queueTopic;

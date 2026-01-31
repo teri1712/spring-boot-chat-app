@@ -1,6 +1,6 @@
 package com.decade.practice.infra.configs;
 
-import com.decade.practice.application.events.EventSubscriber;
+import com.decade.practice.application.events.RealtimeSubscriber;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.data.redis.connection.RedisConnectionFactory;
@@ -23,7 +23,7 @@ public class WebsocketRelayConfiguration {
     @Bean
     public RedisMessageListenerContainer redisMessageListenerContainer(
             RedisConnectionFactory connectionFactory,
-            EventSubscriber subscriber
+            RealtimeSubscriber subscriber
     ) {
         RedisMessageListenerContainer container =
                 new RedisMessageListenerContainer();

@@ -44,7 +44,7 @@ public class AccountController {
             @RequestBody @Valid ProfileRequest profile,
             @AuthenticationPrincipal(expression = "id") UUID id
     ) throws OptimisticLockException {
-        return UserResponse.from(userService.changeProfile(id, profile));
+        return userService.changeProfile(id, profile);
     }
 
     @PostMapping("/profile/password")
@@ -53,6 +53,6 @@ public class AccountController {
             @RequestParam(value = "password", required = false) String password,
             @StrongPassword @RequestParam("new_password") String newPassword
     ) {
-        return UserResponse.from(userService.changePassword(id, newPassword, password));
+        return userService.changePassword(id, newPassword, password);
     }
 }

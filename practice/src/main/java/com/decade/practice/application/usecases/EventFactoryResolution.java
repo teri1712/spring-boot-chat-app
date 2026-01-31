@@ -14,6 +14,7 @@ import java.util.Map;
 @Component
 @RequiredArgsConstructor
 public class EventFactoryResolution implements InitializingBean {
+
     private final List<EventFactory<? extends ChatEvent>> eventFactories;
     private Map<Class<? extends ChatEvent>, EventFactory<? extends ChatEvent>> eventFactoryMap = new HashMap<>();
 
