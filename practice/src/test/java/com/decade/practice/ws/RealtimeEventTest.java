@@ -2,7 +2,7 @@ package com.decade.practice.ws;
 
 import com.decade.practice.common.BaseTestClass;
 import com.decade.practice.dto.EventDto;
-import com.decade.practice.infra.security.UserClaimsService;
+import com.decade.practice.infra.security.TokenService;
 import com.decade.practice.infra.security.models.UserClaims;
 import com.decade.practice.persistence.jpa.entities.User;
 import org.junit.jupiter.api.Assertions;
@@ -43,7 +43,7 @@ public class RealtimeEventTest extends BaseTestClass {
     private MessageConverter converter;
 
     @Autowired
-    private UserClaimsService tokenService;
+    private TokenService tokenService;
 
 
     @Test

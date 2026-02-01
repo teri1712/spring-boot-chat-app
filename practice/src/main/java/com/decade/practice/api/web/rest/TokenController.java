@@ -3,7 +3,7 @@ package com.decade.practice.api.web.rest;
 import com.decade.practice.application.usecases.UserService;
 import com.decade.practice.dto.SignUpRequest;
 import com.decade.practice.dto.TokenCredential;
-import com.decade.practice.infra.security.UserClaimsService;
+import com.decade.practice.infra.security.TokenService;
 import com.decade.practice.infra.security.models.UserClaims;
 import com.decade.practice.infra.security.strategies.LoginSuccessStrategy;
 import com.decade.practice.persistence.jpa.DefaultAvatar;
@@ -43,7 +43,7 @@ public class TokenController {
 
     private final UserService userService;
     private final LoginSuccessStrategy loginSuccessStrategy;
-    private final UserClaimsService userClaimsService;
+    private final TokenService tokenService;
 
     @PostMapping("/oauth2")
     public void exchange(
@@ -86,10 +86,10 @@ public class TokenController {
             throw new AccessDeniedException("No refresh token provided in the request");
         }
 
-        userClaimsService.validate(refreshToken);
+        tokenService.validate(refreshToken);
 
-        UserClaims claims = userClaimsService.decodeToken(refreshToken);
-        TokenCredential credential = userClaimsService.create(claims, refreshToken);
+        UserClaims claims = tokenService.decodeToken(refreshToken);
+        TokenCredential credential = tokenService.create(claims, refreshToken);
 
         response.setContentType(MediaType.APPLICATION_JSON_VALUE);
         response.setCharacterEncoding(StandardCharsets.UTF_8.name());

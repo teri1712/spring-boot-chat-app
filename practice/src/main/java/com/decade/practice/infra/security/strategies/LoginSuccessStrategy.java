@@ -5,7 +5,7 @@ import com.decade.practice.dto.AccountEntryResponse;
 import com.decade.practice.dto.AccountResponse;
 import com.decade.practice.dto.TokenCredential;
 import com.decade.practice.dto.UserResponse;
-import com.decade.practice.infra.security.UserClaimsService;
+import com.decade.practice.infra.security.TokenService;
 import com.decade.practice.infra.security.models.UserClaims;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import jakarta.servlet.http.HttpServletRequest;
@@ -22,7 +22,7 @@ import java.io.IOException;
 public class LoginSuccessStrategy implements AuthenticationSuccessHandler {
 
     private final UserService userService;
-    private final UserClaimsService tokenService;
+    private final TokenService tokenService;
     private final ObjectMapper objectMapper;
 
     @Override

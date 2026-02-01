@@ -1,6 +1,6 @@
 package com.decade.practice.infra.websocket;
 
-import com.decade.practice.infra.security.UserClaimsService;
+import com.decade.practice.infra.security.TokenService;
 import com.decade.practice.infra.security.jwt.JwtUser;
 import com.decade.practice.infra.security.jwt.JwtUserAuthentication;
 import com.decade.practice.infra.security.models.UserClaims;
@@ -21,7 +21,7 @@ import org.springframework.stereotype.Component;
 @AllArgsConstructor
 @Order
 public class AuthenticatorInterceptor implements ChannelInterceptor {
-    private final UserClaimsService tokenService;
+    private final TokenService tokenService;
 
     @Nullable
     @Override

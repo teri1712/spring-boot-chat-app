@@ -1,7 +1,7 @@
 package com.decade.practice.web;
 
 import com.decade.practice.common.BaseTestClass;
-import com.decade.practice.infra.security.UserClaimsService;
+import com.decade.practice.infra.security.TokenService;
 import com.decade.practice.infra.security.models.UserClaims;
 import com.decade.practice.utils.TokenUtils;
 import org.junit.jupiter.api.Test;
@@ -21,7 +21,7 @@ class SecurityFilterTest extends BaseTestClass {
     private MockMvc mockMvc;
 
     @Autowired
-    private UserClaimsService tokenService;
+    private TokenService tokenService;
 
     @Test
     @Sql(scripts = {"/sql/clean.sql", "/sql/seed_users.sql"})
