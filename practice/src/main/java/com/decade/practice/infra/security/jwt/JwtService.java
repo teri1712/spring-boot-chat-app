@@ -1,7 +1,7 @@
 package com.decade.practice.infra.security.jwt;
 
-import com.decade.practice.api.dto.TokenCredential;
-import com.decade.practice.infra.security.UserClaimsTokenService;
+import com.decade.practice.dto.TokenCredential;
+import com.decade.practice.infra.security.UserClaimsService;
 import com.decade.practice.infra.security.models.UserClaims;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -15,7 +15,7 @@ import java.util.*;
 import java.util.concurrent.TimeUnit;
 
 @Service
-public class JwtService implements UserClaimsTokenService {
+public class JwtService implements UserClaimsService {
 
     private static final long ONE_WEEK = 7L * 24 * 60 * 60 * 1000L;
     private static final long ONE_MONTH = 30 * 24 * 60 * 60 * 1000L;
@@ -73,6 +73,12 @@ public class JwtService implements UserClaimsTokenService {
     public void evict(String username, String refreshToken) {
         String key = generateKey(username);
         redisTemplate.opsForSet().remove(key, refreshToken);
+    }
+
+    @Override
+    public boolean has(String username, String refreshToken) {
+        String key = generateKey(username);
+        return redisTemplate.opsForSet().isMember(key, refreshToken);
     }
 
     private List<String> get(String username) {

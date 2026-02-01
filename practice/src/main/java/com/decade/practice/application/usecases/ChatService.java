@@ -1,7 +1,7 @@
 package com.decade.practice.application.usecases;
 
-import com.decade.practice.api.dto.ChatDetailsDto;
-import com.decade.practice.api.dto.ChatSnapshot;
+import com.decade.practice.dto.ChatDetailsDto;
+import com.decade.practice.dto.ChatSnapshot;
 import com.decade.practice.persistence.jpa.embeddables.ChatIdentifier;
 import com.decade.practice.persistence.jpa.entities.Chat;
 

@@ -1,7 +1,7 @@
 package com.decade.practice.web.rest;
 
-import com.decade.practice.api.dto.ProfileRequest;
 import com.decade.practice.common.BaseTestClass;
+import com.decade.practice.dto.ProfileRequest;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -24,6 +24,7 @@ class ProfileControllerTest extends BaseTestClass {
 
     @Autowired
     private ObjectMapper objectMapper;
+
 
     @Test
     @Sql(scripts = {"/sql/clean.sql", "/sql/seed_users.sql"})

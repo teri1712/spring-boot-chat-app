@@ -1,6 +1,6 @@
 package com.decade.practice.application.usecases;
 
-import com.decade.practice.api.dto.*;
+import com.decade.practice.dto.*;
 import com.decade.practice.persistence.jpa.embeddables.Preference;
 import com.decade.practice.persistence.jpa.entities.PreferenceEvent;
 import com.decade.practice.persistence.jpa.repositories.ThemeRepository;

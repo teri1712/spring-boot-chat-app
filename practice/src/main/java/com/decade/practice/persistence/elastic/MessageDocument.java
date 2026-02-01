@@ -1,12 +1,16 @@
 package com.decade.practice.persistence.elastic;
 
 import com.decade.practice.persistence.jpa.embeddables.ChatIdentifier;
+import lombok.Getter;
+import lombok.Setter;
 import org.springframework.data.annotation.Id;
 import org.springframework.data.elasticsearch.annotations.Document;
 
 import java.util.UUID;
 
 @Document(indexName = "messages", createIndex = true)
+@Setter
+@Getter
 public class MessageDocument {
 
     @Id
@@ -14,7 +18,6 @@ public class MessageDocument {
     private UUID sender;
     private ChatIdentifier chatIdentifier;
 
-    private String senderName;
-    private String roomName;
+    private String partnerName;
     private String content;
 }

@@ -1,6 +1,6 @@
 package com.decade.practice.infra.configs;
 
-import com.decade.practice.application.events.RealtimeSubscriber;
+import com.decade.practice.events.consumers.RealtimeSubscriber;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.data.redis.connection.RedisConnectionFactory;

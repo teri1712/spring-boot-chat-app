@@ -1,11 +1,7 @@
 package com.decade.practice.unit;
 
-import com.decade.practice.api.dto.AccountResponse;
-import com.decade.practice.api.dto.ProfileRequest;
-import com.decade.practice.api.dto.SignUpRequest;
-import com.decade.practice.api.dto.UserResponse;
-import com.decade.practice.application.events.AccountEventListener;
 import com.decade.practice.application.services.UserServiceImpl;
+import com.decade.practice.dto.*;
 import com.decade.practice.persistence.jpa.entities.SyncContext;
 import com.decade.practice.persistence.jpa.entities.User;
 import com.decade.practice.persistence.jpa.repositories.UserRepository;
@@ -13,13 +9,15 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
-import org.mockito.Spy;
 import org.mockito.junit.jupiter.MockitoExtension;
+import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.security.access.AccessDeniedException;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.transaction.support.TransactionSynchronizationManager;
 
-import java.util.*;
+import java.util.Date;
+import java.util.Optional;
+import java.util.UUID;
 
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.ArgumentMatchers.any;
@@ -35,8 +33,8 @@ class UserServiceImplTest {
     @Mock
     private PasswordEncoder encoder;
 
-    @Spy
-    private List<AccountEventListener> accountListeners = new ArrayList<>();
+    @Mock
+    private ApplicationEventPublisher eventPublisher;
 
     @InjectMocks
     private UserServiceImpl userService;
@@ -88,6 +86,7 @@ class UserServiceImplTest {
             UUID userId = UUID.randomUUID();
             User user = new User();
             user.setId(userId);
+            user.setUsername("testuser");
             user.setPassword("oldEncodedPassword");
 
             given(userRepo.findByIdWithPessimisticWrite(userId)).willReturn(Optional.of(user));
@@ -96,6 +95,7 @@ class UserServiceImplTest {
 
             userService.changePassword(userId, "newPassword", "oldPassword");
 
+            verify(eventPublisher).publishEvent(new UserPasswordChangedEvent("testuser"));
             assertEquals("newEncodedPassword", user.getPassword());
         } finally {
             TransactionSynchronizationManager.clearSynchronization();

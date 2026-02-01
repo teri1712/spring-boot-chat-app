@@ -1,9 +1,9 @@
 package com.decade.practice.api.web.rest;
 
-import com.decade.practice.api.dto.AccountEntryResponse;
-import com.decade.practice.api.dto.AccountResponse;
-import com.decade.practice.api.dto.ProfileRequest;
-import com.decade.practice.api.dto.UserResponse;
+import com.decade.practice.dto.AccountEntryResponse;
+import com.decade.practice.dto.AccountResponse;
+import com.decade.practice.dto.ProfileRequest;
+import com.decade.practice.dto.UserResponse;
 import com.decade.practice.api.web.validation.StrongPassword;
 import com.decade.practice.application.usecases.UserService;
 import com.decade.practice.persistence.jpa.entities.User;

@@ -1,9 +1,9 @@
 package com.decade.practice.api.websocket;
 
-import com.decade.practice.api.dto.EventDto;
-import com.decade.practice.api.dto.TypeEventDto;
+import com.decade.practice.dto.EventDto;
+import com.decade.practice.dto.TypeEventDto;
 import com.decade.practice.application.usecases.EventService;
-import com.decade.practice.application.usecases.LiveConversationService;
+import com.decade.practice.application.usecases.LiveService;
 import com.decade.practice.infra.configs.WebSocketConfiguration;
 import com.decade.practice.infra.security.jwt.JwtUserAuthentication;
 import com.decade.practice.persistence.jpa.embeddables.ChatIdentifier;
@@ -18,7 +18,7 @@ import org.springframework.stereotype.Controller;
 @AllArgsConstructor
 public class ConversationController {
 
-    private final LiveConversationService liveService;
+    private final LiveService liveService;
     private final EventService eventService;
 
 

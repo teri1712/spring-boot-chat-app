@@ -1,6 +1,6 @@
 package com.decade.practice.application.usecases;
 
-import com.decade.practice.api.dto.EventDto;
+import com.decade.practice.dto.EventDto;
 import com.decade.practice.persistence.jpa.embeddables.ChatIdentifier;
 
 import java.util.List;

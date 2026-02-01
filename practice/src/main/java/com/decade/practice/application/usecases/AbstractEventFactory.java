@@ -1,8 +1,8 @@
 package com.decade.practice.application.usecases;
 
-import com.decade.practice.api.dto.ChatDto;
-import com.decade.practice.api.dto.EventDto;
-import com.decade.practice.api.dto.UserResponse;
+import com.decade.practice.dto.ChatDto;
+import com.decade.practice.dto.EventDto;
+import com.decade.practice.dto.UserResponse;
 import com.decade.practice.persistence.jpa.entities.ChatEvent;
 import com.decade.practice.persistence.jpa.entities.MessageEvent;
 import com.decade.practice.utils.ChatUtils;

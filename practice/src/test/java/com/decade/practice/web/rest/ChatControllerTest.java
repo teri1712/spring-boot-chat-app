@@ -1,6 +1,6 @@
 package com.decade.practice.web.rest;
 
-import com.decade.practice.api.dto.PreferenceResponse;
+import com.decade.practice.dto.PreferenceResponse;
 import com.decade.practice.common.BaseTestClass;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.junit.jupiter.api.Test;

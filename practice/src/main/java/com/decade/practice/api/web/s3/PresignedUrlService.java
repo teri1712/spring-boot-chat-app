@@ -1,6 +1,6 @@
 package com.decade.practice.api.web.s3;
 
-import com.decade.practice.api.dto.S3PresignedDto;
+import com.decade.practice.dto.S3PresignedDto;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;

@@ -1,6 +1,6 @@
 package com.decade.practice.api.web.s3;
 
-import com.decade.practice.api.dto.S3PresignedDto;
+import com.decade.practice.dto.S3PresignedDto;
 import lombok.AllArgsConstructor;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;

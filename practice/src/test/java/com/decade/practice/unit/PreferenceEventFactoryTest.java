@@ -1,8 +1,8 @@
 package com.decade.practice.unit;
 
-import com.decade.practice.api.dto.EventDto;
-import com.decade.practice.api.dto.EventRequest;
-import com.decade.practice.api.dto.PreferenceRequest;
+import com.decade.practice.dto.EventDto;
+import com.decade.practice.dto.EventRequest;
+import com.decade.practice.dto.PreferenceRequest;
 import com.decade.practice.application.usecases.PreferenceEventFactory;
 import com.decade.practice.persistence.jpa.embeddables.ChatIdentifier;
 import com.decade.practice.persistence.jpa.embeddables.Preference;

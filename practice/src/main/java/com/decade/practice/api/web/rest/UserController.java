@@ -1,7 +1,7 @@
 package com.decade.practice.api.web.rest;
 
-import com.decade.practice.api.dto.SignUpRequest;
-import com.decade.practice.api.dto.UserResponse;
+import com.decade.practice.dto.SignUpRequest;
+import com.decade.practice.dto.UserResponse;
 import com.decade.practice.application.usecases.SearchService;
 import com.decade.practice.application.usecases.UserService;
 import jakarta.validation.Valid;

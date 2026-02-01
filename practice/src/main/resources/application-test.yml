@@ -7,3 +7,4 @@ logging:
     root: INFO
     com.decade.practice: TRACE
     org.springframework: INFO
+

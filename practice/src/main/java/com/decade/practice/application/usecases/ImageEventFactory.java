@@ -1,8 +1,8 @@
 package com.decade.practice.application.usecases;
 
-import com.decade.practice.api.dto.EventDto;
-import com.decade.practice.api.dto.EventRequest;
-import com.decade.practice.api.dto.ImageEventDto;
+import com.decade.practice.dto.EventDto;
+import com.decade.practice.dto.EventRequest;
+import com.decade.practice.dto.ImageEventDto;
 import com.decade.practice.persistence.jpa.embeddables.ImageSpec;
 import com.decade.practice.persistence.jpa.entities.ImageEvent;
 import org.springframework.stereotype.Component;

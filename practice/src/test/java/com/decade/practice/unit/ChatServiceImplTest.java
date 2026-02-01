@@ -1,7 +1,7 @@
 package com.decade.practice.unit;
 
-import com.decade.practice.api.dto.ChatDetailsDto;
-import com.decade.practice.api.dto.ChatSnapshot;
+import com.decade.practice.dto.ChatDetailsDto;
+import com.decade.practice.dto.ChatSnapshot;
 import com.decade.practice.application.exception.OutdatedVersionException;
 import com.decade.practice.application.services.ChatServiceImpl;
 import com.decade.practice.application.usecases.EventService;

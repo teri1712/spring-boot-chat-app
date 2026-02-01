@@ -1,9 +1,9 @@
 package com.decade.practice.api.web.rest;
 
-import com.decade.practice.api.dto.ChatDetailsDto;
-import com.decade.practice.api.dto.ChatSnapshot;
-import com.decade.practice.api.dto.EventRequest;
-import com.decade.practice.api.dto.PreferenceRequest;
+import com.decade.practice.dto.ChatDetailsDto;
+import com.decade.practice.dto.ChatSnapshot;
+import com.decade.practice.dto.EventRequest;
+import com.decade.practice.dto.PreferenceRequest;
 import com.decade.practice.application.usecases.ChatService;
 import com.decade.practice.application.usecases.DeliveryService;
 import com.decade.practice.application.usecases.EventFactoryResolution;

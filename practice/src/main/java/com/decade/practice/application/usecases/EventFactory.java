@@ -1,7 +1,7 @@
 package com.decade.practice.application.usecases;
 
-import com.decade.practice.api.dto.EventDto;
-import com.decade.practice.api.dto.EventRequest;
+import com.decade.practice.dto.EventDto;
+import com.decade.practice.dto.EventRequest;
 import com.decade.practice.persistence.jpa.entities.ChatEvent;
 
 public interface EventFactory<E extends ChatEvent> {

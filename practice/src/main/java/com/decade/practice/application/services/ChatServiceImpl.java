@@ -1,9 +1,9 @@
 package com.decade.practice.application.services;
 
-import com.decade.practice.api.dto.ChatDetailsDto;
-import com.decade.practice.api.dto.ChatSnapshot;
-import com.decade.practice.api.dto.Conversation;
-import com.decade.practice.api.dto.EventDto;
+import com.decade.practice.dto.ChatDetailsDto;
+import com.decade.practice.dto.ChatSnapshot;
+import com.decade.practice.dto.Conversation;
+import com.decade.practice.dto.EventDto;
 import com.decade.practice.application.exception.OutdatedVersionException;
 import com.decade.practice.application.usecases.ChatService;
 import com.decade.practice.application.usecases.EventFactoryResolution;

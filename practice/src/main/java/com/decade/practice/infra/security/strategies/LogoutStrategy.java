@@ -1,6 +1,6 @@
 package com.decade.practice.infra.security.strategies;
 
-import com.decade.practice.application.usecases.TokenService;
+import com.decade.practice.application.usecases.TokenStore;
 import com.decade.practice.utils.TokenUtils;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
@@ -11,23 +11,23 @@ import org.springframework.stereotype.Service;
 @Service
 public class LogoutStrategy implements LogoutHandler {
 
-        private final TokenService credentialService;
+    private final TokenStore credentialService;
 
-        public LogoutStrategy(TokenService credentialService) {
-                this.credentialService = credentialService;
-        }
+    public LogoutStrategy(TokenStore credentialService) {
+        this.credentialService = credentialService;
+    }
 
-        @Override
-        public void logout(
-                HttpServletRequest request,
-                HttpServletResponse response,
-                Authentication authentication
-        ) {
-                String refreshToken = TokenUtils.extractRefreshToken(request);
-                if (refreshToken == null) {
-                        return;
-                }
-                String username = authentication.getName();
-                credentialService.evict(username, refreshToken);
+    @Override
+    public void logout(
+            HttpServletRequest request,
+            HttpServletResponse response,
+            Authentication authentication
+    ) {
+        String refreshToken = TokenUtils.extractRefreshToken(request);
+        if (refreshToken == null) {
+            return;
         }
+        String username = authentication.getName();
+        credentialService.evict(username, refreshToken);
+    }
 }

@@ -1,8 +1,8 @@
 package com.decade.practice.application.usecases;
 
-import com.decade.practice.api.dto.EventDto;
-import com.decade.practice.api.dto.EventRequest;
-import com.decade.practice.api.dto.SeenEventDto;
+import com.decade.practice.dto.EventDto;
+import com.decade.practice.dto.EventRequest;
+import com.decade.practice.dto.SeenEventDto;
 import com.decade.practice.persistence.jpa.entities.SeenEvent;
 import org.springframework.stereotype.Component;
 

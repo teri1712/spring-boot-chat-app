@@ -1,9 +1,9 @@
 package com.decade.practice.application.usecases;
 
-import com.decade.practice.api.dto.AccountResponse;
-import com.decade.practice.api.dto.ProfileRequest;
-import com.decade.practice.api.dto.SignUpRequest;
-import com.decade.practice.api.dto.UserResponse;
+import com.decade.practice.dto.AccountResponse;
+import com.decade.practice.dto.ProfileRequest;
+import com.decade.practice.dto.SignUpRequest;
+import com.decade.practice.dto.UserResponse;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.security.access.AccessDeniedException;
 

@@ -2,7 +2,7 @@ package com.decade.practice.ws;
 
 import com.decade.practice.api.web.converters.ChatIdentifierConverter;
 import com.decade.practice.common.BaseTestClass;
-import com.decade.practice.infra.security.UserClaimsTokenService;
+import com.decade.practice.infra.security.UserClaimsService;
 import com.decade.practice.infra.security.models.UserClaims;
 import com.decade.practice.persistence.jpa.embeddables.ChatIdentifier;
 import com.decade.practice.persistence.jpa.entities.User;
@@ -44,7 +44,7 @@ public class TypeEventTest extends BaseTestClass {
     private MessageConverter converter;
 
     @Autowired
-    private UserClaimsTokenService tokenService;
+    private UserClaimsService tokenService;
 
     @Test
     @Timeout(5)

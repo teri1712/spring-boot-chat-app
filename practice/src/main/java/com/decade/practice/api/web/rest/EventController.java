@@ -1,9 +1,9 @@
 package com.decade.practice.api.web.rest;
 
-import com.decade.practice.api.dto.*;
 import com.decade.practice.application.usecases.DeliveryService;
 import com.decade.practice.application.usecases.EventFactoryResolution;
 import com.decade.practice.application.usecases.EventService;
+import com.decade.practice.dto.*;
 import com.decade.practice.persistence.jpa.embeddables.ChatIdentifier;
 import com.decade.practice.persistence.jpa.entities.*;
 import jakarta.persistence.EntityNotFoundException;

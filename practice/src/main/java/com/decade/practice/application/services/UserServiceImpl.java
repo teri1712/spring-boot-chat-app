@@ -1,28 +1,24 @@
 package com.decade.practice.application.services;
 
-import com.decade.practice.api.dto.AccountResponse;
-import com.decade.practice.api.dto.ProfileRequest;
-import com.decade.practice.api.dto.SignUpRequest;
-import com.decade.practice.api.dto.UserResponse;
-import com.decade.practice.application.events.AccountEventListener;
 import com.decade.practice.application.usecases.UserService;
 import com.decade.practice.common.SelfAwareBean;
+import com.decade.practice.dto.*;
 import com.decade.practice.persistence.jpa.entities.User;
 import com.decade.practice.persistence.jpa.repositories.UserRepository;
 import jakarta.persistence.EntityManager;
 import jakarta.persistence.OptimisticLockException;
 import jakarta.persistence.PersistenceContext;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
+import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.security.access.AccessDeniedException;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import org.springframework.transaction.support.TransactionSynchronization;
-import org.springframework.transaction.support.TransactionSynchronizationManager;
 
-import java.util.List;
 import java.util.UUID;
 
+@Slf4j
 @Service
 @Transactional
 @RequiredArgsConstructor
@@ -30,7 +26,7 @@ public class UserServiceImpl extends SelfAwareBean implements UserService {
 
     private final UserRepository userRepo;
     private final PasswordEncoder encoder;
-    private final List<AccountEventListener> accountListeners;
+    private final ApplicationEventPublisher eventPublisher;
 
     @PersistenceContext
     private EntityManager em;
@@ -52,19 +48,15 @@ public class UserServiceImpl extends SelfAwareBean implements UserService {
         user.setGender(signUpRequest.getGender());
         userRepo.save(user);
 
-        for (AccountEventListener listener : accountListeners) {
-            listener.beforeAccountCreated(user);
-        }
-
-        TransactionSynchronizationManager.registerSynchronization(
-                new TransactionSynchronization() {
-                    @Override
-                    public void afterCompletion(int status) {
-                        for (AccountEventListener listener : accountListeners) {
-                            listener.afterAccountCreated(user, status == STATUS_COMMITTED);
-                        }
-                    }
-                });
+        // TODO: Outbox
+//        eventPublisher.publishEvent(UserCreatedEvent.builder()
+//                .userId(id)
+//                .username(signUpRequest.getUsername())
+//                .name(signUpRequest.getName())
+//                .dob(signUpRequest.getDob())
+//                .avatar(signUpRequest.getAvatar())
+//                .gender(signUpRequest.getGender())
+//                .build());
 
         return UserResponse.from(user);
     }
@@ -94,20 +86,7 @@ public class UserServiceImpl extends SelfAwareBean implements UserService {
 
         user.setPassword(encoder.encode(newPassword));
 
-        for (AccountEventListener listener : accountListeners) {
-            listener.beforePasswordChanged(user);
-        }
-
-        TransactionSynchronizationManager.registerSynchronization(
-                new TransactionSynchronization() {
-                    @Override
-                    public void afterCompletion(int status) {
-                        for (AccountEventListener listener : accountListeners) {
-                            listener.afterPasswordChanged(user, status == STATUS_COMMITTED);
-                        }
-                    }
-                });
-
+        eventPublisher.publishEvent(new UserPasswordChangedEvent(user.getUsername()));
         return UserResponse.from(user);
     }
 
