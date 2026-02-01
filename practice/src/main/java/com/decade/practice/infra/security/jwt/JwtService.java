@@ -12,13 +12,14 @@ import org.springframework.security.access.AccessDeniedException;
 import org.springframework.stereotype.Service;
 
 import java.util.Base64;
+import java.util.Date;
 import java.util.Map;
 
 @Service
 public class JwtService implements TokenService {
 
     private static final long ONE_WEEK = 7L * 24 * 60 * 60 * 1000L;
-    private static final long ONE_MONTH = 30 * 24 * 60 * 60 * 1000L;
+    private static final long FIFTEEN_MINUTES = 15 * 60 * 1000L;
     private static final String TOKEN_KEY_SPACE = "JWT_TOKENS";
 
     private final TokenStore tokenStore;
@@ -65,7 +66,7 @@ public class JwtService implements TokenService {
         return objectMapper.convertValue(claims, UserClaims.class);
     }
 
-    private String encodeToken(UserClaims user, long expiration, long at) {
+    private String encodeToken(UserClaims user, long duration, long at) {
         Map<String, Object> claims = objectMapper.convertValue(
                 user,
                 new TypeReference<Map<String, Object>>() {
@@ -74,6 +75,8 @@ public class JwtService implements TokenService {
         return Jwts.builder()
                 .setHeaderParam("typ", "JWT")
                 .setHeaderParam("alg", "HS256")
+                .setIssuedAt(new Date(at))
+                .setExpiration(new Date(at + duration))
                 .setClaims(claims)
                 .signWith(SignatureAlgorithm.HS256, key)
                 .compact();
@@ -84,16 +87,16 @@ public class JwtService implements TokenService {
         String refresh = refreshToken;
         long currentTime = System.currentTimeMillis();
 
-        String accessToken = encodeToken(claims, ONE_WEEK, currentTime);
+        String accessToken = encodeToken(claims, FIFTEEN_MINUTES, currentTime);
         if (refresh == null) {
-            refresh = encodeToken(claims, ONE_MONTH, currentTime);
+            refresh = encodeToken(claims, ONE_WEEK, currentTime);
             tokenStore.add(claims.getUsername(), refresh);
         }
 
         return new TokenCredential(
                 accessToken,
                 refresh,
-                ONE_WEEK,
+                FIFTEEN_MINUTES,
                 currentTime
         );
     }

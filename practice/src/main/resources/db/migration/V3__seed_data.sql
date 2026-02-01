@@ -17,35 +17,36 @@ VALUES (1, 'https://i.pinimg.com/736x/7d/ec/62/7dec625b5a1bb168d8f472e75982cb88.
 
 -- Users
 -- Luffy
-INSERT INTO user_member (id, username, password, name, dob, role, version, uri, format, width, height)
+INSERT INTO user_member (id, username, password, name, gender, dob, role, version, uri, format, width, height)
 VALUES ('00000000-0000-0000-0000-000000000002', 'Luffy', '$2y$10$JknJ3L/C9cTH1y2Uyu1DY.LxqHHsLu6ZtyZFm5Bpav3DurKwOmHm2',
-        'Luffy', CURRENT_TIMESTAMP, 'ROLE_USER', 0,
+        'Luffy', 1.0, CURRENT_TIMESTAMP, 'ROLE_USER', 0,
         'https://i.pinimg.com/736x/40/31/00/403100c729d0ef4551aeadfa57d9cbf7.jpg', 'jpeg',
         512, 512);
 INSERT INTO sync_context (owner_id, event_version)
 VALUES ('00000000-0000-0000-0000-000000000002', 0);
 
 -- Nami
-INSERT INTO user_member (id, username, password, name, dob, role, version, uri, format, width, height)
+INSERT INTO user_member (id, username, password, name, gender, dob, role, version, uri, format, width, height)
 VALUES ('00000000-0000-0000-0000-000000000003', 'Nami', '$2y$10$XevrAA3o1R2p2kpjOXO7BeFQgmGCLXUcvIyZWp3eyl9BjsaJgjTHK',
-        'Nami', CURRENT_TIMESTAMP, 'ROLE_USER', 0,
+        'Nami', 1.0, CURRENT_TIMESTAMP, 'ROLE_USER', 0,
         'https://i.pinimg.com/736x/74/d2/0f/74d20f3bdbeeaea11da2bf70cd1ef60a.jpg', 'jpeg', 512,
         512);
 INSERT INTO sync_context (owner_id, event_version)
 VALUES ('00000000-0000-0000-0000-000000000003', 0);
 
 -- Chopper
-INSERT INTO user_member (id, username, password, name, dob, role, version, uri, format, width, height)
+INSERT INTO user_member (id, username, password, name, gender, dob, role, version, uri, format, width, height)
 VALUES ('00000000-0000-0000-0000-000000000004', 'Chopper',
-        '$2y$10$kZBoOZpP9PRmjJNFqNB1b.Hokw66GviLP0IZ4TruPBl.W.OBIvXFa', 'Chopper', CURRENT_TIMESTAMP, 'ROLE_USER', 0,
+        '$2y$10$kZBoOZpP9PRmjJNFqNB1b.Hokw66GviLP0IZ4TruPBl.W.OBIvXFa', 'Chopper', 1.0, CURRENT_TIMESTAMP, 'ROLE_USER',
+        0,
         'https://i.pinimg.com/736x/ec/a7/0f/eca70f7274805de4be9553a9632778bf.jpg', 'jpeg', 512, 512);
 INSERT INTO sync_context (owner_id, event_version)
 VALUES ('00000000-0000-0000-0000-000000000004', 0);
 
 -- Zoro
-INSERT INTO user_member (id, username, password, name, dob, role, version, uri, format, width, height)
+INSERT INTO user_member (id, username, password, name, dob, gender, role, version, uri, format, width, height)
 VALUES ('00000000-0000-0000-0000-000000000005', 'Zoro', '$2y$10$S298DZN6DkqbjbBaP9MSYuE0ckWbCj3HyLViP.sP/zaqnoUUT6VUK',
-        'Zoro', CURRENT_TIMESTAMP, 'ROLE_USER', 0,
+        'Zoro', CURRENT_TIMESTAMP, 1.0, 'ROLE_USER', 0,
         'https://i.pinimg.com/736x/79/e2/c9/79e2c9402014ead1eebf6c9f184c5bf8.jpg', 'jpg', 512,
         512);
 INSERT INTO sync_context (owner_id, event_version)

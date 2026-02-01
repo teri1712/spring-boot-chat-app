@@ -16,6 +16,7 @@ services:
       SPRING_DATA_REDIS_HOST: redis
       SPRING_DATASOURCE_URL: jdbc:postgresql://postgres:5432/chatapp
       SPRING_ELASTICSEARCH_URIS: http://elasticsearch:9200
+      SPRING_KAFKA_BOOTSTRAP_SERVERS: kafka:9092
 
     ports:
       - "8080:8080"
@@ -25,6 +26,8 @@ services:
         condition: service_healthy
       redis:
         condition: service_healthy
+      kafka:
+        condition: service_started
     volumes:
       - ./logs:/app/logs
 
@@ -120,6 +123,24 @@ services:
       - ./s3/init:/etc/localstack/init/ready.d
     cpus: 1
     mem_limit: 1g
+
+  kafka:
+    image: apache/kafka:3.7.0
+    environment:
+      KAFKA_NODE_ID: 1
+      KAFKA_PROCESS_ROLES: broker,controller
+      KAFKA_LISTENERS: PLAINTEXT://0.0.0.0:9092,CONTROLLER://0.0.0.0:9093
+      KAFKA_ADVERTISED_LISTENERS: PLAINTEXT://kafka:9092
+      KAFKA_CONTROLLER_LISTENER_NAMES: CONTROLLER
+      KAFKA_LISTENER_SECURITY_PROTOCOL_MAP: CONTROLLER:PLAINTEXT,PLAINTEXT:PLAINTEXT
+      KAFKA_CONTROLLER_QUORUM_VOTERS: 1@kafka:9093
+      KAFKA_OFFSETS_TOPIC_REPLICATION_FACTOR: 1
+      KAFKA_TRANSACTION_STATE_LOG_REPLICATION_FACTOR: 1
+      KAFKA_TRANSACTION_STATE_LOG_MIN_ISR: 1
+      KAFKA_GROUP_INITIAL_REBALANCE_DELAY_MS: 0
+      CLUSTER_ID: 'MkU3OEVBNTcwNTJENDM2Qk'
+    cpus: 0.5
+    mem_limit: 500m
 
 volumes:
   grafana-data:
