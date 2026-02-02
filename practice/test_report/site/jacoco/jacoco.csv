@@ -1,0 +1,155 @@
+GROUP,PACKAGE,CLASS,INSTRUCTION_MISSED,INSTRUCTION_COVERED,BRANCH_MISSED,BRANCH_COVERED,LINE_MISSED,LINE_COVERED,COMPLEXITY_MISSED,COMPLEXITY_COVERED,METHOD_MISSED,METHOD_COVERED
+messenger-clone-server,com.decade.practice.infra.security,DaoUserDetailsService,0,31,0,0,0,8,0,3,0,3
+messenger-clone-server,com.decade.practice.dto.events,UserCreatedEvent.UserCreatedEventBuilder,17,49,0,0,0,1,1,8,1,8
+messenger-clone-server,com.decade.practice.dto.events,UserCreatedEvent,27,43,0,0,2,8,7,8,7,8
+messenger-clone-server,com.decade.practice.dto.events,MessageCreatedEvent,16,67,0,2,0,18,4,11,4,10
+messenger-clone-server,com.decade.practice.dto.events,UserPasswordChangedEvent,0,6,0,0,0,1,0,1,0,1
+messenger-clone-server,com.decade.practice.dto.events,MessageCreatedEvent.MessageCreatedEventBuilder,17,42,0,0,0,1,1,7,1,7
+messenger-clone-server,com.decade.practice.persistence.jpa.repositories,AdminRepository,25,0,4,0,6,0,4,0,2,0
+messenger-clone-server,com.decade.practice.persistence.jpa.embeddables,Preference,0,38,0,0,0,10,0,8,0,8
+messenger-clone-server,com.decade.practice.persistence.jpa.embeddables,ImageSpec,0,71,0,0,0,20,0,12,0,12
+messenger-clone-server,com.decade.practice.persistence.jpa.embeddables,ChatIdentifier,23,75,4,6,2,12,6,10,2,9
+messenger-clone-server,com.decade.practice.application.services.outbox,OutboxWorker,39,16,0,0,9,2,2,2,2,2
+messenger-clone-server,com.decade.practice.api.web.converters,ChatIdentifierConverter,4,40,1,1,1,8,1,4,0,4
+messenger-clone-server,com.decade.practice.persistence.elastic,MessageDocument,3,35,0,0,1,6,1,10,1,10
+messenger-clone-server,com.decade.practice.persistence.elastic,UserDocument,3,42,0,0,1,7,1,12,1,12
+messenger-clone-server,com.decade.practice.application.exception,OutdatedVersionException,0,15,0,0,0,2,0,2,0,2
+messenger-clone-server,com.decade.practice.api.web.rest,SearchController,0,17,0,0,0,3,0,3,0,3
+messenger-clone-server,com.decade.practice.api.web.rest,PresenceController,0,17,0,0,0,3,0,3,0,3
+messenger-clone-server,com.decade.practice.api.web.rest,UserController,0,36,0,0,0,9,0,3,0,3
+messenger-clone-server,com.decade.practice.api.web.rest,ThemeController,0,10,0,0,0,2,0,2,0,2
+messenger-clone-server,com.decade.practice.api.web.rest,EventController,0,140,0,0,0,28,0,8,0,8
+messenger-clone-server,com.decade.practice.api.web.rest,TokenController,136,16,4,0,37,2,4,2,2,2
+messenger-clone-server,com.decade.practice.api.web.rest,ChatController,0,62,0,0,0,11,0,4,0,4
+messenger-clone-server,com.decade.practice.api.web.rest,ChatController.new Function() {...},0,23,0,0,0,2,0,2,0,2
+messenger-clone-server,com.decade.practice.api.web.rest,AccountController,0,45,0,0,0,6,0,4,0,4
+messenger-clone-server,com.decade.practice.infra.security.jwt,JwtUser,26,20,4,0,4,5,5,5,3,5
+messenger-clone-server,com.decade.practice.infra.security.jwt,JwtTokenFilter,0,64,0,2,0,21,0,4,0,3
+messenger-clone-server,com.decade.practice.infra.security.jwt,JwtService,31,106,3,1,9,26,4,5,2,5
+messenger-clone-server,com.decade.practice.infra.security.jwt,JwtService.new TypeReference() {...},0,6,0,0,0,1,0,1,0,1
+messenger-clone-server,com.decade.practice.infra.security.jwt,JwtUserAuthentication,62,23,12,0,8,7,9,2,3,2
+messenger-clone-server,com.decade.practice.api.websocket.arguments,ChatIdentifierArgumentResolver,6,37,3,3,1,9,3,4,0,4
+messenger-clone-server,com.decade.practice.application.services,SearchServiceImpl,0,368,0,0,0,74,0,23,0,23
+messenger-clone-server,com.decade.practice.application.services,TokenSessionService,45,23,8,2,9,6,6,2,1,2
+messenger-clone-server,com.decade.practice.application.services,UserEventStore.new Supplier() {...},14,12,0,0,4,1,1,1,1,1
+messenger-clone-server,com.decade.practice.application.services,UserEventStore.new Function() {...},0,12,0,0,0,2,0,2,0,2
+messenger-clone-server,com.decade.practice.application.services,UserServiceImpl,23,187,2,10,2,47,4,10,2,6
+messenger-clone-server,com.decade.practice.application.services,DeliveryServiceImpl,0,163,0,8,0,36,0,7,0,3
+messenger-clone-server,com.decade.practice.application.services,ChatServiceImpl.new Function() {...},0,9,0,0,0,2,0,2,0,2
+messenger-clone-server,com.decade.practice.application.services,ChatServiceImpl.new Function() {...},9,0,0,0,2,0,2,0,2,0
+messenger-clone-server,com.decade.practice.application.services,ChatServiceImpl.new Function() {...},8,9,0,0,1,1,1,1,1,1
+messenger-clone-server,com.decade.practice.application.services,UserEventStore,0,138,0,2,0,27,0,7,0,6
+messenger-clone-server,com.decade.practice.application.services,RedisBasedTokenStore,47,63,2,2,8,14,4,5,2,5
+messenger-clone-server,com.decade.practice.application.services,OutboxStoreImpl.new TypeReference() {...},0,6,0,0,0,1,0,1,0,1
+messenger-clone-server,com.decade.practice.application.services,OutboxStoreImpl,0,36,0,0,0,7,0,2,0,2
+messenger-clone-server,com.decade.practice.application.services,TransactionalTempResource.new TransactionSynchronization() {...},10,12,1,1,2,3,1,2,0,2
+messenger-clone-server,com.decade.practice.application.services,UserEventStore.new Function() {...},0,12,0,0,0,2,0,2,0,2
+messenger-clone-server,com.decade.practice.application.services,UserEventStore.new Function() {...},6,6,0,0,1,1,1,1,1,1
+messenger-clone-server,com.decade.practice.application.services,CacheableEventService,15,22,0,0,3,4,2,3,2,3
+messenger-clone-server,com.decade.practice.application.services,ChatServiceImpl,55,166,1,3,12,26,1,9,0,8
+messenger-clone-server,com.decade.practice.application.services,LiveServiceImpl,0,48,0,0,0,11,0,3,0,3
+messenger-clone-server,com.decade.practice.application.services,TransactionalTempResource,20,26,3,1,4,7,3,3,1,3
+messenger-clone-server,com.decade.practice.infra.schedule,SchedulingConfiguration,3,0,0,0,1,0,1,0,1,0
+messenger-clone-server,com.decade.practice.api.web.s3,PresignController,0,17,0,0,0,3,0,2,0,2
+messenger-clone-server,com.decade.practice.api.web.s3,S3Config,0,28,0,0,0,11,0,2,0,2
+messenger-clone-server,com.decade.practice.api.web.s3,PresignedUrlService,0,70,0,0,0,23,0,4,0,4
+messenger-clone-server,com.decade.practice.persistence.jpa.entities,TextEvent,23,10,0,0,6,3,3,3,3,3
+messenger-clone-server,com.decade.practice.persistence.jpa.entities,Chat,15,73,0,2,1,18,4,11,4,10
+messenger-clone-server,com.decade.practice.persistence.jpa.entities,ImageEvent,27,10,0,0,7,3,3,3,3,3
+messenger-clone-server,com.decade.practice.persistence.jpa.entities,FileEvent,29,10,0,0,6,3,2,3,2,3
+messenger-clone-server,com.decade.practice.persistence.jpa.entities,Theme,17,9,0,0,5,4,3,3,3,3
+messenger-clone-server,com.decade.practice.persistence.jpa.entities,MediaEvent,6,17,0,0,2,5,1,5,1,5
+messenger-clone-server,com.decade.practice.persistence.jpa.entities,PreferenceEvent,14,27,0,0,3,10,2,5,2,5
+messenger-clone-server,com.decade.practice.persistence.jpa.entities,ChatOrder,24,14,0,0,4,3,7,4,7,4
+messenger-clone-server,com.decade.practice.persistence.jpa.entities,OutboxStatus,0,15,0,0,0,2,0,1,0,1
+messenger-clone-server,com.decade.practice.persistence.jpa.entities,ChatEvent,7,113,0,0,1,25,2,19,2,19
+messenger-clone-server,com.decade.practice.persistence.jpa.entities,IconEvent,23,10,0,0,6,3,3,3,3,3
+messenger-clone-server,com.decade.practice.persistence.jpa.entities,User,8,68,0,0,0,13,2,19,2,19
+messenger-clone-server,com.decade.practice.persistence.jpa.entities,SyncContext,7,36,0,0,1,9,2,7,2,7
+messenger-clone-server,com.decade.practice.persistence.jpa.entities,WelcomeEvent,17,0,0,0,6,0,3,0,3,0
+messenger-clone-server,com.decade.practice.persistence.jpa.entities,Admin,3,0,0,0,1,0,1,0,1,0
+messenger-clone-server,com.decade.practice.persistence.jpa.entities,SeenEvent,23,10,0,0,6,3,3,3,3,3
+messenger-clone-server,com.decade.practice.persistence.jpa.entities,Outbox,21,38,0,0,2,8,6,7,6,7
+messenger-clone-server,com.decade.practice.persistence.jpa.entities,MessageEvent,6,3,0,0,2,2,1,1,1,1
+messenger-clone-server,com.decade.practice.api.web.validation,StrongPasswordValidator,0,13,1,3,0,2,1,3,0,2
+messenger-clone-server,com.decade.practice.api.web.advices,ExceptionControllerAdvice,5,46,0,0,2,14,1,5,1,5
+messenger-clone-server,com.decade.practice.infra.configs,CacheConfiguration,0,28,0,0,0,10,0,4,0,4
+messenger-clone-server,com.decade.practice.infra.configs,CacheConfiguration.ByteBuddyRemovalGenericJackson2JsonRedisSerializer,0,11,0,0,0,3,0,1,0,1
+messenger-clone-server,com.decade.practice.infra.configs,SecurityConfiguration.ShowUserNotFoundConfiguration,0,30,0,6,0,8,0,5,0,2
+messenger-clone-server,com.decade.practice.infra.configs,WebSocketConfiguration.new HashSet() {...},0,11,0,0,0,4,0,1,0,1
+messenger-clone-server,com.decade.practice.infra.configs,RedisConfiguration,0,23,0,0,0,6,0,2,0,2
+messenger-clone-server,com.decade.practice.infra.configs,SecurityConfiguration,0,303,0,0,0,66,0,17,0,17
+messenger-clone-server,com.decade.practice.infra.configs,WebsocketRelayConfiguration,0,32,0,0,0,8,0,4,0,4
+messenger-clone-server,com.decade.practice.infra.configs,WebSocketConfiguration,0,99,0,2,0,18,0,8,0,7
+messenger-clone-server,com.decade.practice.persistence.jpa,DefaultAvatar,0,15,0,0,0,4,0,3,0,3
+messenger-clone-server,com.decade.practice.api.web,WebConfiguration,0,76,0,0,0,14,0,3,0,3
+messenger-clone-server,com.decade.practice.api.websocket,ConversationController,0,54,0,0,0,11,0,5,0,5
+messenger-clone-server,com.decade.practice.events.producers,BrokerEventSender.new TransactionSynchronization() {...},0,21,0,0,0,3,0,2,0,2
+messenger-clone-server,com.decade.practice.events.producers,BrokerEventSender,8,33,2,2,1,6,2,3,0,3
+messenger-clone-server,com.decade.practice.persistence.redis,TypeEvent,0,41,0,0,0,8,0,10,0,10
+messenger-clone-server,com.decade.practice.persistence.redis,OnlineStatus,0,38,0,0,0,7,0,11,0,11
+messenger-clone-server,com.decade.practice.infra.websocket,AuthenticatorInterceptor,5,44,1,3,1,11,1,3,0,2
+messenger-clone-server,com.decade.practice.utils,EventUtils,3,24,0,0,1,3,1,1,1,1
+messenger-clone-server,com.decade.practice.utils,TokenUtils,6,35,3,5,3,10,4,4,1,3
+messenger-clone-server,com.decade.practice.utils,ChatUtils,6,19,1,3,1,2,2,3,1,2
+messenger-clone-server,com.decade.practice.utils,PlatformsUtils,9,8,3,1,1,2,3,1,1,1
+messenger-clone-server,com.decade.practice.application.domain,MyChatOnlyAccessPolicy,0,17,0,4,0,2,0,4,0,2
+messenger-clone-server,com.decade.practice.events.consumers,RealtimeSubscriber,5,81,1,3,2,16,1,4,0,3
+messenger-clone-server,com.decade.practice.events.consumers,SearchServiceEventListener,32,13,0,0,8,2,2,2,2,2
+messenger-clone-server,com.decade.practice.common,SelfAwareBean,0,31,2,2,0,9,2,3,0,3
+messenger-clone-server,com.decade.practice.dto,Conversation,12,35,0,0,1,11,3,5,3,5
+messenger-clone-server,com.decade.practice.dto,S3PresignedDto,0,60,0,0,0,9,0,13,0,13
+messenger-clone-server,com.decade.practice.dto,PreferenceResponse,5,42,1,1,1,11,1,8,0,8
+messenger-clone-server,com.decade.practice.dto,SignUpRequest,0,48,0,0,0,8,0,13,0,13
+messenger-clone-server,com.decade.practice.dto,AccountEntryResponse,8,15,0,0,1,3,2,3,2,3
+messenger-clone-server,com.decade.practice.dto,AccountResponse,8,19,0,0,1,3,2,4,2,4
+messenger-clone-server,com.decade.practice.dto,PreferenceRequest,0,24,0,0,0,5,0,7,0,7
+messenger-clone-server,com.decade.practice.dto,S3PresignedDto.S3PresignedDtoBuilder,12,42,0,0,0,1,1,7,1,7
+messenger-clone-server,com.decade.practice.dto,EventRequest,0,59,0,0,0,10,0,17,0,17
+messenger-clone-server,com.decade.practice.dto,MessageHistoryDto.MessageHistoryDtoBuilder,12,35,0,0,0,1,1,6,1,6
+messenger-clone-server,com.decade.practice.dto,ThemeDto,31,0,0,0,8,0,6,0,6,0
+messenger-clone-server,com.decade.practice.dto,EventDto,0,115,0,0,0,18,0,33,0,33
+messenger-clone-server,com.decade.practice.dto,PreferenceEventDto,0,16,0,0,0,7,0,4,0,4
+messenger-clone-server,com.decade.practice.dto,TokenCredential,100,27,14,0,18,10,15,5,8,5
+messenger-clone-server,com.decade.practice.dto,UserResponse,0,104,0,0,0,20,0,18,0,18
+messenger-clone-server,com.decade.practice.dto,ChatSnapshot,12,21,0,0,1,4,3,4,3,4
+messenger-clone-server,com.decade.practice.dto,SeenEventDto,0,16,0,0,0,4,0,4,0,4
+messenger-clone-server,com.decade.practice.dto,ChatDetailsDto,12,36,0,0,1,9,3,5,3,5
+messenger-clone-server,com.decade.practice.dto,TextEventDto,0,16,0,0,0,4,0,4,0,4
+messenger-clone-server,com.decade.practice.dto,ImageEventDto,18,38,0,0,1,7,1,11,1,11
+messenger-clone-server,com.decade.practice.dto,UserResponse.UserResponseBuilder,19,56,0,0,0,1,1,9,1,9
+messenger-clone-server,com.decade.practice.dto,TypeEventDto,38,30,0,0,7,6,4,8,4,8
+messenger-clone-server,com.decade.practice.dto,FileEventDto,0,36,0,0,0,6,0,8,0,8
+messenger-clone-server,com.decade.practice.dto,IconEventDto,0,16,0,0,0,4,0,4,0,4
+messenger-clone-server,com.decade.practice.dto,AccountResponse.AccountResponseBuilder,8,21,0,0,0,1,1,4,1,4
+messenger-clone-server,com.decade.practice.dto,ChatDto,0,52,0,2,0,13,0,10,0,9
+messenger-clone-server,com.decade.practice.dto,MessageHistoryDto,19,31,0,0,2,6,5,6,5,6
+messenger-clone-server,com.decade.practice.dto,ProfileRequest,0,31,0,0,0,6,0,9,0,9
+messenger-clone-server,com.decade.practice.dto,TypeEventDto.TypeEventDtoBuilder,48,0,0,0,1,0,7,0,7,0
+messenger-clone-server,com.decade.practice.application.usecases,ImageEventFactory,0,91,1,1,0,22,1,4,0,4
+messenger-clone-server,com.decade.practice.application.usecases,EventFactory,0,5,0,0,0,1,0,1,0,1
+messenger-clone-server,com.decade.practice.application.usecases,TextEventFactory,0,32,0,0,0,9,0,4,0,4
+messenger-clone-server,com.decade.practice.application.usecases,SeenEventFactory,0,32,0,0,0,9,0,4,0,4
+messenger-clone-server,com.decade.practice.application.usecases,FileEventFactory,0,46,0,0,0,11,0,4,0,4
+messenger-clone-server,com.decade.practice.application.usecases,EventFactoryResolution,18,50,5,3,6,11,3,5,0,4
+messenger-clone-server,com.decade.practice.application.usecases,PreferenceEventFactory,6,78,1,3,1,19,1,5,0,4
+messenger-clone-server,com.decade.practice.application.usecases,IconEventFactory,0,32,0,0,0,9,0,4,0,4
+messenger-clone-server,com.decade.practice.application.usecases,AbstractEventFactory,5,78,1,3,1,16,1,3,0,2
+messenger-clone-server,com.decade.practice,Application,20,3,0,0,5,1,2,1,2,1
+messenger-clone-server,com.decade.practice.infra.security.models,UserClaims.UserClaimsBuilder,16,49,0,0,0,1,1,8,1,8
+messenger-clone-server,com.decade.practice.infra.security.models,UserClaims,0,100,0,0,0,18,0,16,0,16
+messenger-clone-server,com.decade.practice.infra.security.models,DaoUser,25,43,4,0,4,14,5,9,3,9
+messenger-clone-server,com.decade.practice.infra.security.strategies,LoginSuccessStrategy,0,69,0,0,0,17,0,2,0,2
+messenger-clone-server,com.decade.practice.infra.security.strategies,EntryPointStrategy,4,11,1,1,1,4,1,2,0,2
+messenger-clone-server,com.decade.practice.infra.security.strategies,LogoutStrategy,15,6,2,0,6,3,2,1,1,1
+messenger-clone-server,com.decade.practice.infra.security.strategies,LoginFailStrategy,7,30,1,3,1,11,1,3,0,2
+messenger-clone-server,com.decade.practice.infra.bootstrap,PresencesInitializer,0,37,0,0,0,5,0,2,0,2
+messenger-clone-server,com.decade.practice.infra.bootstrap,RedisInitializer,0,12,0,0,0,5,0,2,0,2
+messenger-clone-server,com.decade.practice.infra.bootstrap,PresencesInitializer.new Consumer() {...},0,22,0,0,0,4,0,2,0,2
+messenger-clone-server,com.decade.practice.infra.bootstrap,PresencesInitializer.new Consumer() {...},0,24,0,0,0,4,0,2,0,2
+messenger-clone-server,com.decade.practice.infra.bootstrap,PresencesInitializer.new Consumer() {...},0,24,0,0,0,4,0,2,0,2
+messenger-clone-server,com.decade.practice.application.events,MessageEventListener,0,15,0,0,0,3,0,2,0,2
+messenger-clone-server,com.decade.practice.application.events,AccountEventListener,6,32,0,0,2,8,1,5,1,5
+messenger-clone-server,com.decade.practice.application.presence,UserPresenceManager,4,125,1,3,1,30,1,8,0,7
+messenger-clone-server,com.decade.practice.application.presence,PresenceListener.new HandlerInterceptor() {...},0,28,0,4,0,4,0,4,0,2
+messenger-clone-server,com.decade.practice.application.presence,PresenceListener,0,33,0,2,0,9,0,4,0,3

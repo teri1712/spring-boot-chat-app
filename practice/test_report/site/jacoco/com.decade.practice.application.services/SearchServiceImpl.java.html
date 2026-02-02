@@ -1,0 +1,147 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>SearchServiceImpl.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">messenger-clone-server</a> &gt; <a href="index.source.html" class="el_package">com.decade.practice.application.services</a> &gt; <span class="el_source">SearchServiceImpl.java</span></div><h1>SearchServiceImpl.java</h1><pre class="source lang-java linenums">package com.decade.practice.application.services;
+
+import com.decade.practice.application.usecases.SearchService;
+import com.decade.practice.application.usecases.SearchStore;
+import com.decade.practice.dto.MessageHistoryDto;
+import com.decade.practice.dto.UserResponse;
+import com.decade.practice.dto.events.MessageCreatedEvent;
+import com.decade.practice.dto.events.UserCreatedEvent;
+import com.decade.practice.persistence.elastic.MessageDocument;
+import com.decade.practice.persistence.elastic.UserDocument;
+import com.decade.practice.persistence.elastic.repositories.MessageDocumentRepository;
+import com.decade.practice.persistence.elastic.repositories.UserDocumentRepository;
+import com.decade.practice.persistence.jpa.entities.User;
+import lombok.AllArgsConstructor;
+import org.springframework.data.elasticsearch.client.elc.NativeQuery;
+import org.springframework.data.elasticsearch.core.ElasticsearchOperations;
+import org.springframework.data.elasticsearch.core.SearchHit;
+import org.springframework.data.elasticsearch.core.SearchHits;
+import org.springframework.data.elasticsearch.core.query.HighlightQuery;
+import org.springframework.data.elasticsearch.core.query.Query;
+import org.springframework.data.elasticsearch.core.query.highlight.Highlight;
+import org.springframework.data.elasticsearch.core.query.highlight.HighlightField;
+import org.springframework.data.elasticsearch.core.query.highlight.HighlightFieldParameters;
+import org.springframework.stereotype.Service;
+
+import java.util.List;
+import java.util.UUID;
+
+@Service
+<span class="fc" id="L30">@AllArgsConstructor</span>
+public class SearchServiceImpl implements SearchService, SearchStore {
+
+    private final MessageDocumentRepository messageDocumentRepository;
+    private final UserDocumentRepository userDocumentRepository;
+    private final ElasticsearchOperations elasticsearchOperations;
+
+    @Override
+    public List&lt;UserResponse&gt; searchUsers(String string) {
+<span class="fc" id="L39">        Query query = NativeQuery.builder()</span>
+<span class="fc" id="L40">                .withQuery(q -&gt; q.bool(b -&gt; b</span>
+<span class="fc" id="L41">                        .should(f -&gt; f.term(t -&gt; t.field(&quot;gender&quot;).value(User.FEMALE)))</span>
+<span class="fc" id="L42">                        .should(m -&gt; m.match(mm -&gt; mm.field(&quot;username&quot;).query(string)))</span>
+<span class="fc" id="L43">                        .should(m -&gt; m.match(mm -&gt; mm.field(&quot;name&quot;).query(string)))</span>
+<span class="fc" id="L44">                        .minimumShouldMatch(&quot;1&quot;)</span>
+                ))
+<span class="fc" id="L46">                .withHighlightQuery(new HighlightQuery(</span>
+<span class="fc" id="L47">                        new Highlight(List.of(</span>
+                                new HighlightField(&quot;username&quot;,
+<span class="fc" id="L49">                                        HighlightFieldParameters.builder()</span>
+<span class="fc" id="L50">                                                .withPreTags(&quot;&lt;strong&gt;&quot;)</span>
+<span class="fc" id="L51">                                                .withPostTags(&quot;&lt;/strong&gt;&quot;)</span>
+<span class="fc" id="L52">                                                .build()</span>
+                                ),
+                                new HighlightField(&quot;name&quot;,
+<span class="fc" id="L55">                                        HighlightFieldParameters.builder()</span>
+<span class="fc" id="L56">                                                .withPreTags(&quot;&lt;strong&gt;&quot;)</span>
+<span class="fc" id="L57">                                                .withPostTags(&quot;&lt;/strong&gt;&quot;)</span>
+<span class="fc" id="L58">                                                .build()</span>
+                                )
+                        )),
+                        null
+                ))
+<span class="fc" id="L63">                .build();</span>
+<span class="fc" id="L64">        SearchHits&lt;UserDocument&gt; hits =</span>
+<span class="fc" id="L65">                elasticsearchOperations.search(query, UserDocument.class);</span>
+<span class="fc" id="L66">        return hits.getSearchHits()</span>
+<span class="fc" id="L67">                .stream()</span>
+<span class="fc" id="L68">                .map(SearchHit::getContent)</span>
+<span class="fc" id="L69">                .map(document -&gt; UserResponse.builder()</span>
+<span class="fc" id="L70">                        .id(document.getId())</span>
+<span class="fc" id="L71">                        .username(document.getUsername())</span>
+<span class="fc" id="L72">                        .name(document.getName())</span>
+<span class="fc" id="L73">                        .avatar(document.getAvatar())</span>
+<span class="fc" id="L74">                        .gender(document.getGender())</span>
+<span class="fc" id="L75">                        .build()).toList();</span>
+    }
+
+    @Override
+    public List&lt;MessageHistoryDto&gt; searchMessages(UUID owner, String string) {
+<span class="fc" id="L80">        Query query = NativeQuery.builder()</span>
+<span class="fc" id="L81">                .withQuery(q -&gt; q.bool(b -&gt; b</span>
+<span class="fc" id="L82">                        .filter(f -&gt; f.term(t -&gt; t.field(&quot;owner&quot;).value(owner.toString())))</span>
+<span class="fc" id="L83">                        .should(m -&gt; m.match(mm -&gt; mm.field(&quot;partnerName&quot;).query(string)))</span>
+<span class="fc" id="L84">                        .should(m -&gt; m.match(mm -&gt; mm.field(&quot;content&quot;).query(string).fuzziness(&quot;AUTO&quot;)))</span>
+<span class="fc" id="L85">                        .minimumShouldMatch(&quot;1&quot;)</span>
+                ))
+<span class="fc" id="L87">                .withHighlightQuery(new HighlightQuery(</span>
+<span class="fc" id="L88">                        new Highlight(List.of(</span>
+                                new HighlightField(&quot;partnerName&quot;,
+<span class="fc" id="L90">                                        HighlightFieldParameters.builder()</span>
+<span class="fc" id="L91">                                                .withPreTags(&quot;&lt;strong&gt;&quot;)</span>
+<span class="fc" id="L92">                                                .withPostTags(&quot;&lt;/strong&gt;&quot;)</span>
+<span class="fc" id="L93">                                                .build()</span>
+                                ),
+                                new HighlightField(&quot;content&quot;,
+<span class="fc" id="L96">                                        HighlightFieldParameters.builder()</span>
+<span class="fc" id="L97">                                                .withPreTags(&quot;&lt;strong&gt;&quot;)</span>
+<span class="fc" id="L98">                                                .withPostTags(&quot;&lt;/strong&gt;&quot;)</span>
+<span class="fc" id="L99">                                                .build()</span>
+                                )
+                        )),
+                        null
+                ))
+<span class="fc" id="L104">                .build();</span>
+<span class="fc" id="L105">        SearchHits&lt;MessageDocument&gt; hits =</span>
+<span class="fc" id="L106">                elasticsearchOperations.search(query, MessageDocument.class);</span>
+
+<span class="fc" id="L108">        return hits.getSearchHits().stream().map(SearchHit::getContent)</span>
+<span class="fc" id="L109">                .map(document -&gt; MessageHistoryDto.builder()</span>
+<span class="fc" id="L110">                        .id(document.getId())</span>
+<span class="fc" id="L111">                        .content(document.getContent())</span>
+<span class="fc" id="L112">                        .chatIdentifier(document.getChatIdentifier())</span>
+<span class="fc" id="L113">                        .partnerName(document.getPartnerName())</span>
+<span class="fc" id="L114">                        .build())</span>
+
+<span class="fc" id="L116">                .toList();</span>
+    }
+
+    @Override
+    public void save(UserCreatedEvent userCreatedEvent) {
+
+<span class="fc" id="L122">        UserDocument document = new UserDocument();</span>
+<span class="fc" id="L123">        document.setAvatar(userCreatedEvent.getAvatar());</span>
+<span class="fc" id="L124">        document.setUsername(userCreatedEvent.getUsername());</span>
+<span class="fc" id="L125">        document.setName(userCreatedEvent.getName());</span>
+<span class="fc" id="L126">        document.setGender(userCreatedEvent.getGender());</span>
+<span class="fc" id="L127">        document.setDob(userCreatedEvent.getDob());</span>
+<span class="fc" id="L128">        document.setId(userCreatedEvent.getUserId());</span>
+<span class="fc" id="L129">        userDocumentRepository.save(document);</span>
+
+<span class="fc" id="L131">    }</span>
+
+    @Override
+    public void save(MessageCreatedEvent messageCreatedEvent) {
+<span class="fc" id="L135">        MessageDocument document = new MessageDocument();</span>
+<span class="fc" id="L136">        document.setId(messageCreatedEvent.getIdempotencyKey());</span>
+<span class="fc" id="L137">        document.setOwner(messageCreatedEvent.getChat().getOwner());</span>
+<span class="fc" id="L138">        document.setChatIdentifier(messageCreatedEvent.getChat().getIdentifier());</span>
+<span class="fc" id="L139">        document.setPartnerName(messageCreatedEvent.getPartner().getName());</span>
+<span class="fc" id="L140">        document.setContent(messageCreatedEvent.getTextEvent().getContent());</span>
+
+
+<span class="fc" id="L143">        messageDocumentRepository.save(document);</span>
+
+<span class="fc" id="L145">    }</span>
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.11.202310140853</span></div></body></html>

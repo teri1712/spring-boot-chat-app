@@ -1,0 +1,61 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>ExceptionControllerAdvice.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">messenger-clone-server</a> &gt; <a href="index.source.html" class="el_package">com.decade.practice.api.web.advices</a> &gt; <span class="el_source">ExceptionControllerAdvice.java</span></div><h1>ExceptionControllerAdvice.java</h1><pre class="source lang-java linenums">package com.decade.practice.api.web.advices;
+
+import com.decade.practice.application.exception.OutdatedVersionException;
+import jakarta.persistence.EntityNotFoundException;
+import jakarta.persistence.OptimisticLockException;
+import jakarta.validation.ConstraintViolationException;
+import lombok.extern.slf4j.Slf4j;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ProblemDetail;
+import org.springframework.messaging.handler.annotation.MessageExceptionHandler;
+import org.springframework.web.bind.annotation.ExceptionHandler;
+import org.springframework.web.bind.annotation.ResponseStatus;
+import org.springframework.web.bind.annotation.RestControllerAdvice;
+
+import java.util.NoSuchElementException;
+
+<span class="fc" id="L17">@Slf4j</span>
+@RestControllerAdvice
+<span class="fc" id="L19">public class ExceptionControllerAdvice {</span>
+
+    @ResponseStatus(value = HttpStatus.NOT_FOUND)
+    @ExceptionHandler({
+            EntityNotFoundException.class,
+            NoSuchElementException.class,
+    })
+    @MessageExceptionHandler({
+            EntityNotFoundException.class,
+            NoSuchElementException.class,
+    })
+    public void handleNoEntity(Exception e) {
+<span class="fc" id="L31">        log.warn(&quot;Entity not found&quot;, e);</span>
+<span class="fc" id="L32">    }</span>
+
+    @ExceptionHandler(OptimisticLockException.class)
+    @ResponseStatus(value = HttpStatus.CONFLICT)
+    public void handleLockException(Exception e) {
+<span class="nc" id="L37">        log.warn(&quot;Concurrent update on the same resource&quot;, e);</span>
+<span class="nc" id="L38">    }</span>
+
+    @ExceptionHandler(OutdatedVersionException.class)
+    @ResponseStatus(value = HttpStatus.CONFLICT)
+    public ProblemDetail handleOutdatedVersionException(OutdatedVersionException e) {
+<span class="fc" id="L43">        log.warn(&quot;Version mismatched&quot;, e);</span>
+<span class="fc" id="L44">        ProblemDetail pd = ProblemDetail.forStatus(HttpStatus.CONFLICT.value());</span>
+<span class="fc" id="L45">        pd.setDetail(e.getMessage());</span>
+<span class="fc" id="L46">        pd.setTitle(&quot;Version mismatched&quot;);</span>
+<span class="fc" id="L47">        return pd;</span>
+    }
+
+    @ExceptionHandler({ConstraintViolationException.class})
+    @ResponseStatus(value = HttpStatus.BAD_REQUEST)
+    public ProblemDetail handleBeanValidationException(Exception e) {
+<span class="fc" id="L53">        log.warn(&quot;Validation failure&quot;, e);</span>
+<span class="fc" id="L54">        ProblemDetail pd = ProblemDetail.forStatus(HttpStatus.BAD_REQUEST.value());</span>
+<span class="fc" id="L55">        pd.setDetail(e.getMessage());</span>
+<span class="fc" id="L56">        pd.setTitle(&quot;Validation failure&quot;);</span>
+<span class="fc" id="L57">        return pd;</span>
+    }
+
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.11.202310140853</span></div></body></html>

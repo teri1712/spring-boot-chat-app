@@ -1,0 +1,182 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>SecurityConfiguration.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">messenger-clone-server</a> &gt; <a href="index.source.html" class="el_package">com.decade.practice.infra.configs</a> &gt; <span class="el_source">SecurityConfiguration.java</span></div><h1>SecurityConfiguration.java</h1><pre class="source lang-java linenums">package com.decade.practice.infra.configs;
+
+import com.decade.practice.infra.security.jwt.JwtTokenFilter;
+import com.decade.practice.infra.security.strategies.EntryPointStrategy;
+import com.decade.practice.infra.security.strategies.LoginFailStrategy;
+import com.decade.practice.infra.security.strategies.LoginSuccessStrategy;
+import com.decade.practice.infra.security.strategies.LogoutStrategy;
+import org.springframework.beans.BeansException;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.beans.factory.config.BeanPostProcessor;
+import org.springframework.boot.actuate.autoconfigure.security.servlet.EndpointRequest;
+import org.springframework.context.annotation.Bean;
+import org.springframework.context.annotation.Configuration;
+import org.springframework.core.annotation.Order;
+import org.springframework.http.HttpMethod;
+import org.springframework.http.HttpStatus;
+import org.springframework.security.authentication.ProviderManager;
+import org.springframework.security.authentication.dao.AbstractUserDetailsAuthenticationProvider;
+import org.springframework.security.authentication.dao.DaoAuthenticationProvider;
+import org.springframework.security.config.Customizer;
+import org.springframework.security.config.annotation.authentication.builders.AuthenticationManagerBuilder;
+import org.springframework.security.config.annotation.authentication.configuration.GlobalAuthenticationConfigurerAdapter;
+import org.springframework.security.config.annotation.method.configuration.EnableMethodSecurity;
+import org.springframework.security.config.annotation.web.builders.HttpSecurity;
+import org.springframework.security.config.http.SessionCreationPolicy;
+import org.springframework.security.core.userdetails.User;
+import org.springframework.security.core.userdetails.UserDetails;
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
+import org.springframework.security.crypto.password.PasswordEncoder;
+import org.springframework.security.oauth2.server.resource.web.HeaderBearerTokenResolver;
+import org.springframework.security.provisioning.InMemoryUserDetailsManager;
+import org.springframework.security.web.SecurityFilterChain;
+import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
+import org.springframework.security.web.authentication.logout.HttpStatusReturningLogoutSuccessHandler;
+import org.springframework.security.web.context.RequestAttributeSecurityContextRepository;
+import org.springframework.security.web.context.SecurityContextRepository;
+import org.springframework.web.cors.CorsConfiguration;
+import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
+
+import java.util.List;
+
+@EnableMethodSecurity
+@Configuration
+<span class="fc" id="L44">public class SecurityConfiguration extends GlobalAuthenticationConfigurerAdapter {</span>
+    public static final String FILTER_CHAIN_BEAN_NAME = &quot;DECADE_FILTER_CHAIN&quot;;
+
+    @Value(&quot;${frontend.host.address}&quot;)
+    private String frontEndAddress;
+
+    @Value(&quot;${actuator.user.name}&quot;)
+    private String actuatorUsername;
+
+    @Value(&quot;${actuator.user.password}&quot;)
+    private String actuatorPassword;
+
+    @Value(&quot;${actuator.user.roles}&quot;)
+    private String actuatorRoles;
+
+    @Configuration(proxyBeanMethods = false)
+<span class="fc" id="L60">    public static class ShowUserNotFoundConfiguration implements BeanPostProcessor {</span>
+        // TODO: Will be removed latter
+        @Override
+        public Object postProcessAfterInitialization(Object bean, String beanName) throws BeansException {
+<span class="fc bfc" id="L64" title="All 2 branches covered.">            if (bean instanceof ProviderManager) {</span>
+<span class="fc" id="L65">                ProviderManager providerManager = (ProviderManager) bean;</span>
+<span class="fc bfc" id="L66" title="All 2 branches covered.">                for (var authProvider : providerManager.getProviders()) {</span>
+<span class="fc bfc" id="L67" title="All 2 branches covered.">                    if (authProvider instanceof AbstractUserDetailsAuthenticationProvider) {</span>
+<span class="fc" id="L68">                        ((AbstractUserDetailsAuthenticationProvider) authProvider).setHideUserNotFoundExceptions(false);</span>
+                    }
+<span class="fc" id="L70">                }</span>
+            }
+<span class="fc" id="L72">            return bean;</span>
+        }
+    }
+
+    @Override
+    public void configure(AuthenticationManagerBuilder auth) throws Exception {
+<span class="fc" id="L78">        auth.eraseCredentials(false);</span>
+<span class="fc" id="L79">    }</span>
+
+    @Bean
+    public PasswordEncoder passwordEncoder() {
+<span class="fc" id="L83">        return new BCryptPasswordEncoder(10);</span>
+    }
+
+
+    @Bean
+    public SecurityContextRepository contextRepository() {
+<span class="fc" id="L89">        return new RequestAttributeSecurityContextRepository();</span>
+    }
+
+    @Bean
+    public UrlBasedCorsConfigurationSource corsConfigurationSource() {
+<span class="fc" id="L94">        CorsConfiguration config = new CorsConfiguration();</span>
+<span class="fc" id="L95">        config.setAllowedOrigins(List.of(frontEndAddress));</span>
+<span class="fc" id="L96">        config.setAllowedMethods(List.of(&quot;*&quot;));</span>
+<span class="fc" id="L97">        config.setAllowedHeaders(List.of(&quot;*&quot;));</span>
+<span class="fc" id="L98">        config.setAllowCredentials(true);</span>
+<span class="fc" id="L99">        config.setMaxAge(3600L);</span>
+
+<span class="fc" id="L101">        UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();</span>
+<span class="fc" id="L102">        source.registerCorsConfiguration(&quot;/**&quot;, config);</span>
+<span class="fc" id="L103">        return source;</span>
+    }
+
+    @Bean
+    @Order(0)
+    public SecurityFilterChain actuatorSecurity(HttpSecurity http) throws Exception {
+<span class="fc" id="L109">        UserDetails actuator = User.builder()</span>
+<span class="fc" id="L110">                .username(actuatorUsername)</span>
+<span class="fc" id="L111">                .password(passwordEncoder().encode(actuatorPassword))</span>
+<span class="fc" id="L112">                .roles(actuatorRoles.split(&quot;,&quot;))</span>
+<span class="fc" id="L113">                .build();</span>
+<span class="fc" id="L114">        DaoAuthenticationProvider adminProvider = new DaoAuthenticationProvider();</span>
+<span class="fc" id="L115">        adminProvider.setUserDetailsService(new InMemoryUserDetailsManager(actuator));</span>
+<span class="fc" id="L116">        adminProvider.setPasswordEncoder(passwordEncoder());</span>
+
+<span class="fc" id="L118">        http</span>
+<span class="fc" id="L119">                .authenticationManager(new ProviderManager(adminProvider))</span>
+<span class="fc" id="L120">                .securityMatcher(EndpointRequest.toAnyEndpoint())</span>
+<span class="fc" id="L121">                .authorizeHttpRequests(</span>
+                        auth -&gt; auth
+<span class="fc" id="L123">                                .requestMatchers(EndpointRequest.to(&quot;health&quot;, &quot;info&quot;)).permitAll()</span>
+<span class="fc" id="L124">                                .requestMatchers(EndpointRequest.to(&quot;prometheus&quot;)).hasRole(&quot;OPS&quot;)</span>
+<span class="fc" id="L125">                                .anyRequest().denyAll()</span>
+                )
+<span class="fc" id="L127">                .httpBasic(Customizer.withDefaults())</span>
+<span class="fc" id="L128">                .csrf(csrf -&gt; csrf.disable());</span>
+<span class="fc" id="L129">        return http.build();</span>
+    }
+
+
+    @Bean(name = FILTER_CHAIN_BEAN_NAME)
+    public SecurityFilterChain filterChain(
+            HttpSecurity http,
+            LoginSuccessStrategy strategy,
+            LogoutStrategy logoutHandler,
+            JwtTokenFilter jwtAuthenticationFilter
+    ) throws Exception {
+<span class="fc" id="L140">        http</span>
+<span class="fc" id="L141">                .requestCache(Customizer.withDefaults())</span>
+<span class="fc" id="L142">                .securityContext(context -&gt;</span>
+<span class="fc" id="L143">                        context.securityContextRepository(contextRepository())</span>
+                )
+<span class="fc" id="L145">                .cors(Customizer.withDefaults())</span>
+<span class="fc" id="L146">                .csrf(csrf -&gt; csrf.disable())</span>
+<span class="fc" id="L147">                .formLogin(login -&gt;</span>
+<span class="fc" id="L148">                        login.successHandler(strategy)</span>
+<span class="fc" id="L149">                                .failureHandler(new LoginFailStrategy())</span>
+<span class="fc" id="L150">                                .loginPage(&quot;/login&quot;)</span>
+<span class="fc" id="L151">                                .permitAll()</span>
+                )
+<span class="fc" id="L153">                .exceptionHandling(exceptionHandling -&gt;</span>
+<span class="fc" id="L154">                        exceptionHandling.accessDeniedPage(null)</span>
+<span class="fc" id="L155">                                .authenticationEntryPoint(new EntryPointStrategy())</span>
+                )
+<span class="fc" id="L157">                .logout(logout -&gt;</span>
+<span class="fc" id="L158">                        logout.logoutSuccessHandler(new HttpStatusReturningLogoutSuccessHandler(HttpStatus.OK))</span>
+<span class="fc" id="L159">                                .addLogoutHandler(logoutHandler)</span>
+<span class="fc" id="L160">                                .permitAll()</span>
+                )
+<span class="fc" id="L162">                .addFilterAfter(jwtAuthenticationFilter, UsernamePasswordAuthenticationFilter.class)</span>
+<span class="fc" id="L163">                .authorizeHttpRequests(authorize -&gt;</span>
+<span class="fc" id="L164">                        authorize.requestMatchers(&quot;/files/**&quot;).permitAll()</span>
+<span class="fc" id="L165">                                .requestMatchers(HttpMethod.POST, &quot;/users&quot;).permitAll()</span>
+<span class="fc" id="L166">                                .requestMatchers(&quot;/tokens/**&quot;).permitAll()</span>
+<span class="fc" id="L167">                                .requestMatchers(WebSocketConfiguration.HANDSHAKE_DESTINATION).permitAll()</span>
+<span class="fc" id="L168">                                .requestMatchers(HttpMethod.POST, &quot;/login&quot;).permitAll()</span>
+<span class="fc" id="L169">                                .anyRequest().authenticated()</span>
+                )
+<span class="fc" id="L171">                .oauth2ResourceServer(oauth2 -&gt; {</span>
+<span class="fc" id="L172">                    oauth2.bearerTokenResolver(new HeaderBearerTokenResolver(&quot;Oauth2-Token&quot;));</span>
+<span class="fc" id="L173">                    oauth2.jwt(Customizer.withDefaults());</span>
+<span class="fc" id="L174">                })</span>
+<span class="fc" id="L175">                .sessionManagement(session -&gt;</span>
+<span class="fc" id="L176">                        session</span>
+<span class="fc" id="L177">                                .sessionCreationPolicy(SessionCreationPolicy.STATELESS)</span>
+                );
+<span class="fc" id="L179">        return http.build();</span>
+    }
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.11.202310140853</span></div></body></html>

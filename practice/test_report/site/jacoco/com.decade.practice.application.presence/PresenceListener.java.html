@@ -1,0 +1,52 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>PresenceListener.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">messenger-clone-server</a> &gt; <a href="index.source.html" class="el_package">com.decade.practice.application.presence</a> &gt; <span class="el_source">PresenceListener.java</span></div><h1>PresenceListener.java</h1><pre class="source lang-java linenums">package com.decade.practice.application.presence;
+
+import com.decade.practice.application.usecases.UserPresenceService;
+import com.decade.practice.infra.security.jwt.JwtUserAuthentication;
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletResponse;
+import org.springframework.core.Ordered;
+import org.springframework.core.annotation.Order;
+import org.springframework.messaging.Message;
+import org.springframework.messaging.MessageChannel;
+import org.springframework.messaging.simp.SimpMessageHeaderAccessor;
+import org.springframework.messaging.support.ChannelInterceptor;
+import org.springframework.stereotype.Component;
+import org.springframework.web.servlet.HandlerInterceptor;
+import org.springframework.web.servlet.config.annotation.InterceptorRegistry;
+import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
+
+import java.time.Instant;
+
+@Component
+@Order(Ordered.HIGHEST_PRECEDENCE)
+public class PresenceListener implements ChannelInterceptor, WebMvcConfigurer {
+    private final UserPresenceService userPresenceService;
+
+<span class="fc" id="L25">    public PresenceListener(UserPresenceService userPresenceService) {</span>
+<span class="fc" id="L26">        this.userPresenceService = userPresenceService;</span>
+<span class="fc" id="L27">    }</span>
+
+    @Override
+    public void addInterceptors(InterceptorRegistry registry) {
+<span class="fc" id="L31">        registry.addInterceptor(new HandlerInterceptor() {</span>
+            @Override
+            public boolean preHandle(HttpServletRequest request, HttpServletResponse response, Object handler) throws Exception {
+<span class="fc bfc" id="L34" title="All 4 branches covered.">                if (request.getUserPrincipal() != null &amp;&amp; request.getUserPrincipal() instanceof JwtUserAuthentication authentication) {</span>
+<span class="fc" id="L35">                    userPresenceService.set(authentication.getPrincipal(), Instant.now());</span>
+                }
+<span class="fc" id="L37">                return true;</span>
+            }
+        });
+<span class="fc" id="L40">    }</span>
+
+    @Override
+    public Message&lt;?&gt; preSend(Message&lt;?&gt; message, MessageChannel channel) {
+<span class="fc" id="L44">        var principal = SimpMessageHeaderAccessor.getUser(message.getHeaders());</span>
+<span class="fc bfc" id="L45" title="All 2 branches covered.">        if (principal instanceof JwtUserAuthentication authentication) {</span>
+<span class="fc" id="L46">            userPresenceService.set(authentication.getPrincipal(), Instant.now());</span>
+        }
+<span class="fc" id="L48">        return message;</span>
+    }
+
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.11.202310140853</span></div></body></html>

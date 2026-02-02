@@ -1,0 +1,104 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>JwtService.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">messenger-clone-server</a> &gt; <a href="index.source.html" class="el_package">com.decade.practice.infra.security.jwt</a> &gt; <span class="el_source">JwtService.java</span></div><h1>JwtService.java</h1><pre class="source lang-java linenums">package com.decade.practice.infra.security.jwt;
+
+import com.decade.practice.application.usecases.TokenStore;
+import com.decade.practice.dto.TokenCredential;
+import com.decade.practice.infra.security.TokenService;
+import com.decade.practice.infra.security.models.UserClaims;
+import com.fasterxml.jackson.core.type.TypeReference;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import io.jsonwebtoken.*;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.security.access.AccessDeniedException;
+import org.springframework.stereotype.Service;
+
+import java.util.Base64;
+import java.util.Date;
+import java.util.Map;
+
+@Service
+public class JwtService implements TokenService {
+
+    private static final long ONE_WEEK = 7L * 24 * 60 * 60 * 1000L;
+    private static final long FIFTEEN_MINUTES = 15 * 60 * 1000L;
+    private static final String TOKEN_KEY_SPACE = &quot;JWT_TOKENS&quot;;
+
+    private final TokenStore tokenStore;
+    private final String key;
+<span class="fc" id="L27">    private final ObjectMapper objectMapper = new ObjectMapper();</span>
+
+    public JwtService(
+            TokenStore tokenStore, @Value(&quot;${jwt.secret}&quot;) String secret
+<span class="fc" id="L31">    ) {</span>
+<span class="fc" id="L32">        this.tokenStore = tokenStore;</span>
+<span class="fc" id="L33">        this.key = Base64.getEncoder().encodeToString(secret.getBytes());</span>
+<span class="fc" id="L34">    }</span>
+
+    private static String generateKey(String username) {
+<span class="nc" id="L37">        return TOKEN_KEY_SPACE + &quot;:&quot; + username;</span>
+    }
+
+    @Override
+    public void validate(String refreshToken) throws AccessDeniedException {
+        UserClaims claims;
+        try {
+<span class="nc" id="L44">            claims = decodeToken(refreshToken);</span>
+<span class="nc" id="L45">        } catch (Exception e) {</span>
+<span class="nc" id="L46">            throw new AccessDeniedException(&quot;Token expired&quot;, e);</span>
+<span class="nc" id="L47">        }</span>
+<span class="nc" id="L48">        String key = generateKey(claims.getUsername());</span>
+<span class="nc bnc" id="L49" title="All 2 branches missed.">        if (!tokenStore.has(key, refreshToken)) {</span>
+<span class="nc" id="L50">            throw new AccessDeniedException(&quot;Token expired&quot;);</span>
+        }
+<span class="nc" id="L52">    }</span>
+
+
+    private Jws&lt;Claims&gt; parse(String token) throws ExpiredJwtException, UnsupportedJwtException,
+            MalformedJwtException, SignatureException, IllegalArgumentException {
+<span class="fc" id="L57">        return Jwts.parser()</span>
+<span class="fc" id="L58">                .setSigningKey(key)</span>
+<span class="fc" id="L59">                .parseClaimsJws(token);</span>
+    }
+
+    @Override
+    public UserClaims decodeToken(String token) throws ExpiredJwtException, UnsupportedJwtException,
+            MalformedJwtException, SignatureException, IllegalArgumentException {
+<span class="fc" id="L65">        Claims claims = parse(token).getBody();</span>
+<span class="fc" id="L66">        return objectMapper.convertValue(claims, UserClaims.class);</span>
+    }
+
+    private String encodeToken(UserClaims user, long duration, long at) {
+<span class="fc" id="L70">        Map&lt;String, Object&gt; claims = objectMapper.convertValue(</span>
+                user,
+<span class="fc" id="L72">                new TypeReference&lt;Map&lt;String, Object&gt;&gt;() {</span>
+                }
+        );
+<span class="fc" id="L75">        return Jwts.builder()</span>
+<span class="fc" id="L76">                .setHeaderParam(&quot;typ&quot;, &quot;JWT&quot;)</span>
+<span class="fc" id="L77">                .setHeaderParam(&quot;alg&quot;, &quot;HS256&quot;)</span>
+<span class="fc" id="L78">                .setIssuedAt(new Date(at))</span>
+<span class="fc" id="L79">                .setExpiration(new Date(at + duration))</span>
+<span class="fc" id="L80">                .setClaims(claims)</span>
+<span class="fc" id="L81">                .signWith(SignatureAlgorithm.HS256, key)</span>
+<span class="fc" id="L82">                .compact();</span>
+    }
+
+    @Override
+    public TokenCredential create(UserClaims claims, String refreshToken) {
+<span class="fc" id="L87">        String refresh = refreshToken;</span>
+<span class="fc" id="L88">        long currentTime = System.currentTimeMillis();</span>
+
+<span class="fc" id="L90">        String accessToken = encodeToken(claims, FIFTEEN_MINUTES, currentTime);</span>
+<span class="pc bpc" id="L91" title="1 of 2 branches missed.">        if (refresh == null) {</span>
+<span class="fc" id="L92">            refresh = encodeToken(claims, ONE_WEEK, currentTime);</span>
+<span class="fc" id="L93">            tokenStore.add(claims.getUsername(), refresh);</span>
+        }
+
+<span class="fc" id="L96">        return new TokenCredential(</span>
+                accessToken,
+                refresh,
+                FIFTEEN_MINUTES,
+                currentTime
+        );
+    }
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.11.202310140853</span></div></body></html>

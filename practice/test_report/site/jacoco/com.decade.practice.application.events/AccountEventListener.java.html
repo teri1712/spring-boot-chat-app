@@ -1,0 +1,49 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>AccountEventListener.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">messenger-clone-server</a> &gt; <a href="index.source.html" class="el_package">com.decade.practice.application.events</a> &gt; <span class="el_source">AccountEventListener.java</span></div><h1>AccountEventListener.java</h1><pre class="source lang-java linenums">package com.decade.practice.application.events;
+
+import com.decade.practice.application.services.outbox.OutboxStore;
+import com.decade.practice.application.usecases.SessionService;
+import com.decade.practice.dto.events.UserCreatedEvent;
+import com.decade.practice.dto.events.UserPasswordChangedEvent;
+import com.decade.practice.utils.TokenUtils;
+import jakarta.servlet.http.HttpServletRequest;
+import lombok.AllArgsConstructor;
+import org.springframework.stereotype.Component;
+import org.springframework.transaction.event.TransactionPhase;
+import org.springframework.transaction.event.TransactionalEventListener;
+import org.springframework.web.context.request.RequestContextHolder;
+import org.springframework.web.context.request.ServletRequestAttributes;
+
+@Component
+<span class="fc" id="L17">@AllArgsConstructor</span>
+public class AccountEventListener {
+
+    private final SessionService sessionService;
+    private final OutboxStore outboxStore;
+
+    private static HttpServletRequest getCurrentRequest() {
+<span class="fc" id="L24">        return ((ServletRequestAttributes) RequestContextHolder.getRequestAttributes()).getRequest();</span>
+    }
+
+    @TransactionalEventListener(phase = TransactionPhase.BEFORE_COMMIT)
+    public void onUserCreated(UserCreatedEvent userCreatedEvent) {
+<span class="fc" id="L29">        outboxStore.save(userCreatedEvent.getUsername(), &quot;users&quot;, userCreatedEvent);</span>
+<span class="fc" id="L30">    }</span>
+
+    @TransactionalEventListener(phase = TransactionPhase.AFTER_ROLLBACK)
+    public void onUserCreatedFailed(UserCreatedEvent userCreatedEvent) {
+<span class="fc" id="L34">    }</span>
+
+    @TransactionalEventListener(phase = TransactionPhase.BEFORE_COMMIT)
+    public void onPasswordChanged(UserPasswordChangedEvent event) {
+<span class="fc" id="L38">        String refreshToken = TokenUtils.extractRefreshToken(getCurrentRequest());</span>
+<span class="fc" id="L39">        sessionService.invalidate(event.username(), refreshToken);</span>
+<span class="fc" id="L40">    }</span>
+
+
+    @TransactionalEventListener(phase = TransactionPhase.AFTER_ROLLBACK)
+    private void onPasswordChangeFailed(UserPasswordChangedEvent event) {
+<span class="nc" id="L45">        sessionService.restoreToPreviousSessions(event.username());</span>
+<span class="nc" id="L46">    }</span>
+
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.11.202310140853</span></div></body></html>

@@ -1,0 +1,49 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>PresencesInitializer.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">messenger-clone-server</a> &gt; <a href="index.source.html" class="el_package">com.decade.practice.infra.bootstrap</a> &gt; <span class="el_source">PresencesInitializer.java</span></div><h1>PresencesInitializer.java</h1><pre class="source lang-java linenums">package com.decade.practice.infra.bootstrap;
+
+import com.decade.practice.application.usecases.UserPresenceService;
+import com.decade.practice.infra.security.jwt.JwtUser;
+import com.decade.practice.infra.security.models.UserClaims;
+import com.decade.practice.persistence.jpa.entities.User;
+import com.decade.practice.persistence.jpa.repositories.UserRepository;
+import lombok.RequiredArgsConstructor;
+import org.springframework.boot.ApplicationArguments;
+import org.springframework.boot.ApplicationRunner;
+import org.springframework.context.annotation.Configuration;
+
+import java.time.Instant;
+import java.util.function.Consumer;
+
+@Configuration
+<span class="fc" id="L17">@RequiredArgsConstructor</span>
+public class PresencesInitializer implements ApplicationRunner {
+
+    private final UserPresenceService presenceService;
+    private final UserRepository userRepository;
+
+    @Override
+    public void run(ApplicationArguments args) throws Exception {
+<span class="fc" id="L25">        userRepository.findByUsername(&quot;Nami&quot;).ifPresent(new Consumer&lt;User&gt;() {</span>
+            @Override
+            public void accept(User user) {
+<span class="fc" id="L28">                JwtUser jwtUser = new JwtUser(UserClaims.from(user));</span>
+<span class="fc" id="L29">                presenceService.set(jwtUser, Instant.ofEpochSecond(Instant.now().getEpochSecond() - 2 * 60));</span>
+<span class="fc" id="L30">            }</span>
+        });
+<span class="fc" id="L32">        userRepository.findByUsername(&quot;Chopper&quot;).ifPresent(new Consumer&lt;User&gt;() {</span>
+            @Override
+            public void accept(User user) {
+<span class="fc" id="L35">                JwtUser jwtUser = new JwtUser(UserClaims.from(user));</span>
+<span class="fc" id="L36">                presenceService.set(jwtUser, Instant.ofEpochSecond(Instant.now().getEpochSecond() - 10 * 60));</span>
+<span class="fc" id="L37">            }</span>
+        });
+<span class="fc" id="L39">        userRepository.findByUsername(&quot;Zoro&quot;).ifPresent(new Consumer&lt;User&gt;() {</span>
+            @Override
+            public void accept(User user) {
+<span class="fc" id="L42">                JwtUser jwtUser = new JwtUser(UserClaims.from(user));</span>
+<span class="fc" id="L43">                presenceService.set(jwtUser, Instant.ofEpochSecond(Instant.now().getEpochSecond()));</span>
+<span class="fc" id="L44">            }</span>
+        });
+<span class="fc" id="L46">    }</span>
+
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.11.202310140853</span></div></body></html>
