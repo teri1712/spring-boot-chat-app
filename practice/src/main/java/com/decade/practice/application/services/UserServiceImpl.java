@@ -8,6 +8,7 @@ import com.decade.practice.dto.SignUpRequest;
 import com.decade.practice.dto.UserResponse;
 import com.decade.practice.dto.events.UserCreatedEvent;
 import com.decade.practice.dto.events.UserPasswordChangedEvent;
+import com.decade.practice.persistence.jpa.entities.SyncContext;
 import com.decade.practice.persistence.jpa.entities.User;
 import com.decade.practice.persistence.jpa.repositories.UserRepository;
 import jakarta.persistence.EntityManager;
@@ -16,6 +17,7 @@ import jakarta.persistence.PersistenceContext;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.context.ApplicationEventPublisher;
+import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.security.access.AccessDeniedException;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
@@ -37,6 +39,11 @@ public class UserServiceImpl extends SelfAwareBean implements UserService {
     private EntityManager em;
 
     @Override
+    public UserResponse createIfNotExists(SignUpRequest signUpRequest, boolean usernameAsIdentifier) throws DataIntegrityViolationException {
+        return userRepo.findByUsername(signUpRequest.getUsername()).map(UserResponse::from).orElseGet(() -> create(signUpRequest, usernameAsIdentifier));
+    }
+
+    @Override
     public UserResponse create(SignUpRequest signUpRequest, boolean usernameAsIdentifier) {
         UUID id = usernameAsIdentifier ?
                 UUID.nameUUIDFromBytes(signUpRequest.getUsername().getBytes()) :
@@ -51,6 +58,10 @@ public class UserServiceImpl extends SelfAwareBean implements UserService {
         user.setName(signUpRequest.getName());
         user.setAvatar(signUpRequest.getAvatar());
         user.setGender(signUpRequest.getGender());
+
+        SyncContext syncContext = new SyncContext();
+        user.setSyncContext(syncContext);
+        syncContext.setOwner(user);
         userRepo.save(user);
 
         eventPublisher.publishEvent(UserCreatedEvent.builder()

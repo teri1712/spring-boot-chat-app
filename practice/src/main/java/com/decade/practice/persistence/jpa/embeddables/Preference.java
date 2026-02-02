@@ -29,7 +29,7 @@ public class Preference {
 
     public Preference(User firstUser, User secondUser) {
         this.iconId = 1;
-        this.roomName = "Room " + firstUser.getUsername() + " and " + secondUser.getUsername();
+        this.roomName = "Room " + firstUser.getName() + " and " + secondUser.getName();
     }
 
     public Preference() {

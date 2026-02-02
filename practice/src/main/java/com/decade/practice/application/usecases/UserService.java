@@ -11,6 +11,8 @@ import java.util.UUID;
 
 public interface UserService {
 
+    UserResponse createIfNotExists(SignUpRequest signUpRequest, boolean usernameAsIdentifier) throws DataIntegrityViolationException;
+    
     UserResponse create(SignUpRequest signUpRequest, boolean usernameAsIdentifier) throws DataIntegrityViolationException;
 
     UserResponse changeProfile(UUID id, ProfileRequest profileRequest);

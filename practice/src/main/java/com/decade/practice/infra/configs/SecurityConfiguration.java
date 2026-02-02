@@ -161,10 +161,11 @@ public class SecurityConfiguration extends GlobalAuthenticationConfigurerAdapter
                 )
                 .addFilterAfter(jwtAuthenticationFilter, UsernamePasswordAuthenticationFilter.class)
                 .authorizeHttpRequests(authorize ->
-                        authorize.requestMatchers("/medias/**").permitAll()
-                                .requestMatchers("/users/**").permitAll()
+                        authorize.requestMatchers("/files/**").permitAll()
+                                .requestMatchers(HttpMethod.POST, "/users").permitAll()
+                                .requestMatchers("/tokens/**").permitAll()
                                 .requestMatchers(WebSocketConfiguration.HANDSHAKE_DESTINATION).permitAll()
-                                .requestMatchers(HttpMethod.GET, "/login").permitAll()
+                                .requestMatchers(HttpMethod.POST, "/login").permitAll()
                                 .anyRequest().authenticated()
                 )
                 .oauth2ResourceServer(oauth2 -> {

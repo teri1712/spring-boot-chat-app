@@ -68,7 +68,7 @@ public class TokenController {
         signUpRequest.setAvatar(avatar);
         signUpRequest.setPassword(UUID.randomUUID().toString());
         try {
-            userService.create(signUpRequest, false);
+            userService.createIfNotExists(signUpRequest, false);
         } catch (DataIntegrityViolationException ignored) {
             log.debug("Oauth2 user already exists");
         }

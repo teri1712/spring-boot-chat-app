@@ -42,6 +42,7 @@ class SearchControllerTest extends BaseTestClass {
     }
 
     @Test
+    @WithUserDetails("alice")
     void givenUsersExist_whenFindUsers_shouldReturnUserList() throws Exception {
         UUID userId = UUID.randomUUID();
         UserDocument user = new UserDocument();
@@ -90,6 +91,7 @@ class SearchControllerTest extends BaseTestClass {
     }
 
     @Test
+    @WithUserDetails("alice")
     void givenEmptyQuery_whenFindUsers_thenReturnsEmptyList() throws Exception {
         mockMvc.perform(get("/users")
                         .param("query", "")
