@@ -14,7 +14,6 @@ services:
       interval: 10s
       timeout: 5s
       retries: 5
-
   redis:
     image: redis/redis-stack:latest
     ports:
@@ -51,13 +50,19 @@ services:
     image: docker.elastic.co/elasticsearch/elasticsearch:8.12.2
     environment:
       discovery.type: single-node
-      ES_JAVA_OPTS: "-Xms1g -Xmx1g"
+      ES_JAVA_OPTS: "-Xms512m -Xmx512m"
       xpack.security.enabled: "false"
+      network.host: 0.0.0.0
     ports:
       - "9200:9200"
     cpus: 1
     mem_limit: 1g
-
+    healthcheck:
+      test: [ "CMD-SHELL", "curl -s http://127.0.0.1:9200/_cluster/health?wait_for_status=yellow&timeout=5s > /dev/null || exit 1" ]
+      interval: 10s
+      timeout: 5s
+      retries: 10
+      start_period: 30s
   kibana:
     image: docker.elastic.co/kibana/kibana:8.12.2
     ports:
@@ -96,8 +101,6 @@ services:
 
   kafka:
     image: apache/kafka:3.7.0
-    ports:
-      - "9092:9092"
     environment:
       KAFKA_NODE_ID: 1
       KAFKA_PROCESS_ROLES: broker,controller
@@ -105,7 +108,7 @@ services:
       KAFKA_ADVERTISED_LISTENERS: PLAINTEXT://localhost:9092
       KAFKA_CONTROLLER_LISTENER_NAMES: CONTROLLER
       KAFKA_LISTENER_SECURITY_PROTOCOL_MAP: CONTROLLER:PLAINTEXT,PLAINTEXT:PLAINTEXT
-      KAFKA_CONTROLLER_QUORUM_VOTERS: 1@localhost:9093
+      KAFKA_CONTROLLER_QUORUM_VOTERS: 1@kafka:9093
       KAFKA_OFFSETS_TOPIC_REPLICATION_FACTOR: 1
       KAFKA_TRANSACTION_STATE_LOG_REPLICATION_FACTOR: 1
       KAFKA_TRANSACTION_STATE_LOG_MIN_ISR: 1
@@ -113,5 +116,15 @@ services:
       CLUSTER_ID: 'MkU3OEVBNTcwNTJENDM2Qk'
     cpus: 0.5
     mem_limit: 500m
+    ports:
+      - "9092:9092"
+    healthcheck:
+      test: [ "CMD", "/opt/kafka/bin/kafka-broker-api-versions.sh",
+              "--bootstrap-server", "localhost:9092" ]
+      interval: 30s
+      timeout: 10s
+      retries: 5
+      start_period: 60s
+
 volumes:
   grafana-data:

@@ -2,9 +2,7 @@ package com.decade.practice.dto;
 
 import com.decade.practice.persistence.jpa.embeddables.ImageSpec;
 import com.decade.practice.persistence.jpa.entities.User;
-import lombok.Builder;
-import lombok.Getter;
-import lombok.Setter;
+import lombok.*;
 
 import java.util.Date;
 import java.util.UUID;
@@ -12,6 +10,8 @@ import java.util.UUID;
 @Builder
 @Getter
 @Setter
+@AllArgsConstructor
+@NoArgsConstructor
 public class UserResponse {
 
     private String username;

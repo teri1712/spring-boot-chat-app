@@ -18,7 +18,7 @@ SELECT nextval('outbox_seq'),
                          )
        ),
        now(),
-       CAST('SENT' AS outbox_status)
+       CAST('PENDING' AS outbox_status)
 FROM user_member u;
 
 -- Seed EventDto from chat_event
@@ -63,6 +63,6 @@ SELECT nextval('outbox_seq'),
                                 ELSE NULL END
        ),
        e.created_time,
-       CAST('SENT' AS outbox_status)
+       CAST('PENDING' AS outbox_status)
 FROM chat_event e
 WHERE e.event_type = 'TEXT';

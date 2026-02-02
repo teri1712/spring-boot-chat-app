@@ -16,6 +16,7 @@ services:
       SPRING_DATA_REDIS_HOST: redis
       SPRING_DATASOURCE_URL: jdbc:postgresql://postgres:5432/chatapp
       SPRING_ELASTICSEARCH_URIS: http://elasticsearch:9200
+      SPRING_DATA_ELASTICSEARCH_URIS: http://elasticsearch:9200
       SPRING_KAFKA_BOOTSTRAP_SERVERS: kafka:9092
 
     ports:
@@ -27,7 +28,9 @@ services:
       redis:
         condition: service_healthy
       kafka:
-        condition: service_started
+        condition: service_healthy
+      elasticsearch:
+        condition: service_healthy
     volumes:
       - ./logs:/app/logs
 
@@ -44,7 +47,6 @@ services:
       interval: 10s
       timeout: 5s
       retries: 5
-
   redis:
     image: redis/redis-stack:latest
     ports:
@@ -63,8 +65,8 @@ services:
       - "9090:9090"
     volumes:
       - ./prometheus/prometheus.yml:/etc/prometheus/prometheus.yml
-    cpus: 0.5
-    mem_limit: 500m
+    cpus: 0.3
+    mem_limit: 300m
 
   grafana:
     image: grafana/grafana
@@ -74,20 +76,24 @@ services:
       - grafana-data:/var/lib/grafana
     depends_on:
       - prometheus
-    cpus: 0.5
-    mem_limit: 500m
+    cpus: 0.3
+    mem_limit: 300m
 
   elasticsearch:
     image: docker.elastic.co/elasticsearch/elasticsearch:8.12.2
     environment:
       discovery.type: single-node
-      ES_JAVA_OPTS: "-Xms1g -Xmx1g"
+      ES_JAVA_OPTS: "-Xms512m -Xmx512m"
       xpack.security.enabled: "false"
     ports:
       - "9200:9200"
     cpus: 1
     mem_limit: 1g
-
+    healthcheck:
+      test: [ "CMD-SHELL", "curl -s http://localhost:9200/_cluster/health?pretty >/dev/null || exit 1" ]
+      interval: 10s
+      timeout: 10s
+      retries: 12
   kibana:
     image: docker.elastic.co/kibana/kibana:8.12.2
     ports:
@@ -96,8 +102,8 @@ services:
       - elasticsearch
     environment:
       ELASTICSEARCH_HOSTS: http://elasticsearch:9200
-    cpus: 0.5
-    mem_limit: 500m
+    cpus: 0.3
+    mem_limit: 300m
 
   filebeat:
     image: docker.elastic.co/beats/filebeat:8.12.2
@@ -107,8 +113,8 @@ services:
       - ./logs:/logs:ro
     depends_on:
       - elasticsearch
-    cpus: 0.5
-    mem_limit: 500m
+    cpus: 0.3
+    mem_limit: 300m
 
   s3:
     image: localstack/localstack:latest
@@ -121,8 +127,8 @@ services:
       - ./s3/localstack:/var/lib/localstack
       - /var/run/docker.sock:/var/run/docker.sock
       - ./s3/init:/etc/localstack/init/ready.d
-    cpus: 1
-    mem_limit: 1g
+    cpus: 0.5
+    mem_limit: 500m
 
   kafka:
     image: apache/kafka:3.7.0
@@ -141,6 +147,14 @@ services:
       CLUSTER_ID: 'MkU3OEVBNTcwNTJENDM2Qk'
     cpus: 0.5
     mem_limit: 500m
+
+    healthcheck:
+      test: [ "CMD", "/opt/kafka/bin/kafka-broker-api-versions.sh",
+              "--bootstrap-server", "localhost:9092" ]
+      interval: 30s
+      timeout: 10s
+      retries: 5
+      start_period: 60s
 
 volumes:
   grafana-data:

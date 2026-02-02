@@ -1,14 +1,13 @@
 package com.decade.practice.application.services;
 
+import com.decade.practice.application.exception.OutdatedVersionException;
+import com.decade.practice.application.usecases.ChatService;
+import com.decade.practice.application.usecases.EventService;
+import com.decade.practice.common.SelfAwareBean;
 import com.decade.practice.dto.ChatDetailsDto;
 import com.decade.practice.dto.ChatSnapshot;
 import com.decade.practice.dto.Conversation;
 import com.decade.practice.dto.EventDto;
-import com.decade.practice.application.exception.OutdatedVersionException;
-import com.decade.practice.application.usecases.ChatService;
-import com.decade.practice.application.usecases.EventFactoryResolution;
-import com.decade.practice.application.usecases.EventService;
-import com.decade.practice.common.SelfAwareBean;
 import com.decade.practice.persistence.jpa.embeddables.ChatIdentifier;
 import com.decade.practice.persistence.jpa.entities.Chat;
 import com.decade.practice.persistence.jpa.entities.ChatOrder;
@@ -44,7 +43,6 @@ public class ChatServiceImpl extends SelfAwareBean implements ChatService {
     private final EventService eventService;
     private final ChatRepository chatRepo;
     private final ChatOrderRepository chatOrderRepo;
-    private final EventFactoryResolution factoryResolution;
 
     @PersistenceContext
     private EntityManager em;
@@ -140,6 +138,7 @@ public class ChatServiceImpl extends SelfAwareBean implements ChatService {
     @PreAuthorize("@accessPolicy.isAllowed(#chatIdentifier,#userId)")
     public ChatDetailsDto getDetails(ChatIdentifier chatIdentifier, UUID userId) {
         User owner = userRepo.findById(userId).orElseThrow();
+        // TODO: N + 1 resolve
         Chat chat = getOrCreateChat(chatIdentifier);
         return ChatDetailsDto.from(chat, owner);
     }

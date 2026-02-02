@@ -8,6 +8,7 @@ import com.decade.practice.persistence.elastic.repositories.UserDocumentReposito
 import com.decade.practice.persistence.jpa.embeddables.ChatIdentifier;
 import com.decade.practice.persistence.jpa.embeddables.ImageSpec;
 import com.decade.practice.persistence.jpa.entities.User;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.MediaType;
@@ -33,6 +34,12 @@ class SearchControllerTest extends BaseTestClass {
 
     @Autowired
     private MessageDocumentRepository messageDocumentRepository;
+
+    @BeforeEach
+    void setUp() {
+        messageDocumentRepository.deleteAll();
+        userDocumentRepository.deleteAll();
+    }
 
     @Test
     void givenUsersExist_whenFindUsers_shouldReturnUserList() throws Exception {
