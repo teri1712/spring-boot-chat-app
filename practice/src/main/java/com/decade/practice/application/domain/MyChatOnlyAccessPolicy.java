@@ -1,4 +1,4 @@
-package com.decade.practice.domain;
+package com.decade.practice.application.domain;
 
 import com.decade.practice.persistence.jpa.embeddables.ChatIdentifier;
 import org.springframework.stereotype.Service;

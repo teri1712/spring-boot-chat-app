@@ -1,9 +1,7 @@
 package com.decade.practice.api.web.rest;
 
-import com.decade.practice.dto.SignUpRequest;
-import com.decade.practice.dto.UserResponse;
-import com.decade.practice.application.usecases.SearchService;
 import com.decade.practice.application.usecases.UserService;
+import com.decade.practice.dto.SignUpRequest;
 import jakarta.validation.Valid;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -11,9 +9,10 @@ import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ProblemDetail;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.*;
-
-import java.util.List;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RestController;
 
 @Slf4j
 @RestController
@@ -21,16 +20,7 @@ import java.util.List;
 @AllArgsConstructor
 public class UserController {
 
-    private final SearchService searchService;
     private final UserService userService;
-
-    @GetMapping
-    // TODO: Migrate to elastic
-    public List<UserResponse> findUsers(
-            @RequestParam() String query
-    ) {
-        return searchService.searchUsers(query);
-    }
 
     @PostMapping
     // TODO: Adjust client to problem detail

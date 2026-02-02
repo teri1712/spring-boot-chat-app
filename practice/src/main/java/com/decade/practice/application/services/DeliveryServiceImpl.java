@@ -3,6 +3,7 @@ package com.decade.practice.application.services;
 import com.decade.practice.application.usecases.*;
 import com.decade.practice.dto.EventDto;
 import com.decade.practice.dto.EventRequest;
+import com.decade.practice.dto.events.MessageCreatedEvent;
 import com.decade.practice.persistence.jpa.embeddables.ChatIdentifier;
 import com.decade.practice.persistence.jpa.entities.Chat;
 import com.decade.practice.persistence.jpa.entities.ChatEvent;
@@ -13,6 +14,7 @@ import jakarta.persistence.PersistenceContext;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.hibernate.exception.ConstraintViolationException;
+import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -32,6 +34,7 @@ public class DeliveryServiceImpl implements DeliveryService {
     private final ChatService chatService;
     private final ChatRepository chatRepo;
     private final EventRepository eventRepo;
+    private final ApplicationEventPublisher eventPublisher;
 
     @Override
     @Transactional
@@ -60,8 +63,24 @@ public class DeliveryServiceImpl implements DeliveryService {
 
             em.flush();
 
-            eventSender.send(eventFactory.createEventDto(mine));
-            eventSender.send(eventFactory.createEventDto(yours));
+            EventDto myEventDto = eventFactory.createEventDto(mine);
+            EventDto yourDto = eventFactory.createEventDto(yours);
+
+            eventSender.send(myEventDto);
+            eventSender.send(yourDto);
+
+
+            eventPublisher.publishEvent(myEventDto);
+            eventPublisher.publishEvent(yourDto);
+
+            MessageCreatedEvent myCreatedEvent = MessageCreatedEvent.from(myEventDto);
+            if (myCreatedEvent != null) {
+                eventPublisher.publishEvent(myCreatedEvent);
+            }
+            MessageCreatedEvent yourCreatedEvent = MessageCreatedEvent.from(yourDto);
+            if (yourCreatedEvent != null) {
+                eventPublisher.publishEvent(yourCreatedEvent);
+            }
 
 
         } catch (ConstraintViolationException e) {

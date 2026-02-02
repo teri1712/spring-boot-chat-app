@@ -2,7 +2,12 @@ package com.decade.practice.application.services;
 
 import com.decade.practice.application.usecases.UserService;
 import com.decade.practice.common.SelfAwareBean;
-import com.decade.practice.dto.*;
+import com.decade.practice.dto.AccountResponse;
+import com.decade.practice.dto.ProfileRequest;
+import com.decade.practice.dto.SignUpRequest;
+import com.decade.practice.dto.UserResponse;
+import com.decade.practice.dto.events.UserCreatedEvent;
+import com.decade.practice.dto.events.UserPasswordChangedEvent;
 import com.decade.practice.persistence.jpa.entities.User;
 import com.decade.practice.persistence.jpa.repositories.UserRepository;
 import jakarta.persistence.EntityManager;
@@ -48,15 +53,14 @@ public class UserServiceImpl extends SelfAwareBean implements UserService {
         user.setGender(signUpRequest.getGender());
         userRepo.save(user);
 
-        // TODO: Outbox
-//        eventPublisher.publishEvent(UserCreatedEvent.builder()
-//                .userId(id)
-//                .username(signUpRequest.getUsername())
-//                .name(signUpRequest.getName())
-//                .dob(signUpRequest.getDob())
-//                .avatar(signUpRequest.getAvatar())
-//                .gender(signUpRequest.getGender())
-//                .build());
+        eventPublisher.publishEvent(UserCreatedEvent.builder()
+                .userId(id)
+                .username(signUpRequest.getUsername())
+                .name(signUpRequest.getName())
+                .dob(signUpRequest.getDob())
+                .avatar(signUpRequest.getAvatar())
+                .gender(signUpRequest.getGender())
+                .build());
 
         return UserResponse.from(user);
     }

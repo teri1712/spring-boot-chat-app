@@ -30,5 +30,4 @@ public class EventDto {
     private UserResponse partner;
     private ChatDto chat;
 
-
 }

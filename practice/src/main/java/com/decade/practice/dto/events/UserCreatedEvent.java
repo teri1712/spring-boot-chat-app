@@ -1,4 +1,4 @@
-package com.decade.practice.dto;
+package com.decade.practice.dto.events;
 
 import com.decade.practice.persistence.jpa.embeddables.ImageSpec;
 import lombok.*;
@@ -18,4 +18,5 @@ public class UserCreatedEvent {
     private Float gender;
     private Date dob;
     private ImageSpec avatar;
+
 }

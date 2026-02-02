@@ -1,7 +1,11 @@
 package com.decade.practice.unit;
 
 import com.decade.practice.application.services.UserServiceImpl;
-import com.decade.practice.dto.*;
+import com.decade.practice.dto.AccountResponse;
+import com.decade.practice.dto.ProfileRequest;
+import com.decade.practice.dto.SignUpRequest;
+import com.decade.practice.dto.UserResponse;
+import com.decade.practice.dto.events.UserPasswordChangedEvent;
 import com.decade.practice.persistence.jpa.entities.SyncContext;
 import com.decade.practice.persistence.jpa.entities.User;
 import com.decade.practice.persistence.jpa.repositories.UserRepository;

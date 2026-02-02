@@ -1,10 +1,10 @@
 package com.decade.practice.application.usecases;
 
-import com.decade.practice.dto.EventDto;
-import com.decade.practice.dto.UserCreatedEvent;
+import com.decade.practice.dto.events.MessageCreatedEvent;
+import com.decade.practice.dto.events.UserCreatedEvent;
 
 public interface SearchStore {
     void save(UserCreatedEvent userCreatedEvent);
 
-    void save(EventDto eventDto);
+    void save(MessageCreatedEvent messageCreatedEvent);
 }

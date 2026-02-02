@@ -8,3 +8,7 @@ logging:
     com.decade.practice: TRACE
     org.springframework: INFO
 
+
+outbox:
+  scheduling:
+    enabled: false

@@ -10,7 +10,7 @@ import java.util.UUID;
 @Builder
 @AllArgsConstructor
 @NoArgsConstructor
-public class SearchResultDto {
+public class MessageHistoryDto {
 
     private UUID id;
     private ChatIdentifier chatIdentifier;
