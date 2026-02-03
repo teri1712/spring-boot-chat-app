@@ -1,14 +1,14 @@
 ## Spring Boot Chat Application
 
 A real-time chat application built with Spring Boot for the backend and Angular for the frontend. Users can manage
-profiles, authenticate, and participate in live chat rooms.
+profiles, authenticate, searching and participate in live chat rooms.
 
 ## Live web app
 
 https://angular-chat-application-psi.vercel.app (Unavailable now due to budget constraints)
 
 ## Demo
-A initial version of the demo is available here:
+A initial version of the application is available here:
 
 * Web: [https://youtu.be/xm_pWF36_Uo](https://youtu.be/xm_pWF36_Uo)
 * Android: [https://youtu.be/E1SQVj2nTtw](https://youtu.be/E1SQVj2nTtw)
@@ -16,7 +16,7 @@ A initial version of the demo is available here:
 ### Tech Stack
 
 * **Backend:** Spring Boot, Spring Security, Hibernate, WebSocket
-* **Database:** POSTGRES
+* **Database:** Postgres
 * **Cache:** Redis
 * **Build Tool:** Maven
 * **Containerization:** Docker, Docker Compose
@@ -45,11 +45,12 @@ cd "source code/practice"
 docker-compose -f docker-compose.deploy.yml up -d --build
 ```
 
-or development deployment with:
+or development deployable services with:
 
 ```bash
 cd "source code/practice"
 docker-compose -f docker-compose.dev.yml up -d --build
+
 mvn spring-boot:run
 ```
 
@@ -57,8 +58,29 @@ mvn spring-boot:run
 
 ## Reports
 
-### Query Cache
-- Please refer to the `perf_report` for more details.
+### Performance Report
 
-### Test report
-- Please refer to the `test_report` for more details.
+This section compares the performance of the application with and without event caching. The benchmarks were conducted using JMeter.
+
+#### No Cache
+| Label | # Samples | Average (ms) | Min (ms) | Max (ms) | Throughput |
+|-------|-----------|--------------|----------|----------|------------|
+| my messages | 5000 | 8 | 5 | 210 | 237.6/sec |
+| chat messages | 5000 | 9 | 5 | 52 | 240.0/sec |
+| **TOTAL** | **10000** | **9** | **5** | **210** | **475.1/sec** |
+
+#### With Cache (Redis)
+| Label | # Samples | Average (ms) | Min (ms) | Max (ms) | Throughput |
+|-------|-----------|--------------|----------|----------|------------|
+| my messages | 5000 | 3 | 2 | 198 | 246.4/sec |
+| chat messages | 5000 | 3 | 2 | 43 | 248.8/sec |
+| **TOTAL** | **10000** | **3** | **2** | **198** | **492.7/sec** |
+
+*Note: Enabling cache reduced average latency by approximately 66%. Detailed CSV reports can be found in the `perf_report` folder.*
+
+### Test Report
+
+The project maintains high code quality with a comprehensive test suite. We have achieved **over 80% test coverage**.
+
+- Detailed JaCoCo coverage reports are available in: `test_report/site/jacoco`
+- To view the report, open `test_report/site/jacoco/index.html` in your browser.
