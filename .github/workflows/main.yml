@@ -42,44 +42,44 @@ jobs:
                     push: true
                     tags: ${{ secrets.DOCKERHUB_USERNAME }}/decade-chat-app:latest
 
-    deploy-azure:
-        needs: containerize-and-push
-        runs-on: ubuntu-latest
-        steps:
-            -   name: Checkout repository
-                uses: actions/checkout@v4
-            #            -   name: Copy docker-compose file to Azure VM
-            #                uses: appleboy/scp-action@master
-            #                with:
-            #                    host: ${{ secrets.AZURE_HOST }}
-            #                    username: ${{ secrets.AZURE_USER }}
-            #                    key: ${{ secrets.AZURE_SSH_PRIVATE_KEY }}
-            #                    source: "practice/docker-compose.yml"
-            #                    target: "~/app/practice/docker-compose.yml"
+    # deploy-azure:
+    #     needs: containerize-and-push
+    #     runs-on: ubuntu-latest
+    #     steps:
+    #         -   name: Checkout repository
+    #             uses: actions/checkout@v4
+    #         #            -   name: Copy docker-compose file to Azure VM
+    #         #                uses: appleboy/scp-action@master
+    #         #                with:
+    #         #                    host: ${{ secrets.AZURE_HOST }}
+    #         #                    username: ${{ secrets.AZURE_USER }}
+    #         #                    key: ${{ secrets.AZURE_SSH_PRIVATE_KEY }}
+    #         #                    source: "practice/docker-compose.yml"
+    #         #                    target: "~/app/practice/docker-compose.yml"
 
-            -   name: Deploy to VM
-                uses: appleboy/ssh-action@master
-                with:
-                    host: ${{ secrets.AZURE_HOST }}
-                    username: ${{ secrets.AZURE_USER }}
-                    key: ${{ secrets.AZURE_SSH_PRIVATE_KEY }}
-                    script: |
-                        cd ~/app/practice
+    #         -   name: Deploy to VM
+    #             uses: appleboy/ssh-action@master
+    #             with:
+    #                 host: ${{ secrets.AZURE_HOST }}
+    #                 username: ${{ secrets.AZURE_USER }}
+    #                 key: ${{ secrets.AZURE_SSH_PRIVATE_KEY }}
+    #                 script: |
+    #                     cd ~/app/practice
                         
-                        # Pull the latest images from Docker Hub
+    #                     # Pull the latest images from Docker Hub
                         
-                        echo "SPRING_PROFILES_ACTIVE=container,production" > .env
-                        echo "MYSQL_ROOT_PASSWORD=root" >> .env
-                        echo "MYSQL_DATABASE=chatapp" >> .env
-                        echo "SPRING_SECURITY_OAUTH2_RESOURCESERVER_JWT_ISSUER_URI=${{ secrets.SPRING_SECURITY_OAUTH2_RESOURCESERVER_JWT_ISSUER_URI }}" >> .env
-                        echo "SPRING_SECURITY_OAUTH2_CLIENT_REGISTRATION_GOOGLE_CLIENTID=${{ secrets.SPRING_SECURITY_OAUTH2_CLIENT_REGISTRATION_GOOGLE_CLIENTID }}" >> .env
-                        echo "SPRING_SECURITY_OAUTH2_CLIENT_REGISTRATION_GOOGLE_CLIENTSECRET=${{ secrets.SPRING_SECURITY_OAUTH2_CLIENT_REGISTRATION_GOOGLE_CLIENTSECRET }}" >> .env
-                        echo "SPRING_SECURITY_USER_NAME=${{ secrets.SPRING_SECURITY_USER_NAME }}" >> .env
-                        echo "SPRING_SECURITY_USER_PASSWORD=${{ secrets.SPRING_SECURITY_USER_PASSWORD }}" >> .env
-                        echo "SPRING_BOOT_ADMIN_CLIENT_URL=http://monitor:9090" >> .env
-                        echo "SPRING_BOOT_ADMIN_CLIENT_INSTANCE_MANAGEMENT_BASE_URL=http://server:8081" >> .env
-                        docker-compose pull
+    #                     echo "SPRING_PROFILES_ACTIVE=container,production" > .env
+    #                     echo "MYSQL_ROOT_PASSWORD=root" >> .env
+    #                     echo "MYSQL_DATABASE=chatapp" >> .env
+    #                     echo "SPRING_SECURITY_OAUTH2_RESOURCESERVER_JWT_ISSUER_URI=${{ secrets.SPRING_SECURITY_OAUTH2_RESOURCESERVER_JWT_ISSUER_URI }}" >> .env
+    #                     echo "SPRING_SECURITY_OAUTH2_CLIENT_REGISTRATION_GOOGLE_CLIENTID=${{ secrets.SPRING_SECURITY_OAUTH2_CLIENT_REGISTRATION_GOOGLE_CLIENTID }}" >> .env
+    #                     echo "SPRING_SECURITY_OAUTH2_CLIENT_REGISTRATION_GOOGLE_CLIENTSECRET=${{ secrets.SPRING_SECURITY_OAUTH2_CLIENT_REGISTRATION_GOOGLE_CLIENTSECRET }}" >> .env
+    #                     echo "SPRING_SECURITY_USER_NAME=${{ secrets.SPRING_SECURITY_USER_NAME }}" >> .env
+    #                     echo "SPRING_SECURITY_USER_PASSWORD=${{ secrets.SPRING_SECURITY_USER_PASSWORD }}" >> .env
+    #                     echo "SPRING_BOOT_ADMIN_CLIENT_URL=http://monitor:9090" >> .env
+    #                     echo "SPRING_BOOT_ADMIN_CLIENT_INSTANCE_MANAGEMENT_BASE_URL=http://server:8081" >> .env
+    #                     docker-compose pull
                         
-                        # Start the new containers
-                        docker-compose down
-                        docker-compose up -d
+    #                     # Start the new containers
+    #                     docker-compose down
+    #                     docker-compose up -d

@@ -5,18 +5,18 @@ profiles, authenticate, and participate in live chat rooms.
 
 ## Live web app
 
-https://angular-chat-application-psi.vercel.app
+https://angular-chat-application-psi.vercel.app (Unavailable now due to budget constraints)
 
 ## Demo
-A short version of the demo is available here:
+A initial version of the demo is available here:
 
 * Web: [https://youtu.be/xm_pWF36_Uo](https://youtu.be/xm_pWF36_Uo)
 * Android: [https://youtu.be/E1SQVj2nTtw](https://youtu.be/E1SQVj2nTtw)
 
 ### Tech Stack
 
-* **Backend:** Spring Boot, Spring Security, Spring Data JPA, WebSocket
-* **Database:** MySQL
+* **Backend:** Spring Boot, Spring Security, Hibernate, WebSocket
+* **Database:** POSTGRES
 * **Cache:** Redis
 * **Build Tool:** Maven
 * **Containerization:** Docker, Docker Compose
@@ -25,64 +25,40 @@ A short version of the demo is available here:
 
 * Backend: [https://github.com/teri1712/spring-boot-chat-app.git](https://github.com/teri1712/spring-boot-chat-app.git)
 * Frontend: [https://github.com/teri1712/angular-chat-application.git](https://github.com/teri1712/angular-chat-application.git)
-* Android (older version): [https://github.com/teri1712/android-chat-app](https://github.com/teri1712/android-chat-app)
+
 ## Run Locally
 
-This repository contains the Spring Boot backend. You can run it either with Docker Compose or directly with Maven/Java.
+This repository contains the Spring Boot backend. You can run it with Docker Compose.
 
 ### Prerequisites
 
 * Java 17
 * Maven 3.x
-* Docker & Docker Compose
+* Docker & Docker Compose 2.x
 
-### Environment configuration
+### Local Environment Deployments with Docker Compose
 
-The backend reads configuration from application.properties. For local development, the defaults under practice/src/main/resources/application.properties are used. You will need running instances of MySQL and Redis and to provide their connection details. If you use Docker Compose below, these services are provisioned for you.
-
-Key properties you may override via environment variables or JVM system properties:
-
-* spring.datasource.url, spring.datasource.username, spring.datasource.password
-* spring.data.redis.host, spring.data.redis.port
-* frontend.host.address (the Angular app origin, e.g. http://localhost:4200)
-
-### Deploy with Docker Compose (backend + MySQL + Redis)
-
-1) Configure environment in practice/.env (Compose reads this automatically):
-- SPRING_SECURITY_OAUTH2_RESOURCESERVER_JWT_ISSUER_URI
-- SPRING_SECURITY_OAUTH2_CLIENT_REGISTRATION_GOOGLE_CLIENTID
-- SPRING_SECURITY_OAUTH2_CLIENT_REGISTRATION_GOOGLE_CLIENTSECRET
-- MYSQL_ROOT_PASSWORD (for the MySQL container)
-- MYSQL_DATABASE (default: chatapp)
-
-2) Choose profile and domains:
-- Local development: remove `SPRING_PROFILES_ACTIVE=production` in practice/.env (keep `container`). Defaults from application.properties will be used:
-  - Backend: http://localhost:8080
-  - Frontend origin: http://localhost:4200
-  - MySQL: localhost:3306 (or the compose mysql service)
-  - Redis: localhost:6379 (or the compose redis service)
-- Production: keep `SPRING_PROFILES_ACTIVE=production` and edit practice/src/main/resources/application-production.properties to your domains:
-  - frontend.host.address = https://YOUR_FRONTEND_DOMAIN
-  - app.host.address = https://YOUR_BACKEND_DOMAIN
-  Review cookie/security settings there if needed.
-
-From the repository root (where docker-compose.yml is located under practice/):
+From the repository root:
 
 ```bash
-cd practice
-docker-compose up --build
+cd "source code/practice"
+docker-compose -f docker-compose.deploy.yml up -d --build
 ```
+
+or development deployment with:
+
+```bash
+cd "source code/practice"
+docker-compose -f docker-compose.dev.yml up -d --build
+mvn spring-boot:run
+```
+
 ## Refer to the frontend repository for detailed Angular setup and configuration.
 
-## Performance
+## Reports
 
 ### Query Cache
+- Please refer to the [report](https://github.com/teri1712/spring-boot-chat-app/blob/main/perf_report) for more details.
 
-The query cache using redis on critical endpoints to minimize database load and accelerate response times. The following table summarizes the impact of this optimization based on the report in the `query cache stats` folder.
-
-**Endpoint-Specific Performance Gains**
-
-| Endpoint                       | Avg. Response Time (Before) | Avg. Response Time (After) | Reduction |
-| :----------------------------- | :-------------------------- | :------------------------- | :-------- |
-| `/users/me/events`             | 41ms                        | 23ms                       | ~43.9%    |
-| `/chats/{chatIdentifier}/events` | 38ms                        | 31ms                       | ~18.4%    |
+### Test report
+- Please refer to the [report](https://github.com/teri1712/spring-boot-chat-app/blob/main/test_report) for more details.
