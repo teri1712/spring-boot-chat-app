@@ -32,8 +32,8 @@ services:
       - "9090:9090"
     volumes:
       - ./prometheus/prometheus.yml:/etc/prometheus/prometheus.yml
-    cpus: 0.5
-    mem_limit: 500m
+    cpus: 0.3
+    mem_limit: 300m
 
   grafana:
     image: grafana/grafana
@@ -43,8 +43,8 @@ services:
       - grafana-data:/var/lib/grafana
     depends_on:
       - prometheus
-    cpus: 0.5
-    mem_limit: 500m
+    cpus: 0.3
+    mem_limit: 300m
 
   elasticsearch:
     image: docker.elastic.co/elasticsearch/elasticsearch:8.12.2
@@ -55,8 +55,8 @@ services:
       network.host: 0.0.0.0
     ports:
       - "9200:9200"
-    cpus: 1
-    mem_limit: 1g
+    cpus: 0.5
+    mem_limit: 500m
     healthcheck:
       test: [ "CMD-SHELL", "curl -s http://127.0.0.1:9200/_cluster/health?wait_for_status=yellow&timeout=5s > /dev/null || exit 1" ]
       interval: 10s
@@ -71,8 +71,8 @@ services:
       - elasticsearch
     environment:
       ELASTICSEARCH_HOSTS: http://elasticsearch:9200
-    cpus: 0.5
-    mem_limit: 500m
+    cpus: 0.3
+    mem_limit: 300m
 
   filebeat:
     image: docker.elastic.co/beats/filebeat:8.12.2
@@ -82,8 +82,8 @@ services:
       - ./logs:/logs:ro
     depends_on:
       - elasticsearch
-    cpus: 0.5
-    mem_limit: 500m
+    cpus: 0.3
+    mem_limit: 300m
 
   s3:
     image: localstack/localstack:latest
@@ -96,8 +96,8 @@ services:
       - ./s3/localstack:/var/lib/localstack
       - /var/run/docker.sock:/var/run/docker.sock
       - ./s3/init:/etc/localstack/init/ready.d
-    cpus: 1
-    mem_limit: 1g
+    cpus: 0.5
+    mem_limit: 500m
 
   kafka:
     image: apache/kafka:3.7.0

@@ -100,6 +100,7 @@ public class EventController {
         return deliveryService.createAndSend(key, eventRequest, factoryResolution.getFactory(SeenEvent.class));
     }
 
+    // TODO: Migrate real time dto != api dto, eventdto must exclude partner, owner
     @GetMapping("/chats/{chatIdentifier}/events")
     public List<EventDto> listEvents(
             @AuthenticationPrincipal(expression = "id") UUID userId,
