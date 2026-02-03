@@ -65,8 +65,8 @@ services:
       - "9090:9090"
     volumes:
       - ./prometheus/prometheus.yml:/etc/prometheus/prometheus.yml
-    cpus: 0.3
-    mem_limit: 300m
+    cpus: 0.5
+    mem_limit: 500m
 
   grafana:
     image: grafana/grafana
@@ -102,8 +102,8 @@ services:
       - elasticsearch
     environment:
       ELASTICSEARCH_HOSTS: http://elasticsearch:9200
-    cpus: 0.3
-    mem_limit: 300m
+    cpus: 0.5
+    mem_limit: 500m
 
   filebeat:
     image: docker.elastic.co/beats/filebeat:8.12.2
