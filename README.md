@@ -58,7 +58,7 @@ mvn spring-boot:run
 ## Reports
 
 ### Query Cache
-- Please refer to the [report](https://github.com/teri1712/spring-boot-chat-app/blob/main/perf_report) for more details.
+- Please refer to the `perf_report` for more details.
 
 ### Test report
-- Please refer to the [report](https://github.com/teri1712/spring-boot-chat-app/blob/main/test_report) for more details.
+- Please refer to the `test_report` for more details.
