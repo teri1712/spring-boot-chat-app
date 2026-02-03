@@ -22,7 +22,7 @@ jobs:
                     distribution: 'temurin'
                     cache: 'maven'
             -   name: Build and test with Maven
-                working-directory: ./practice
+                working-directory: "./source code/practice"
                 run: mvn -B clean test
     containerize-and-push:
         needs: clean-and-test
