@@ -1,0 +1,81 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>UserPresenceManager.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">messenger-clone-server</a> &gt; <a href="index.source.html" class="el_package">com.decade.practice.application.presence</a> &gt; <span class="el_source">UserPresenceManager.java</span></div><h1>UserPresenceManager.java</h1><pre class="source lang-java linenums">package com.decade.practice.application.presence;
+
+import com.decade.practice.application.usecases.UserPresenceService;
+import com.decade.practice.infra.security.jwt.JwtUser;
+import com.decade.practice.persistence.redis.OnlineStatus;
+import com.decade.practice.persistence.redis.repositories.OnlineRepository;
+import org.springframework.data.redis.core.RedisTemplate;
+import org.springframework.data.redis.core.ZSetOperations;
+import org.springframework.stereotype.Component;
+
+import java.time.Instant;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Objects;
+import java.util.Set;
+import java.util.stream.Collectors;
+
+@Component
+public class UserPresenceManager implements UserPresenceService {
+
+    private static final String KEYSPACE = &quot;ONLINE_USERS&quot;;
+    private static final int TTL = 5 * 60;
+
+    private final OnlineRepository onlineRepo;
+    private final ZSetOperations&lt;String, Object&gt; zSet;
+
+<span class="fc" id="L27">    public UserPresenceManager(OnlineRepository onlineRepo, RedisTemplate&lt;String, Object&gt; redisTemplate) {</span>
+<span class="fc" id="L28">        this.onlineRepo = onlineRepo;</span>
+<span class="fc" id="L29">        this.zSet = redisTemplate.opsForZSet();</span>
+<span class="fc" id="L30">    }</span>
+
+    private void evict() {
+<span class="fc" id="L33">        zSet.removeRangeByScore(</span>
+<span class="fc" id="L34">                KEYSPACE, 0.0, Instant.now().getEpochSecond() - TTL</span>
+        );
+<span class="fc" id="L36">    }</span>
+
+    @Override
+    public OnlineStatus set(JwtUser user, Instant at) {
+<span class="fc" id="L40">        evict();</span>
+<span class="fc" id="L41">        OnlineStatus status = new OnlineStatus();</span>
+<span class="fc" id="L42">        status.setUsername(user.getUsername());</span>
+<span class="fc" id="L43">        status.setAvatar(user.getClaims().getAvatar());</span>
+<span class="fc" id="L44">        status.setName(user.getClaims().getName());</span>
+<span class="fc" id="L45">        status.setUserId(user.getClaims().getId());</span>
+<span class="fc" id="L46">        status.setAt(at);</span>
+
+<span class="fc" id="L48">        onlineRepo.save(status);</span>
+<span class="fc" id="L49">        zSet.add(KEYSPACE, status.getUsername(), status.getAt().getEpochSecond());</span>
+<span class="fc" id="L50">        return status;</span>
+    }
+
+
+    @Override
+    public OnlineStatus get(String username) {
+<span class="fc" id="L56">        return onlineRepo.findById(username).orElseThrow();</span>
+    }
+
+    @Override
+    public List&lt;OnlineStatus&gt; getOnlineList(String username) {
+<span class="fc" id="L61">        evict();</span>
+<span class="fc" id="L62">        Set&lt;ZSetOperations.TypedTuple&lt;Object&gt;&gt; rangeWithScores = zSet.rangeWithScores(KEYSPACE, 0, -1);</span>
+
+<span class="pc bpc" id="L64" title="1 of 2 branches missed.">        if (rangeWithScores == null) {</span>
+<span class="nc" id="L65">            return new ArrayList&lt;&gt;();</span>
+        }
+
+<span class="fc" id="L68">        List&lt;OnlineStatus&gt; result = rangeWithScores.stream()</span>
+<span class="fc" id="L69">                .map(tuple -&gt; {</span>
+<span class="fc" id="L70">                    String who = (String) tuple.getValue();</span>
+<span class="fc" id="L71">                    return onlineRepo.findById(who).orElse(null);</span>
+                })
+<span class="fc" id="L73">                .filter(Objects::nonNull)</span>
+<span class="fc" id="L74">                .toList();</span>
+
+<span class="fc" id="L76">        return result.stream()</span>
+<span class="fc bfc" id="L77" title="All 2 branches covered.">                .filter(status -&gt; !status.getUsername().equals(username))</span>
+<span class="fc" id="L78">                .collect(Collectors.toList());</span>
+    }
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.11.202310140853</span></div></body></html>

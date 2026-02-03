@@ -1,0 +1,60 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>Chat.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">messenger-clone-server</a> &gt; <a href="index.source.html" class="el_package">com.decade.practice.persistence.jpa.entities</a> &gt; <span class="el_source">Chat.java</span></div><h1>Chat.java</h1><pre class="source lang-java linenums">package com.decade.practice.persistence.jpa.entities;
+
+import com.decade.practice.persistence.jpa.embeddables.ChatIdentifier;
+import com.decade.practice.persistence.jpa.embeddables.Preference;
+import jakarta.persistence.*;
+import jakarta.validation.constraints.NotNull;
+import lombok.Getter;
+import lombok.Setter;
+import org.hibernate.annotations.CurrentTimestamp;
+import org.hibernate.annotations.SourceType;
+import org.hibernate.generator.EventType;
+
+import java.util.Date;
+
+@Entity
+@Getter
+<span class="pc" id="L17">@Setter</span>
+public class Chat {
+
+    @ManyToOne(cascade = CascadeType.PERSIST)
+    @JoinColumn(name = &quot;first_user&quot;) // for naming
+    @MapsId(&quot;firstUser&quot;)
+<span class="fc" id="L23">    private User firstUser;</span>
+
+    @ManyToOne(cascade = CascadeType.PERSIST)
+    @JoinColumn(name = &quot;second_user&quot;) // for naming
+    @MapsId(&quot;secondUser&quot;)
+<span class="fc" id="L28">    private User secondUser;</span>
+
+    @EmbeddedId
+<span class="fc" id="L31">    private ChatIdentifier identifier;</span>
+
+    @Embedded
+    @NotNull
+<span class="fc" id="L35">    private Preference preference;</span>
+
+    @CurrentTimestamp(event = EventType.INSERT, source = SourceType.VM)
+    @Temporal(TemporalType.TIMESTAMP)
+<span class="nc" id="L39">    private Date interactTime;</span>
+
+<span class="fc" id="L41">    private int messageCount = 0;</span>
+
+    // No-arg constructor required by JPA
+<span class="fc" id="L44">    protected Chat() {</span>
+<span class="fc" id="L45">    }</span>
+
+<span class="fc" id="L47">    public Chat(User firstUser, User secondUser) {</span>
+        // Ensure firstUser.id is less than secondUser.id
+<span class="fc bfc" id="L49" title="All 2 branches covered.">        if (firstUser.getId().compareTo(secondUser.getId()) &gt; 0) {</span>
+<span class="fc" id="L50">            User temp = firstUser;</span>
+<span class="fc" id="L51">            firstUser = secondUser;</span>
+<span class="fc" id="L52">            secondUser = temp;</span>
+        }
+<span class="fc" id="L54">        this.firstUser = firstUser;</span>
+<span class="fc" id="L55">        this.secondUser = secondUser;</span>
+<span class="fc" id="L56">        this.identifier = new ChatIdentifier(firstUser.getId(), secondUser.getId());</span>
+<span class="fc" id="L57">        this.preference = new Preference(firstUser, secondUser);</span>
+<span class="fc" id="L58">    }</span>
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.11.202310140853</span></div></body></html>

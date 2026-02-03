@@ -1,0 +1,118 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>UserServiceImpl.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">messenger-clone-server</a> &gt; <a href="index.source.html" class="el_package">com.decade.practice.application.services</a> &gt; <span class="el_source">UserServiceImpl.java</span></div><h1>UserServiceImpl.java</h1><pre class="source lang-java linenums">package com.decade.practice.application.services;
+
+import com.decade.practice.application.usecases.UserService;
+import com.decade.practice.common.SelfAwareBean;
+import com.decade.practice.dto.AccountResponse;
+import com.decade.practice.dto.ProfileRequest;
+import com.decade.practice.dto.SignUpRequest;
+import com.decade.practice.dto.UserResponse;
+import com.decade.practice.dto.events.UserCreatedEvent;
+import com.decade.practice.dto.events.UserPasswordChangedEvent;
+import com.decade.practice.persistence.jpa.entities.SyncContext;
+import com.decade.practice.persistence.jpa.entities.User;
+import com.decade.practice.persistence.jpa.repositories.UserRepository;
+import jakarta.persistence.EntityManager;
+import jakarta.persistence.OptimisticLockException;
+import jakarta.persistence.PersistenceContext;
+import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
+import org.springframework.context.ApplicationEventPublisher;
+import org.springframework.dao.DataIntegrityViolationException;
+import org.springframework.security.access.AccessDeniedException;
+import org.springframework.security.crypto.password.PasswordEncoder;
+import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
+
+import java.util.UUID;
+
+<span class="fc" id="L28">@Slf4j</span>
+@Service
+@Transactional
+<span class="fc" id="L31">@RequiredArgsConstructor</span>
+public class UserServiceImpl extends SelfAwareBean implements UserService {
+
+    private final UserRepository userRepo;
+    private final PasswordEncoder encoder;
+    private final ApplicationEventPublisher eventPublisher;
+
+    @PersistenceContext
+    private EntityManager em;
+
+    @Override
+    public UserResponse createIfNotExists(SignUpRequest signUpRequest, boolean usernameAsIdentifier) throws DataIntegrityViolationException {
+<span class="nc" id="L43">        return userRepo.findByUsername(signUpRequest.getUsername()).map(UserResponse::from).orElseGet(() -&gt; create(signUpRequest, usernameAsIdentifier));</span>
+    }
+
+    @Override
+    public UserResponse create(SignUpRequest signUpRequest, boolean usernameAsIdentifier) {
+<span class="fc bfc" id="L48" title="All 2 branches covered.">        UUID id = usernameAsIdentifier ?</span>
+<span class="fc" id="L49">                UUID.nameUUIDFromBytes(signUpRequest.getUsername().getBytes()) :</span>
+<span class="fc" id="L50">                UUID.randomUUID();</span>
+
+<span class="fc" id="L52">        String encodedPassword = encoder.encode(signUpRequest.getPassword());</span>
+<span class="fc" id="L53">        User user = new User();</span>
+<span class="fc" id="L54">        user.setId(id);</span>
+<span class="fc" id="L55">        user.setUsername(signUpRequest.getUsername());</span>
+<span class="fc" id="L56">        user.setPassword(encodedPassword);</span>
+<span class="fc" id="L57">        user.setDob(signUpRequest.getDob());</span>
+<span class="fc" id="L58">        user.setName(signUpRequest.getName());</span>
+<span class="fc" id="L59">        user.setAvatar(signUpRequest.getAvatar());</span>
+<span class="fc" id="L60">        user.setGender(signUpRequest.getGender());</span>
+
+<span class="fc" id="L62">        SyncContext syncContext = new SyncContext();</span>
+<span class="fc" id="L63">        user.setSyncContext(syncContext);</span>
+<span class="fc" id="L64">        syncContext.setOwner(user);</span>
+<span class="fc" id="L65">        userRepo.save(user);</span>
+
+<span class="fc" id="L67">        eventPublisher.publishEvent(UserCreatedEvent.builder()</span>
+<span class="fc" id="L68">                .userId(id)</span>
+<span class="fc" id="L69">                .username(signUpRequest.getUsername())</span>
+<span class="fc" id="L70">                .name(signUpRequest.getName())</span>
+<span class="fc" id="L71">                .dob(signUpRequest.getDob())</span>
+<span class="fc" id="L72">                .avatar(signUpRequest.getAvatar())</span>
+<span class="fc" id="L73">                .gender(signUpRequest.getGender())</span>
+<span class="fc" id="L74">                .build());</span>
+
+<span class="fc" id="L76">        return UserResponse.from(user);</span>
+    }
+
+    @Override
+    public UserResponse changeProfile(UUID id, ProfileRequest profileRequest) throws OptimisticLockException {
+<span class="fc" id="L81">        User user = userRepo.findById(id).orElseThrow();</span>
+<span class="pc bpc" id="L82" title="1 of 2 branches missed.">        if (profileRequest.getName() != null)</span>
+<span class="fc" id="L83">            user.setName(profileRequest.getName());</span>
+<span class="fc bfc" id="L84" title="All 2 branches covered.">        if (profileRequest.getDob() != null)</span>
+<span class="fc" id="L85">            user.setDob(profileRequest.getDob());</span>
+<span class="fc bfc" id="L86" title="All 2 branches covered.">        if (profileRequest.getGender() != null)</span>
+<span class="fc" id="L87">            user.setGender(profileRequest.getGender());</span>
+<span class="pc bpc" id="L88" title="1 of 2 branches missed.">        if (profileRequest.getAvatar() != null)</span>
+<span class="nc" id="L89">            user.setAvatar(profileRequest.getAvatar());</span>
+<span class="fc" id="L90">        return UserResponse.from(user);</span>
+    }
+
+
+    @Override
+    public UserResponse changePassword(UUID id, String newPassword, String password) throws AccessDeniedException, OptimisticLockException {
+<span class="fc" id="L96">        User user = userRepo.findByIdWithPessimisticWrite(id).orElseThrow();</span>
+
+<span class="fc bfc" id="L98" title="All 2 branches covered.">        if (!encoder.matches(password, user.getPassword())) {</span>
+<span class="fc" id="L99">            throw new AccessDeniedException(&quot;Password miss matched&quot;);</span>
+        }
+
+<span class="fc" id="L102">        user.setPassword(encoder.encode(newPassword));</span>
+
+<span class="fc" id="L104">        eventPublisher.publishEvent(new UserPasswordChangedEvent(user.getUsername()));</span>
+<span class="fc" id="L105">        return UserResponse.from(user);</span>
+    }
+
+    @Override
+    public AccountResponse prepareAccount(String username) {
+<span class="fc" id="L110">        User user = userRepo.findByUsername(username).orElseThrow();</span>
+<span class="fc" id="L111">        return AccountResponse.builder()</span>
+<span class="fc" id="L112">                .user(UserResponse.from(user))</span>
+<span class="fc" id="L113">                .syncContext(user.getSyncContext())</span>
+<span class="fc" id="L114">                .build();</span>
+    }
+
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.11.202310140853</span></div></body></html>

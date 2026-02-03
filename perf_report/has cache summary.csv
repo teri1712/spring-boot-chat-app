@@ -1,0 +1,4 @@
+Label,# Samples,Average,Min,Max,Std. Dev.,Error %,Throughput,Received KB/sec,Sent KB/sec,Avg. Bytes
+my messages,5000,3,2,198,2.99,0.000%,246.36610,5960.66,144.60,24775.0
+chat messages,5000,3,2,43,1.29,0.000%,248.76860,6018.65,163.25,24774.4
+TOTAL,10000,3,2,198,2.30,0.000%,492.65938,11919.43,306.23,24774.7

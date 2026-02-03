@@ -1,0 +1,45 @@
+# ===== Build output =====
+target/
+build/
+
+# ===== IDE files =====
+.idea/
+.vscode/
+*.iml
+*.ipr
+*.iws
+
+# ===== OS files =====
+.DS_Store
+Thumbs.db
+
+# ===== Git =====
+.git/
+.gitignore
+
+# ===== Logs =====
+logs/
+*.log
+
+# ===== Test & coverage =====
+**/test/
+**/tests/
+coverage/
+jacoco/
+*.exec
+
+# ===== Local config / secrets =====
+.env
+.env.*
+application-local.yml
+application-dev.yml
+application-test.yml
+
+# ===== Docker files =====
+docker-compose.deploy.yml
+docker-compose.*.yml
+
+# ===== Misc =====
+*.swp
+*.tmp
+*.bak

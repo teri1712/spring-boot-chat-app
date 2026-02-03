@@ -1,0 +1,94 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>DeliveryServiceImpl.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">messenger-clone-server</a> &gt; <a href="index.source.html" class="el_package">com.decade.practice.application.services</a> &gt; <span class="el_source">DeliveryServiceImpl.java</span></div><h1>DeliveryServiceImpl.java</h1><pre class="source lang-java linenums">package com.decade.practice.application.services;
+
+import com.decade.practice.application.usecases.*;
+import com.decade.practice.dto.EventDto;
+import com.decade.practice.dto.EventRequest;
+import com.decade.practice.dto.events.MessageCreatedEvent;
+import com.decade.practice.persistence.jpa.embeddables.ChatIdentifier;
+import com.decade.practice.persistence.jpa.entities.Chat;
+import com.decade.practice.persistence.jpa.entities.ChatEvent;
+import com.decade.practice.persistence.jpa.repositories.ChatRepository;
+import com.decade.practice.persistence.jpa.repositories.EventRepository;
+import jakarta.persistence.EntityManager;
+import jakarta.persistence.PersistenceContext;
+import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
+import org.hibernate.exception.ConstraintViolationException;
+import org.springframework.context.ApplicationEventPublisher;
+import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
+
+import java.util.UUID;
+
+@Service
+<span class="fc" id="L24">@RequiredArgsConstructor</span>
+<span class="fc" id="L25">@Slf4j</span>
+public class DeliveryServiceImpl implements DeliveryService {
+
+
+    @PersistenceContext
+    private EntityManager em;
+
+    private final EventStore eventStore;
+    private final EventSender eventSender;
+    private final ChatService chatService;
+    private final ChatRepository chatRepo;
+    private final EventRepository eventRepo;
+    private final ApplicationEventPublisher eventPublisher;
+
+    @Override
+    @Transactional
+    public &lt;E extends ChatEvent&gt; EventDto createAndSend(UUID idempotentKey, EventRequest eventRequest, EventFactory&lt;E&gt; eventFactory) {
+
+<span class="fc" id="L43">        ChatIdentifier chatIdentifier = eventRequest.getChatIdentifier();</span>
+<span class="fc bfc" id="L44" title="All 2 branches covered.">        UUID receiverId = chatIdentifier.getSecondUser().equals(eventRequest.getSender()) ? chatIdentifier.getFirstUser() : chatIdentifier.getSecondUser();</span>
+<span class="fc" id="L45">        UUID senderId = eventRequest.getSender();</span>
+
+
+<span class="fc" id="L48">        E mine = eventFactory.createEvent(eventRequest);</span>
+<span class="fc" id="L49">        E yours = eventFactory.createEvent(eventRequest);</span>
+<span class="fc" id="L50">        mine.setIdempotentKey(idempotentKey);</span>
+        try {
+<span class="fc" id="L52">            Chat chat = chatRepo.findByIdWithPessimisticLock(mine.getChatIdentifier());</span>
+<span class="fc bfc" id="L53" title="All 2 branches covered.">            if (chat == null) {</span>
+<span class="fc" id="L54">                chatService.createChat(mine.getChatIdentifier());</span>
+<span class="fc" id="L55">                chat = chatRepo.findByIdWithPessimisticLock(mine.getChatIdentifier());</span>
+            }
+<span class="fc" id="L57">            chat.setMessageCount(chat.getMessageCount() + 1);</span>
+<span class="fc" id="L58">            mine.setChat(chat);</span>
+<span class="fc" id="L59">            yours.setChat(chat);</span>
+
+<span class="fc" id="L61">            eventStore.save(senderId, senderId, mine);</span>
+<span class="fc" id="L62">            eventStore.save(senderId, receiverId, yours);</span>
+
+<span class="fc" id="L64">            em.flush();</span>
+
+<span class="fc" id="L66">            EventDto myEventDto = eventFactory.createEventDto(mine);</span>
+<span class="fc" id="L67">            EventDto yourDto = eventFactory.createEventDto(yours);</span>
+
+<span class="fc" id="L69">            eventSender.send(myEventDto);</span>
+<span class="fc" id="L70">            eventSender.send(yourDto);</span>
+
+
+<span class="fc" id="L73">            eventPublisher.publishEvent(myEventDto);</span>
+<span class="fc" id="L74">            eventPublisher.publishEvent(yourDto);</span>
+
+<span class="fc" id="L76">            MessageCreatedEvent myCreatedEvent = MessageCreatedEvent.from(myEventDto);</span>
+<span class="fc bfc" id="L77" title="All 2 branches covered.">            if (myCreatedEvent != null) {</span>
+<span class="fc" id="L78">                eventPublisher.publishEvent(myCreatedEvent);</span>
+            }
+<span class="fc" id="L80">            MessageCreatedEvent yourCreatedEvent = MessageCreatedEvent.from(yourDto);</span>
+<span class="fc bfc" id="L81" title="All 2 branches covered.">            if (yourCreatedEvent != null) {</span>
+<span class="fc" id="L82">                eventPublisher.publishEvent(yourCreatedEvent);</span>
+            }
+
+
+<span class="fc" id="L86">        } catch (ConstraintViolationException e) {</span>
+<span class="fc" id="L87">            log.debug(&quot;Event already sent&quot;, e);</span>
+<span class="fc" id="L88">            ChatEvent persistedOne = eventRepo.findByIdempotentKey(mine.getIdempotentKey()).orElseThrow();</span>
+<span class="fc" id="L89">            mine = (E) persistedOne;</span>
+<span class="fc" id="L90">        }</span>
+<span class="fc" id="L91">        return eventFactory.createEventDto(mine);</span>
+    }
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.11.202310140853</span></div></body></html>

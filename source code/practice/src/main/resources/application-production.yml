@@ -1,0 +1,19 @@
+frontend:
+  host:
+    address: https://angular-chatResponse-application-psi.vercel.app
+
+server:
+  forward-headers-strategy: framework
+  servlet:
+    session:
+      cookie:
+        secure: true
+        same-site: None
+
+spring:
+  jpa:
+    properties:
+      hibernate:
+        cache:
+          redisson:
+            config: redisson-production.yaml

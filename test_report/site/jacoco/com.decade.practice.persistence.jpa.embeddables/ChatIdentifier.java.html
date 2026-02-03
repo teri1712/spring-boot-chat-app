@@ -1,0 +1,64 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>ChatIdentifier.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">messenger-clone-server</a> &gt; <a href="index.source.html" class="el_package">com.decade.practice.persistence.jpa.embeddables</a> &gt; <span class="el_source">ChatIdentifier.java</span></div><h1>ChatIdentifier.java</h1><pre class="source lang-java linenums">package com.decade.practice.persistence.jpa.embeddables;
+
+import com.decade.practice.persistence.jpa.entities.User;
+import jakarta.persistence.Embeddable;
+import lombok.AllArgsConstructor;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
+
+import java.io.Serializable;
+import java.util.Objects;
+import java.util.UUID;
+
+@Embeddable
+@Getter
+<span class="fc" id="L16">@Setter</span>
+<span class="fc" id="L17">@AllArgsConstructor</span>
+<span class="fc" id="L18">@NoArgsConstructor</span>
+public class ChatIdentifier implements Serializable {
+<span class="fc" id="L20">    private UUID firstUser;</span>
+<span class="fc" id="L21">    private UUID secondUser;</span>
+
+    /**
+     * Creates a ChatIdentifier from two UUIDs, ensuring the smaller UUID is always first.
+     *
+     * @param u1 the first UUID
+     * @param u2 the second UUID
+     * @return a new ChatIdentifier
+     */
+    public static ChatIdentifier from(UUID u1, UUID u2) {
+<span class="fc bfc" id="L31" title="All 2 branches covered.">        return u1.compareTo(u2) &lt; 0 ?</span>
+<span class="fc" id="L32">                new ChatIdentifier(u1, u2) :</span>
+<span class="fc" id="L33">                new ChatIdentifier(u2, u1);</span>
+    }
+
+    /**
+     * Creates a ChatIdentifier from two Users, ensuring the User with the smaller ID is always first.
+     *
+     * @param u1 the first User
+     * @param u2 the second User
+     * @return a new ChatIdentifier
+     */
+    public static ChatIdentifier from(User u1, User u2) {
+<span class="nc" id="L44">        return from(u1.getId(), u2.getId());</span>
+    }
+
+    @Override
+    public boolean equals(Object o) {
+<span class="pc bpc" id="L49" title="2 of 4 branches missed.">        if (o == null || getClass() != o.getClass()) return false;</span>
+<span class="fc" id="L50">        ChatIdentifier that = (ChatIdentifier) o;</span>
+<span class="pc bpc" id="L51" title="2 of 4 branches missed.">        return Objects.equals(firstUser, that.firstUser) &amp;&amp; Objects.equals(secondUser, that.secondUser);</span>
+    }
+
+    @Override
+    public int hashCode() {
+<span class="nc" id="L56">        return Objects.hash(firstUser, secondUser);</span>
+    }
+
+    @Override
+    public String toString() {
+<span class="fc" id="L61">        return firstUser + &quot;+&quot; + secondUser;</span>
+    }
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.11.202310140853</span></div></body></html>

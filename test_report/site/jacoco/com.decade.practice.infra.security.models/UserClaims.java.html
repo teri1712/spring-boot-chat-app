@@ -1,0 +1,34 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>UserClaims.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">messenger-clone-server</a> &gt; <a href="index.source.html" class="el_package">com.decade.practice.infra.security.models</a> &gt; <span class="el_source">UserClaims.java</span></div><h1>UserClaims.java</h1><pre class="source lang-java linenums">package com.decade.practice.infra.security.models;
+
+import com.decade.practice.persistence.jpa.embeddables.ImageSpec;
+import com.decade.practice.persistence.jpa.entities.User;
+import lombok.*;
+
+import java.util.UUID;
+
+<span class="fc" id="L9">@AllArgsConstructor</span>
+<span class="pc" id="L10">@Builder</span>
+<span class="fc" id="L11">@NoArgsConstructor</span>
+@Getter
+<span class="fc" id="L13">@Setter</span>
+public class UserClaims {
+
+<span class="fc" id="L16">    private UUID id;</span>
+<span class="fc" id="L17">    private String username;</span>
+<span class="fc" id="L18">    private String name;</span>
+<span class="fc" id="L19">    private String role;</span>
+<span class="fc" id="L20">    private Float gender;</span>
+<span class="fc" id="L21">    private ImageSpec avatar;</span>
+
+    public static UserClaims from(User user) {
+<span class="fc" id="L24">        UserClaims userClaims = new UserClaims();</span>
+<span class="fc" id="L25">        userClaims.id = user.getId();</span>
+<span class="fc" id="L26">        userClaims.username = user.getUsername();</span>
+<span class="fc" id="L27">        userClaims.name = user.getName();</span>
+<span class="fc" id="L28">        userClaims.role = user.getRole();</span>
+<span class="fc" id="L29">        userClaims.gender = user.getGender();</span>
+<span class="fc" id="L30">        userClaims.avatar = user.getAvatar();</span>
+<span class="fc" id="L31">        return userClaims;</span>
+    }
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.11.202310140853</span></div></body></html>

@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>Conversation.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">messenger-clone-server</a> &gt; <a href="index.source.html" class="el_package">com.decade.practice.dto</a> &gt; <span class="el_source">Conversation.java</span></div><h1>Conversation.java</h1><pre class="source lang-java linenums">package com.decade.practice.dto;
+
+import com.decade.practice.persistence.jpa.entities.Chat;
+import com.decade.practice.persistence.jpa.entities.User;
+import com.decade.practice.utils.ChatUtils;
+import lombok.Getter;
+import lombok.Setter;
+
+@Getter
+<span class="nc" id="L10">@Setter</span>
+public class Conversation {
+<span class="fc" id="L12">    private ChatDto chat;</span>
+<span class="fc" id="L13">    private UserResponse partner;</span>
+<span class="fc" id="L14">    private UserResponse owner;</span>
+
+<span class="fc" id="L16">    public Conversation(ChatDto chat, User partner, User owner) {</span>
+<span class="fc" id="L17">        this.chat = chat;</span>
+<span class="fc" id="L18">        this.partner = UserResponse.from(partner);</span>
+<span class="fc" id="L19">        this.owner = UserResponse.from(owner);</span>
+<span class="fc" id="L20">    }</span>
+
+    public Conversation(Chat chat, User owner) {
+<span class="fc" id="L23">        this(</span>
+                new ChatDto(chat, owner),
+<span class="fc" id="L25">                ChatUtils.inspectPartner(chat, owner),</span>
+                owner
+        );
+<span class="fc" id="L28">    }</span>
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.11.202310140853</span></div></body></html>
