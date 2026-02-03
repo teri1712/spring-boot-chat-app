@@ -65,18 +65,18 @@ This section compares the performance of the application with and without event 
 #### No Cache
 | Label | # Samples | Average (ms) | Min (ms) | Max (ms) | Throughput |
 |-------|-----------|--------------|----------|----------|------------|
-| my messages | 5000 | 8 | 5 | 210 | 237.6/sec |
-| chat messages | 5000 | 9 | 5 | 52 | 240.0/sec |
-| **TOTAL** | **10000** | **9** | **5** | **210** | **475.1/sec** |
+| my messages | 5000 | 59 | 9 | 244 | 174.3/sec |
+| chat messages | 5000 | 58 | 9 | 269 | 175.4/sec |
+| **TOTAL** | **10000** | **59** | **9** | **269** | **348.4/sec** |
 
 #### With Cache (Redis)
 | Label | # Samples | Average (ms) | Min (ms) | Max (ms) | Throughput |
 |-------|-----------|--------------|----------|----------|------------|
-| my messages | 5000 | 3 | 2 | 198 | 246.4/sec |
-| chat messages | 5000 | 3 | 2 | 43 | 248.8/sec |
-| **TOTAL** | **10000** | **3** | **2** | **198** | **492.7/sec** |
+| my messages | 5000 | 4 | 2 | 227 | 241.6/sec |
+| chat messages | 5000 | 4 | 2 | 48 | 244.2/sec |
+| **TOTAL** | **10000** | **4** | **2** | **227** | **483.1/sec** |
 
-*Note: Enabling cache reduced average latency by approximately 66%. Detailed CSV reports can be found in the `perf_report` folder.*
+*Note: Enabling cache reduced average latency by approximately 93%. Detailed CSV reports can be found in the `perf_report` folder.*
 
 ### Test Report
 
