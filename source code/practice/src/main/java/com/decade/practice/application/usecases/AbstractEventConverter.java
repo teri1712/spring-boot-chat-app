@@ -6,20 +6,16 @@ import com.decade.practice.dto.UserResponse;
 import com.decade.practice.persistence.jpa.entities.ChatEvent;
 import com.decade.practice.persistence.jpa.entities.MessageEvent;
 import com.decade.practice.utils.ChatUtils;
-import org.hibernate.Hibernate;
-import org.hibernate.proxy.HibernateProxy;
+import jakarta.validation.constraints.NotNull;
 
 public abstract class AbstractEventConverter<E extends ChatEvent> extends EventConverter<E> {
 
 
+    @NotNull
     abstract protected EventDto postInitEventResponse(E event, EventDto res);
 
     @Override
     public EventDto doConvert(E chatEvent) {
-
-        if (chatEvent instanceof HibernateProxy proxy) {
-            chatEvent = (E) Hibernate.unproxy(proxy);
-        }
 
         EventDto event = new EventDto();
         event.setId(chatEvent.getId());
