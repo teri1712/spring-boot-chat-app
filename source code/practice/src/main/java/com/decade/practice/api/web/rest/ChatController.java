@@ -1,15 +1,14 @@
 package com.decade.practice.api.web.rest;
 
+import com.decade.practice.application.usecases.ChatService;
+import com.decade.practice.application.usecases.DeliveryService;
+import com.decade.practice.application.usecases.EventConverterResolution;
 import com.decade.practice.dto.ChatDetailsDto;
 import com.decade.practice.dto.ChatSnapshot;
 import com.decade.practice.dto.EventRequest;
 import com.decade.practice.dto.PreferenceRequest;
-import com.decade.practice.application.usecases.ChatService;
-import com.decade.practice.application.usecases.DeliveryService;
-import com.decade.practice.application.usecases.EventFactoryResolution;
 import com.decade.practice.persistence.jpa.embeddables.ChatIdentifier;
 import com.decade.practice.persistence.jpa.entities.Chat;
-import com.decade.practice.persistence.jpa.entities.PreferenceEvent;
 import jakarta.validation.Valid;
 import lombok.AllArgsConstructor;
 import org.springframework.http.HttpStatus;
@@ -26,7 +25,7 @@ import java.util.function.Function;
 @AllArgsConstructor
 public class ChatController {
 
-    private final EventFactoryResolution factoryResolution;
+    private final EventConverterResolution factoryResolution;
     private final ChatService chatService;
     private final DeliveryService deliveryService;
 
@@ -51,10 +50,8 @@ public class ChatController {
             @Valid @RequestBody PreferenceRequest preference) {
 
         EventRequest eventRequest = new EventRequest();
-        eventRequest.setSender(userId);
         eventRequest.setPreferenceEvent(preference);
-        eventRequest.setChatIdentifier(identifier);
-        deliveryService.createAndSend(key, eventRequest, factoryResolution.getFactory(PreferenceEvent.class));
+        deliveryService.createAndSend(userId, identifier, key, eventRequest);
     }
 
 

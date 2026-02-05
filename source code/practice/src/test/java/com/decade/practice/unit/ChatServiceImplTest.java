@@ -1,10 +1,10 @@
 package com.decade.practice.unit;
 
-import com.decade.practice.dto.ChatDetailsDto;
-import com.decade.practice.dto.ChatSnapshot;
 import com.decade.practice.application.exception.OutdatedVersionException;
 import com.decade.practice.application.services.ChatServiceImpl;
 import com.decade.practice.application.usecases.EventService;
+import com.decade.practice.dto.ChatDetailsDto;
+import com.decade.practice.dto.ChatSnapshot;
 import com.decade.practice.persistence.jpa.embeddables.ChatIdentifier;
 import com.decade.practice.persistence.jpa.entities.Chat;
 import com.decade.practice.persistence.jpa.entities.SyncContext;
@@ -53,19 +53,19 @@ class ChatServiceImplTest {
     }
 
     @Test
-    void givenExistingChatIdentifier_whenGetOrCreateChat_thenChatIsReturned() {
+    void givenExistingChatIdentifier_whenGetOrSafelyCreateChat_thenChatIsReturned() {
         ChatIdentifier identifier = new ChatIdentifier(UUID.randomUUID(), UUID.randomUUID());
         Chat chat = mock(Chat.class);
         given(chatRepo.findById(identifier)).willReturn(Optional.of(chat));
 
-        Chat result = chatService.getOrCreateChat(identifier);
+        Chat result = chatService.ensureExist(identifier);
 
         assertEquals(chat, result);
         verify(chatRepo, times(1)).findById(identifier);
     }
 
     @Test
-    void givenChatIdentifier_whenCreateChat_thenChatIsCreated() {
+    void givenChatIdentifier_whenSafelyCreateChat_thenChatIsCreated() {
         UUID u1Id = UUID.randomUUID();
         UUID u2Id = UUID.randomUUID();
         if (u1Id.compareTo(u2Id) > 0) {

@@ -1,29 +1,16 @@
 package com.decade.practice.application.usecases;
 
-import com.decade.practice.dto.EventDto;
 import com.decade.practice.dto.EventRequest;
-import com.decade.practice.dto.FileEventDto;
 import com.decade.practice.persistence.jpa.entities.FileEvent;
 import org.springframework.stereotype.Component;
 
 @Component
-public class FileEventFactory extends AbstractEventFactory<FileEvent> {
+
+public class FileEventFactory implements EventFactory<FileEvent> {
 
     @Override
-    protected EventDto postInitEventResponse(FileEvent fileEvent, EventDto res) {
-        res.setFileEvent(new FileEventDto(fileEvent.getFilename(), fileEvent.getSize(), fileEvent.getMediaUrl()));
-        return res;
-    }
-
-    @Override
-    public Class<FileEvent> getSupportedType() {
-        return FileEvent.class;
-    }
-
-    @Override
-    public FileEvent createEvent(EventRequest eventRequest) {
+    public FileEvent newInstance(EventRequest eventRequest) {
         FileEvent fileEvent = new FileEvent();
-        fileEvent.setChatIdentifier(eventRequest.getChatIdentifier());
         fileEvent.setFilename(eventRequest.getFileEvent().getFilename());
         fileEvent.setMediaUrl(eventRequest.getFileEvent().getMediaUrl());
         fileEvent.setSize(eventRequest.getFileEvent().getSize());
@@ -31,4 +18,8 @@ public class FileEventFactory extends AbstractEventFactory<FileEvent> {
         return fileEvent;
     }
 
+    @Override
+    public boolean supports(EventRequest eventRequest) {
+        return eventRequest.getFileEvent() != null;
+    }
 }

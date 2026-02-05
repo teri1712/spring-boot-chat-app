@@ -1,65 +1,46 @@
 package com.decade.practice.unit;
 
+import com.decade.practice.application.services.ChatEventStore;
 import com.decade.practice.application.services.DeliveryServiceImpl;
-import com.decade.practice.application.usecases.ChatService;
-import com.decade.practice.application.usecases.EventFactory;
+import com.decade.practice.application.usecases.EventConverterResolution;
 import com.decade.practice.application.usecases.EventSender;
-import com.decade.practice.application.usecases.EventStore;
-import com.decade.practice.dto.ChatDto;
 import com.decade.practice.dto.EventDto;
 import com.decade.practice.dto.EventRequest;
-import com.decade.practice.dto.TextEventDto;
-import com.decade.practice.dto.events.MessageCreatedEvent;
 import com.decade.practice.persistence.jpa.embeddables.ChatIdentifier;
-import com.decade.practice.persistence.jpa.entities.Chat;
 import com.decade.practice.persistence.jpa.entities.ChatEvent;
-import com.decade.practice.persistence.jpa.repositories.ChatRepository;
 import com.decade.practice.persistence.jpa.repositories.EventRepository;
-import jakarta.persistence.EntityManager;
-import org.hibernate.exception.ConstraintViolationException;
-import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
-import org.springframework.context.ApplicationEventPublisher;
-import org.springframework.test.util.ReflectionTestUtils;
+import org.springframework.dao.DataIntegrityViolationException;
 
+import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
-import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.BDDMockito.given;
-import static org.mockito.Mockito.*;
+import static org.mockito.Mockito.times;
+import static org.mockito.Mockito.verify;
 
 @ExtendWith(MockitoExtension.class)
 class DeliveryServiceImplTest {
 
     @Mock
-    private EventStore eventStore;
+    private ChatEventStore eventStore;
     @Mock
     private EventSender eventSender;
     @Mock
-    private ChatService chatService;
-    @Mock
-    private ChatRepository chatRepo;
-    @Mock
     private EventRepository eventRepo;
     @Mock
-    private ApplicationEventPublisher eventPublisher;
-    @Mock
-    private EntityManager em;
+    private EventConverterResolution converterResolution;
 
     @InjectMocks
     private DeliveryServiceImpl deliveryService;
-
-    @BeforeEach
-    void setUp() {
-        ReflectionTestUtils.setField(deliveryService, "em", em);
-    }
 
     @Test
     void givenValidRequest_whenCreateAndSend_thenEventsAreStoredAndSent() {
@@ -69,71 +50,44 @@ class DeliveryServiceImplTest {
         ChatIdentifier chatIdentifier = ChatIdentifier.from(senderId, receiverId);
 
         EventRequest request = new EventRequest();
-        request.setSender(senderId);
-        request.setChatIdentifier(chatIdentifier);
-
-        EventFactory<ChatEvent> factory = mock(EventFactory.class);
-        ChatEvent mine = mock(ChatEvent.class);
-        ChatEvent yours = mock(ChatEvent.class);
-        given(factory.createEvent(request)).willReturn(mine, yours);
-        given(mine.getChatIdentifier()).willReturn(chatIdentifier);
-
-        Chat chat = mock(Chat.class);
-        given(chatRepo.findByIdWithPessimisticLock(chatIdentifier)).willReturn(chat);
-        given(chat.getMessageCount()).willReturn(0);
 
         EventDto myDto = new EventDto();
         myDto.setIdempotencyKey(idempotentKey);
-        myDto.setTextEvent(new TextEventDto("hello"));
-        myDto.setChat(new ChatDto(chatIdentifier, senderId));
 
         EventDto yourDto = new EventDto();
-        yourDto.setIdempotencyKey(idempotentKey);
-        yourDto.setTextEvent(new TextEventDto("hello"));
-        yourDto.setChat(new ChatDto(chatIdentifier, senderId));
+        yourDto.setIdempotencyKey(UUID.randomUUID());
 
-        given(factory.createEventDto(mine)).willReturn(myDto);
-        given(factory.createEventDto(yours)).willReturn(yourDto);
+        given(eventStore.save(eq(senderId), eq(senderId), eq(idempotentKey), eq(chatIdentifier), eq(request)))
+                .willReturn(List.of(myDto, yourDto));
 
-        EventDto result = deliveryService.createAndSend(idempotentKey, request, factory);
+        EventDto result = deliveryService.createAndSend(senderId, chatIdentifier, idempotentKey, request);
 
         assertNotNull(result);
         assertEquals(myDto, result);
 
-        verify(eventStore).save(eq(senderId), eq(senderId), eq(mine));
-        verify(eventStore).save(eq(senderId), eq(receiverId), eq(yours));
+        verify(eventStore).save(eq(senderId), eq(senderId), eq(idempotentKey), eq(chatIdentifier), eq(request));
         verify(eventSender).send(myDto);
         verify(eventSender).send(yourDto);
-        verify(eventPublisher, times(2)).publishEvent(any(EventDto.class));
-        verify(eventPublisher, times(2)).publishEvent(any(MessageCreatedEvent.class));
     }
 
     @Test
-    void givenChatNotExists_whenCreateAndSend_thenChatIsCreated() {
+    void givenChatNotExists_whenCreateAndSend_thenDelegatesToEventStore() {
         UUID idempotentKey = UUID.randomUUID();
         UUID senderId = UUID.randomUUID();
         UUID receiverId = UUID.randomUUID();
         ChatIdentifier chatIdentifier = ChatIdentifier.from(senderId, receiverId);
 
         EventRequest request = new EventRequest();
-        request.setSender(senderId);
-        request.setChatIdentifier(chatIdentifier);
 
-        EventFactory<ChatEvent> factory = mock(EventFactory.class);
-        ChatEvent mine = mock(ChatEvent.class);
-        ChatEvent yours = mock(ChatEvent.class);
-        given(factory.createEvent(request)).willReturn(mine, yours);
-        given(mine.getChatIdentifier()).willReturn(chatIdentifier);
+        EventDto myDto = new EventDto();
+        myDto.setIdempotencyKey(idempotentKey);
 
-        Chat chat = mock(Chat.class);
-        given(chatRepo.findByIdWithPessimisticLock(chatIdentifier)).willReturn(null, chat);
-        given(chat.getMessageCount()).willReturn(0);
+        given(eventStore.save(eq(senderId), eq(senderId), eq(idempotentKey), eq(chatIdentifier), eq(request)))
+                .willReturn(List.of(myDto));
 
-        given(factory.createEventDto(any())).willReturn(new EventDto());
+        deliveryService.createAndSend(senderId, chatIdentifier, idempotentKey, request);
 
-        deliveryService.createAndSend(idempotentKey, request, factory);
-
-        verify(chatService).createChat(chatIdentifier);
+        verify(eventStore, times(1)).save(eq(senderId), eq(senderId), eq(idempotentKey), eq(chatIdentifier), eq(request));
     }
 
     @Test
@@ -144,24 +98,17 @@ class DeliveryServiceImplTest {
         ChatIdentifier chatIdentifier = ChatIdentifier.from(senderId, receiverId);
 
         EventRequest request = new EventRequest();
-        request.setSender(senderId);
-        request.setChatIdentifier(chatIdentifier);
 
-        EventFactory<ChatEvent> factory = mock(EventFactory.class);
-        ChatEvent mine = mock(ChatEvent.class);
-        given(factory.createEvent(request)).willReturn(mine);
-        given(mine.getChatIdentifier()).willReturn(chatIdentifier);
-        given(mine.getIdempotentKey()).willReturn(idempotentKey);
+        given(eventStore.save(eq(senderId), eq(senderId), eq(idempotentKey), eq(chatIdentifier), eq(request)))
+                .willThrow(new DataIntegrityViolationException("Duplicate"));
 
-        given(chatRepo.findByIdWithPessimisticLock(chatIdentifier)).willThrow(new ConstraintViolationException("Duplicate", null, null));
-
-        ChatEvent persisted = mock(ChatEvent.class);
+        ChatEvent persisted = org.mockito.Mockito.mock(ChatEvent.class);
         given(eventRepo.findByIdempotentKey(idempotentKey)).willReturn(Optional.of(persisted));
 
         EventDto persistedDto = new EventDto();
-        given(factory.createEventDto(persisted)).willReturn(persistedDto);
+        given(converterResolution.convert(persisted)).willReturn(persistedDto);
 
-        EventDto result = deliveryService.createAndSend(idempotentKey, request, factory);
+        EventDto result = deliveryService.createAndSend(senderId, chatIdentifier, idempotentKey, request);
 
         assertEquals(persistedDto, result);
     }

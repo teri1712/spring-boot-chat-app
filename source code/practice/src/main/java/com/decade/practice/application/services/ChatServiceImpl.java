@@ -49,11 +49,11 @@ public class ChatServiceImpl extends SelfAwareBean implements ChatService {
 
 
     @Override
-    public Chat getOrCreateChat(ChatIdentifier identifier) {
+    public Chat ensureExist(ChatIdentifier identifier) {
         try {
             return chatRepo.findById(identifier).orElseThrow();
         } catch (NoSuchElementException e) {
-            ((ChatServiceImpl) getSelf()).ensureExists(identifier);
+            ((ChatServiceImpl) getSelf()).safelyCreate(identifier);
         }
         return chatRepo.findById(identifier).orElseThrow();
     }
@@ -63,7 +63,7 @@ public class ChatServiceImpl extends SelfAwareBean implements ChatService {
             noRollbackFor = NoSuchElementException.class
     )
     @Override
-    public void ensureExists(ChatIdentifier identifier) {
+    public void safelyCreate(ChatIdentifier identifier) {
         try {
             Chat chat = new Chat(
                     userRepo.findById(identifier.getFirstUser()).orElseThrow(),
@@ -139,7 +139,7 @@ public class ChatServiceImpl extends SelfAwareBean implements ChatService {
     public ChatDetailsDto getDetails(ChatIdentifier chatIdentifier, UUID userId) {
         User owner = userRepo.findById(userId).orElseThrow();
         // TODO: N + 1 resolve
-        Chat chat = getOrCreateChat(chatIdentifier);
+        Chat chat = ensureExist(chatIdentifier);
         return ChatDetailsDto.from(chat, owner);
     }
 }

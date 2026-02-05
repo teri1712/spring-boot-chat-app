@@ -9,20 +9,17 @@ import com.decade.practice.utils.ChatUtils;
 import org.hibernate.Hibernate;
 import org.hibernate.proxy.HibernateProxy;
 
-public abstract class AbstractEventFactory<E extends ChatEvent> implements EventFactory<E> {
+public abstract class AbstractEventConverter<E extends ChatEvent> extends EventConverter<E> {
 
 
     abstract protected EventDto postInitEventResponse(E event, EventDto res);
 
     @Override
-    public EventDto createEventDto(ChatEvent chatEvent) {
+    public EventDto doConvert(E chatEvent) {
 
         if (chatEvent instanceof HibernateProxy proxy) {
-            chatEvent = (ChatEvent) Hibernate.unproxy(proxy);
+            chatEvent = (E) Hibernate.unproxy(proxy);
         }
-
-        if (!support(chatEvent))
-            throw new IllegalStateException("Chat event is not supported by this factory");
 
         EventDto event = new EventDto();
         event.setId(chatEvent.getId());
@@ -35,6 +32,6 @@ public abstract class AbstractEventFactory<E extends ChatEvent> implements Event
         event.setChat(new ChatDto(chatEvent.getChat(), chatEvent.getOwner()));
         event.setSender(chatEvent.getSender().getId());
         event.setCreatedTime(chatEvent.getCreatedTime());
-        return postInitEventResponse((E) chatEvent, event);
+        return postInitEventResponse(chatEvent, event);
     }
 }

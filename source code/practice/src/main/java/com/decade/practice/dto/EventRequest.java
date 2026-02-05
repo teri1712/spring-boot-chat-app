@@ -1,11 +1,8 @@
 package com.decade.practice.dto;
 
-import com.decade.practice.persistence.jpa.embeddables.ChatIdentifier;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
-
-import java.util.UUID;
 
 @Getter
 @Setter
@@ -19,9 +16,5 @@ public class EventRequest {
     private FileEventDto fileEvent;
     private SeenEventDto seenEvent;
 
-    private UUID sender;
-
-    // TODO: check client
-    private ChatIdentifier chatIdentifier;
 
 }

@@ -13,11 +13,11 @@ import java.util.UUID;
 public interface ChatService {
 
 
-    void ensureExists(ChatIdentifier chatIdentifier);
+    void safelyCreate(ChatIdentifier chatIdentifier);
 
     Chat createChat(ChatIdentifier identifier);
 
-    Chat getOrCreateChat(ChatIdentifier identifier) throws NoSuchElementException;
+    Chat ensureExist(ChatIdentifier identifier) throws NoSuchElementException;
 
     ChatSnapshot getSnapshot(ChatIdentifier chatIdentifier, UUID userId, int atVersion);
 

@@ -1,9 +1,14 @@
 package com.decade.practice.application.usecases;
 
-import com.decade.practice.persistence.jpa.entities.ChatEvent;
+import com.decade.practice.dto.EventDto;
+import com.decade.practice.dto.EventRequest;
+import com.decade.practice.persistence.jpa.embeddables.ChatIdentifier;
+import org.springframework.stereotype.Repository;
 
+import java.util.List;
 import java.util.UUID;
 
+@Repository
 public interface EventStore extends EventService {
-    void save(UUID senderId, UUID ownerId, ChatEvent event);
+    List<EventDto> save(UUID senderId, UUID ownerId, UUID idempotentKey, ChatIdentifier chatIdentifier, EventRequest eventRequest);
 }
