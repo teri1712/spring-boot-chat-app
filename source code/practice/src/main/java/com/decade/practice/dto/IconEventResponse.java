@@ -1,4 +1,6 @@
 package com.decade.practice.dto;
 
-public record IconEventResponse(int iconId) {
+import java.io.Serializable;
+
+public record IconEventResponse(int iconId) implements Serializable {
 }

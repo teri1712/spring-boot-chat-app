@@ -4,7 +4,7 @@ import com.decade.practice.application.exception.OutdatedVersionException;
 import com.decade.practice.application.usecases.ChatService;
 import com.decade.practice.application.usecases.EventService;
 import com.decade.practice.common.SelfAwareBean;
-import com.decade.practice.dto.ChatDetailsDto;
+import com.decade.practice.dto.ChatDetails;
 import com.decade.practice.dto.ChatSnapshot;
 import com.decade.practice.dto.Conversation;
 import com.decade.practice.dto.EventResponse;
@@ -94,12 +94,7 @@ public class ChatServiceImpl extends SelfAwareBean implements ChatService {
         User owner = userRepo.findById(userId).orElseThrow();
         if (owner.getSyncContext().getEventVersion() != version)
             throw new OutdatedVersionException(owner.getSyncContext().getEventVersion(), version);
-        Optional<ChatOrder> order = offset.flatMap(new Function<ChatIdentifier, Optional<ChatOrder>>() {
-            @Override
-            public Optional<ChatOrder> apply(ChatIdentifier chatIdentifier) {
-                return chatOrderRepo.findByChat_IdentifierAndOwner(chatIdentifier, owner);
-            }
-        });
+        Optional<ChatOrder> order = offset.flatMap((Function<ChatIdentifier, Optional<ChatOrder>>) chatIdentifier -> chatOrderRepo.findByChat_IdentifierAndOwner(chatIdentifier, owner));
 
         if (order.isPresent()) {
             List<ChatOrder> chatOrders = chatOrderRepo.findByOwnerAndCurrentVersionLessThan(owner, order.get().getCurrentVersion(), PageRequest.of(0, limit, EventUtils.CURRENT_SORT_DESC));
@@ -131,10 +126,10 @@ public class ChatServiceImpl extends SelfAwareBean implements ChatService {
 
     @Override
     @PreAuthorize("@accessPolicy.isAllowed(#chatIdentifier,#userId)")
-    public ChatDetailsDto getDetails(ChatIdentifier chatIdentifier, UUID userId) {
+    public ChatDetails getDetails(ChatIdentifier chatIdentifier, UUID userId) {
         User owner = userRepo.findById(userId).orElseThrow();
         // TODO: N + 1 resolve
         Chat chat = ensureExist(chatIdentifier);
-        return ChatDetailsDto.from(chat, owner);
+        return ChatDetails.from(chat, owner);
     }
 }

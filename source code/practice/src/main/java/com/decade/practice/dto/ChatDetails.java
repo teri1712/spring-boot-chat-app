@@ -10,13 +10,13 @@ import lombok.Setter;
 @Getter
 @Setter
 @NoArgsConstructor
-public class ChatDetailsDto {
+public class ChatDetails {
     private ChatDto chat;
     private UserResponse partner;
     private PreferenceResponse preference;
 
-    public static ChatDetailsDto from(Chat chat, User owner) {
-        ChatDetailsDto dto = new ChatDetailsDto();
+    public static ChatDetails from(Chat chat, User owner) {
+        ChatDetails dto = new ChatDetails();
         dto.chat = new ChatDto(chat, owner);
         dto.partner = UserResponse.from(ChatUtils.inspectPartner(chat, owner));
         dto.preference = PreferenceResponse.from(chat.getPreference());

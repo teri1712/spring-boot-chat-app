@@ -1,4 +1,6 @@
 package com.decade.practice.dto;
 
-public record TextEventResponse(String content) {
+import java.io.Serializable;
+
+public record TextEventResponse(String content) implements Serializable {
 }

@@ -3,7 +3,7 @@ package com.decade.practice.unit;
 import com.decade.practice.application.exception.OutdatedVersionException;
 import com.decade.practice.application.services.ChatServiceImpl;
 import com.decade.practice.application.usecases.EventService;
-import com.decade.practice.dto.ChatDetailsDto;
+import com.decade.practice.dto.ChatDetails;
 import com.decade.practice.dto.ChatSnapshot;
 import com.decade.practice.persistence.jpa.embeddables.ChatIdentifier;
 import com.decade.practice.persistence.jpa.entities.Chat;
@@ -153,7 +153,7 @@ class ChatServiceImplTest {
         given(userRepo.findById(userId)).willReturn(Optional.of(owner));
         given(chatRepo.findById(identifier)).willReturn(Optional.of(chat));
 
-        ChatDetailsDto result = chatService.getDetails(identifier, userId);
+        ChatDetails result = chatService.getDetails(identifier, userId);
 
         assertNotNull(result);
     }

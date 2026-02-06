@@ -1,4 +1,6 @@
 package com.decade.practice.dto;
 
-public record PreferenceEventResponse(PreferenceResponse preference) {
+import java.io.Serializable;
+
+public record PreferenceEventResponse(PreferenceResponse preference) implements Serializable {
 }

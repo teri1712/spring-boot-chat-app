@@ -2,7 +2,7 @@ package com.decade.practice.api.web.rest;
 
 import com.decade.practice.application.usecases.ChatService;
 import com.decade.practice.application.usecases.DeliveryService;
-import com.decade.practice.dto.ChatDetailsDto;
+import com.decade.practice.dto.ChatDetails;
 import com.decade.practice.dto.ChatSnapshot;
 import com.decade.practice.dto.EventRequest;
 import com.decade.practice.dto.PreferenceRequest;
@@ -28,7 +28,7 @@ public class ChatController {
     private final DeliveryService deliveryService;
 
     @GetMapping("/{identifier}")
-    public ChatDetailsDto getChat(
+    public ChatDetails getChat(
             @AuthenticationPrincipal(expression = "id") UUID userId,
             @PathVariable ChatIdentifier identifier
     ) {

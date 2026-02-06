@@ -22,7 +22,6 @@ import java.util.UUID;
 @ConditionalOnProperty(name = "server.cache.events", havingValue = "true", matchIfMissing = true)
 public class CacheableEventService implements EventService {
 
-
     public final EventStore eventStore;
 
     @Override
