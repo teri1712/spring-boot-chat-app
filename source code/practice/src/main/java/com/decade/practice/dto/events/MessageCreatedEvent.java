@@ -1,37 +1,29 @@
 package com.decade.practice.dto.events;
 
-import com.decade.practice.dto.ChatDto;
-import com.decade.practice.dto.EventDto;
-import com.decade.practice.dto.TextEventDto;
-import com.decade.practice.dto.UserResponse;
-import lombok.*;
+import com.decade.practice.dto.*;
 
 import java.util.UUID;
 
-@Getter
-@Setter
-@Builder
-@AllArgsConstructor
-@NoArgsConstructor
-public class MessageCreatedEvent {
+// Event-Carried State Transfer
+public record MessageCreatedEvent(
+        UUID idempotencyKey,
+        UUID sender,
+        ChatResponse chat,
+        UserResponse partner,
+        TextEventResponse textEvent
+) {
 
-    private UUID idempotencyKey;
-    private UUID sender;
-    private ChatDto chat;
-
-    private UserResponse partner;
-    private TextEventDto textEvent;
-
-
-    public static MessageCreatedEvent from(EventDto eventDto) {
-        if (eventDto.getTextEvent() == null)
+    public static MessageCreatedEvent from(EventDetails eventDetails) {
+        EventResponse eventResponse = eventDetails.event();
+        Conversation conversation = eventDetails.conversation();
+        if (eventResponse.textEvent() == null)
             return null;
-        return MessageCreatedEvent.builder()
-                .idempotencyKey(eventDto.getIdempotencyKey())
-                .sender(eventDto.getSender())
-                .chat(eventDto.getChat())
-                .partner(eventDto.getPartner())
-                .textEvent(eventDto.getTextEvent())
-                .build();
+        return new MessageCreatedEvent(
+                eventResponse.idempotencyKey(),
+                eventResponse.sender(),
+                eventResponse.chat(),
+                conversation.partner(),
+                eventResponse.textEvent()
+        );
     }
 }

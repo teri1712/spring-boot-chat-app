@@ -1,8 +1,7 @@
 package com.decade.practice.application.usecases;
 
-import com.decade.practice.dto.ChatDto;
-import com.decade.practice.dto.EventDto;
-import com.decade.practice.dto.UserResponse;
+import com.decade.practice.dto.ChatResponse;
+import com.decade.practice.dto.EventResponse;
 import com.decade.practice.persistence.jpa.entities.ChatEvent;
 import com.decade.practice.persistence.jpa.entities.MessageEvent;
 import com.decade.practice.utils.ChatUtils;
@@ -12,22 +11,29 @@ public abstract class AbstractEventConverter<E extends ChatEvent> extends EventC
 
 
     @NotNull
-    abstract protected EventDto postInitEventResponse(E event, EventDto res);
+    abstract protected EventResponse postInitEventResponse(E event, EventResponse res);
 
     @Override
-    public EventDto doConvert(E chatEvent) {
+    public EventResponse doConvert(E chatEvent) {
 
-        EventDto event = new EventDto();
-        event.setId(chatEvent.getId());
-        event.setIdempotencyKey(chatEvent.getIdempotentKey());
-        event.setEventVersion(chatEvent.getEventVersion());
-        event.setEventType(chatEvent.getEventType());
-        event.setMessage(chatEvent instanceof MessageEvent);
-        event.setOwner(UserResponse.from(chatEvent.getOwner()));
-        event.setPartner(UserResponse.from(ChatUtils.inspectPartner(chatEvent.getChat(), chatEvent.getOwner())));
-        event.setChat(new ChatDto(chatEvent.getChat(), chatEvent.getOwner()));
-        event.setSender(chatEvent.getSender().getId());
-        event.setCreatedTime(chatEvent.getCreatedTime());
+        EventResponse event = new EventResponse(
+                chatEvent.getId(),
+                chatEvent.getIdempotentKey(),
+                chatEvent.getSender().getId(),
+                null, // textEvent
+                null, // imageEvent
+                null, // iconEvent
+                null, // preferenceEvent
+                null, // fileEvent
+                null, // seenEvent
+                chatEvent.getCreatedTime(),
+                chatEvent.getEventType(),
+                chatEvent.getEventVersion(),
+                chatEvent instanceof MessageEvent,
+                chatEvent.getOwner().getId(),
+                ChatUtils.inspectPartner(chatEvent.getChat(), chatEvent.getOwner()).getId(),
+                ChatResponse.from(chatEvent.getChat(), chatEvent.getOwner())
+        );
         return postInitEventResponse(chatEvent, event);
     }
 }

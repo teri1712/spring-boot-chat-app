@@ -23,4 +23,13 @@ public class ChatOrder {
     private ChatEvent currentEvent;
 
     int currentVersion;
+
+
+    protected ChatOrder() {
+    }
+
+    public ChatOrder(Chat chat, User owner) {
+        this.chat = chat;
+        this.owner = owner;
+    }
 }

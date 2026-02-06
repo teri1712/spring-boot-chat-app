@@ -3,8 +3,10 @@ package com.decade.practice.application.services;
 import com.decade.practice.application.usecases.EventConverterResolution;
 import com.decade.practice.application.usecases.EventFactoryResolution;
 import com.decade.practice.application.usecases.EventStore;
-import com.decade.practice.dto.EventDto;
+import com.decade.practice.dto.Conversation;
+import com.decade.practice.dto.EventDetails;
 import com.decade.practice.dto.EventRequest;
+import com.decade.practice.dto.EventResponse;
 import com.decade.practice.dto.events.MessageCreatedEvent;
 import com.decade.practice.persistence.jpa.embeddables.ChatIdentifier;
 import com.decade.practice.persistence.jpa.entities.*;
@@ -22,8 +24,6 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 import java.util.UUID;
-import java.util.function.Function;
-import java.util.function.Supplier;
 
 @Slf4j
 @RequiredArgsConstructor
@@ -41,7 +41,7 @@ public class UserEventStore implements EventStore {
     @Transactional
     @Override
     @PreAuthorize("@accessPolicy.isAllowed(#chatIdentifier,#ownerId)")
-    public List<EventDto> save(UUID senderId, UUID ownerId, UUID idempotentKey, ChatIdentifier chatIdentifier, EventRequest eventRequest) {
+    public List<EventDetails> save(UUID senderId, UUID ownerId, UUID idempotentKey, ChatIdentifier chatIdentifier, EventRequest eventRequest) {
         ChatEvent event = factoryResolution.newInstance(eventRequest).orElseThrow();
 
         Chat chat = chatRepository.findById(chatIdentifier).orElseThrow();
@@ -58,63 +58,46 @@ public class UserEventStore implements EventStore {
         event.setEventVersion(syncContext.getEventVersion());
         eventRepository.save(event);
         if (event instanceof MessageEvent) {
-            ChatOrder order = chatOrderRepository.findByChatAndOwner(chat, owner).orElseGet(new Supplier<ChatOrder>() {
-                @Override
-                public ChatOrder get() {
-                    ChatOrder chatOrder = new ChatOrder();
-                    chatOrder.setChat(chat);
-                    chatOrder.setOwner(owner);
-                    return chatOrder;
-                }
-            });
+            ChatOrder order = chatOrderRepository.findByChatAndOwner(chat, owner).orElseGet
+                    (() -> new ChatOrder(chat, owner)
+                    );
             order.setCurrentVersion(event.getEventVersion());
             order.setCurrentEvent(event);
 
             chatOrderRepository.save(order);
         }
-        EventDto eventDto = converterResolution.convert(event);
-        MessageCreatedEvent messageCreatedEvent = MessageCreatedEvent.from(eventDto);
+        EventResponse eventResponse = converterResolution.convert(event);
+        Conversation conversation = new Conversation(chat, owner);
+        EventDetails eventDetails = new EventDetails(eventResponse, conversation);
+        MessageCreatedEvent messageCreatedEvent = MessageCreatedEvent.from(eventDetails);
         if (messageCreatedEvent != null) {
             applicationEventPublisher.publishEvent(messageCreatedEvent);
         }
-        return List.of(eventDto);
+        return List.of(eventDetails);
     }
 
 
     @Override
     @PreAuthorize("@accessPolicy.isAllowed(#chatIdentifier,#userId)")
-    public List<EventDto> findByOwnerAndChatAndEventVersionLessThanEqual(UUID userId, ChatIdentifier chatIdentifier, int eventVersion) {
+    public List<EventResponse> findByOwnerAndChatAndEventVersionLessThanEqual(UUID userId, ChatIdentifier chatIdentifier, int eventVersion) {
 
         log.trace("Finding events for owner '{}' and chat '{}'", userId, chatIdentifier);
         return eventRepository.findByOwner_IdAndChat_IdentifierAndEventVersionLessThanEqual(userId, chatIdentifier, eventVersion, EventUtils.EVENT_VERSION_LESS_THAN_EQUAL)
-                .stream().map(new Function<ChatEvent, EventDto>() {
-                    @Override
-                    public EventDto apply(ChatEvent chatEvent) {
-                        return converterResolution.convert(chatEvent);
-                    }
-                }).toList();
+                .stream().map(converterResolution::convert).toList();
     }
 
     @Override
-    public List<EventDto> findByOwnerAndEventVersionLessThanEqual(UUID userId, int eventVersion) {
+    public List<EventResponse> findByOwnerAndEventVersionLessThanEqual(UUID userId, int eventVersion) {
         log.trace("Finding events for owner '{}'", userId);
         return eventRepository.findByOwner_IdAndEventVersionLessThanEqual(userId, eventVersion, EventUtils.EVENT_VERSION_LESS_THAN_EQUAL)
-                .stream().map(new Function<ChatEvent, EventDto>() {
-                    @Override
-                    public EventDto apply(ChatEvent chatEvent) {
-                        return converterResolution.convert(chatEvent);
-                    }
-                }).toList()
-                ;
+                .stream().map(converterResolution::convert).toList();
     }
 
     @Override
-    public EventDto findFirstByOwnerOrderByEventVersionDesc(UUID userId) {
-        return eventRepository.findFirstByOwner_IdOrderByEventVersionDesc(userId).map(new Function<ChatEvent, EventDto>() {
-            @Override
-            public EventDto apply(ChatEvent chatEvent) {
-                return converterResolution.convert(chatEvent);
-            }
+    public EventDetails findFirstByOwnerOrderByEventVersionDesc(UUID userId) {
+        return eventRepository.findFirstByOwner_IdOrderByEventVersionDesc(userId).map(chatEvent -> {
+            Conversation conversation = new Conversation(chatEvent.getChat(), chatEvent.getOwner());
+            return new EventDetails(converterResolution.convert(chatEvent), conversation);
         }).orElse(null);
     }
 }

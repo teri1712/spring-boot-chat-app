@@ -14,7 +14,7 @@ public class MessageEventListener {
 
     @TransactionalEventListener(phase = TransactionPhase.BEFORE_COMMIT)
     public void onMessageCreated(MessageCreatedEvent messageCreatedEvent) {
-        outboxStore.save(messageCreatedEvent.getIdempotencyKey().toString(), "messages", messageCreatedEvent);
+        outboxStore.save(messageCreatedEvent.idempotencyKey().toString(), "messages", messageCreatedEvent);
     }
 
 }

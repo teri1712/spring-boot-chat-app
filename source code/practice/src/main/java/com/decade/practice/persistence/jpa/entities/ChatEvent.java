@@ -27,7 +27,7 @@ public abstract class ChatEvent {
     })
     private Chat chat;
 
-    @ManyToOne(cascade = CascadeType.PERSIST)
+    @ManyToOne(cascade = CascadeType.PERSIST, fetch = FetchType.LAZY)
     private User sender;
 
     @Column(name = "event_type", insertable = false, updatable = false)

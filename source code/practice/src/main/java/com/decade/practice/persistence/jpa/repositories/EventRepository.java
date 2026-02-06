@@ -22,5 +22,6 @@ public interface EventRepository extends CrudRepository<ChatEvent, UUID> {
     @EntityGraph(attributePaths = {"chat", "chat.firstUser", "chat.secondUser"})
     Optional<ChatEvent> findFirstByOwner_IdOrderByEventVersionDesc(UUID ownerId);
 
+    @EntityGraph(attributePaths = {"chat", "owner", "sender"})
     Optional<ChatEvent> findByIdempotentKey(UUID idempotentKey);
 }

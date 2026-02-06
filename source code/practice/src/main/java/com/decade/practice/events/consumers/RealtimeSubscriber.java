@@ -1,6 +1,6 @@
 package com.decade.practice.events.consumers;
 
-import com.decade.practice.dto.EventDto;
+import com.decade.practice.dto.EventDetails;
 import com.decade.practice.infra.configs.WebSocketConfiguration;
 import com.decade.practice.persistence.redis.TypeEvent;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -36,9 +36,9 @@ public class RealtimeSubscriber implements MessageListener {
             );
             String json = new String(message.getBody(), StandardCharsets.UTF_8);
             if (channel.equals(queueTopic.getTopic())) {
-                EventDto event = objectMapper.readValue(json, EventDto.class);
+                EventDetails event = objectMapper.readValue(json, EventDetails.class);
                 template.convertAndSendToUser(
-                        event.getOwner().getUsername(),
+                        event.conversation().owner().username(),
                         WebSocketConfiguration.QUEUE_DESTINATION,
                         event
                 );

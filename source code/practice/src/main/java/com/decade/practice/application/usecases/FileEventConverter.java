@@ -1,7 +1,7 @@
 package com.decade.practice.application.usecases;
 
-import com.decade.practice.dto.EventDto;
-import com.decade.practice.dto.FileEventDto;
+import com.decade.practice.dto.EventResponse;
+import com.decade.practice.dto.FileEventResponse;
 import com.decade.practice.persistence.jpa.entities.FileEvent;
 import org.springframework.stereotype.Component;
 
@@ -9,9 +9,25 @@ import org.springframework.stereotype.Component;
 public class FileEventConverter extends AbstractEventConverter<FileEvent> {
 
     @Override
-    protected EventDto postInitEventResponse(FileEvent fileEvent, EventDto res) {
-        res.setFileEvent(new FileEventDto(fileEvent.getFilename(), fileEvent.getSize(), fileEvent.getMediaUrl()));
-        return res;
+    protected EventResponse postInitEventResponse(FileEvent fileEvent, EventResponse res) {
+        return new EventResponse(
+                res.id(),
+                res.idempotencyKey(),
+                res.sender(),
+                res.textEvent(),
+                res.imageEvent(),
+                res.iconEvent(),
+                res.preferenceEvent(),
+                new FileEventResponse(fileEvent.getFilename(), fileEvent.getSize(), fileEvent.getMediaUrl()),
+                res.seenEvent(),
+                res.createdTime(),
+                res.eventType(),
+                res.eventVersion(),
+                res.message(),
+                res.owner(),
+                res.partner(),
+                res.chat()
+        );
     }
 
     @Override

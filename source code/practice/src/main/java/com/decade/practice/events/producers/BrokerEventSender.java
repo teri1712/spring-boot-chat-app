@@ -1,7 +1,7 @@
 package com.decade.practice.events.producers;
 
 import com.decade.practice.application.usecases.EventSender;
-import com.decade.practice.dto.EventDto;
+import com.decade.practice.dto.EventDetails;
 import com.decade.practice.dto.TypeEventDto;
 import lombok.AllArgsConstructor;
 import org.springframework.data.redis.core.RedisTemplate;
@@ -18,7 +18,7 @@ public class BrokerEventSender implements EventSender {
     private final ChannelTopic chatTopic;
 
     @Override
-    public void send(EventDto event) {
+    public void send(EventDetails event) {
         if (TransactionSynchronizationManager.isSynchronizationActive() && TransactionSynchronizationManager.isActualTransactionActive()) {
             TransactionSynchronizationManager.registerSynchronization(new TransactionSynchronization() {
                 @Override

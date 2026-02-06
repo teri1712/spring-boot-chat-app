@@ -7,7 +7,7 @@ import com.decade.practice.common.SelfAwareBean;
 import com.decade.practice.dto.ChatDetailsDto;
 import com.decade.practice.dto.ChatSnapshot;
 import com.decade.practice.dto.Conversation;
-import com.decade.practice.dto.EventDto;
+import com.decade.practice.dto.EventResponse;
 import com.decade.practice.persistence.jpa.embeddables.ChatIdentifier;
 import com.decade.practice.persistence.jpa.entities.Chat;
 import com.decade.practice.persistence.jpa.entities.ChatOrder;
@@ -112,12 +112,7 @@ public class ChatServiceImpl extends SelfAwareBean implements ChatService {
             }).toList();
         }
         List<ChatOrder> chatOrders = chatOrderRepo.findByOwnerAndCurrentVersionLessThan(owner, version + 1, PageRequest.of(0, limit, EventUtils.CURRENT_SORT_DESC));
-        return chatOrders.stream().map(new Function<ChatOrder, Chat>() {
-            @Override
-            public Chat apply(ChatOrder chatOrder) {
-                return chatOrder.getChat();
-            }
-        }).toList();
+        return chatOrders.stream().map(ChatOrder::getChat).toList();
     }
 
     @Override
@@ -126,7 +121,7 @@ public class ChatServiceImpl extends SelfAwareBean implements ChatService {
     public ChatSnapshot getSnapshot(ChatIdentifier chatIdentifier, UUID userId, int atVersion) {
         User owner = userRepo.findById(userId).orElseThrow();
         Chat chat = chatRepo.findById(chatIdentifier).orElseThrow();
-        List<EventDto> eventList = eventService.findByOwnerAndChatAndEventVersionLessThanEqual(userId, chatIdentifier, atVersion);
+        List<EventResponse> eventList = eventService.findByOwnerAndChatAndEventVersionLessThanEqual(userId, chatIdentifier, atVersion);
         return new ChatSnapshot(
                 new Conversation(chat, owner),
                 eventList,

@@ -32,14 +32,14 @@ public class LoginSuccessStrategy implements AuthenticationSuccessHandler {
             Authentication authentication
     ) throws IOException {
         AccountResponse account = userService.prepareAccount(authentication.getName());
-        UserResponse userDto = account.getUser();
+        UserResponse user = account.getUser();
         TokenCredential tokenCredential = tokenService.create(UserClaims.builder()
-                .id(userDto.getId())
-                .username(userDto.getUsername())
-                .name(userDto.getName())
-                .role(userDto.getRole())
-                .gender(userDto.getGender())
-                .avatar(userDto.getAvatar())
+                .id(user.id())
+                .username(user.username())
+                .name(user.name())
+                .role(user.role())
+                .gender(user.gender())
+                .avatar(user.avatar())
                 .build(), null);
         AccountEntryResponse entryResponse = new AccountEntryResponse(account, tokenCredential);
         httpResponse.setContentType("application/json;charset=UTF-8");

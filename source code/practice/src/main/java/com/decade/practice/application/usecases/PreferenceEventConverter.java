@@ -1,9 +1,8 @@
 package com.decade.practice.application.usecases;
 
-import com.decade.practice.dto.EventDto;
-import com.decade.practice.dto.PreferenceEventDto;
+import com.decade.practice.dto.EventResponse;
+import com.decade.practice.dto.PreferenceEventResponse;
 import com.decade.practice.dto.PreferenceResponse;
-import com.decade.practice.dto.ThemeDto;
 import com.decade.practice.persistence.jpa.entities.PreferenceEvent;
 import org.springframework.stereotype.Component;
 
@@ -11,14 +10,25 @@ import org.springframework.stereotype.Component;
 public class PreferenceEventConverter extends AbstractEventConverter<PreferenceEvent> {
 
     @Override
-    protected EventDto postInitEventResponse(PreferenceEvent chatEvent, EventDto res) {
-        PreferenceResponse preference = new PreferenceResponse();
-        preference.setRoomName(chatEvent.getPreference().getRoomName());
-        preference.setIconId(chatEvent.getPreference().getIconId());
-        if (chatEvent.getPreference().getTheme() != null)
-            preference.setTheme(ThemeDto.from(chatEvent.getPreference().getTheme()));
-        res.setPreferenceEvent(new PreferenceEventDto(preference));
-        return res;
+    protected EventResponse postInitEventResponse(PreferenceEvent chatEvent, EventResponse res) {
+        return new EventResponse(
+                res.id(),
+                res.idempotencyKey(),
+                res.sender(),
+                res.textEvent(),
+                res.imageEvent(),
+                res.iconEvent(),
+                new PreferenceEventResponse(PreferenceResponse.from(chatEvent.getPreference())),
+                res.fileEvent(),
+                res.seenEvent(),
+                res.createdTime(),
+                res.eventType(),
+                res.eventVersion(),
+                res.message(),
+                res.owner(),
+                res.partner(),
+                res.chat()
+        );
     }
 
     @Override

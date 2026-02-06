@@ -59,7 +59,7 @@ class UserServiceImplTest {
             UserResponse result = userService.create(request, false);
 
             assertNotNull(result);
-            assertEquals("testuser", result.getUsername());
+            assertEquals("testuser", result.username());
             verify(userRepo).save(any(User.class));
         } finally {
             TransactionSynchronizationManager.clearSynchronization();
@@ -80,7 +80,7 @@ class UserServiceImplTest {
 
         UserResponse result = userService.changeProfile(userId, request);
 
-        assertEquals("New Name", result.getName());
+        assertEquals("New Name", result.name());
     }
 
     @Test
@@ -135,6 +135,6 @@ class UserServiceImplTest {
         AccountResponse result = userService.prepareAccount(username);
 
         assertNotNull(result);
-        assertEquals(username, result.getUser().getUsername());
+        assertEquals(username, result.getUser().username());
     }
 }

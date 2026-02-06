@@ -2,7 +2,7 @@ package com.decade.practice.application.services;
 
 import com.decade.practice.application.usecases.ChatService;
 import com.decade.practice.application.usecases.EventStore;
-import com.decade.practice.dto.EventDto;
+import com.decade.practice.dto.EventDetails;
 import com.decade.practice.dto.EventRequest;
 import com.decade.practice.persistence.jpa.embeddables.ChatIdentifier;
 import com.decade.practice.utils.ChatUtils;
@@ -22,12 +22,12 @@ public class ChatEventStore {
 
 
     @Transactional
-    public List<EventDto> save(UUID senderId, UUID ownerId, UUID idempotentKey, ChatIdentifier chatIdentifier, EventRequest eventRequest) {
+    public List<EventDetails> save(UUID senderId, UUID ownerId, UUID idempotentKey, ChatIdentifier chatIdentifier, EventRequest eventRequest) {
         UUID receiverId = ChatUtils.inspectPartner(chatIdentifier, senderId);
         chatService.ensureExist(chatIdentifier);
 
-        List<EventDto> mineStored = eventStore.save(senderId, ownerId, idempotentKey, chatIdentifier, eventRequest);
-        List<EventDto> yoursStored = eventStore.save(senderId, receiverId, UUID.randomUUID(), chatIdentifier, eventRequest);
+        List<EventDetails> mineStored = eventStore.save(senderId, ownerId, idempotentKey, chatIdentifier, eventRequest);
+        List<EventDetails> yoursStored = eventStore.save(senderId, receiverId, UUID.randomUUID(), chatIdentifier, eventRequest);
 
 
         return Stream.of(mineStored, yoursStored).flatMap(List::stream).toList();

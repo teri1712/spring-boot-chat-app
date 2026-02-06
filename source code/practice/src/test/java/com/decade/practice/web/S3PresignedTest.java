@@ -1,7 +1,7 @@
 package com.decade.practice.web;
 
-import com.decade.practice.dto.S3PresignedDto;
 import com.decade.practice.common.BaseTestClass;
+import com.decade.practice.dto.S3PresignedDto;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
@@ -83,7 +83,7 @@ class S3PresignedTest extends BaseTestClass {
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(eventJson))
                 .andExpect(status().isCreated())
-                .andExpect(jsonPath("$.imageEvent.downloadUrl").value(response.getDownloadUrl()));
+                .andExpect(jsonPath("$.event.imageEvent.downloadUrl").value(response.getDownloadUrl()));
 
     }
 

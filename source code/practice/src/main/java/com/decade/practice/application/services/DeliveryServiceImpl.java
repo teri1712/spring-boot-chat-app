@@ -3,8 +3,10 @@ package com.decade.practice.application.services;
 import com.decade.practice.application.usecases.DeliveryService;
 import com.decade.practice.application.usecases.EventConverterResolution;
 import com.decade.practice.application.usecases.EventSender;
-import com.decade.practice.dto.EventDto;
+import com.decade.practice.dto.Conversation;
+import com.decade.practice.dto.EventDetails;
 import com.decade.practice.dto.EventRequest;
+import com.decade.practice.dto.EventResponse;
 import com.decade.practice.persistence.jpa.embeddables.ChatIdentifier;
 import com.decade.practice.persistence.jpa.entities.ChatEvent;
 import com.decade.practice.persistence.jpa.repositories.EventRepository;
@@ -28,15 +30,15 @@ public class DeliveryServiceImpl implements DeliveryService {
     private final EventConverterResolution converterResolution;
 
     @Override
-    public EventDto createAndSend(UUID senderId, ChatIdentifier chatIdentifier, UUID idempotentKey, EventRequest eventRequest) {
+    public EventDetails createAndSend(UUID senderId, ChatIdentifier chatIdentifier, UUID idempotentKey, EventRequest eventRequest) {
 
         try {
 
-            List<EventDto> stored = eventStore.save(senderId, senderId, idempotentKey, chatIdentifier, eventRequest);
+            List<EventDetails> stored = eventStore.save(senderId, senderId, idempotentKey, chatIdentifier, eventRequest);
             stored.forEach(eventSender::send);
 
             for (int i = 0; i < stored.size(); i++) {
-                if (stored.get(i).getIdempotencyKey().equals(idempotentKey)) {
+                if (stored.get(i).event().idempotencyKey().equals(idempotentKey)) {
                     return stored.get(i);
                 }
             }
@@ -44,6 +46,8 @@ public class DeliveryServiceImpl implements DeliveryService {
             log.debug("Event already sent", e);
         }
         ChatEvent existingOne = eventRepo.findByIdempotentKey(idempotentKey).orElseThrow();
-        return converterResolution.convert(existingOne);
+        EventResponse response = converterResolution.convert(existingOne);
+        Conversation conversation = new Conversation(existingOne.getChat(), existingOne.getOwner());
+        return new EventDetails(response, conversation);
     }
 }

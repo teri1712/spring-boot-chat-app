@@ -66,13 +66,15 @@ public class SearchServiceImpl implements SearchService, SearchStore {
         return hits.getSearchHits()
                 .stream()
                 .map(SearchHit::getContent)
-                .map(document -> UserResponse.builder()
-                        .id(document.getId())
-                        .username(document.getUsername())
-                        .name(document.getName())
-                        .avatar(document.getAvatar())
-                        .gender(document.getGender())
-                        .build()).toList();
+                .map(document -> new UserResponse(
+                        document.getId(),
+                        document.getUsername(),
+                        document.getName(),
+                        document.getDob(),
+                        "ROLE_USER",
+                        document.getAvatar(),
+                        document.getGender()
+                )).toList();
     }
 
     @Override
@@ -133,11 +135,11 @@ public class SearchServiceImpl implements SearchService, SearchStore {
     @Override
     public void save(MessageCreatedEvent messageCreatedEvent) {
         MessageDocument document = new MessageDocument();
-        document.setId(messageCreatedEvent.getIdempotencyKey());
-        document.setOwner(messageCreatedEvent.getChat().getOwner());
-        document.setChatIdentifier(messageCreatedEvent.getChat().getIdentifier());
-        document.setPartnerName(messageCreatedEvent.getPartner().getName());
-        document.setContent(messageCreatedEvent.getTextEvent().getContent());
+        document.setId(messageCreatedEvent.idempotencyKey());
+        document.setOwner(messageCreatedEvent.chat().owner());
+        document.setChatIdentifier(messageCreatedEvent.chat().identifier());
+        document.setPartnerName(messageCreatedEvent.partner().name());
+        document.setContent(messageCreatedEvent.textEvent().content());
 
 
         messageDocumentRepository.save(document);

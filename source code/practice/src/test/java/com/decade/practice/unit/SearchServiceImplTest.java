@@ -1,9 +1,9 @@
 package com.decade.practice.unit;
 
 import com.decade.practice.application.services.SearchServiceImpl;
-import com.decade.practice.dto.ChatDto;
+import com.decade.practice.dto.ChatResponse;
 import com.decade.practice.dto.MessageHistoryDto;
-import com.decade.practice.dto.TextEventDto;
+import com.decade.practice.dto.TextEventResponse;
 import com.decade.practice.dto.UserResponse;
 import com.decade.practice.dto.events.MessageCreatedEvent;
 import com.decade.practice.dto.events.UserCreatedEvent;
@@ -67,7 +67,7 @@ class SearchServiceImplTest {
 
         assertNotNull(result);
         assertEquals(1, result.size());
-        assertEquals("testuser", result.get(0).getUsername());
+        assertEquals("testuser", result.get(0).username());
     }
 
     @Test
@@ -109,12 +109,12 @@ class SearchServiceImplTest {
 
     @Test
     void givenMessageCreatedEvent_whenSave_thenRepositorySaveIsCalled() {
-        MessageCreatedEvent event = MessageCreatedEvent.builder()
-                .idempotencyKey(UUID.randomUUID())
-                .chat(new ChatDto(new ChatIdentifier(UUID.randomUUID(), UUID.randomUUID()), UUID.randomUUID()))
-                .partner(UserResponse.builder().name("Partner").build())
-                .textEvent(new TextEventDto("Hello"))
-                .build();
+        ChatIdentifier identifier = new ChatIdentifier(UUID.randomUUID(), UUID.randomUUID());
+        UUID owner = UUID.randomUUID();
+        ChatResponse chat = ChatResponse.from(identifier, owner);
+        UserResponse partner = new UserResponse(null, null, "Partner", null, null, null, null);
+        TextEventResponse text = new TextEventResponse("Hello");
+        MessageCreatedEvent event = new MessageCreatedEvent(UUID.randomUUID(), owner, chat, partner, text);
 
         searchService.save(event);
 

@@ -1,16 +1,17 @@
 package com.decade.practice.api.web.rest;
 
+import com.decade.practice.api.web.validation.StrongPassword;
+import com.decade.practice.application.usecases.UserService;
 import com.decade.practice.dto.AccountEntryResponse;
 import com.decade.practice.dto.AccountResponse;
 import com.decade.practice.dto.ProfileRequest;
 import com.decade.practice.dto.UserResponse;
-import com.decade.practice.api.web.validation.StrongPassword;
-import com.decade.practice.application.usecases.UserService;
 import com.decade.practice.persistence.jpa.entities.User;
 import com.decade.practice.persistence.jpa.repositories.UserRepository;
 import jakarta.persistence.OptimisticLockException;
 import jakarta.validation.Valid;
 import lombok.AllArgsConstructor;
+import org.springframework.http.HttpStatus;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
@@ -39,12 +40,15 @@ public class AccountController {
         );
     }
 
+    // TODO: Adjust client to no content
+    // TODO: PATCH + adjust client
+    @ResponseStatus(HttpStatus.NO_CONTENT)
     @PutMapping("/profile")
-    public UserResponse changeProfile(
+    public void changeProfile(
             @RequestBody @Valid ProfileRequest profile,
             @AuthenticationPrincipal(expression = "id") UUID id
     ) throws OptimisticLockException {
-        return userService.changeProfile(id, profile);
+        userService.changeProfile(id, profile);
     }
 
     @PostMapping("/profile/password")

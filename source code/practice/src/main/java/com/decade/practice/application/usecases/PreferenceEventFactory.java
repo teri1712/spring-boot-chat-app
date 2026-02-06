@@ -18,10 +18,10 @@ public class PreferenceEventFactory implements EventFactory<PreferenceEvent> {
     public PreferenceEvent newInstance(EventRequest eventRequest) {
         PreferenceRequest preferenceReq = eventRequest.getPreferenceEvent();
         Preference preference = new Preference();
-        preference.setRoomName(preferenceReq.getRoomName());
-        preference.setIconId(preferenceReq.getIconId());
-        if (preferenceReq.getThemeId() != null)
-            preference.setTheme(themeRepository.findById(preferenceReq.getThemeId()).orElseThrow());
+        preference.setRoomName(preferenceReq.roomName());
+        preference.setIconId(preferenceReq.iconId());
+        if (preferenceReq.themeId() != null)
+            preference.setTheme(themeRepository.findById(preferenceReq.themeId()).orElseThrow());
 
         PreferenceEvent preferenceEvent = new PreferenceEvent();
         preferenceEvent.setPreference(preference);

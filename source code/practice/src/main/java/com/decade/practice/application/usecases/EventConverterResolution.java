@@ -1,6 +1,6 @@
 package com.decade.practice.application.usecases;
 
-import com.decade.practice.dto.EventDto;
+import com.decade.practice.dto.EventResponse;
 import com.decade.practice.persistence.jpa.entities.ChatEvent;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -22,7 +22,7 @@ public class EventConverterResolution implements InitializingBean {
     private final Map<Class<? extends ChatEvent>, EventConverter<? extends ChatEvent>> eventConverterMap = new HashMap<>();
 
 
-    public EventDto convert(ChatEvent chatEvent) {
+    public EventResponse convert(ChatEvent chatEvent) {
         Class<? extends ChatEvent> eventType = Hibernate.getClass(chatEvent);
         EventConverter<ChatEvent> eventConverter = (EventConverter<ChatEvent>) eventConverterMap.get(eventType);
         if (eventConverter == null) {

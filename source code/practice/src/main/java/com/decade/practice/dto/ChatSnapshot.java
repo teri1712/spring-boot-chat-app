@@ -12,7 +12,7 @@ import java.util.List;
 public class ChatSnapshot {
 
     private Conversation conversation;
-    private List<EventDto> eventList;
+    private List<EventResponse> eventList;
     private int atVersion;
 
 }

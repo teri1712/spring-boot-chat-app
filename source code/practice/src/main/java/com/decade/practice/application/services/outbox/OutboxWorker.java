@@ -3,7 +3,6 @@ package com.decade.practice.application.services.outbox;
 import com.decade.practice.persistence.jpa.entities.Outbox;
 import com.decade.practice.persistence.jpa.entities.OutboxStatus;
 import com.decade.practice.persistence.jpa.repositories.OutboxRepository;
-import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -18,8 +17,8 @@ import org.springframework.transaction.annotation.Transactional;
 public class OutboxWorker {
 
     private final KafkaTemplate<Object, Object> kafkaTemplate;
-    private final ObjectMapper objectMapper;
     private final OutboxRepository outboxRepository;
+    private final ObjectMapper objectMapper;
 
 
     @Scheduled(fixedDelay = 1000)
@@ -29,11 +28,8 @@ public class OutboxWorker {
     }
 
     private void handleOutbox(Outbox outbox) {
-        try {
-            kafkaTemplate.send(outbox.getTopic(), outbox.getKey(), objectMapper.writeValueAsString(outbox.getPayload()));
-        } catch (JsonProcessingException e) {
-            throw new RuntimeException(e);
-        }
+
+        kafkaTemplate.send(outbox.getTopic(), outbox.getKey(), outbox.getPayload());
         outbox.setStatus(OutboxStatus.SENT);
         log.trace("Sent message to topic: {} with key: {}", outbox.getTopic(), outbox.getKey());
     }

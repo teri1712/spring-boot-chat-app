@@ -1,7 +1,7 @@
 package com.decade.practice.ws;
 
 import com.decade.practice.common.BaseTestClass;
-import com.decade.practice.dto.EventDto;
+import com.decade.practice.dto.EventDetails;
 import com.decade.practice.infra.security.TokenService;
 import com.decade.practice.infra.security.models.UserClaims;
 import com.decade.practice.persistence.jpa.entities.User;
@@ -81,8 +81,8 @@ public class RealtimeEventTest extends BaseTestClass {
                     .defaultHeader(HEADER_NAME, BEARER + aliceToken)
                     .defaultHeader("Content-Type", MediaType.APPLICATION_JSON_VALUE)
                     .build();
-            CompletableFuture<EventDto> aliceEvent = new CompletableFuture<>();
-            CompletableFuture<EventDto> bobEvent = new CompletableFuture<>();
+            CompletableFuture<EventDetails> aliceEvent = new CompletableFuture<>();
+            CompletableFuture<EventDetails> bobEvent = new CompletableFuture<>();
 
             stompClient = new WebSocketStompClient(new StandardWebSocketClient());
             stompClient.setMessageConverter(converter);
@@ -113,24 +113,24 @@ public class RealtimeEventTest extends BaseTestClass {
             aliceSession.subscribe(USER_QUEUE_DESTINATION, new StompFrameHandler() {
                 @Override
                 public Type getPayloadType(StompHeaders headers) {
-                    return EventDto.class;
+                    return EventDetails.class;
                 }
 
                 @Override
                 public void handleFrame(StompHeaders headers, Object payload) {
-                    aliceEvent.complete((EventDto) payload);
+                    aliceEvent.complete((EventDetails) payload);
                 }
             });
 
             bobSession.subscribe(USER_QUEUE_DESTINATION, new StompFrameHandler() {
                 @Override
                 public Type getPayloadType(StompHeaders headers) {
-                    return EventDto.class;
+                    return EventDetails.class;
                 }
 
                 @Override
                 public void handleFrame(StompHeaders headers, Object payload) {
-                    bobEvent.complete((EventDto) payload);
+                    bobEvent.complete((EventDetails) payload);
                 }
             });
             String eventJson = """
@@ -139,23 +139,23 @@ public class RealtimeEventTest extends BaseTestClass {
                     }
                     """;
 
-            EventDto received = aliceClient.post()
+            EventDetails received = aliceClient.post()
                     .header("Idempotency-key", UUID.randomUUID().toString())
                     .contentType(MediaType.APPLICATION_JSON).body(eventJson)
-                    .retrieve().body(EventDto.class);
+                    .retrieve().body(EventDetails.class);
 
             Assertions.assertNotNull(received);
 
             Assertions.assertNotNull(aliceEvent.get(2, TimeUnit.SECONDS));
             Assertions.assertNotNull(bobEvent.get(2, TimeUnit.SECONDS));
-            Assertions.assertNotNull(aliceEvent.get().getTextEvent());
-            Assertions.assertNotNull(bobEvent.get().getTextEvent());
-            Assertions.assertEquals("TEXT", aliceEvent.get().getEventType());
-            Assertions.assertEquals(aliceEvent.get().getChat().getIdentifier(), bobEvent.get().getChat().getIdentifier());
+            Assertions.assertNotNull(aliceEvent.get().event().textEvent());
+            Assertions.assertNotNull(bobEvent.get().event().textEvent());
+            Assertions.assertEquals("TEXT", aliceEvent.get().event().eventType());
+            Assertions.assertEquals(aliceEvent.get().event().chat().identifier(), bobEvent.get().event().chat().identifier());
 
-            Assertions.assertEquals(aliceEvent.get().getTextEvent().getContent(), bobEvent.get().getTextEvent().getContent());
-            Assertions.assertEquals("Hello Bob", aliceEvent.get().getTextEvent().getContent());
-            Assertions.assertEquals(alice.getId(), aliceEvent.get().getSender());
+            Assertions.assertEquals(aliceEvent.get().event().textEvent().content(), bobEvent.get().event().textEvent().content());
+            Assertions.assertEquals("Hello Bob", aliceEvent.get().event().textEvent().content());
+            Assertions.assertEquals(alice.getId(), aliceEvent.get().event().sender());
 
         } finally {
 

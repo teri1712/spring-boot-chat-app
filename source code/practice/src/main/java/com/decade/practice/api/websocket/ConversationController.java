@@ -1,9 +1,9 @@
 package com.decade.practice.api.websocket;
 
-import com.decade.practice.dto.EventDto;
-import com.decade.practice.dto.TypeEventDto;
 import com.decade.practice.application.usecases.EventService;
 import com.decade.practice.application.usecases.LiveService;
+import com.decade.practice.dto.EventDetails;
+import com.decade.practice.dto.TypeEventDto;
 import com.decade.practice.infra.configs.WebSocketConfiguration;
 import com.decade.practice.infra.security.jwt.JwtUserAuthentication;
 import com.decade.practice.persistence.jpa.embeddables.ChatIdentifier;
@@ -23,7 +23,7 @@ public class ConversationController {
 
 
     @SubscribeMapping(WebSocketConfiguration.USER_QUEUE_DESTINATION)
-    public EventDto subsSelf(JwtUserAuthentication user) {
+    public EventDetails subsSelf(JwtUserAuthentication user) {
         return eventService.findFirstByOwnerOrderByEventVersionDesc(user.getPrincipal().getId());
     }
 

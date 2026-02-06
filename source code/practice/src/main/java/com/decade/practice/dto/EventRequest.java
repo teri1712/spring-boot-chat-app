@@ -9,12 +9,11 @@ import lombok.Setter;
 @NoArgsConstructor
 public class EventRequest {
 
-    private TextEventDto textEvent;
-    private ImageEventDto imageEvent;
-    private IconEventDto iconEvent;
+    private TextEventRequest textEvent;
+    private ImageEventRequest imageEvent;
+    private IconEventRequest iconEvent;
     private PreferenceRequest preferenceEvent;
-    private FileEventDto fileEvent;
-    private SeenEventDto seenEvent;
-
+    private FileEventRequest fileEvent;
+    private SeenEventRequest seenEvent;
 
 }

@@ -3,21 +3,17 @@ package com.decade.practice.dto;
 import jakarta.annotation.Nullable;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
-import lombok.Getter;
-import lombok.Setter;
 
-@Getter
-@Setter
-public class PreferenceRequest {
+public record PreferenceRequest(
+        @NotNull
+        Integer iconId,
 
-    @NotNull
-    private Integer iconId;
+        @NotNull
+        @NotBlank
+        String roomName,
 
-    @NotNull
-    @NotBlank
-    private String roomName;
+        @Nullable
+        Integer themeId
 
-    @Nullable
-    private Integer themeId;
-
+) {
 }

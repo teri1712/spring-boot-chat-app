@@ -7,8 +7,6 @@ import org.hibernate.annotations.JdbcTypeCode;
 import org.hibernate.type.SqlTypes;
 
 import java.sql.Timestamp;
-import java.util.HashMap;
-import java.util.Map;
 
 @Entity
 @Setter
@@ -24,7 +22,7 @@ public class Outbox {
 
     @Column(columnDefinition = "jsonb")
     @JdbcTypeCode(SqlTypes.JSON)
-    private Map<String, Object> payload = new HashMap<>();
+    private String payload;
 
     private Timestamp createdAt = new Timestamp(System.currentTimeMillis());
 

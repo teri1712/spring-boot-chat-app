@@ -40,7 +40,7 @@ class EventControllerTest extends BaseTestClass {
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(eventJson))
                 .andExpect(status().isCreated())
-                .andExpect(jsonPath("$.textEvent.content").value("Hello Bob"));
+                .andExpect(jsonPath("$.event.textEvent.content").value("Hello Bob"));
     }
 
     @Test
@@ -65,7 +65,7 @@ class EventControllerTest extends BaseTestClass {
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(eventJson))
                 .andExpect(status().isCreated())
-                .andExpect(jsonPath("$.imageEvent.downloadUrl").value("http://example.com/image.jpg"));
+                .andExpect(jsonPath("$.event.imageEvent.downloadUrl").value("http://example.com/image.jpg"));
     }
 
     @Test
@@ -85,7 +85,7 @@ class EventControllerTest extends BaseTestClass {
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(eventJson))
                 .andExpect(status().isCreated())
-                .andExpect(jsonPath("$.iconEvent.iconId").value(5));
+                .andExpect(jsonPath("$.event.iconEvent.iconId").value(5));
     }
 
     @Test
@@ -106,7 +106,7 @@ class EventControllerTest extends BaseTestClass {
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(eventJson))
                 .andExpect(status().isCreated())
-                .andExpect(jsonPath("$.seenEvent.at").value("2016-01-24T10:15:30Z"));
+                .andExpect(jsonPath("$.event.seenEvent.at").value("2016-01-24T10:15:30Z"));
     }
 
     @Test
@@ -129,8 +129,8 @@ class EventControllerTest extends BaseTestClass {
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(eventJson))
                 .andExpect(status().isCreated())
-                .andExpect(jsonPath("$.fileEvent.filename").value("test.txt"))
-                .andExpect(jsonPath("$.fileEvent.size").value(1024));
+                .andExpect(jsonPath("$.event.fileEvent.filename").value("test.txt"))
+                .andExpect(jsonPath("$.event.fileEvent.size").value(1024));
     }
 
     @Test

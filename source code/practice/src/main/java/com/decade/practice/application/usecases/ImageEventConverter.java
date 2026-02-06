@@ -1,7 +1,7 @@
 package com.decade.practice.application.usecases;
 
-import com.decade.practice.dto.EventDto;
-import com.decade.practice.dto.ImageEventDto;
+import com.decade.practice.dto.EventResponse;
+import com.decade.practice.dto.ImageEventResponse;
 import com.decade.practice.persistence.jpa.entities.ImageEvent;
 import org.springframework.stereotype.Component;
 
@@ -10,17 +10,35 @@ import org.springframework.stereotype.Component;
 public class ImageEventConverter extends AbstractEventConverter<ImageEvent> {
 
     @Override
-    protected EventDto postInitEventResponse(ImageEvent event, EventDto res) {
-        ImageEventDto imageEventDto = new ImageEventDto();
+    protected EventResponse postInitEventResponse(ImageEvent event, EventResponse res) {
+        ImageEventResponse imageEventResponse = null;
         if (event.getImage() != null) {
-            imageEventDto.setFilename(event.getImage().getFilename());
-            imageEventDto.setDownloadUrl(event.getImage().getUri());
-            imageEventDto.setFormat(event.getImage().getFormat());
-            imageEventDto.setWidth(event.getImage().getWidth());
-            imageEventDto.setHeight(event.getImage().getHeight());
+            imageEventResponse = new ImageEventResponse(
+                    event.getImage().getUri(),
+                    event.getImage().getFilename(),
+                    event.getImage().getWidth(),
+                    event.getImage().getHeight(),
+                    event.getImage().getFormat()
+            );
         }
-        res.setImageEvent(imageEventDto);
-        return res;
+        return new EventResponse(
+                res.id(),
+                res.idempotencyKey(),
+                res.sender(),
+                res.textEvent(),
+                imageEventResponse,
+                res.iconEvent(),
+                res.preferenceEvent(),
+                res.fileEvent(),
+                res.seenEvent(),
+                res.createdTime(),
+                res.eventType(),
+                res.eventVersion(),
+                res.message(),
+                res.owner(),
+                res.partner(),
+                res.chat()
+        );
     }
 
     @Override

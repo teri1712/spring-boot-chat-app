@@ -2,7 +2,6 @@ package com.decade.practice.api.web.rest;
 
 import com.decade.practice.application.usecases.ChatService;
 import com.decade.practice.application.usecases.DeliveryService;
-import com.decade.practice.application.usecases.EventConverterResolution;
 import com.decade.practice.dto.ChatDetailsDto;
 import com.decade.practice.dto.ChatSnapshot;
 import com.decade.practice.dto.EventRequest;
@@ -25,7 +24,6 @@ import java.util.function.Function;
 @AllArgsConstructor
 public class ChatController {
 
-    private final EventConverterResolution factoryResolution;
     private final ChatService chatService;
     private final DeliveryService deliveryService;
 
@@ -40,7 +38,7 @@ public class ChatController {
         );
     }
 
-    //TODO: adjust client to put
+    // TODO: Patch
     @PutMapping("/{identifier}/preference")
     @ResponseStatus(HttpStatus.NO_CONTENT)
     public void setPreference(

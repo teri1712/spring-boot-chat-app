@@ -66,13 +66,13 @@ spring:
       key-deserializer: org.apache.kafka.common.serialization.StringDeserializer
       value-deserializer: org.apache.kafka.common.serialization.StringDeserializer
       properties:
-        spring.json.trusted.packages: "com.decade.practice.dto.events"
+        spring.json.add.type.headers: false
 
 logging:
   level:
     root: INFO
     com.decade.practice: DEBUG
-    org.springframework: INFO
+    org.springframework: TRACE
 
 
 actuator:

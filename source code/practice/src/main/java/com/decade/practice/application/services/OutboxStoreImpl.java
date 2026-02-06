@@ -3,7 +3,7 @@ package com.decade.practice.application.services;
 import com.decade.practice.application.services.outbox.OutboxStore;
 import com.decade.practice.persistence.jpa.entities.Outbox;
 import com.decade.practice.persistence.jpa.repositories.OutboxRepository;
-import com.fasterxml.jackson.core.type.TypeReference;
+import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.AllArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -20,8 +20,11 @@ public class OutboxStoreImpl implements OutboxStore {
         Outbox outbox = new Outbox();
         outbox.setKey(key);
         outbox.setTopic(topic);
-        outbox.setPayload(objectMapper.convertValue(content, new TypeReference<>() {
-        }));
+        try {
+            outbox.setPayload(objectMapper.writeValueAsString(content));
+        } catch (JsonProcessingException e) {
+            throw new RuntimeException(e);
+        }
         outboxRepository.save(outbox);
     }
 }
