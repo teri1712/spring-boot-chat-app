@@ -4,7 +4,7 @@ import jakarta.annotation.Nullable;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 
-public record PreferenceRequest(
+public record PreferenceCreateRequest(
         @NotNull
         Integer iconId,
 

@@ -6,12 +6,12 @@ import com.decade.practice.dto.AccountEntryResponse;
 import com.decade.practice.dto.AccountResponse;
 import com.decade.practice.dto.ProfileRequest;
 import com.decade.practice.dto.UserResponse;
+import com.decade.practice.dto.mapper.UserMapper;
 import com.decade.practice.persistence.jpa.entities.User;
 import com.decade.practice.persistence.jpa.repositories.UserRepository;
 import jakarta.persistence.OptimisticLockException;
 import jakarta.validation.Valid;
 import lombok.AllArgsConstructor;
-import org.springframework.http.HttpStatus;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
@@ -29,26 +29,28 @@ public class AccountController {
 
     private final UserRepository userRepository;
     private final UserService userService;
+    private final UserMapper userMapper;
 
     @GetMapping
+    // TODO: Move to user service
     public AccountEntryResponse get(Principal principal) {
         User user = userRepository.findByUsername(principal.getName()).orElseThrow();
-        AccountResponse accountResponse = AccountResponse.builder().user(UserResponse.from(user)).syncContext(user.getSyncContext()).build();
+        AccountResponse accountResponse = AccountResponse.builder()
+                .user(userMapper.toResponse(user))
+                .syncContext(user.getSyncContext())
+                .build();
         return new AccountEntryResponse(
                 accountResponse,
                 null
         );
     }
 
-    // TODO: Adjust client to no content
-    // TODO: PATCH + adjust client
-    @ResponseStatus(HttpStatus.NO_CONTENT)
-    @PutMapping("/profile")
-    public void changeProfile(
+    @PatchMapping("/profile")
+    public UserResponse changeProfile(
             @RequestBody @Valid ProfileRequest profile,
             @AuthenticationPrincipal(expression = "id") UUID id
     ) throws OptimisticLockException {
-        userService.changeProfile(id, profile);
+        return userService.changeProfile(id, profile);
     }
 
     @PostMapping("/profile/password")

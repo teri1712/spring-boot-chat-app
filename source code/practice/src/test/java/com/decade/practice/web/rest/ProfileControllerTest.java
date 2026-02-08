@@ -46,10 +46,10 @@ class ProfileControllerTest extends BaseTestClass {
         request.setDob(new Date());
         request.setGender(2.0f);
 
-        mockMvc.perform(put("/accounts/me/profile")
+        mockMvc.perform(patch("/accounts/me/profile")
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(request)))
-                .andExpect(status().isOk())
+                .andExpect(status().isNoContent())
                 .andExpect(jsonPath("$.name").value("Alice in Wonderland"));
     }
 

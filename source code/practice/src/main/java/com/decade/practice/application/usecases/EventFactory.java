@@ -1,11 +1,32 @@
 package com.decade.practice.application.usecases;
 
-import com.decade.practice.dto.EventRequest;
+import com.decade.practice.dto.EventCreateCommand;
 import com.decade.practice.persistence.jpa.entities.ChatEvent;
+import com.decade.practice.persistence.jpa.repositories.ChatRepository;
+import com.decade.practice.persistence.jpa.repositories.UserRepository;
 
-public interface EventFactory<E extends ChatEvent> {
+import java.util.UUID;
 
-    E newInstance(EventRequest eventRequest);
+public abstract class EventFactory<E extends ChatEvent> {
 
-    boolean supports(EventRequest eventRequest);
+    private final UserRepository userRepository;
+    private final ChatRepository chatRepository;
+
+    protected EventFactory(UserRepository userRepository, ChatRepository chatRepository) {
+        this.userRepository = userRepository;
+        this.chatRepository = chatRepository;
+    }
+
+    public E newInstance(EventCreateCommand command, UUID ownerId, UUID idempotencyKey) {
+        E event = newInstance(command);
+        event.setOwner(userRepository.findById(ownerId).orElseThrow());
+        event.setSender(userRepository.findById(command.getSenderId()).orElseThrow());
+        event.setChat(chatRepository.findById(command.getChatId()).orElseThrow());
+        event.setIdempotentKey(idempotencyKey);
+        return event;
+    }
+
+    protected abstract E newInstance(EventCreateCommand command);
+
+    protected abstract boolean supports(EventCreateCommand command);
 }

@@ -1,6 +1,5 @@
 package com.decade.practice.api.web;
 
-import com.decade.practice.api.web.converters.ChatIdentifierConverter;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.core.Ordered;
 import org.springframework.core.annotation.Order;

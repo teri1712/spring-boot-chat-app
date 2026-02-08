@@ -8,6 +8,10 @@ import com.decade.practice.dto.SignUpRequest;
 import com.decade.practice.dto.UserResponse;
 import com.decade.practice.dto.events.UserCreatedEvent;
 import com.decade.practice.dto.events.UserPasswordChangedEvent;
+import com.decade.practice.dto.mapper.ImageMapper;
+import com.decade.practice.dto.mapper.UserMapper;
+import com.decade.practice.persistence.jpa.DefaultAvatar;
+import com.decade.practice.persistence.jpa.embeddables.ImageSpecEmbeddable;
 import com.decade.practice.persistence.jpa.entities.SyncContext;
 import com.decade.practice.persistence.jpa.entities.User;
 import com.decade.practice.persistence.jpa.repositories.UserRepository;
@@ -23,6 +27,7 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.Optional;
 import java.util.UUID;
 
 @Slf4j
@@ -31,16 +36,20 @@ import java.util.UUID;
 @RequiredArgsConstructor
 public class UserServiceImpl extends SelfAwareBean implements UserService {
 
+    private final ImageMapper imageMapper;
     private final UserRepository userRepo;
     private final PasswordEncoder encoder;
     private final ApplicationEventPublisher eventPublisher;
+    private final UserMapper userMapper;
 
     @PersistenceContext
     private EntityManager em;
 
     @Override
     public UserResponse createIfNotExists(SignUpRequest signUpRequest, boolean usernameAsIdentifier) throws DataIntegrityViolationException {
-        return userRepo.findByUsername(signUpRequest.getUsername()).map(UserResponse::from).orElseGet(() -> create(signUpRequest, usernameAsIdentifier));
+        return userRepo.findByUsername(signUpRequest.getUsername())
+                .map(userMapper::toResponse)
+                .orElseGet(() -> create(signUpRequest, usernameAsIdentifier));
     }
 
     @Override
@@ -56,7 +65,12 @@ public class UserServiceImpl extends SelfAwareBean implements UserService {
         user.setPassword(encodedPassword);
         user.setDob(signUpRequest.getDob());
         user.setName(signUpRequest.getName());
-        user.setAvatar(signUpRequest.getAvatar());
+
+        ImageSpecEmbeddable avatar = Optional.ofNullable(signUpRequest.getAvatar())
+                .map(imageMapper::toEntity)
+                .orElse(DefaultAvatar.getInstance());
+
+        user.setAvatar(avatar);
         user.setGender(signUpRequest.getGender());
 
         SyncContext syncContext = new SyncContext();
@@ -66,14 +80,14 @@ public class UserServiceImpl extends SelfAwareBean implements UserService {
 
         eventPublisher.publishEvent(UserCreatedEvent.builder()
                 .userId(id)
-                .username(signUpRequest.getUsername())
-                .name(signUpRequest.getName())
-                .dob(signUpRequest.getDob())
-                .avatar(signUpRequest.getAvatar())
-                .gender(signUpRequest.getGender())
+                .username(user.getUsername())
+                .name(user.getName())
+                .dob(user.getDob())
+                .avatar(imageMapper.toResponse(avatar))
+                .gender(user.getGender())
                 .build());
 
-        return UserResponse.from(user);
+        return userMapper.toResponse(user);
     }
 
     @Override
@@ -85,9 +99,10 @@ public class UserServiceImpl extends SelfAwareBean implements UserService {
             user.setDob(profileRequest.getDob());
         if (profileRequest.getGender() != null)
             user.setGender(profileRequest.getGender());
-        if (profileRequest.getAvatar() != null)
-            user.setAvatar(profileRequest.getAvatar());
-        return UserResponse.from(user);
+        if (profileRequest.getAvatar() != null) {
+            user.setAvatar(imageMapper.toEntity(profileRequest.getAvatar()));
+        }
+        return userMapper.toResponse(user);
     }
 
 
@@ -102,14 +117,14 @@ public class UserServiceImpl extends SelfAwareBean implements UserService {
         user.setPassword(encoder.encode(newPassword));
 
         eventPublisher.publishEvent(new UserPasswordChangedEvent(user.getUsername()));
-        return UserResponse.from(user);
+        return userMapper.toResponse(user);
     }
 
     @Override
     public AccountResponse prepareAccount(String username) {
         User user = userRepo.findByUsername(username).orElseThrow();
         return AccountResponse.builder()
-                .user(UserResponse.from(user))
+                .user(userMapper.toResponse(user))
                 .syncContext(user.getSyncContext())
                 .build();
     }

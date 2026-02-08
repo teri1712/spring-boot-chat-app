@@ -6,30 +6,30 @@ import com.decade.practice.application.usecases.EventService;
 import com.decade.practice.common.SelfAwareBean;
 import com.decade.practice.dto.ChatDetails;
 import com.decade.practice.dto.ChatSnapshot;
-import com.decade.practice.dto.Conversation;
 import com.decade.practice.dto.EventResponse;
-import com.decade.practice.persistence.jpa.embeddables.ChatIdentifier;
+import com.decade.practice.dto.mapper.ChatMapper;
+import com.decade.practice.dto.mapper.ConversationMapper;
+import com.decade.practice.persistence.jpa.embeddables.ChatCreators;
+import com.decade.practice.persistence.jpa.embeddables.Preference;
 import com.decade.practice.persistence.jpa.entities.Chat;
 import com.decade.practice.persistence.jpa.entities.ChatOrder;
 import com.decade.practice.persistence.jpa.entities.User;
 import com.decade.practice.persistence.jpa.repositories.ChatOrderRepository;
 import com.decade.practice.persistence.jpa.repositories.ChatRepository;
 import com.decade.practice.persistence.jpa.repositories.UserRepository;
+import com.decade.practice.utils.ChatUtils;
 import com.decade.practice.utils.EventUtils;
 import jakarta.persistence.EntityManager;
 import jakarta.persistence.PersistenceContext;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.hibernate.exception.ConstraintViolationException;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Isolation;
-import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
-import java.util.NoSuchElementException;
 import java.util.Optional;
 import java.util.UUID;
 import java.util.function.Function;
@@ -37,74 +37,55 @@ import java.util.function.Function;
 @Slf4j
 @Service("chatService")
 @RequiredArgsConstructor
+@Transactional
 public class ChatServiceImpl extends SelfAwareBean implements ChatService {
 
     private final UserRepository userRepo;
     private final EventService eventService;
     private final ChatRepository chatRepo;
     private final ChatOrderRepository chatOrderRepo;
+    private final ConversationMapper conversationMapper;
+    private final ChatMapper chatMapper;
 
     @PersistenceContext
     private EntityManager em;
 
 
     @Override
-    public Chat ensureExist(ChatIdentifier identifier) {
-        try {
-            return chatRepo.findById(identifier).orElseThrow();
-        } catch (NoSuchElementException e) {
-            ((ChatServiceImpl) getSelf()).safelyCreate(identifier);
-        }
-        return chatRepo.findById(identifier).orElseThrow();
-    }
+    public ChatDetails createChat(String chatId, UUID userId, String roomName, Integer iconId, UUID withPartner) {
+        User user = userRepo.findById(userId).orElseThrow();
+        User partner = userRepo.findById(withPartner).orElseThrow();
 
-    @Transactional(
-            propagation = Propagation.REQUIRES_NEW,
-            noRollbackFor = NoSuchElementException.class
-    )
-    @Override
-    public void safelyCreate(ChatIdentifier identifier) {
-        try {
-            Chat chat = new Chat(
-                    userRepo.findById(identifier.getFirstUser()).orElseThrow(),
-                    userRepo.findById(identifier.getSecondUser()).orElseThrow()
-            );
-            // transient check stuffs
-            em.merge(chat);
-            em.flush();
-        } catch (ConstraintViolationException e) {
-            log.debug("Concurrent creating chat encountered", e);
-        }
-    }
+        ChatCreators creators = new ChatCreators(user, partner);
 
+        Chat chat = new Chat();
 
-    @Override
-    public Chat createChat(ChatIdentifier identifier) throws NoSuchElementException {
-        Chat chat = new Chat(
-                userRepo.findById(identifier.getFirstUser()).orElseThrow(),
-                userRepo.findById(identifier.getSecondUser()).orElseThrow()
-        );
-        em.merge(chat);
-        return chat;
+        chat.setIdentifier(chatId);
+        chat.setCreators(creators);
+        chat.setIdentifier(chatId);
+
+        Preference preference = new Preference();
+        preference.setRoomName(roomName);
+        preference.setIconId(iconId);
+        chat.setPreference(preference);
+
+        chat.getParticipants().add(user);
+        chat.getParticipants().add(partner);
+        return chatMapper.toChatDetails(chat, partner);
     }
 
     @Override
     @Transactional(isolation = Isolation.REPEATABLE_READ, readOnly = true)
-    public List<Chat> listChat(UUID userId, Integer version, Optional<ChatIdentifier> offset, int limit) {
+    public List<Chat> listChat(UUID userId, Integer version, Optional<String> offset, int limit) {
         User owner = userRepo.findById(userId).orElseThrow();
         if (owner.getSyncContext().getEventVersion() != version)
             throw new OutdatedVersionException(owner.getSyncContext().getEventVersion(), version);
-        Optional<ChatOrder> order = offset.flatMap((Function<ChatIdentifier, Optional<ChatOrder>>) chatIdentifier -> chatOrderRepo.findByChat_IdentifierAndOwner(chatIdentifier, owner));
+        Optional<ChatOrder> order = offset.flatMap((Function<String, Optional<ChatOrder>>) chatIdentifier -> chatOrderRepo.findByChat_IdentifierAndOwner(chatIdentifier, owner));
 
         if (order.isPresent()) {
             List<ChatOrder> chatOrders = chatOrderRepo.findByOwnerAndCurrentVersionLessThan(owner, order.get().getCurrentVersion(), PageRequest.of(0, limit, EventUtils.CURRENT_SORT_DESC));
 
-            return chatOrders.stream().map(new Function<ChatOrder, Chat>() {
-                @Override
-                public Chat apply(ChatOrder chatOrder) {
-                    return chatOrder.getChat();
-                }
-            }).toList();
+            return chatOrders.stream().map(ChatOrder::getChat).toList();
         }
         List<ChatOrder> chatOrders = chatOrderRepo.findByOwnerAndCurrentVersionLessThan(owner, version + 1, PageRequest.of(0, limit, EventUtils.CURRENT_SORT_DESC));
         return chatOrders.stream().map(ChatOrder::getChat).toList();
@@ -112,24 +93,24 @@ public class ChatServiceImpl extends SelfAwareBean implements ChatService {
 
     @Override
     @Transactional
-    @PreAuthorize("@accessPolicy.isAllowed(#chatIdentifier,#userId)")
-    public ChatSnapshot getSnapshot(ChatIdentifier chatIdentifier, UUID userId, int atVersion) {
+    @PreAuthorize("@accessPolicy.isAllowed(#chatId,#userId)")
+    public ChatSnapshot getSnapshot(String chatId, UUID userId, int atVersion) {
         User owner = userRepo.findById(userId).orElseThrow();
-        Chat chat = chatRepo.findById(chatIdentifier).orElseThrow();
-        List<EventResponse> eventList = eventService.findByOwnerAndChatAndEventVersionLessThanEqual(userId, chatIdentifier, atVersion);
+        Chat chat = chatRepo.findById(chatId).orElseThrow();
+        List<EventResponse> eventList = eventService.findByOwnerAndChatAndEventVersionLessThanEqual(userId, chatId, atVersion);
         return new ChatSnapshot(
-                new Conversation(chat, owner),
+                conversationMapper.toConversation(chat, owner),
                 eventList,
                 atVersion
         );
     }
 
     @Override
-    @PreAuthorize("@accessPolicy.isAllowed(#chatIdentifier,#userId)")
-    public ChatDetails getDetails(ChatIdentifier chatIdentifier, UUID userId) {
+    @PreAuthorize("@accessPolicy.isAllowed(#chatId,#userId)")
+    public ChatDetails getDetails(String chatId, UUID userId) {
         User owner = userRepo.findById(userId).orElseThrow();
         // TODO: N + 1 resolve
-        Chat chat = ensureExist(chatIdentifier);
-        return ChatDetails.from(chat, owner);
+        Chat chat = chatRepo.findById(chatId).orElseThrow();
+        return chatMapper.toChatDetails(chat, ChatUtils.inspectPartner(chat, owner));
     }
 }

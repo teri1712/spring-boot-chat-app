@@ -1,15 +1,22 @@
 CREATE TABLE chat
 (
-    interact_time TIMESTAMP WITH TIME ZONE,
-    message_count INTEGER NOT NULL,
-    version       INTEGER,
-    first_user    UUID    NOT NULL,
-    second_user   UUID    NOT NULL,
-    icon_id       INTEGER NOT NULL,
-    room_name     VARCHAR(255),
-    theme_id      INTEGER,
-    CONSTRAINT pk_chat PRIMARY KEY (first_user, second_user)
+    id             VARCHAR(100) PRIMARY KEY,
+    interact_time  TIMESTAMP WITH TIME ZONE,
+    message_count  INTEGER NOT NULL,
+    version        INTEGER,
+    first_creator  UUID    NOT NULL,
+    second_creator UUID    NOT NULL,
+    icon_id        INTEGER NOT NULL,
+    room_name      VARCHAR(255),
+    theme_id       INTEGER
 );
+CREATE TABLE participants
+(
+    chat_id        VARCHAR(100) NOT NULL,
+    participant_id UUID         NOT NULL,
+    CONSTRAINT pk_participants PRIMARY KEY (chat_id, participant_id)
+);
+
 
 CREATE TABLE chat_event
 (
@@ -20,8 +27,7 @@ CREATE TABLE chat_event
     idempotent_key     UUID                     NOT NULL UNIQUE,
     event_version      INTEGER                  NOT NULL,
     created_time       TIMESTAMP WITH TIME ZONE NOT NULL,
-    first_user         UUID,
-    second_user        UUID,
+    chat_id            VARCHAR(100),
     at                 TIMESTAMP,
     content            TEXT,
     media_url          VARCHAR(255),
@@ -44,8 +50,7 @@ CREATE TABLE chat_order
     owner_id         UUID,
     current_event_id UUID,
     current_version  INTEGER                                 NOT NULL,
-    chat_first_user  UUID,
-    chat_second_user UUID,
+    chat_id          VARCHAR(100)                            NOT NULL,
     CONSTRAINT pk_chatorder PRIMARY KEY (id)
 );
 
@@ -88,7 +93,7 @@ CREATE TABLE user_member
 
 
 ALTER TABLE chat_event
-    ADD CONSTRAINT FK_CHATEVENT_ON_FIUSSEUS FOREIGN KEY (first_user, second_user) REFERENCES chat (first_user, second_user);
+    ADD CONSTRAINT FK_CHATEVENT_ON_FIUSSEUS FOREIGN KEY (chat_id) REFERENCES chat (id);
 
 ALTER TABLE chat_event
     ADD CONSTRAINT FK_CHATEVENT_ON_OWNER FOREIGN KEY (owner_id) REFERENCES user_member (id);
@@ -100,7 +105,7 @@ ALTER TABLE chat_event
     ADD CONSTRAINT FK_CHATEVENT_ON_THEME FOREIGN KEY (theme_id) REFERENCES theme (id);
 
 ALTER TABLE chat_order
-    ADD CONSTRAINT FK_CHATORDER_ON_CHFICHSE FOREIGN KEY (chat_first_user, chat_second_user) REFERENCES chat (first_user, second_user);
+    ADD CONSTRAINT FK_CHATORDER_ON_CHFICHSE FOREIGN KEY (chat_id) REFERENCES chat (id);
 
 ALTER TABLE chat_order
     ADD CONSTRAINT FK_CHATORDER_ON_CURRENTEVENT FOREIGN KEY (current_event_id) REFERENCES chat_event (id);
@@ -109,13 +114,24 @@ ALTER TABLE chat_order
     ADD CONSTRAINT FK_CHATORDER_ON_OWNER FOREIGN KEY (owner_id) REFERENCES user_member (id);
 
 ALTER TABLE chat
-    ADD CONSTRAINT FK_CHAT_ON_FIRST_USER FOREIGN KEY (first_user) REFERENCES user_member (id);
+    ADD CONSTRAINT FK_CHAT_ON_FIRST_CREATOR FOREIGN KEY (first_creator) REFERENCES user_member (id);
 
 ALTER TABLE chat
-    ADD CONSTRAINT FK_CHAT_ON_SECOND_USER FOREIGN KEY (second_user) REFERENCES user_member (id);
+    ADD CONSTRAINT FK_CHAT_ON_SECOND_CREATOR FOREIGN KEY (second_creator) REFERENCES user_member (id);
 
 ALTER TABLE chat
     ADD CONSTRAINT FK_CHAT_ON_THEME FOREIGN KEY (theme_id) REFERENCES theme (id);
 
 ALTER TABLE sync_context
     ADD CONSTRAINT FK_SYNCCONTEXT_ON_OWNER FOREIGN KEY (owner_id) REFERENCES user_member (id);
+
+
+ALTER TABLE chat
+    ADD CONSTRAINT FK_CHAT_ON_THEME FOREIGN KEY (theme_id) REFERENCES theme (id);
+
+ALTER TABLE chat_participants
+    ADD CONSTRAINT fk_chapar_on_chat FOREIGN KEY (chat_id) REFERENCES chat (id);
+
+ALTER TABLE chat_participants
+    ADD CONSTRAINT fk_chapar_on_user FOREIGN KEY (participant_id) REFERENCES user_member (id);
+

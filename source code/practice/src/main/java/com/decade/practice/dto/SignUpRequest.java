@@ -1,8 +1,7 @@
 package com.decade.practice.dto;
 
 import com.decade.practice.api.web.validation.StrongPassword;
-import com.decade.practice.persistence.jpa.DefaultAvatar;
-import com.decade.practice.persistence.jpa.embeddables.ImageSpec;
+import jakarta.annotation.Nullable;
 import jakarta.validation.constraints.*;
 import lombok.Getter;
 import lombok.Setter;
@@ -43,6 +42,7 @@ public class SignUpRequest {
     private Date dob;
 
 
-    private ImageSpec avatar = DefaultAvatar.getInstance();
+    @Nullable
+    private ImageRequest avatar;
 
 }

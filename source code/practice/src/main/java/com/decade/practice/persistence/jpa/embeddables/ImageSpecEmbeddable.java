@@ -10,7 +10,7 @@ import java.io.Serializable;
 @Getter
 @Setter
 @Embeddable
-public class ImageSpec implements Serializable {
+public class ImageSpecEmbeddable implements Serializable {
     public static final String DEFAULT_FORMAT = "jpg";
     public static final int DEFAULT_HEIGHT = 512;
     public static final int DEFAULT_WIDTH = 512;
@@ -26,7 +26,7 @@ public class ImageSpec implements Serializable {
     private String format;
 
     // No-arg constructor required by JPA
-    public ImageSpec() {
+    public ImageSpecEmbeddable() {
         this.uri = "";
         this.filename = "";
         this.width = DEFAULT_WIDTH;
@@ -34,7 +34,7 @@ public class ImageSpec implements Serializable {
         this.format = DEFAULT_FORMAT;
     }
 
-    public ImageSpec(String uri, String filename, int width, int height, String format) {
+    public ImageSpecEmbeddable(String uri, String filename, int width, int height, String format) {
         this.uri = uri;
         this.filename = filename;
         this.width = width;

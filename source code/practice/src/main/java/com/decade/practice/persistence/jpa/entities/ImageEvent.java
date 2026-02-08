@@ -1,6 +1,6 @@
 package com.decade.practice.persistence.jpa.entities;
 
-import com.decade.practice.persistence.jpa.embeddables.ImageSpec;
+import com.decade.practice.persistence.jpa.embeddables.ImageSpecEmbeddable;
 import jakarta.persistence.Column;
 import jakarta.persistence.DiscriminatorValue;
 import jakarta.persistence.Embedded;
@@ -22,9 +22,9 @@ public class ImageEvent extends MediaEvent {
     @Valid
     @Column(updatable = false)
     @Embedded
-    private ImageSpec image;
+    private ImageSpecEmbeddable image;
 
-    public ImageEvent(Chat chat, User sender, ImageSpec image) {
+    public ImageEvent(Chat chat, User sender, ImageSpecEmbeddable image) {
         super(chat, sender, "IMAGE");
         this.image = image;
         setMediaUrl(image.getUri());

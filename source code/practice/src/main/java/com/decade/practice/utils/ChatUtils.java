@@ -1,6 +1,6 @@
 package com.decade.practice.utils;
 
-import com.decade.practice.persistence.jpa.embeddables.ChatIdentifier;
+import com.decade.practice.persistence.jpa.embeddables.ChatCreators;
 import com.decade.practice.persistence.jpa.entities.Chat;
 import com.decade.practice.persistence.jpa.entities.User;
 
@@ -13,7 +13,7 @@ public class ChatUtils {
         return chat.getFirstUser().equals(me) ? chat.getSecondUser() : chat.getFirstUser();
     }
 
-    public static UUID inspectPartner(ChatIdentifier chat, UUID me) {
+    public static UUID inspectPartner(ChatCreators chat, UUID me) {
         return chat.getFirstUser().equals(me) ? chat.getSecondUser() : chat.getFirstUser();
     }
 

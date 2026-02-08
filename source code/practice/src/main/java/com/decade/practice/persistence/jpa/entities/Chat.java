@@ -1,6 +1,6 @@
 package com.decade.practice.persistence.jpa.entities;
 
-import com.decade.practice.persistence.jpa.embeddables.ChatIdentifier;
+import com.decade.practice.persistence.jpa.embeddables.ChatCreators;
 import com.decade.practice.persistence.jpa.embeddables.Preference;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotNull;
@@ -11,24 +11,19 @@ import org.hibernate.annotations.SourceType;
 import org.hibernate.generator.EventType;
 
 import java.util.Date;
+import java.util.HashSet;
+import java.util.Set;
 
 @Entity
 @Getter
 @Setter
 public class Chat {
 
-    @ManyToOne(cascade = CascadeType.PERSIST)
-    @JoinColumn(name = "first_user") // for naming
-    @MapsId("firstUser")
-    private User firstUser;
+    @Embedded
+    private ChatCreators creators;
 
-    @ManyToOne(cascade = CascadeType.PERSIST)
-    @JoinColumn(name = "second_user") // for naming
-    @MapsId("secondUser")
-    private User secondUser;
-
-    @EmbeddedId
-    private ChatIdentifier identifier;
+    @Id
+    private String identifier;
 
     @Embedded
     @NotNull
@@ -40,20 +35,10 @@ public class Chat {
 
     private int messageCount = 0;
 
-    // No-arg constructor required by JPA
-    protected Chat() {
-    }
+    @ManyToMany(fetch = FetchType.LAZY)
+    @JoinTable(name = "participants", joinColumns = {@JoinColumn(name = "chat_id")}, inverseJoinColumns = {@JoinColumn(name = "participant_id")})
+    // TODO: Handle fanout
+    private Set<User> participants = new HashSet<>();
 
-    public Chat(User firstUser, User secondUser) {
-        // Ensure firstUser.id is less than secondUser.id
-        if (firstUser.getId().compareTo(secondUser.getId()) > 0) {
-            User temp = firstUser;
-            firstUser = secondUser;
-            secondUser = temp;
-        }
-        this.firstUser = firstUser;
-        this.secondUser = secondUser;
-        this.identifier = new ChatIdentifier(firstUser.getId(), secondUser.getId());
-        this.preference = new Preference(firstUser, secondUser);
-    }
+
 }

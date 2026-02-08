@@ -1,10 +1,9 @@
 package com.decade.practice.ws;
 
-import com.decade.practice.api.web.converters.ChatIdentifierConverter;
 import com.decade.practice.common.BaseTestClass;
 import com.decade.practice.infra.security.TokenService;
 import com.decade.practice.infra.security.models.UserClaims;
-import com.decade.practice.persistence.jpa.embeddables.ChatIdentifier;
+import com.decade.practice.persistence.jpa.embeddables.ChatCreators;
 import com.decade.practice.persistence.jpa.entities.User;
 import com.decade.practice.persistence.redis.TypeEvent;
 import org.junit.jupiter.api.Test;
@@ -100,7 +99,7 @@ public class TypeEventTest extends BaseTestClass {
                     new StompSessionHandlerAdapter() {
                     }).get(2, TimeUnit.SECONDS);
 
-            ChatIdentifier aliceBobChat = ChatIdentifier.from(UUID.fromString("11111111-1111-1111-1111-111111111111"), UUID.fromString("22222222-2222-2222-2222-222222222222"));
+            ChatCreators aliceBobChat = ChatCreators.from(UUID.fromString("11111111-1111-1111-1111-111111111111"), UUID.fromString("22222222-2222-2222-2222-222222222222"));
 
             StompHeaders aliceStompHeaders = new StompHeaders();
             aliceStompHeaders.setDestination("/typing");

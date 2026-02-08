@@ -1,6 +1,5 @@
 package com.decade.practice.persistence.jpa.repositories;
 
-import com.decade.practice.persistence.jpa.embeddables.ChatIdentifier;
 import com.decade.practice.persistence.jpa.entities.Chat;
 import com.decade.practice.persistence.jpa.entities.ChatOrder;
 import com.decade.practice.persistence.jpa.entities.User;
@@ -15,7 +14,7 @@ public interface ChatOrderRepository extends JpaRepository<ChatOrder, Long> {
 
 
     @EntityGraph(attributePaths = {"chat"})
-    Optional<ChatOrder> findByChat_IdentifierAndOwner(ChatIdentifier chatIdentifier, User owner);
+    Optional<ChatOrder> findByChat_IdentifierAndOwner(String identifier, User owner);
 
     Optional<ChatOrder> findByChatAndOwner(Chat chat, User owner);
 

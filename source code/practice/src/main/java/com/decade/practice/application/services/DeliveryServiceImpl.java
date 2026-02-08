@@ -1,53 +1,62 @@
 package com.decade.practice.application.services;
 
-import com.decade.practice.application.usecases.DeliveryService;
-import com.decade.practice.application.usecases.EventConverterResolution;
-import com.decade.practice.application.usecases.EventSender;
+import com.decade.practice.application.usecases.*;
 import com.decade.practice.dto.Conversation;
+import com.decade.practice.dto.EventCreateCommand;
 import com.decade.practice.dto.EventDetails;
-import com.decade.practice.dto.EventRequest;
 import com.decade.practice.dto.EventResponse;
-import com.decade.practice.persistence.jpa.embeddables.ChatIdentifier;
+import com.decade.practice.dto.mapper.ConversationMapper;
+import com.decade.practice.persistence.jpa.entities.Chat;
 import com.decade.practice.persistence.jpa.entities.ChatEvent;
+import com.decade.practice.persistence.jpa.repositories.ChatRepository;
 import com.decade.practice.persistence.jpa.repositories.EventRepository;
+import com.decade.practice.persistence.jpa.repositories.UserRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.dao.DataIntegrityViolationException;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
-import java.util.List;
 import java.util.UUID;
 
 @Service
 @RequiredArgsConstructor
 @Slf4j
+@Transactional
 public class DeliveryServiceImpl implements DeliveryService {
 
 
-    private final ChatEventStore eventStore;
+    private final EventStore eventStore;
     private final EventSender eventSender;
     private final EventRepository eventRepo;
     private final EventConverterResolution converterResolution;
+    private final ConversationMapper conversationMapper;
+    private final EventFactoryResolution factoryResolution;
+    private final ChatRepository chatRepo;
+    private final UserRepository userRepository;
+
 
     @Override
-    public EventDetails createAndSend(UUID senderId, ChatIdentifier chatIdentifier, UUID idempotentKey, EventRequest eventRequest) {
-
+    @PreAuthorize("@accessPolicy.isAllowed(#chatId,#senderId)")
+    public EventDetails createAndSend(UUID senderId, String chatId, UUID idempotentKey, EventCreateCommand command) {
         try {
 
-            List<EventDetails> stored = eventStore.save(senderId, senderId, idempotentKey, chatIdentifier, eventRequest);
-            stored.forEach(eventSender::send);
+            Chat chat = chatRepo.findById(chatId).orElseThrow();
 
-            for (int i = 0; i < stored.size(); i++) {
-                if (stored.get(i).event().idempotencyKey().equals(idempotentKey)) {
-                    return stored.get(i);
-                }
-            }
+            chat.getParticipants().forEach(participant -> {
+                UUID key = participant.getId().equals(senderId) ? idempotentKey : UUID.randomUUID();
+                ChatEvent event = factoryResolution.newInstance(command, participant.getId(), key).orElseThrow();
+                EventDetails eventDetails = eventStore.save(event);
+                eventSender.send(eventDetails);
+            });
+
         } catch (DataIntegrityViolationException e) {
             log.debug("Event already sent", e);
         }
         ChatEvent existingOne = eventRepo.findByIdempotentKey(idempotentKey).orElseThrow();
         EventResponse response = converterResolution.convert(existingOne);
-        Conversation conversation = new Conversation(existingOne.getChat(), existingOne.getOwner());
+        Conversation conversation = conversationMapper.toConversation(existingOne.getChat(), existingOne.getOwner());
         return new EventDetails(response, conversation);
     }
 }

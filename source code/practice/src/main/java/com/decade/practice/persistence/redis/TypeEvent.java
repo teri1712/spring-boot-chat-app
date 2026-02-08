@@ -1,6 +1,6 @@
 package com.decade.practice.persistence.redis;
 
-import com.decade.practice.persistence.jpa.embeddables.ChatIdentifier;
+import com.decade.practice.persistence.jpa.embeddables.ChatCreators;
 import com.decade.practice.utils.ChatUtils;
 import lombok.Getter;
 import lombok.Setter;
@@ -16,7 +16,7 @@ import java.util.UUID;
 public class TypeEvent {
 
     private UUID from;
-    private ChatIdentifier chat;
+    private ChatCreators chat;
     // TODO: Adjust client
     private Instant time;
 
@@ -27,7 +27,7 @@ public class TypeEvent {
      * Determines a key based on the from UUID and chat identifier.
      * This is a utility method that was a top-level function in the Kotlin version.
      */
-    public static String determineKey(UUID from, ChatIdentifier chat) {
+    public static String determineKey(UUID from, ChatCreators chat) {
         UUID partner = ChatUtils.inspectPartner(chat, from);
         return from + "->" + partner;
     }

@@ -4,9 +4,8 @@ import com.decade.practice.application.usecases.UserService;
 import com.decade.practice.dto.AccountEntryResponse;
 import com.decade.practice.dto.AccountResponse;
 import com.decade.practice.dto.TokenCredential;
-import com.decade.practice.dto.UserResponse;
+import com.decade.practice.dto.mapper.ClaimsMapper;
 import com.decade.practice.infra.security.TokenService;
-import com.decade.practice.infra.security.models.UserClaims;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
@@ -24,6 +23,7 @@ public class LoginSuccessStrategy implements AuthenticationSuccessHandler {
     private final UserService userService;
     private final TokenService tokenService;
     private final ObjectMapper objectMapper;
+    private final ClaimsMapper claimsMapper;
 
     @Override
     public void onAuthenticationSuccess(
@@ -32,15 +32,7 @@ public class LoginSuccessStrategy implements AuthenticationSuccessHandler {
             Authentication authentication
     ) throws IOException {
         AccountResponse account = userService.prepareAccount(authentication.getName());
-        UserResponse user = account.getUser();
-        TokenCredential tokenCredential = tokenService.create(UserClaims.builder()
-                .id(user.id())
-                .username(user.username())
-                .name(user.name())
-                .role(user.role())
-                .gender(user.gender())
-                .avatar(user.avatar())
-                .build(), null);
+        TokenCredential tokenCredential = tokenService.create(claimsMapper.toClaims(account.getUser()), null);
         AccountEntryResponse entryResponse = new AccountEntryResponse(account, tokenCredential);
         httpResponse.setContentType("application/json;charset=UTF-8");
         httpResponse.getWriter().write(objectMapper.writeValueAsString(entryResponse));

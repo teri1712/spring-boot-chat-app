@@ -1,6 +1,6 @@
 package com.decade.practice.dto;
 
-import com.decade.practice.persistence.jpa.embeddables.ChatIdentifier;
+import com.decade.practice.persistence.jpa.embeddables.ChatCreators;
 import lombok.*;
 
 import java.util.UUID;
@@ -13,7 +13,7 @@ import java.util.UUID;
 public class MessageHistoryDto {
 
     private UUID id;
-    private ChatIdentifier chatIdentifier;
+    private ChatCreators chatCreators;
 
     private String partnerName;
     private String content;

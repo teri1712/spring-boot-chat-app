@@ -1,6 +1,6 @@
 package com.decade.practice.dto;
 
-import com.decade.practice.persistence.jpa.embeddables.ChatIdentifier;
+import com.decade.practice.persistence.jpa.embeddables.ChatCreators;
 import com.decade.practice.persistence.redis.TypeEvent;
 
 import java.time.Instant;
@@ -8,7 +8,7 @@ import java.util.UUID;
 
 public record TypeEventResponse(
         UUID from,
-        ChatIdentifier chat,
+        ChatCreators chat,
         Instant time,
         String key
 ) {

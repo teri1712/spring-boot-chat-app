@@ -1,6 +1,6 @@
 package com.decade.practice.dto;
 
-import com.decade.practice.persistence.jpa.embeddables.ChatIdentifier;
+import com.decade.practice.persistence.jpa.embeddables.ChatCreators;
 import com.decade.practice.persistence.redis.TypeEvent;
 import lombok.*;
 
@@ -15,7 +15,7 @@ import java.util.UUID;
 public class TypeEventDto {
 
     private UUID from;
-    private ChatIdentifier chat;
+    private ChatCreators chat;
     private Instant time = Instant.now();
 
     private String key;

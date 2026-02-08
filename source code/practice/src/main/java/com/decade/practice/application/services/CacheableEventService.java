@@ -4,7 +4,6 @@ import com.decade.practice.application.usecases.EventService;
 import com.decade.practice.application.usecases.EventStore;
 import com.decade.practice.dto.EventDetails;
 import com.decade.practice.dto.EventResponse;
-import com.decade.practice.persistence.jpa.embeddables.ChatIdentifier;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
@@ -26,9 +25,9 @@ public class CacheableEventService implements EventService {
 
     @Override
     @Cacheable(cacheNames = "events", key = "#owner + ':' + #chat + ':' + #eventVersion")
-    public List<EventResponse> findByOwnerAndChatAndEventVersionLessThanEqual(UUID owner, ChatIdentifier chat, int eventVersion) {
-        log.trace("Events for chatId: {} and owner : {} are about to be cached", chat, owner);
-        return eventStore.findByOwnerAndChatAndEventVersionLessThanEqual(owner, chat, eventVersion);
+    public List<EventResponse> findByOwnerAndChatAndEventVersionLessThanEqual(UUID owner, String chatId, int eventVersion) {
+        log.trace("Events for chatId: {} and owner : {} are about to be cached", chatId, owner);
+        return eventStore.findByOwnerAndChatAndEventVersionLessThanEqual(owner, chatId, eventVersion);
     }
 
     @Override

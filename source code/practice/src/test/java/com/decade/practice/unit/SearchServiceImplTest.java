@@ -11,7 +11,7 @@ import com.decade.practice.persistence.elastic.MessageDocument;
 import com.decade.practice.persistence.elastic.UserDocument;
 import com.decade.practice.persistence.elastic.repositories.MessageDocumentRepository;
 import com.decade.practice.persistence.elastic.repositories.UserDocumentRepository;
-import com.decade.practice.persistence.jpa.embeddables.ChatIdentifier;
+import com.decade.practice.persistence.jpa.embeddables.ChatCreators;
 import com.decade.practice.persistence.jpa.entities.User;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -109,7 +109,7 @@ class SearchServiceImplTest {
 
     @Test
     void givenMessageCreatedEvent_whenSave_thenRepositorySaveIsCalled() {
-        ChatIdentifier identifier = new ChatIdentifier(UUID.randomUUID(), UUID.randomUUID());
+        ChatCreators identifier = new ChatCreators(UUID.randomUUID(), UUID.randomUUID());
         UUID owner = UUID.randomUUID();
         ChatResponse chat = ChatResponse.from(identifier, owner);
         UserResponse partner = new UserResponse(null, null, "Partner", null, null, null, null);

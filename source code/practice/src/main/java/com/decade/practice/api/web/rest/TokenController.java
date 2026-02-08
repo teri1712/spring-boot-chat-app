@@ -1,13 +1,13 @@
 package com.decade.practice.api.web.rest;
 
 import com.decade.practice.application.usecases.UserService;
+import com.decade.practice.dto.ImageRequest;
 import com.decade.practice.dto.SignUpRequest;
 import com.decade.practice.dto.TokenCredential;
 import com.decade.practice.infra.security.TokenService;
 import com.decade.practice.infra.security.models.UserClaims;
 import com.decade.practice.infra.security.strategies.LoginSuccessStrategy;
-import com.decade.practice.persistence.jpa.DefaultAvatar;
-import com.decade.practice.persistence.jpa.embeddables.ImageSpec;
+import com.decade.practice.persistence.jpa.embeddables.ImageSpecEmbeddable;
 import com.decade.practice.persistence.jpa.entities.User;
 import com.decade.practice.utils.TokenUtils;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -57,9 +57,9 @@ public class TokenController {
         String name = claims.get("name").toString();
         String picture = claims.get("picture").toString();
 
-        ImageSpec avatar = (picture != null)
-                ? new ImageSpec(picture, picture, ImageSpec.DEFAULT_WIDTH, ImageSpec.DEFAULT_HEIGHT, ImageSpec.DEFAULT_FORMAT)
-                : DefaultAvatar.getInstance();
+        ImageRequest avatar = (picture != null)
+                ? new ImageRequest(picture, picture, ImageSpecEmbeddable.DEFAULT_WIDTH, ImageSpecEmbeddable.DEFAULT_HEIGHT, ImageSpecEmbeddable.DEFAULT_FORMAT)
+                : null;
         SignUpRequest signUpRequest = new SignUpRequest();
         signUpRequest.setUsername(username);
         signUpRequest.setName(name);

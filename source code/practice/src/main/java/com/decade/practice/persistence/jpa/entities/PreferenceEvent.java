@@ -32,9 +32,4 @@ public class PreferenceEvent extends ChatEvent {
         super.setChat(chat);
         chat.setPreference(preference);
     }
-
-    @Override
-    public ChatEvent clone() {
-        return new PreferenceEvent(this);
-    }
 }

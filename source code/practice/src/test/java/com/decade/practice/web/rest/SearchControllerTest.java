@@ -5,8 +5,8 @@ import com.decade.practice.persistence.elastic.MessageDocument;
 import com.decade.practice.persistence.elastic.UserDocument;
 import com.decade.practice.persistence.elastic.repositories.MessageDocumentRepository;
 import com.decade.practice.persistence.elastic.repositories.UserDocumentRepository;
-import com.decade.practice.persistence.jpa.embeddables.ChatIdentifier;
-import com.decade.practice.persistence.jpa.embeddables.ImageSpec;
+import com.decade.practice.persistence.jpa.embeddables.ChatCreators;
+import com.decade.practice.persistence.jpa.embeddables.ImageSpecEmbeddable;
 import com.decade.practice.persistence.jpa.entities.User;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -50,7 +50,7 @@ class SearchControllerTest extends BaseTestClass {
         user.setUsername("searchable_user");
         user.setName("Searchable Name");
         user.setGender(User.FEMALE);
-        user.setAvatar(new ImageSpec());
+        user.setAvatar(new ImageSpecEmbeddable());
         userDocumentRepository.save(user);
 
         mockMvc.perform(get("/users")
@@ -79,7 +79,7 @@ class SearchControllerTest extends BaseTestClass {
         message.setOwner(userId);
         message.setContent("unique message content");
         message.setPartnerName("Partner");
-        message.setChatIdentifier(new ChatIdentifier(userId, partnerId));
+        message.setChatCreators(new ChatCreators(userId, partnerId));
         messageDocumentRepository.save(message);
 
         mockMvc.perform(get("/me/history/messages")

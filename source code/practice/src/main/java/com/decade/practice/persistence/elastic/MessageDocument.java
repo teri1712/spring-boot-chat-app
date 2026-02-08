@@ -1,6 +1,6 @@
 package com.decade.practice.persistence.elastic;
 
-import com.decade.practice.persistence.jpa.embeddables.ChatIdentifier;
+import com.decade.practice.persistence.jpa.embeddables.ChatCreators;
 import lombok.Getter;
 import lombok.Setter;
 import org.springframework.data.annotation.Id;
@@ -20,7 +20,7 @@ public class MessageDocument {
 
     @Field(type = FieldType.Keyword)
     private UUID owner;
-    private ChatIdentifier chatIdentifier;
+    private ChatCreators chatCreators;
 
     private String partnerName;
     private String content;

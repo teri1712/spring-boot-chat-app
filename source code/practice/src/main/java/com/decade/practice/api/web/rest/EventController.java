@@ -3,7 +3,7 @@ package com.decade.practice.api.web.rest;
 import com.decade.practice.application.usecases.DeliveryService;
 import com.decade.practice.application.usecases.EventService;
 import com.decade.practice.dto.*;
-import com.decade.practice.persistence.jpa.embeddables.ChatIdentifier;
+import com.decade.practice.dto.mapper.EventCommandMapper;
 import jakarta.persistence.EntityNotFoundException;
 import jakarta.validation.Valid;
 import lombok.AllArgsConstructor;
@@ -24,79 +24,70 @@ public class EventController {
 
     private final EventService eventService;
     private final DeliveryService deliveryService;
+    private final EventCommandMapper eventCommandMapper;
 
 
-    @PostMapping(path = "/chats/{chatIdentifier}/text-events", consumes = {MediaType.APPLICATION_JSON_VALUE})
+    @PostMapping(path = "/chats/{chatId}/text-events", consumes = {MediaType.APPLICATION_JSON_VALUE})
     @ResponseStatus(HttpStatus.CREATED)
     // TODO: reimplement client to get openid
     public EventDetails createTextEvent(
             @AuthenticationPrincipal(expression = "id") UUID senderId,
             @RequestHeader("Idempotency-key") UUID key,
-            @PathVariable ChatIdentifier chatIdentifier,
+            @PathVariable String chatId,
             @RequestBody @Valid TextEventRequest textEventRequest) {
-        EventRequest eventRequest = new EventRequest();
-        eventRequest.setTextEvent(textEventRequest);
-        return deliveryService.createAndSend(senderId, chatIdentifier, key, eventRequest);
+        return deliveryService.createAndSend(senderId, chatId, key, eventCommandMapper.toText(textEventRequest, chatId, senderId));
     }
 
-    @PostMapping(path = "/chats/{chatIdentifier}/image-events", consumes = {MediaType.APPLICATION_JSON_VALUE})
+    @PostMapping(path = "/chats/{chatId}/image-events", consumes = {MediaType.APPLICATION_JSON_VALUE})
     @ResponseStatus(HttpStatus.CREATED)
     public EventDetails createImageEvent(
-            @PathVariable ChatIdentifier chatIdentifier,
+            @PathVariable String chatId,
             @AuthenticationPrincipal(expression = "id") UUID senderId,
             @RequestHeader("Idempotency-key") UUID key,
-            @RequestBody @Valid ImageEventRequest imageEventRequest) {
-        EventRequest eventRequest = new EventRequest();
-        eventRequest.setImageEvent(imageEventRequest);
-        return deliveryService.createAndSend(senderId, chatIdentifier, key, eventRequest);
+            @RequestBody @Valid ImageEventCreateRequest imageEventCreateRequest) {
+        return deliveryService.createAndSend(senderId, chatId, key, eventCommandMapper.toImage(imageEventCreateRequest, chatId, senderId));
     }
 
-    @PostMapping(path = "/chats/{chatIdentifier}/icon-events", consumes = {MediaType.APPLICATION_JSON_VALUE})
+    @PostMapping(path = "/chats/{chatId}/icon-events", consumes = {MediaType.APPLICATION_JSON_VALUE})
     @ResponseStatus(HttpStatus.CREATED)
     public EventDetails createIconEvent(
-            @PathVariable ChatIdentifier chatIdentifier,
+            @PathVariable String chatId,
             @AuthenticationPrincipal(expression = "id") UUID senderId,
             @RequestHeader("Idempotency-key") UUID key,
-            @RequestBody @Valid IconEventRequest iconEventRequest) {
-        EventRequest eventRequest = new EventRequest();
-        eventRequest.setIconEvent(iconEventRequest);
-        return deliveryService.createAndSend(senderId, chatIdentifier, key, eventRequest);
+            @RequestBody @Valid IconEventCreateRequest iconEventCreateRequest) {
+        return deliveryService.createAndSend(senderId, chatId, key, eventCommandMapper.toIcon(iconEventCreateRequest, chatId, senderId));
 
     }
 
-    @PostMapping(path = "/chats/{chatIdentifier}/file-events", consumes = {MediaType.APPLICATION_JSON_VALUE})
+    @PostMapping(path = "/chats/{chatId}/file-events", consumes = {MediaType.APPLICATION_JSON_VALUE})
     @ResponseStatus(HttpStatus.CREATED)
     public EventDetails createFileEvent(
-            @PathVariable ChatIdentifier chatIdentifier,
+            @PathVariable String chatId,
             @AuthenticationPrincipal(expression = "id") UUID senderId,
             @RequestHeader("Idempotency-key") UUID key,
-            @RequestBody @Valid FileEventRequest fileEventRequest) {
-        EventRequest eventRequest = new EventRequest();
-        eventRequest.setFileEvent(fileEventRequest);
-        return deliveryService.createAndSend(senderId, chatIdentifier, key, eventRequest);
+            @RequestBody @Valid FileEventCreateRequest fileEventCreateRequest) {
+        return deliveryService.createAndSend(senderId, chatId, key, eventCommandMapper.toFile(fileEventCreateRequest, chatId, senderId));
 
     }
 
-    @PostMapping(path = "/chats/{chatIdentifier}/seen-events", consumes = {MediaType.APPLICATION_JSON_VALUE})
+    @PostMapping(path = "/chats/{chatId}/seen-events", consumes = {MediaType.APPLICATION_JSON_VALUE})
     @ResponseStatus(HttpStatus.CREATED)
     public EventDetails createSeenEvent(
-            @PathVariable ChatIdentifier chatIdentifier,
+            @PathVariable String chatId,
             @AuthenticationPrincipal(expression = "id") UUID senderId,
             @RequestHeader("Idempotency-key") UUID key,
-            @RequestBody @Valid SeenEventRequest seenEventRequest) {
-        EventRequest eventRequest = new EventRequest();
-        eventRequest.setSeenEvent(seenEventRequest);
-        return deliveryService.createAndSend(senderId, chatIdentifier, key, eventRequest);
+            @RequestBody @Valid SeenEventCreateRequest seenEventCreateRequest) {
+        return deliveryService.createAndSend(senderId, chatId, key, eventCommandMapper.toSeen(seenEventCreateRequest, chatId, senderId));
     }
 
-    // TODO: Migrate real time dto != api dto, eventdto must exclude partner, owner
-    @GetMapping("/chats/{chatIdentifier}/events")
+    // TODO: Migrate real time dto != api dto, eventdto must exclude withPartner, owner
+    @GetMapping("/chats/{chatId}/events")
     public List<EventResponse> listEvents(
             @AuthenticationPrincipal(expression = "id") UUID userId,
-            @PathVariable @Validated ChatIdentifier chatIdentifier,
+            @PathVariable @Validated String chatId,
             @RequestParam int atVersion
     ) throws EntityNotFoundException {
-        return eventService.findByOwnerAndChatAndEventVersionLessThanEqual(userId, chatIdentifier, atVersion);
+        return eventService.findByOwnerAndChatAndEventVersionLessThanEqual(userId, chatId, atVersion);
     }
 
     @GetMapping("/users/me/events")

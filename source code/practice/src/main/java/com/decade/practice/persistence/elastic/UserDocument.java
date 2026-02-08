@@ -1,6 +1,6 @@
 package com.decade.practice.persistence.elastic;
 
-import com.decade.practice.persistence.jpa.embeddables.ImageSpec;
+import com.decade.practice.dto.ImageResponse;
 import lombok.Getter;
 import lombok.Setter;
 import org.springframework.data.annotation.Id;
@@ -19,7 +19,7 @@ public class UserDocument {
     private String username;
     private String name;
     private Date dob;
-    private ImageSpec avatar;
+    private ImageResponse avatar;
     private Float gender;
 
 }

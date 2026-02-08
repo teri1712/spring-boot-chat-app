@@ -1,15 +1,20 @@
 package com.decade.practice.application.services;
 
+import com.decade.practice.application.domain.ChatThread;
+import com.decade.practice.application.domain.MessagePolicy;
+import com.decade.practice.application.domain.UserThread;
 import com.decade.practice.application.usecases.EventConverterResolution;
-import com.decade.practice.application.usecases.EventFactoryResolution;
+import com.decade.practice.application.usecases.EventService;
 import com.decade.practice.application.usecases.EventStore;
 import com.decade.practice.dto.Conversation;
 import com.decade.practice.dto.EventDetails;
-import com.decade.practice.dto.EventRequest;
 import com.decade.practice.dto.EventResponse;
 import com.decade.practice.dto.events.MessageCreatedEvent;
-import com.decade.practice.persistence.jpa.embeddables.ChatIdentifier;
-import com.decade.practice.persistence.jpa.entities.*;
+import com.decade.practice.dto.mapper.ConversationMapper;
+import com.decade.practice.persistence.jpa.entities.Chat;
+import com.decade.practice.persistence.jpa.entities.ChatEvent;
+import com.decade.practice.persistence.jpa.entities.ChatOrder;
+import com.decade.practice.persistence.jpa.entities.User;
 import com.decade.practice.persistence.jpa.repositories.ChatOrderRepository;
 import com.decade.practice.persistence.jpa.repositories.ChatRepository;
 import com.decade.practice.persistence.jpa.repositories.EventRepository;
@@ -28,61 +33,50 @@ import java.util.UUID;
 @Slf4j
 @RequiredArgsConstructor
 @Component
-public class UserEventStore implements EventStore {
+@Transactional
+public class UserEventStore implements EventStore, EventService {
 
     private final ChatOrderRepository chatOrderRepository;
     private final UserRepository userRepository;
     private final EventRepository eventRepository;
-    private final EventFactoryResolution factoryResolution;
+
     private final EventConverterResolution converterResolution;
-    private final ChatRepository chatRepository;
+    private final MessagePolicy messagePolicy;
     private final ApplicationEventPublisher applicationEventPublisher;
+    private final ConversationMapper conversationMapper;
+    private final ChatRepository chatRepository;
+    private final UserThread userThread;
+    private final ChatThread chatThread;
 
-    @Transactional
     @Override
-    @PreAuthorize("@accessPolicy.isAllowed(#chatIdentifier,#ownerId)")
-    public List<EventDetails> save(UUID senderId, UUID ownerId, UUID idempotentKey, ChatIdentifier chatIdentifier, EventRequest eventRequest) {
-        ChatEvent event = factoryResolution.newInstance(eventRequest).orElseThrow();
+    public EventDetails save(ChatEvent event) {
 
-        Chat chat = chatRepository.findById(chatIdentifier).orElseThrow();
-        event.setIdempotentKey(idempotentKey);
+        UUID ownerId = event.getOwner().getId();
+        Chat chat = event.getChat();
+
         User owner = userRepository.findByIdWithPessimisticWrite(ownerId).orElseThrow();
-        owner.getSyncContext().incVersion();
-        User sender = userRepository.findById(senderId).orElseThrow();
-        event.setSender(sender);
-        event.setOwner(owner);
-        event.setChat(chat);
-        event.setChatIdentifier(chatIdentifier);
-
-        SyncContext syncContext = owner.getSyncContext();
-        event.setEventVersion(syncContext.getEventVersion());
-        eventRepository.save(event);
-        if (event instanceof MessageEvent) {
-            ChatOrder order = chatOrderRepository.findByChatAndOwner(chat, owner).orElseGet
-                    (() -> new ChatOrder(chat, owner)
-                    );
-            order.setCurrentVersion(event.getEventVersion());
-            order.setCurrentEvent(event);
-
-            chatOrderRepository.save(order);
-        }
+        ChatOrder order = chatOrderRepository.findByChatAndOwner(chat, owner)
+                .orElseGet(() -> ChatOrder.of(chat, owner));
+        userThread.registerEvent(event);
+        chatThread.bubbleUp(order, event);
+        
         EventResponse eventResponse = converterResolution.convert(event);
-        Conversation conversation = new Conversation(chat, owner);
+        Conversation conversation = conversationMapper.toConversation(chat, owner);
         EventDetails eventDetails = new EventDetails(eventResponse, conversation);
         MessageCreatedEvent messageCreatedEvent = MessageCreatedEvent.from(eventDetails);
         if (messageCreatedEvent != null) {
             applicationEventPublisher.publishEvent(messageCreatedEvent);
         }
-        return List.of(eventDetails);
+        return eventDetails;
     }
 
 
     @Override
-    @PreAuthorize("@accessPolicy.isAllowed(#chatIdentifier,#userId)")
-    public List<EventResponse> findByOwnerAndChatAndEventVersionLessThanEqual(UUID userId, ChatIdentifier chatIdentifier, int eventVersion) {
+    @PreAuthorize("@accessPolicy.isAllowed(#chatId,#userId)")
+    public List<EventResponse> findByOwnerAndChatAndEventVersionLessThanEqual(UUID userId, String chatId, int eventVersion) {
 
-        log.trace("Finding events for owner '{}' and chat '{}'", userId, chatIdentifier);
-        return eventRepository.findByOwner_IdAndChat_IdentifierAndEventVersionLessThanEqual(userId, chatIdentifier, eventVersion, EventUtils.EVENT_VERSION_LESS_THAN_EQUAL)
+        log.trace("Finding events for owner '{}' and chat '{}'", userId, chatId);
+        return eventRepository.findByOwner_IdAndChat_IdentifierAndEventVersionLessThanEqual(userId, chatId, eventVersion, EventUtils.EVENT_VERSION_LESS_THAN_EQUAL)
                 .stream().map(converterResolution::convert).toList();
     }
 
@@ -96,7 +90,7 @@ public class UserEventStore implements EventStore {
     @Override
     public EventDetails findFirstByOwnerOrderByEventVersionDesc(UUID userId) {
         return eventRepository.findFirstByOwner_IdOrderByEventVersionDesc(userId).map(chatEvent -> {
-            Conversation conversation = new Conversation(chatEvent.getChat(), chatEvent.getOwner());
+            Conversation conversation = conversationMapper.toConversation(chatEvent.getChat(), chatEvent.getOwner());
             return new EventDetails(converterResolution.convert(chatEvent), conversation);
         }).orElse(null);
     }

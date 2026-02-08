@@ -26,10 +26,5 @@ public class TextEvent extends MessageEvent {
         this(event.getChat(), event.getSender(), event.getContent());
     }
 
-    @Override
-    public ChatEvent clone() {
-        return new TextEvent(this);
-    }
-
 
 }

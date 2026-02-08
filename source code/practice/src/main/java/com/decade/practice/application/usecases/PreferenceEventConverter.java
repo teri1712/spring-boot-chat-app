@@ -2,12 +2,16 @@ package com.decade.practice.application.usecases;
 
 import com.decade.practice.dto.EventResponse;
 import com.decade.practice.dto.PreferenceEventResponse;
-import com.decade.practice.dto.PreferenceResponse;
+import com.decade.practice.dto.mapper.PreferenceMapper;
 import com.decade.practice.persistence.jpa.entities.PreferenceEvent;
+import lombok.AllArgsConstructor;
 import org.springframework.stereotype.Component;
 
 @Component
+@AllArgsConstructor
 public class PreferenceEventConverter extends AbstractEventConverter<PreferenceEvent> {
+
+    private PreferenceMapper preferenceMapper;
 
     @Override
     protected EventResponse postInitEventResponse(PreferenceEvent chatEvent, EventResponse res) {
@@ -18,7 +22,7 @@ public class PreferenceEventConverter extends AbstractEventConverter<PreferenceE
                 res.textEvent(),
                 res.imageEvent(),
                 res.iconEvent(),
-                new PreferenceEventResponse(PreferenceResponse.from(chatEvent.getPreference())),
+                new PreferenceEventResponse(preferenceMapper.toPreferenceResponse(chatEvent.getPreference())),
                 res.fileEvent(),
                 res.seenEvent(),
                 res.createdTime(),

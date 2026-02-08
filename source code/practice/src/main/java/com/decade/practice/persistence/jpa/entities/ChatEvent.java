@@ -1,14 +1,11 @@
 package com.decade.practice.persistence.jpa.entities;
 
-import com.decade.practice.persistence.jpa.embeddables.ChatIdentifier;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotNull;
 import lombok.Getter;
 import lombok.Setter;
 
 import java.time.Instant;
-import java.util.HashMap;
-import java.util.Map;
 import java.util.UUID;
 
 @Inheritance(strategy = InheritanceType.SINGLE_TABLE)
@@ -21,10 +18,8 @@ import java.util.UUID;
 public abstract class ChatEvent {
 
     @ManyToOne(fetch = FetchType.LAZY, cascade = CascadeType.PERSIST)
-    @JoinColumns({
-            @JoinColumn(name = "first_user", insertable = false, updatable = false), // referencedName derived
-            @JoinColumn(name = "second_user", insertable = false, updatable = false) // referencedName derived
-    })
+    @JoinColumn(name = "chat_id", nullable = false)
+    @NotNull
     private Chat chat;
 
     @ManyToOne(cascade = CascadeType.PERSIST, fetch = FetchType.LAZY)
@@ -44,18 +39,10 @@ public abstract class ChatEvent {
     @NotNull
     private UUID idempotentKey = UUID.randomUUID();
 
-    @Embedded
-    @AttributeOverrides({
-            @AttributeOverride(
-                    name = "firstUser",
-                    column = @Column(name = "first_user", updatable = false)
-            ),
-            @AttributeOverride(
-                    name = "secondUser",
-                    column = @Column(name = "second_user", updatable = false)
-            )
-    })
-    private ChatIdentifier chatIdentifier;
+
+    @Column(name = "chat_id", nullable = false, updatable = false, insertable = false)
+    @NotNull
+    private String chatId;
 
     private int eventVersion = SyncContext.STARTING_VERSION;
 
@@ -68,21 +55,16 @@ public abstract class ChatEvent {
         this.sender = sender;
         this.eventType = eventType;
         this.owner = sender;
-        this.chatIdentifier = chat.getIdentifier();
+        this.chatId = chat.getIdentifier();
     }
 
     protected ChatEvent() {
 
     }
 
-    public abstract ChatEvent clone();
-
-    @Transient
-    protected final Map<String, Object> extraProperties = new HashMap<>();
-
     public void setChat(Chat chat) {
         this.chat = chat;
-        this.chatIdentifier = chat.getIdentifier();
+        this.chatId = chat.getIdentifier();
     }
 
 }

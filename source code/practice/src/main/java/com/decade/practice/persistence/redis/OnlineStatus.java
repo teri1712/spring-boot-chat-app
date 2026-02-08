@@ -1,6 +1,6 @@
 package com.decade.practice.persistence.redis;
 
-import com.decade.practice.persistence.jpa.embeddables.ImageSpec;
+import com.decade.practice.persistence.jpa.embeddables.ImageSpecEmbeddable;
 import lombok.Getter;
 import lombok.Setter;
 import org.springframework.data.annotation.Id;
@@ -21,6 +21,6 @@ public class OnlineStatus {
     private UUID userId;
     private Instant at;
     private String name;
-    private ImageSpec avatar;
+    private ImageSpecEmbeddable avatar;
 
 }

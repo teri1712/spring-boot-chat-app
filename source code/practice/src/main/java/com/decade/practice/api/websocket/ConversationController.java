@@ -6,7 +6,7 @@ import com.decade.practice.dto.EventDetails;
 import com.decade.practice.dto.TypeEventDto;
 import com.decade.practice.infra.configs.WebSocketConfiguration;
 import com.decade.practice.infra.security.jwt.JwtUserAuthentication;
-import com.decade.practice.persistence.jpa.embeddables.ChatIdentifier;
+import com.decade.practice.persistence.jpa.embeddables.ChatCreators;
 import com.decade.practice.persistence.redis.TypeEvent;
 import lombok.AllArgsConstructor;
 import org.springframework.messaging.Message;
@@ -27,12 +27,12 @@ public class ConversationController {
         return eventService.findFirstByOwnerOrderByEventVersionDesc(user.getPrincipal().getId());
     }
 
-    public static String resolveChatDestination(ChatIdentifier chat) {
+    public static String resolveChatDestination(ChatCreators chat) {
         return WebSocketConfiguration.CHAT_DESTINATION + ":" + chat;
     }
 
     @MessageMapping(WebSocketConfiguration.TYPING_DESTINATION)
-    public void onTyping(ChatIdentifier chat, JwtUserAuthentication from) {
+    public void onTyping(ChatCreators chat, JwtUserAuthentication from) {
         TypeEventDto typeEvent = new TypeEventDto();
         typeEvent.setChat(chat);
         typeEvent.setFrom(from.getPrincipal().getId());
@@ -41,7 +41,7 @@ public class ConversationController {
     }
 
     @SubscribeMapping(WebSocketConfiguration.TYPING_DESTINATION)
-    public void subsType(ChatIdentifier chat, JwtUserAuthentication from, Message<?> message) {
+    public void subsType(ChatCreators chat, JwtUserAuthentication from, Message<?> message) {
         liveService.subscribe(chat, from.getPrincipal().getId(), message);
     }
 }

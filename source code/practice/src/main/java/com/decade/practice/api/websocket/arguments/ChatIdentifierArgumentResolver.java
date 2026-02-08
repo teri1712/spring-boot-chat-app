@@ -1,7 +1,6 @@
 package com.decade.practice.api.websocket.arguments;
 
-import com.decade.practice.api.web.converters.ChatIdentifierConverter;
-import com.decade.practice.persistence.jpa.embeddables.ChatIdentifier;
+import com.decade.practice.persistence.jpa.embeddables.ChatCreators;
 import org.springframework.core.MethodParameter;
 import org.springframework.messaging.Message;
 import org.springframework.messaging.handler.invocation.HandlerMethodArgumentResolver;
@@ -14,7 +13,7 @@ public class ChatIdentifierArgumentResolver implements HandlerMethodArgumentReso
 
     public static final String CHAT_HEADER = "chat_identifier";
 
-    public static ChatIdentifier resolveChatHeader(Message<?> message) {
+    public static ChatCreators resolveChatHeader(Message<?> message) {
         @SuppressWarnings("unchecked")
         Map<String, List<String>> nativeHeaders =
                 (Map<String, List<String>>) message.getHeaders().get(NativeMessageHeaderAccessor.NATIVE_HEADERS);
@@ -30,7 +29,7 @@ public class ChatIdentifierArgumentResolver implements HandlerMethodArgumentReso
 
     @Override
     public boolean supportsParameter(MethodParameter parameter) {
-        return parameter.getParameterType() == ChatIdentifier.class;
+        return parameter.getParameterType() == ChatCreators.class;
     }
 
     @Override

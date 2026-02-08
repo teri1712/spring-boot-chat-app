@@ -29,9 +29,4 @@ public class IconEvent extends MessageEvent {
         this(event.getChat(), event.getSender(), event.getIconId());
     }
 
-
-    @Override
-    public ChatEvent clone() {
-        return new IconEvent(this);
-    }
 }

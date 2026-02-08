@@ -1,6 +1,6 @@
 package com.decade.practice.persistence.jpa.entities;
 
-import com.decade.practice.persistence.jpa.embeddables.ImageSpec;
+import com.decade.practice.persistence.jpa.embeddables.ImageSpecEmbeddable;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import lombok.Getter;
@@ -41,7 +41,7 @@ public class User {
     private UUID id;
 
     @Embedded
-    private ImageSpec avatar;
+    private ImageSpecEmbeddable avatar;
 
     @Version
     private Integer version;
@@ -54,6 +54,7 @@ public class User {
             cascade = CascadeType.ALL
     )
     private SyncContext syncContext;
+
 
 }
 

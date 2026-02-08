@@ -27,9 +27,5 @@ public class SeenEvent extends ChatEvent {
         this(event.getChat(), event.getSender(), event.getAt());
     }
 
-    @Override
-    public ChatEvent clone() {
-        return new SeenEvent(this);
-    }
 
 }

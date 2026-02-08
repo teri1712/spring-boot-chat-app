@@ -1,13 +1,12 @@
 package com.decade.practice.unit;
 
-import com.decade.practice.application.services.ChatEventStore;
 import com.decade.practice.application.services.DeliveryServiceImpl;
 import com.decade.practice.application.usecases.EventConverterResolution;
 import com.decade.practice.application.usecases.EventSender;
+import com.decade.practice.dto.EventCreateRequest;
 import com.decade.practice.dto.EventDetails;
-import com.decade.practice.dto.EventRequest;
 import com.decade.practice.dto.EventResponse;
-import com.decade.practice.persistence.jpa.embeddables.ChatIdentifier;
+import com.decade.practice.persistence.jpa.embeddables.ChatCreators;
 import com.decade.practice.persistence.jpa.entities.Chat;
 import com.decade.practice.persistence.jpa.entities.ChatEvent;
 import com.decade.practice.persistence.jpa.entities.User;
@@ -49,9 +48,9 @@ class DeliveryServiceImplTest {
         UUID idempotentKey = UUID.randomUUID();
         UUID senderId = UUID.randomUUID();
         UUID receiverId = UUID.randomUUID();
-        ChatIdentifier chatIdentifier = ChatIdentifier.from(senderId, receiverId);
+        ChatCreators chatCreators = ChatCreators.from(senderId, receiverId);
 
-        EventRequest request = new EventRequest();
+        EventCreateRequest request = new EventCreateRequest();
 
         EventResponse myEvent = new EventResponse(
                 null, idempotentKey, null,
@@ -67,15 +66,15 @@ class DeliveryServiceImplTest {
         EventDetails myDto = new EventDetails(myEvent, null);
         EventDetails yourDto = new EventDetails(yourEvent, null);
 
-        given(eventStore.save(eq(senderId), eq(senderId), eq(idempotentKey), eq(chatIdentifier), eq(request)))
+        given(eventStore.save(eq(senderId), eq(senderId), eq(idempotentKey), eq(chatCreators), eq(request)))
                 .willReturn(List.of(myDto, yourDto));
 
-        EventDetails result = deliveryService.createAndSend(senderId, chatIdentifier, idempotentKey, request);
+        EventDetails result = deliveryService.createAndSend(senderId, chatCreators, idempotentKey, request);
 
         assertNotNull(result);
         assertEquals(myDto, result);
 
-        verify(eventStore).save(eq(senderId), eq(senderId), eq(idempotentKey), eq(chatIdentifier), eq(request));
+        verify(eventStore).save(eq(senderId), eq(senderId), eq(idempotentKey), eq(chatCreators), eq(request));
         verify(eventSender).send(myDto);
         verify(eventSender).send(yourDto);
     }
@@ -85,9 +84,9 @@ class DeliveryServiceImplTest {
         UUID idempotentKey = UUID.randomUUID();
         UUID senderId = UUID.randomUUID();
         UUID receiverId = UUID.randomUUID();
-        ChatIdentifier chatIdentifier = ChatIdentifier.from(senderId, receiverId);
+        ChatCreators chatCreators = ChatCreators.from(senderId, receiverId);
 
-        EventRequest request = new EventRequest();
+        EventCreateRequest request = new EventCreateRequest();
 
         EventResponse myEvent = new EventResponse(
                 null, idempotentKey, null,
@@ -96,12 +95,12 @@ class DeliveryServiceImplTest {
         );
         EventDetails myDto = new EventDetails(myEvent, null);
 
-        given(eventStore.save(eq(senderId), eq(senderId), eq(idempotentKey), eq(chatIdentifier), eq(request)))
+        given(eventStore.save(eq(senderId), eq(senderId), eq(idempotentKey), eq(chatCreators), eq(request)))
                 .willReturn(List.of(myDto));
 
-        deliveryService.createAndSend(senderId, chatIdentifier, idempotentKey, request);
+        deliveryService.createAndSend(senderId, chatCreators, idempotentKey, request);
 
-        verify(eventStore, times(1)).save(eq(senderId), eq(senderId), eq(idempotentKey), eq(chatIdentifier), eq(request));
+        verify(eventStore, times(1)).save(eq(senderId), eq(senderId), eq(idempotentKey), eq(chatCreators), eq(request));
     }
 
     @Test
@@ -109,21 +108,21 @@ class DeliveryServiceImplTest {
         UUID idempotentKey = UUID.randomUUID();
         UUID senderId = UUID.randomUUID();
         UUID receiverId = UUID.randomUUID();
-        ChatIdentifier chatIdentifier = ChatIdentifier.from(senderId, receiverId);
+        ChatCreators chatCreators = ChatCreators.from(senderId, receiverId);
 
-        EventRequest request = new EventRequest();
+        EventCreateRequest request = new EventCreateRequest();
 
         given(eventStore.save(
                 eq(senderId),
                 eq(senderId),
                 eq(idempotentKey),
-                eq(chatIdentifier),
+                eq(chatCreators),
                 eq(request)))
                 .willThrow(new DataIntegrityViolationException("Duplicate"));
 
         ChatEvent persisted = mock(ChatEvent.class);
         Chat chat = mock(Chat.class);
-        when(chat.getIdentifier()).thenReturn(chatIdentifier);
+        when(chat.getIdentifier()).thenReturn(chatCreators);
         when(chat.getFirstUser()).thenReturn(mock(User.class));
         when(persisted.getChat()).thenReturn(chat);
         when(persisted.getOwner()).thenReturn(mock(User.class));
@@ -138,7 +137,7 @@ class DeliveryServiceImplTest {
         );
         given(converterResolution.convert(persisted)).willReturn(persistedResponse);
 
-        EventDetails result = deliveryService.createAndSend(senderId, chatIdentifier, idempotentKey, request);
+        EventDetails result = deliveryService.createAndSend(senderId, chatCreators, idempotentKey, request);
 
         assertEquals(persistedResponse, result.event());
     }

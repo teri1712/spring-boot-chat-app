@@ -1,9 +1,10 @@
 package com.decade.practice.dto;
 
-import com.decade.practice.persistence.jpa.embeddables.ImageSpec;
+import jakarta.annotation.Nullable;
+import jakarta.validation.Valid;
 import jakarta.validation.constraints.NotBlank;
-import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Past;
+import jakarta.validation.constraints.Pattern;
 import lombok.Getter;
 import lombok.Setter;
 import org.springframework.format.annotation.DateTimeFormat;
@@ -15,15 +16,16 @@ import java.util.Date;
 public class ProfileRequest {
 
     @NotBlank
-    @NotNull
+    @Pattern(regexp = "\\S.*")
     private String name;
 
-    @NotNull
+    @Nullable
     private Float gender;
 
     @Past
     @DateTimeFormat(iso = DateTimeFormat.ISO.DATE)
     private Date dob;
 
-    private ImageSpec avatar;
+    @Valid
+    private ImageRequest avatar;
 }

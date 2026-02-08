@@ -1,7 +1,7 @@
 package com.decade.practice.web.rest;
 
 import com.decade.practice.common.BaseTestClass;
-import com.decade.practice.dto.PreferenceRequest;
+import com.decade.practice.dto.PreferenceCreateRequest;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -66,7 +66,7 @@ class ChatControllerTest extends BaseTestClass {
         // Given
         // Correct order: 1111... < 2222...
         String chatId = "11111111-1111-1111-1111-111111111111+22222222-2222-2222-2222-222222222222";
-        PreferenceRequest preference = new PreferenceRequest(99, "My pookie bob", null);
+        PreferenceCreateRequest preference = new PreferenceCreateRequest(99, "My pookie bob", null);
 
         // When
         mockMvc.perform(put("/chats/{id}/preference", chatId)

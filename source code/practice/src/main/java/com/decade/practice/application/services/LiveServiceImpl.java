@@ -3,7 +3,7 @@ package com.decade.practice.application.services;
 import com.decade.practice.application.usecases.EventSender;
 import com.decade.practice.application.usecases.LiveService;
 import com.decade.practice.dto.TypeEventDto;
-import com.decade.practice.persistence.jpa.embeddables.ChatIdentifier;
+import com.decade.practice.persistence.jpa.embeddables.ChatCreators;
 import com.decade.practice.persistence.redis.TypeEvent;
 import com.decade.practice.persistence.redis.repositories.TypeRepository;
 import lombok.AllArgsConstructor;
@@ -25,7 +25,7 @@ public class LiveServiceImpl implements LiveService {
 
     @Override
     @PreAuthorize("@accessPolicy.isAllowed(#identifier,#event.from)")
-    public void send(ChatIdentifier identifier, TypeEventDto event) {
+    public void send(ChatCreators identifier, TypeEventDto event) {
         TypeEvent typeEvent = new TypeEvent();
         typeEvent.setKey(event.getKey());
         typeEvent.setChat(identifier);
@@ -38,7 +38,7 @@ public class LiveServiceImpl implements LiveService {
 
     @Override
     @PreAuthorize("@accessPolicy.isAllowed(#identifier,#userId)")
-    public void subscribe(ChatIdentifier identifier, UUID userId, Message<?> message) {
+    public void subscribe(ChatCreators identifier, UUID userId, Message<?> message) {
         brokerTemplate.send(resolveChatDestination(identifier), message);
     }
 }

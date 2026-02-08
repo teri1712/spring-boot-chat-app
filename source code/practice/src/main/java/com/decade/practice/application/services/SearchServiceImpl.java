@@ -111,7 +111,7 @@ public class SearchServiceImpl implements SearchService, SearchStore {
                 .map(document -> MessageHistoryDto.builder()
                         .id(document.getId())
                         .content(document.getContent())
-                        .chatIdentifier(document.getChatIdentifier())
+                        .chatCreators(document.getChatCreators())
                         .partnerName(document.getPartnerName())
                         .build())
 
@@ -137,7 +137,7 @@ public class SearchServiceImpl implements SearchService, SearchStore {
         MessageDocument document = new MessageDocument();
         document.setId(messageCreatedEvent.idempotencyKey());
         document.setOwner(messageCreatedEvent.chat().owner());
-        document.setChatIdentifier(messageCreatedEvent.chat().identifier());
+        document.setChatCreators(messageCreatedEvent.chat().identifier());
         document.setPartnerName(messageCreatedEvent.partner().name());
         document.setContent(messageCreatedEvent.textEvent().content());
 

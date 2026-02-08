@@ -31,33 +31,33 @@ SELECT nextval('outbox_seq'),
                'sender', e.sender_id,
                'chat', jsonb_build_object(
                        'identifier', jsonb_build_object(
-                       'firstUser', e.first_user,
-                       'secondUser', e.second_user
+                       'firstCreator', e.first_user,
+                       'secondCreator', e.second_user
                                      ),
                        'owner', e.owner_id,
-                       'partner', (CASE
-                                       WHEN e.first_user = e.owner_id THEN e.second_user
-                                       ELSE e.first_user END)
+                       'withPartner', (CASE
+                                           WHEN e.first_user = e.owner_id THEN e.second_user
+                                           ELSE e.first_user END)
                        ),
-               'partner', (SELECT jsonb_build_object(
-                                          'id', u.id,
-                                          'username', u.username,
-                                          'name', u.name,
-                                          'dob', u.dob,
-                                          'role', u.role,
-                                          'gender', u.gender,
-                                          'avatar', jsonb_build_object(
-                                                  'uri', COALESCE(u.uri, ''),
-                                                  'filename', COALESCE(u.filename, ''),
-                                                  'width', COALESCE(u.width, 512),
-                                                  'height', COALESCE(u.height, 512),
-                                                  'format', COALESCE(u.format, 'jpg')
-                                                    )
-                                  )
-                           FROM user_member u
-                           WHERE u.id = (CASE
-                                             WHEN e.first_user = e.owner_id THEN e.second_user
-                                             ELSE e.first_user END)),
+               'withPartner', (SELECT jsonb_build_object(
+                                              'id', u.id,
+                                              'username', u.username,
+                                              'name', u.name,
+                                              'dob', u.dob,
+                                              'role', u.role,
+                                              'gender', u.gender,
+                                              'avatar', jsonb_build_object(
+                                                      'uri', COALESCE(u.uri, ''),
+                                                      'filename', COALESCE(u.filename, ''),
+                                                      'width', COALESCE(u.width, 512),
+                                                      'height', COALESCE(u.height, 512),
+                                                      'format', COALESCE(u.format, 'jpg')
+                                                        )
+                                      )
+                               FROM user_member u
+                               WHERE u.id = (CASE
+                                                 WHEN e.first_user = e.owner_id THEN e.second_user
+                                                 ELSE e.first_user END)),
                'textEvent', CASE
                                 WHEN e.event_type = 'TEXT' THEN jsonb_build_object('content', e.content)
                                 ELSE NULL END

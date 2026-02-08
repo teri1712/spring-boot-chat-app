@@ -5,7 +5,7 @@ import com.decade.practice.application.services.ChatServiceImpl;
 import com.decade.practice.application.usecases.EventService;
 import com.decade.practice.dto.ChatDetails;
 import com.decade.practice.dto.ChatSnapshot;
-import com.decade.practice.persistence.jpa.embeddables.ChatIdentifier;
+import com.decade.practice.persistence.jpa.embeddables.ChatCreators;
 import com.decade.practice.persistence.jpa.entities.Chat;
 import com.decade.practice.persistence.jpa.entities.SyncContext;
 import com.decade.practice.persistence.jpa.entities.User;
@@ -54,11 +54,11 @@ class ChatServiceImplTest {
 
     @Test
     void givenExistingChatIdentifier_whenGetOrSafelyCreateChat_thenChatIsReturned() {
-        ChatIdentifier identifier = new ChatIdentifier(UUID.randomUUID(), UUID.randomUUID());
+        ChatCreators identifier = new ChatCreators(UUID.randomUUID(), UUID.randomUUID());
         Chat chat = mock(Chat.class);
         given(chatRepo.findById(identifier)).willReturn(Optional.of(chat));
 
-        Chat result = chatService.ensureExist(identifier);
+        Chat result = chatService.getOrCreate(identifier);
 
         assertEquals(chat, result);
         verify(chatRepo, times(1)).findById(identifier);
@@ -73,7 +73,7 @@ class ChatServiceImplTest {
             u1Id = u2Id;
             u2Id = temp;
         }
-        ChatIdentifier identifier = new ChatIdentifier(u1Id, u2Id);
+        ChatCreators identifier = new ChatCreators(u1Id, u2Id);
         User u1 = new User();
         u1.setId(u1Id);
         u1.setUsername("user1");
@@ -85,7 +85,7 @@ class ChatServiceImplTest {
         given(userRepo.findById(u2Id)).willReturn(Optional.of(u2));
         doAnswer(invocation -> invocation.getArgument(0)).when(em).merge(any());
 
-        Chat result = chatService.createChat(identifier);
+        Chat result = chatService.getDetails(identifier);
 
         assertNotNull(result);
         assertEquals(u1Id, result.getFirstUser().getId());
@@ -111,14 +111,14 @@ class ChatServiceImplTest {
 
     @Test
     void givenChatIdentifierAndUserId_whenGetSnapshot_thenChatSnapshotIsReturned() {
-        ChatIdentifier identifier = new ChatIdentifier(UUID.randomUUID(), UUID.randomUUID());
+        ChatCreators identifier = new ChatCreators(UUID.randomUUID(), UUID.randomUUID());
         UUID userId = identifier.getFirstUser();
         User owner = new User();
         owner.setId(userId);
         owner.setUsername("owner");
         User partner = new User();
         partner.setId(identifier.getSecondUser());
-        partner.setUsername("partner");
+        partner.setUsername("withPartner");
         Chat chat = new Chat(owner, partner);
         chat.setIdentifier(identifier);
 
@@ -143,9 +143,9 @@ class ChatServiceImplTest {
         User partner = new User();
         UUID partnerId = UUID.randomUUID();
         partner.setId(partnerId);
-        partner.setUsername("partner");
+        partner.setUsername("withPartner");
 
-        ChatIdentifier identifier = ChatIdentifier.from(userId, partnerId);
+        ChatCreators identifier = ChatCreators.from(userId, partnerId);
 
         Chat chat = new Chat(owner, partner);
         chat.setIdentifier(identifier);

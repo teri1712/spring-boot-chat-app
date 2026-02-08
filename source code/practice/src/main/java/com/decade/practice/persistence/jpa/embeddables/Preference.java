@@ -1,7 +1,6 @@
 package com.decade.practice.persistence.jpa.embeddables;
 
 import com.decade.practice.persistence.jpa.entities.Theme;
-import com.decade.practice.persistence.jpa.entities.User;
 import jakarta.annotation.Nullable;
 import jakarta.persistence.Embeddable;
 import jakarta.persistence.FetchType;
@@ -17,22 +16,14 @@ import lombok.Setter;
 public class Preference {
 
     @NotNull
-    private Integer iconId;
+    private Integer iconId = 1;
 
     @NotNull
     @NotBlank
     private String roomName;
 
-    @ManyToOne(fetch = FetchType.LAZY)
     @Nullable
+    @ManyToOne(fetch = FetchType.LAZY)
     private Theme theme;
-
-    public Preference(User firstUser, User secondUser) {
-        this.iconId = 1;
-        this.roomName = "Room " + firstUser.getName() + " and " + secondUser.getName();
-    }
-
-    public Preference() {
-    }
 
 }

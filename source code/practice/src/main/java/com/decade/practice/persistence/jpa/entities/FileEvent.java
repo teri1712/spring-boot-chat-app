@@ -22,8 +22,4 @@ public class FileEvent extends MediaEvent {
     }
 
 
-    @Override
-    public ChatEvent clone() {
-        return new FileEvent(getChat(), getSender(), getMediaUrl(), filename, getSize());
-    }
 }

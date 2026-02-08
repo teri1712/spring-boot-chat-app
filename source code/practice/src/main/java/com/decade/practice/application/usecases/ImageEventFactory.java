@@ -1,29 +1,39 @@
 package com.decade.practice.application.usecases;
 
-import com.decade.practice.dto.EventRequest;
-import com.decade.practice.persistence.jpa.embeddables.ImageSpec;
+import com.decade.practice.dto.EventCreateCommand;
+import com.decade.practice.dto.ImageEventCreateCommand;
+import com.decade.practice.persistence.jpa.embeddables.ImageSpecEmbeddable;
 import com.decade.practice.persistence.jpa.entities.ImageEvent;
+import com.decade.practice.persistence.jpa.repositories.ChatRepository;
+import com.decade.practice.persistence.jpa.repositories.UserRepository;
 import org.springframework.stereotype.Component;
 
 @Component
-public class ImageEventFactory implements EventFactory<ImageEvent> {
+public class ImageEventFactory extends EventFactory<ImageEvent> {
+
+
+    protected ImageEventFactory(UserRepository userRepository, ChatRepository chatRepository) {
+        super(userRepository, chatRepository);
+    }
 
     @Override
-    public ImageEvent newInstance(EventRequest eventRequest) {
+    public ImageEvent newInstance(EventCreateCommand command) {
+        ImageEventCreateCommand imageEventCreateCommand = (ImageEventCreateCommand) command;
         ImageEvent imageEvent = new ImageEvent();
-        ImageSpec imageSpec = new ImageSpec();
-        imageSpec.setUri(eventRequest.getImageEvent().getDownloadUrl());
-        imageSpec.setFilename(eventRequest.getImageEvent().getFilename());
-        imageSpec.setWidth(eventRequest.getImageEvent().getWidth());
-        imageSpec.setHeight(eventRequest.getImageEvent().getHeight());
-        imageSpec.setFormat(eventRequest.getImageEvent().getFormat());
+
+        ImageSpecEmbeddable imageSpec = new ImageSpecEmbeddable();
+        imageSpec.setUri(imageEventCreateCommand.getDownloadUrl());
+        imageSpec.setFilename(imageEventCreateCommand.getFilename());
+        imageSpec.setWidth(imageEventCreateCommand.getWidth());
+        imageSpec.setHeight(imageEventCreateCommand.getHeight());
+        imageSpec.setFormat(imageEventCreateCommand.getFormat());
         imageEvent.setImage(imageSpec);
         imageEvent.setEventType("IMAGE");
         return imageEvent;
     }
 
     @Override
-    public boolean supports(EventRequest eventRequest) {
-        return eventRequest.getImageEvent() != null;
+    public boolean supports(EventCreateCommand command) {
+        return command instanceof ImageEventCreateCommand;
     }
 }

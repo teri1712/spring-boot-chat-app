@@ -24,12 +24,11 @@ public class ChatOrder {
 
     int currentVersion;
 
-
-    protected ChatOrder() {
+    public static ChatOrder of(Chat chat, User owner) {
+        ChatOrder chatOrder = new ChatOrder();
+        chatOrder.chat = chat;
+        chatOrder.owner = owner;
+        return chatOrder;
     }
 
-    public ChatOrder(Chat chat, User owner) {
-        this.chat = chat;
-        this.owner = owner;
-    }
 }
