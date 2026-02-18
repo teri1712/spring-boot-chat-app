@@ -1,0 +1,16 @@
+package com.decade.practice.engagement.application.ports.in;
+
+import lombok.Getter;
+
+import java.time.Instant;
+import java.util.UUID;
+
+@Getter
+public class SeenCommand extends EventCommand {
+    private final Instant at;
+
+    public SeenCommand(String chatId, UUID senderId, UUID idempotentKey, Instant at) {
+        super(chatId, senderId, idempotentKey);
+        this.at = at;
+    }
+}

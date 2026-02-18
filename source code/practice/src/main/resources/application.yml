@@ -67,6 +67,11 @@ spring:
       value-deserializer: org.apache.kafka.common.serialization.StringDeserializer
       properties:
         spring.json.add.type.headers: false
+  modulith:
+    events:
+      jdbc:
+        schema-initialization:
+          enabled: true
 
 logging:
   level:
@@ -117,4 +122,18 @@ aws:
     access:
       id: decade
       secret: decade
+
+
+broker:
+  topics:
+    queue: queue
+    live: live
+
+
+websocket:
+  topics:
+    user: /user
+    queue: /queue
+    live: /live
+
 
