@@ -1,6 +1,5 @@
 package com.decade.practice.threads.application.events;
 
-import com.decade.practice.engagement.api.events.ChatSnapshot;
 import com.decade.practice.engagement.api.events.IconEventPlaced;
 import com.decade.practice.threads.application.ports.out.EventRepository;
 import com.decade.practice.threads.domain.IconEvent;
@@ -11,9 +10,10 @@ import org.springframework.stereotype.Service;
 import java.util.UUID;
 
 @Service
-public class IconEventPlacedListener extends AbstractEventPlacedListener<IconEventPlaced> {
+public class IconFanoutEventPlacedListener extends AbstractFanoutEventPlacedListener<IconEventPlaced> {
 
-    public IconEventPlacedListener(EventRepository events) {
+
+    public IconFanoutEventPlacedListener(EventRepository events) {
         super(events);
     }
 
@@ -24,7 +24,7 @@ public class IconEventPlacedListener extends AbstractEventPlacedListener<IconEve
     }
 
     @Override
-    protected MessageEvent newInstance(IconEventPlaced eventPlaced, ChatSnapshot snapshot, UUID ownerId) {
-        return new IconEvent(eventPlaced.getSenderId(), ownerId, snapshot.chatId(), snapshot.roomName(), snapshot.roomAvatar(), eventPlaced.getIconId());
+    protected MessageEvent newInstance(IconEventPlaced eventPlaced, UUID ownerId) {
+        return new IconEvent(eventPlaced.getSenderId(), ownerId, eventPlaced.getSnapshot().chatId(), eventPlaced.getIconId());
     }
 }

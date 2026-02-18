@@ -19,8 +19,8 @@ public class TextEvent extends MessageEvent {
     @Column(updatable = false)
     private String content;
 
-    public TextEvent(UUID senderId, UUID ownerId, String chatId, String roomNameSnapshot, String roomAvatarSnapshot, String content) {
-        super(senderId, "TEXT", ownerId, chatId, roomNameSnapshot, roomAvatarSnapshot);
+    public TextEvent(UUID senderId, UUID ownerId, String chatId, String content) {
+        super(senderId, "TEXT", ownerId, chatId);
         this.content = content;
     }
 

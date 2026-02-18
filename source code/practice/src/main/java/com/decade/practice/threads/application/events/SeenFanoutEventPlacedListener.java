@@ -1,6 +1,5 @@
 package com.decade.practice.threads.application.events;
 
-import com.decade.practice.engagement.api.events.ChatSnapshot;
 import com.decade.practice.engagement.api.events.SeenEventPlaced;
 import com.decade.practice.threads.application.ports.out.EventRepository;
 import com.decade.practice.threads.domain.ChatEvent;
@@ -11,10 +10,9 @@ import org.springframework.stereotype.Service;
 import java.util.UUID;
 
 @Service
-public class SeenEventPlacedListener extends AbstractEventPlacedListener<SeenEventPlaced> {
+public class SeenFanoutEventPlacedListener extends AbstractFanoutEventPlacedListener<SeenEventPlaced> {
 
-
-    public SeenEventPlacedListener(EventRepository events) {
+    public SeenFanoutEventPlacedListener(EventRepository events) {
         super(events);
     }
 
@@ -25,7 +23,7 @@ public class SeenEventPlacedListener extends AbstractEventPlacedListener<SeenEve
     }
 
     @Override
-    protected ChatEvent newInstance(SeenEventPlaced eventPlaced, ChatSnapshot snapshot, UUID ownerId) {
-        return new SeenEvent(eventPlaced.getSenderId(), ownerId, snapshot.chatId(), snapshot.roomName(), snapshot.roomAvatar(), eventPlaced.getAt());
+    protected ChatEvent newInstance(SeenEventPlaced eventPlaced, UUID ownerId) {
+        return new SeenEvent(eventPlaced.getSenderId(), ownerId, eventPlaced.getSnapshot().chatId(), eventPlaced.getAt());
     }
 }

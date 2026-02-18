@@ -22,8 +22,8 @@ public class ImageEvent extends MessageEvent {
     protected ImageEvent() {
     }
 
-    public ImageEvent(UUID senderId, UUID ownerId, String chatId, String roomNameSnapshot, String roomAvatarSnapshot, ImageSpec image) {
-        super(senderId, "IMAGE", ownerId, chatId, roomNameSnapshot, roomAvatarSnapshot);
+    public ImageEvent(UUID senderId, UUID ownerId, String chatId, ImageSpec image) {
+        super(senderId, "IMAGE", ownerId, chatId);
         this.image = image;
     }
 

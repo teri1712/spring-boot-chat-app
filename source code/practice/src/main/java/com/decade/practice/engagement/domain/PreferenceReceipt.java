@@ -5,7 +5,6 @@ import jakarta.persistence.DiscriminatorValue;
 import jakarta.persistence.Entity;
 import lombok.Getter;
 
-import java.time.Instant;
 import java.util.UUID;
 
 @Entity
@@ -30,7 +29,7 @@ public class PreferenceReceipt extends Receipt {
     }
 
     public void place() {
-        registerEvent(new PreferenceParticipantPlaced(getSenderId(), getChatId(), getIdempotentKey(), Instant.now(), iconId, roomName, roomAvatar, themeId));
+        registerEvent(new PreferenceParticipantPlaced(getSenderId(), getChatId(), getIdempotentKey(), getCreatedAt(), getIconId(), getRoomName(), getRoomAvatar(), getThemeId()));
     }
 
 }

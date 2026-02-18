@@ -19,7 +19,7 @@ import java.util.List;
 import java.util.UUID;
 
 @AllArgsConstructor
-public abstract class AbstractParticipantEventPlacedListener<E extends ParticipantPlaced> {
+public class ParticipantEventPlacedListener<E extends ParticipantPlaced> {
 
     protected final ChatRepository chats;
     protected final ParticipantRepository participants;
@@ -30,7 +30,7 @@ public abstract class AbstractParticipantEventPlacedListener<E extends Participa
     protected final EventPlacedMapper mapper;
 
     @EventListener
-    public void on(E eventPlaced) {
+    protected void on(E eventPlaced) {
 
         ParticipantId participantId = new ParticipantId(eventPlaced.getSenderId(), eventPlaced.getChatId());
         String chatId = participantId.chatId();
@@ -38,9 +38,6 @@ public abstract class AbstractParticipantEventPlacedListener<E extends Participa
         Participant participant = participants.findById(participantId).orElseThrow();
         Chat chat = chats.findById(chatId).orElseThrow();
         engagementPolicy.applyWrite(participant, chat);
-        chat.incrementInteractionCount();
-
-        handle(eventPlaced);
 
         Preference preference = chat.getPreference();
         String roomName = preference.roomName();
@@ -54,6 +51,4 @@ public abstract class AbstractParticipantEventPlacedListener<E extends Participa
     }
 
 
-    protected void handle(E eventPlaced) {
-    }
 }

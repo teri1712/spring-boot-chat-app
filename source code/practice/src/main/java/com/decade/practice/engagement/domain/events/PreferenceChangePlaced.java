@@ -6,7 +6,7 @@ import java.time.Instant;
 import java.util.UUID;
 
 @Getter
-public class ProcessedPreferenceParticipantPlaced extends ParticipantPlaced {
+public class PreferenceChangePlaced extends ParticipantPlaced {
 
     private final Integer iconId;
     private final String roomName;
@@ -14,7 +14,7 @@ public class ProcessedPreferenceParticipantPlaced extends ParticipantPlaced {
     private final Long themeId;
     private final String theme;
 
-    public ProcessedPreferenceParticipantPlaced(UUID senderId, String chatId, UUID idempotencyKey, Instant createdAt, Integer iconId, String roomName, String roomAvatar, Long themeId, String theme) {
+    public PreferenceChangePlaced(UUID senderId, String chatId, UUID idempotencyKey, Instant createdAt, Integer iconId, String roomName, String roomAvatar, Long themeId, String theme) {
         super(senderId, chatId, idempotencyKey, createdAt);
         this.iconId = iconId;
         this.roomName = roomName;

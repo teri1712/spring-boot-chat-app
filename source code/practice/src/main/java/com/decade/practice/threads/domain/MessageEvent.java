@@ -13,8 +13,8 @@ public abstract class MessageEvent extends ChatEvent {
     protected MessageEvent() {
     }
 
-    public MessageEvent(UUID senderId, String eventType, UUID ownerId, String chatId, String roomNameSnapshot, String roomAvatarSnapshot) {
-        super(senderId, eventType, ownerId, chatId, roomNameSnapshot, roomAvatarSnapshot);
+    public MessageEvent(UUID senderId, String eventType, UUID ownerId, String chatId) {
+        super(senderId, eventType, ownerId, chatId);
     }
 
     public abstract String getMessage();

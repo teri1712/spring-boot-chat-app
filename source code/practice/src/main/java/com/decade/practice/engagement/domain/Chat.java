@@ -34,11 +34,6 @@ public class Chat {
 
     @Version
     private Integer version;
-    private Integer interactionCount = 0;
-
-    public void incrementInteractionCount() {
-        this.interactionCount++;
-    }
 
     protected Chat() {
     }

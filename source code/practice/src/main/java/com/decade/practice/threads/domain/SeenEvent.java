@@ -1,5 +1,6 @@
 package com.decade.practice.threads.domain;
 
+import com.decade.practice.threads.domain.events.SeenReady;
 import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -19,8 +20,15 @@ public class SeenEvent extends ChatEvent {
     @Temporal(TemporalType.TIMESTAMP)
     private Instant at;
 
-    public SeenEvent(UUID senderId, UUID ownerId, String chatId, String roomNameSnapshot, String roomAvatarSnapshot, Instant at) {
-        super(senderId, "SEEN", ownerId, chatId, roomNameSnapshot, roomAvatarSnapshot);
+    public SeenEvent(UUID senderId, UUID ownerId, String chatId, Instant at) {
+        super(senderId, "SEEN", ownerId, chatId);
         this.at = at;
+    }
+
+
+    @Override
+    public void setEventVersion(Integer eventVersion) {
+        super.setEventVersion(eventVersion);
+        registerEvent(new SeenReady(getSenderId(), getChatId(), getOwnerId()));
     }
 }

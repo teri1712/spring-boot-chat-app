@@ -1,6 +1,5 @@
 package com.decade.practice.threads.application.events;
 
-import com.decade.practice.engagement.api.events.ChatSnapshot;
 import com.decade.practice.engagement.api.events.TextEventPlaced;
 import com.decade.practice.threads.application.ports.out.EventRepository;
 import com.decade.practice.threads.domain.MessageEvent;
@@ -11,10 +10,9 @@ import org.springframework.stereotype.Service;
 import java.util.UUID;
 
 @Service
-public class TextEventPlacedListener extends AbstractEventPlacedListener<TextEventPlaced> {
+public class TextFanoutEventPlacedListener extends AbstractFanoutEventPlacedListener<TextEventPlaced> {
 
-
-    public TextEventPlacedListener(EventRepository events) {
+    public TextFanoutEventPlacedListener(EventRepository events) {
         super(events);
     }
 
@@ -25,7 +23,7 @@ public class TextEventPlacedListener extends AbstractEventPlacedListener<TextEve
     }
 
     @Override
-    protected MessageEvent newInstance(TextEventPlaced eventPlaced, ChatSnapshot snapshot, UUID ownerId) {
-        return new TextEvent(eventPlaced.getSenderId(), ownerId, snapshot.chatId(), snapshot.roomName(), snapshot.roomAvatar(), eventPlaced.getContent());
+    protected MessageEvent newInstance(TextEventPlaced eventPlaced, UUID ownerId) {
+        return new TextEvent(eventPlaced.getSenderId(), ownerId, eventPlaced.getSnapshot().chatId(), eventPlaced.getContent());
     }
 }

@@ -15,8 +15,8 @@ public class FileEvent extends MessageEvent {
     private String uri;
     private Integer size;
 
-    public FileEvent(UUID senderId, UUID ownerId, String chatId, String roomNameSnapshot, String roomAvatarSnapshot, String filename, String uri, Integer size) {
-        super(senderId, "FILE", ownerId, chatId, roomNameSnapshot, roomAvatarSnapshot);
+    public FileEvent(UUID senderId, UUID ownerId, String chatId, String filename, String uri, Integer size) {
+        super(senderId, "FILE", ownerId, chatId);
         this.filename = filename;
         this.uri = uri;
         this.size = size;

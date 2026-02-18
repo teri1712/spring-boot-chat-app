@@ -68,9 +68,9 @@ class ChatListingTest extends BaseTestClass {
                         .accept(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.length()").value(2))
-                .andExpect(jsonPath("$[0].chatId").value(aliceCharlieChat))
+                .andExpect(jsonPath("$[0].identifier").value(aliceCharlieChat))
                 .andExpect(jsonPath("$[0].messages.size()").value(1))
-                .andExpect(jsonPath("$[1].chatId").value(aliceBobChat))
+                .andExpect(jsonPath("$[1].identifier").value(aliceBobChat))
                 .andExpect(jsonPath("$[1].messages.size()").value(1))
         ;
     }
@@ -108,11 +108,11 @@ class ChatListingTest extends BaseTestClass {
                         .accept(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.length()").value(2))
-                .andExpect(jsonPath("$[0].chatId").value(aliceCharlieChat))
+                .andExpect(jsonPath("$[0].identifier").value(aliceCharlieChat))
                 .andExpect(jsonPath("$[0].messages.size()").value(2))
                 .andExpect(jsonPath("$[0].messages[0].content").value("new dcm"))
                 .andExpect(jsonPath("$[0].messages[1].content").value("dcm"))
-                .andExpect(jsonPath("$[1].chatId").value(aliceBobChat))
+                .andExpect(jsonPath("$[1].identifier").value(aliceBobChat))
                 .andExpect(jsonPath("$[1].messages.size()").value(1))
         ;
     }
@@ -186,9 +186,9 @@ class ChatListingTest extends BaseTestClass {
                         .accept(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.length()").value(2))
-                .andExpect(jsonPath("$[0].chatId").value(aliceCharlieChat))
+                .andExpect(jsonPath("$[0].identifier").value(aliceCharlieChat))
                 .andExpect(jsonPath("$[0].messages.size()").value(3))
-                .andExpect(jsonPath("$[1].chatId").value(aliceAliceChat))
+                .andExpect(jsonPath("$[1].identifier").value(aliceAliceChat))
                 .andExpect(jsonPath("$[1].messages.size()").value(1));
         mockMvc.perform(get("/me/chats")
                         .queryParam("startAt", aliceCharlieChat)
@@ -196,7 +196,7 @@ class ChatListingTest extends BaseTestClass {
                         .accept(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.length()").value(1))
-                .andExpect(jsonPath("$[0].chatId").value(aliceAliceChat))
+                .andExpect(jsonPath("$[0].identifier").value(aliceAliceChat))
                 .andExpect(jsonPath("$[0].messages.size()").value(1))
         ;
     }

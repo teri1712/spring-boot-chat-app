@@ -19,8 +19,8 @@ public class IconEvent extends MessageEvent {
     @Column(updatable = false)
     private int iconId;
 
-    public IconEvent(UUID senderId, UUID ownerId, String chatId, String roomNameSnapshot, String roomAvatarSnapshot, int iconId) {
-        super(senderId, "ICON", ownerId, chatId, roomNameSnapshot, roomAvatarSnapshot);
+    public IconEvent(UUID senderId, UUID ownerId, String chatId, int iconId) {
+        super(senderId, "ICON", ownerId, chatId);
         this.iconId = iconId;
     }
 

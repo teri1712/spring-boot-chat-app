@@ -1,6 +1,5 @@
 package com.decade.practice.threads.application.events;
 
-import com.decade.practice.engagement.api.events.ChatSnapshot;
 import com.decade.practice.engagement.api.events.PreferenceEventPlaced;
 import com.decade.practice.threads.application.ports.out.EventRepository;
 import com.decade.practice.threads.domain.MessageEvent;
@@ -11,9 +10,9 @@ import org.springframework.stereotype.Service;
 import java.util.UUID;
 
 @Service
-public class PreferenceEventPlacedListener extends AbstractEventPlacedListener<PreferenceEventPlaced> {
+public class PreferenceFanoutEventPlacedListener extends AbstractFanoutEventPlacedListener<PreferenceEventPlaced> {
 
-    public PreferenceEventPlacedListener(EventRepository events) {
+    public PreferenceFanoutEventPlacedListener(EventRepository events) {
         super(events);
     }
 
@@ -24,7 +23,7 @@ public class PreferenceEventPlacedListener extends AbstractEventPlacedListener<P
     }
 
     @Override
-    protected MessageEvent newInstance(PreferenceEventPlaced eventPlaced, ChatSnapshot snapshot, UUID ownerId) {
-        return new PreferenceEvent(eventPlaced.getSenderId(), ownerId, snapshot.chatId(), snapshot.roomName(), snapshot.roomAvatar(), eventPlaced.getIconId(), eventPlaced.getRoomName(), eventPlaced.getRoomAvatar(), eventPlaced.getTheme());
+    protected MessageEvent newInstance(PreferenceEventPlaced eventPlaced, UUID ownerId) {
+        return new PreferenceEvent(eventPlaced.getSenderId(), ownerId, eventPlaced.getSnapshot().chatId(), eventPlaced.getIconId(), eventPlaced.getRoomName(), eventPlaced.getRoomAvatar(), eventPlaced.getTheme());
     }
 }

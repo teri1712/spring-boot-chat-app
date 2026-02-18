@@ -1,6 +1,5 @@
 package com.decade.practice.threads.application.events;
 
-import com.decade.practice.engagement.api.events.ChatSnapshot;
 import com.decade.practice.engagement.api.events.FileEventPlaced;
 import com.decade.practice.threads.application.ports.out.EventRepository;
 import com.decade.practice.threads.domain.FileEvent;
@@ -11,12 +10,12 @@ import org.springframework.stereotype.Service;
 import java.util.UUID;
 
 @Service
-public class FileEventPlacedListener extends AbstractEventPlacedListener<FileEventPlaced> {
+public class FileFanoutEventPlacedListener extends AbstractFanoutEventPlacedListener<FileEventPlaced> {
 
-    public FileEventPlacedListener(EventRepository events) {
+
+    public FileFanoutEventPlacedListener(EventRepository events) {
         super(events);
     }
-
 
     @Override
     @ApplicationModuleListener
@@ -25,7 +24,7 @@ public class FileEventPlacedListener extends AbstractEventPlacedListener<FileEve
     }
 
     @Override
-    protected MessageEvent newInstance(FileEventPlaced eventPlaced, ChatSnapshot snapshot, UUID ownerId) {
-        return new FileEvent(eventPlaced.getSenderId(), ownerId, snapshot.chatId(), snapshot.roomName(), snapshot.roomAvatar(), eventPlaced.getFilename(), eventPlaced.getUri(), eventPlaced.getSize());
+    protected MessageEvent newInstance(FileEventPlaced eventPlaced, UUID ownerId) {
+        return new FileEvent(eventPlaced.getSenderId(), ownerId, eventPlaced.getSnapshot().chatId(), eventPlaced.getFilename(), eventPlaced.getUri(), eventPlaced.getSize());
     }
 }

@@ -13,7 +13,6 @@ import org.mapstruct.ReportingPolicy;
 public interface ChatHistoryMapper {
 
     @Mapping(source = "chatHistoryId.chatId", target = "identifier")
-    @Mapping(source = "chatHistoryId.ownerId", target = "ownerId")
     @Mapping(source = "hash.value", target = "hashValue")
     ChatHistoryResponse toHistoryResponse(ChatHistory chatHistory);
 

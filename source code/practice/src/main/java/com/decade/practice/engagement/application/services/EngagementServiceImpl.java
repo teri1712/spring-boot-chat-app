@@ -1,5 +1,6 @@
 package com.decade.practice.engagement.application.services;
 
+import com.decade.practice.engagement.api.events.ChatCreated;
 import com.decade.practice.engagement.application.exceptions.ChatIdentifierUniqueException;
 import com.decade.practice.engagement.application.ports.in.EngagementService;
 import com.decade.practice.engagement.application.ports.out.ChatRepository;
@@ -16,10 +17,12 @@ import jakarta.persistence.EntityManager;
 import jakarta.persistence.PersistenceContext;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.List;
 import java.util.UUID;
 import java.util.function.Function;
 import java.util.function.Supplier;
@@ -36,6 +39,7 @@ public class EngagementServiceImpl implements EngagementService {
     private final PrivateChatFactory privateChatFactory;
     private final ChatPolicyService chatPolicyService;
     private final ChatMapper chatMapper;
+    private final ApplicationEventPublisher applicationEventPublisher;
 
     @PersistenceContext
     private EntityManager em;
@@ -50,6 +54,7 @@ public class EngagementServiceImpl implements EngagementService {
 
         participants.save(caller);
         participants.save(partner);
+        applicationEventPublisher.publishEvent(new ChatCreated(chat.getPreference().roomName(), chat.getPreference().roomAvatar(), chat.getIdentifier(), List.of(command.callerId(), command.partnerId())));
         return chatMapper.toResponse(chat, true);
     }
 
@@ -76,6 +81,7 @@ public class EngagementServiceImpl implements EngagementService {
                             participants.save(partner);
 
                             em.flush();
+                            applicationEventPublisher.publishEvent(new ChatCreated(chat.getPreference().roomName(), chat.getPreference().roomAvatar(), chat.getIdentifier(), List.of(callerId, partnerId)));
                             return chatMapper.toResponse(chat, true);
                         } catch (DataIntegrityViolationException e) {
                             throw new ChatIdentifierUniqueException(chat.getIdentifier());

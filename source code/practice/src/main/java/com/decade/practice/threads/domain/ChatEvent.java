@@ -35,15 +35,13 @@ public abstract class ChatEvent extends AbstractAggregateRoot<ChatEvent> {
     private Integer version;
 
 
-    ChatEvent(UUID senderId, String eventType, UUID ownerId, String chatId, String roomNameSnapshot, String roomAvatarSnapshot) {
+    ChatEvent(UUID senderId, String eventType, UUID ownerId, String chatId) {
         this.id = UUID.randomUUID();
         this.senderId = senderId;
         this.eventType = eventType;
         this.ownerId = ownerId;
         this.chatId = chatId;
         this.createdAt = Instant.now();
-        this.roomNameSnapshot = roomNameSnapshot;
-        this.roomAvatarSnapshot = roomAvatarSnapshot;
         registerEvent(new EventCreated(id, senderId, eventType, ownerId, chatId, createdAt));
     }
 
@@ -53,9 +51,6 @@ public abstract class ChatEvent extends AbstractAggregateRoot<ChatEvent> {
     @Column(nullable = false, updatable = false)
     @NotNull
     private String chatId;
-
-    private String roomNameSnapshot;
-    private String roomAvatarSnapshot;
 
     private Integer eventVersion;
 

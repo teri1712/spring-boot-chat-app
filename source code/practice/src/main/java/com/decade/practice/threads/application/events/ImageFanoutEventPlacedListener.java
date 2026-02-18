@@ -1,6 +1,5 @@
 package com.decade.practice.threads.application.events;
 
-import com.decade.practice.engagement.api.events.ChatSnapshot;
 import com.decade.practice.engagement.api.events.ImageEventPlaced;
 import com.decade.practice.threads.application.ports.out.EventRepository;
 import com.decade.practice.threads.domain.ImageEvent;
@@ -12,9 +11,10 @@ import org.springframework.stereotype.Service;
 import java.util.UUID;
 
 @Service
-public class ImageEventPlacedListener extends AbstractEventPlacedListener<ImageEventPlaced> {
+public class ImageFanoutEventPlacedListener extends AbstractFanoutEventPlacedListener<ImageEventPlaced> {
 
-    public ImageEventPlacedListener(EventRepository events) {
+
+    public ImageFanoutEventPlacedListener(EventRepository events) {
         super(events);
     }
 
@@ -25,8 +25,8 @@ public class ImageEventPlacedListener extends AbstractEventPlacedListener<ImageE
     }
 
     @Override
-    protected MessageEvent newInstance(ImageEventPlaced eventPlaced, ChatSnapshot snapshot, UUID ownerId) {
-        return new ImageEvent(eventPlaced.getSenderId(), ownerId, snapshot.chatId(), snapshot.roomName(), snapshot.roomAvatar(),
+    protected MessageEvent newInstance(ImageEventPlaced eventPlaced, UUID ownerId) {
+        return new ImageEvent(eventPlaced.getSenderId(), ownerId, eventPlaced.getSnapshot().chatId(),
                 new ImageSpec(eventPlaced.getUri(), eventPlaced.getFilename(), eventPlaced.getWidth(), eventPlaced.getHeight(), eventPlaced.getFormat())
         );
     }
