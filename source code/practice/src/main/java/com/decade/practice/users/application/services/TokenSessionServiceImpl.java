@@ -5,8 +5,8 @@ import com.decade.practice.users.application.ports.out.TokenStore;
 import com.decade.practice.users.application.ports.out.UserRepository;
 import com.decade.practice.users.domain.User;
 import com.decade.practice.users.dto.AccountResponse;
+import com.decade.practice.users.dto.ProfileResponse;
 import com.decade.practice.users.dto.TokenCredential;
-import com.decade.practice.users.dto.UserResponse;
 import com.decade.practice.users.dto.mapper.ClaimsMapper;
 import com.decade.practice.users.dto.mapper.UserMapper;
 import com.decade.practice.web.security.TokenService;
@@ -59,8 +59,8 @@ public class TokenSessionServiceImpl implements TokenSessionService {
     @Override
     public AccountResponse login(String username) {
         User user = users.findByUsername(username).orElseThrow();
-        UserResponse userResponse = userMapper.toResponse(user);
-        UserClaims claims = claimsMapper.toClaims(userResponse);
+        ProfileResponse profileResponse = userMapper.toResponse(user);
+        UserClaims claims = claimsMapper.toClaims(profileResponse);
         String accessToken = tokenService.encodeToken(claims, FIFTEEN_MINUTES);
         String refresh = tokenService.encodeToken(claims, ONE_WEEK);
 
@@ -68,6 +68,6 @@ public class TokenSessionServiceImpl implements TokenSessionService {
                 accessToken,
                 refresh
         );
-        return new AccountResponse(userResponse, credential);
+        return new AccountResponse(profileResponse, credential);
     }
 }

@@ -5,8 +5,11 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.redis.connection.Message;
 import org.springframework.data.redis.connection.MessageListener;
+import org.springframework.messaging.simp.SimpMessageHeaderAccessor;
 import org.springframework.messaging.simp.SimpMessagingTemplate;
+import org.springframework.messaging.support.MessageBuilder;
 import org.springframework.stereotype.Component;
+import org.springframework.util.MimeTypeUtils;
 
 import java.nio.charset.StandardCharsets;
 
@@ -15,52 +18,61 @@ import java.nio.charset.StandardCharsets;
 @RequiredArgsConstructor
 public class RelayListener implements MessageListener {
 
-    @Value("${broker.topics.queue}")
-    private String brokerQueueTopic;
+      @Value("${broker.topics.queue}")
+      private String brokerQueueTopic;
 
-    @Value("${broker.topics.live}")
-    private String brokerLiveTopic;
+      @Value("${broker.topics.live}")
+      private String brokerLiveTopic;
 
-    @Value("${websocket.topics.user}")
-    private String userTopic;
+      @Value("${websocket.topics.queue}")
+      private String queueTopic;
 
-    @Value("${websocket.topics.queue}")
-    private String queueTopic;
-
-    @Value("${websocket.topics.live}")
-    private String liveTopic;
+      @Value("${websocket.topics.live}")
+      private String liveTopic;
 
 
-    private final SimpMessagingTemplate template;
+      private final SimpMessagingTemplate template;
 
+      @Override
+      public void onMessage(Message message, byte[] pattern) {
+            try {
 
-    @Override
-    public void onMessage(Message message, byte[] pattern) {
-        try {
+                  String channel = new String(
+                            message.getChannel(),
+                            StandardCharsets.UTF_8
+                  );
+                  byte[] body = message.getBody();
+                  if (channel.startsWith(brokerQueueTopic)) {
+                        String userId = channel.split(":")[1];
+                        template.convertAndSendToUser(
+                                  userId,
+                                  queueTopic,
+                                  body,
+                                  m -> {
+                                        SimpMessageHeaderAccessor accessor = SimpMessageHeaderAccessor.wrap(m);
+                                        accessor.setContentType(MimeTypeUtils.APPLICATION_JSON);
+                                        accessor.setNativeHeader("content-type", MimeTypeUtils.APPLICATION_JSON_VALUE);
+                                        return MessageBuilder.createMessage(m.getPayload(), accessor.getMessageHeaders());
+                                  }
+                        );
+                  } else if (channel.startsWith(brokerLiveTopic)) {
+                        String chatId = channel.split(":")[1];
 
-            String channel = new String(
-                    message.getChannel(),
-                    StandardCharsets.UTF_8
-            );
-            String body = new String(message.getBody(), StandardCharsets.UTF_8);
-            if (channel.startsWith(brokerQueueTopic)) {
-                String userId = channel.split(":")[1];
-                template.convertAndSendToUser(
-                        userId,
-                        userTopic + queueTopic,
-                        body
-                );
-            } else if (channel.startsWith(brokerLiveTopic)) {
-                String chatId = channel.split(":")[1];
-
-                template.convertAndSend(
-                        liveTopic + "/" + chatId,
-                        body
-                );
+                        template.convertAndSend(
+                                  liveTopic + "/" + chatId,
+                                  body,
+                                  m -> {
+                                        SimpMessageHeaderAccessor accessor =
+                                                  SimpMessageHeaderAccessor.wrap(m);
+                                        accessor.setContentType(MimeTypeUtils.APPLICATION_JSON);
+                                        accessor.setNativeHeader("content-type", MimeTypeUtils.APPLICATION_JSON_VALUE);
+                                        return MessageBuilder.createMessage(m.getPayload(), accessor.getMessageHeaders());
+                                  }
+                        );
+                  }
+                  log.debug("Received user currentState");
+            } catch (Exception e) {
+                  log.error("Failed to receive currentState", e);
             }
-            log.debug("Received user event: {}", body);
-        } catch (Exception e) {
-            log.error("Failed to receive event", e);
-        }
-    }
+      }
 }

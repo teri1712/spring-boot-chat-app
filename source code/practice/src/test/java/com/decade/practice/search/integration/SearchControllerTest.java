@@ -24,67 +24,67 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 @Sql(scripts = {"/sql/clean.sql"}, executionPhase = Sql.ExecutionPhase.AFTER_TEST_METHOD)
 class SearchControllerTest extends BaseTestClass {
 
-    @Autowired
-    private MockMvc mockMvc;
+      @Autowired
+      private MockMvc mockMvc;
 
-    @Autowired
-    private UserDocumentRepository userDocumentRepository;
+      @Autowired
+      private UserDocumentRepository userDocumentRepository;
 
-    @Autowired
-    private MessageDocumentRepository messageDocumentRepository;
+      @Autowired
+      private MessageDocumentRepository messageDocumentRepository;
 
-    @BeforeEach
-    void setUp() {
-        messageDocumentRepository.deleteAll();
-        userDocumentRepository.deleteAll();
-    }
+      @BeforeEach
+      void setUp() {
+            messageDocumentRepository.deleteAll();
+            userDocumentRepository.deleteAll();
+      }
 
-    @Test
-    @WithUserDetails("alice")
-    void givenUsersExist_whenFindUsers_shouldReturnUserList() throws Exception {
-        UUID userId = UUID.randomUUID();
-        UserDocument user = new UserDocument(userId, "searchable_user", "Searchable Name", "Male", "vcl.jpg");
-        userDocumentRepository.save(user);
+      @Test
+      @WithUserDetails("alice")
+      void givenUsersExist_whenFindUsers_shouldReturnUserList() throws Exception {
+            UUID userId = UUID.randomUUID();
+            UserDocument user = new UserDocument(userId, "searchable_user", "Searchable Name", "Male", "vcl.jpg");
+            userDocumentRepository.save(user);
 
-        mockMvc.perform(get("/users")
-                        .param("query", "searchable")
-                        .contentType(MediaType.APPLICATION_JSON))
-                .andExpect(status().isOk())
-                .andExpect(jsonPath("$[0].username").value("searchable_user"))
-                .andExpect(jsonPath("$[0].name").value("Searchable Name"));
-    }
+            mockMvc.perform(get("/users")
+                                .param("query", "searchable")
+                                .contentType(MediaType.APPLICATION_JSON))
+                      .andExpect(status().isOk())
+                      .andExpect(jsonPath("$[0].name").value("Searchable Name"));
+      }
 
-    @Test
-    void givenUnauthenticatedUser_whenFindMessages_thenReturnsUnauthorized() throws Exception {
-        mockMvc.perform(get("/me/history/messages")
-                        .param("query", "hello")
-                        .contentType(MediaType.APPLICATION_JSON))
-                .andExpect(status().isUnauthorized());
-    }
+      @Test
+      void givenUnauthenticatedUser_whenFindMessages_thenReturnsUnauthorized() throws Exception {
+            mockMvc.perform(get("/me/history/messages")
+                                .param("query", "hello")
+                                .contentType(MediaType.APPLICATION_JSON))
+                      .andExpect(status().isUnauthorized());
+      }
 
-    @Test
-    @WithUserDetails("alice")
-    void givenAuthenticatedUser_whenFindMessages_thenReturnsMessageHistory() throws Exception {
-        UUID userId = UUID.fromString("11111111-1111-1111-1111-111111111111");
-        UUID partnerId = UUID.randomUUID();
-        MessageDocument message = new MessageDocument(UUID.randomUUID(), userId, userId + "+" + partnerId, "Room", "unique message content", Instant.now());
-        messageDocumentRepository.save(message);
+      @Test
+      @WithUserDetails("alice")
+      void givenAuthenticatedUser_whenFindMessages_thenReturnsMessageHistory() throws Exception {
+            UUID userId = UUID.fromString("11111111-1111-1111-1111-111111111111");
+            UUID partnerId = UUID.randomUUID();
+            MessageDocument message = new MessageDocument(UUID.randomUUID(), userId, userId + "+" + partnerId, "Room", "unique currentState content", Instant.now());
+            messageDocumentRepository.save(message);
 
-        mockMvc.perform(get("/me/history/messages")
-                        .param("query", "unique")
-                        .contentType(MediaType.APPLICATION_JSON))
-                .andExpect(status().isOk())
-                .andExpect(jsonPath("$[0].content").value("unique message content"))
-                .andExpect(jsonPath("$[0].partnerName").value("Partner"));
-    }
+            mockMvc.perform(get("/me/history/messages")
+                                .param("query", "unique")
+                                .contentType(MediaType.APPLICATION_JSON))
+                      .andExpect(status().isOk())
+                      .andExpect(jsonPath("$.length()").value(1))
+                      .andExpect(jsonPath("$[0].content").value("unique currentState content"))
+                      .andExpect(jsonPath("$[0].roomName").value("Room"));
+      }
 
-    @Test
-    @WithUserDetails("alice")
-    void givenEmptyQuery_whenFindUsers_thenReturnsEmptyList() throws Exception {
-        mockMvc.perform(get("/users")
-                        .param("query", "")
-                        .contentType(MediaType.APPLICATION_JSON))
-                .andExpect(status().isOk())
-                .andExpect(jsonPath("$.length()").value(0));
-    }
+      @Test
+      @WithUserDetails("alice")
+      void givenEmptyQuery_whenFindUsers_thenReturnsEmptyList() throws Exception {
+            mockMvc.perform(get("/users")
+                                .param("query", "")
+                                .contentType(MediaType.APPLICATION_JSON))
+                      .andExpect(status().isOk())
+                      .andExpect(jsonPath("$.length()").value(0));
+      }
 }

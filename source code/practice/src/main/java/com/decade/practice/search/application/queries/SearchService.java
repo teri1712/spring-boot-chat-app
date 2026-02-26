@@ -7,7 +7,8 @@ import java.util.List;
 import java.util.UUID;
 
 public interface SearchService {
-    List<MatchingUserResponse> searchUsers(String query);
 
-    List<MatchingMessageHistoryResponse> searchMessages(UUID owner, String query);
+      List<MatchingUserResponse> searchUsers(String query);
+
+      List<MatchingMessageHistoryResponse> searchMessages(UUID owner, String query);
 }

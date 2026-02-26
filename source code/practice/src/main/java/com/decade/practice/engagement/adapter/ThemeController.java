@@ -1,7 +1,7 @@
 package com.decade.practice.engagement.adapter;
 
-import com.decade.practice.engagement.application.ports.out.ThemeRepository;
-import com.decade.practice.engagement.domain.Theme;
+import com.decade.practice.engagement.application.query.ThemeService;
+import com.decade.practice.engagement.dto.ThemeResponse;
 import lombok.AllArgsConstructor;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -14,10 +14,10 @@ import java.util.List;
 @AllArgsConstructor
 public class ThemeController {
 
-    private final ThemeRepository themeRepository;
+      private final ThemeService themeService;
 
-    @GetMapping
-    public List<Theme> getThemes() {
-        return themeRepository.findAll();
-    }
+      @GetMapping
+      public List<ThemeResponse> getThemes() {
+            return themeService.findAll();
+      }
 }

@@ -5,13 +5,13 @@ import lombok.Getter;
 import java.util.UUID;
 
 @Getter
-public class IconCommand extends EventCommand {
+public class IconCommand extends ParticipantCommand {
 
 
-    private final Integer iconId;
+      private final Integer iconId;
 
-    public IconCommand(String chatId, UUID senderId, UUID idempotentKey, Integer iconId) {
-        super(chatId, senderId, idempotentKey);
-        this.iconId = iconId;
-    }
+      public IconCommand(String chatId, UUID senderId, UUID idempotentKey, Integer iconId) {
+            super(chatId, senderId, idempotentKey);
+            this.iconId = iconId;
+      }
 }

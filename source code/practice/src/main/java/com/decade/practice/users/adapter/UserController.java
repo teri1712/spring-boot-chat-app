@@ -1,8 +1,8 @@
 package com.decade.practice.users.adapter;
 
-import com.decade.practice.users.application.ports.in.UserService;
+import com.decade.practice.users.application.ports.in.ProfileService;
+import com.decade.practice.users.dto.ProfileResponse;
 import com.decade.practice.users.dto.SignUpRequest;
-import com.decade.practice.users.dto.UserResponse;
 import jakarta.validation.Valid;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -17,7 +17,7 @@ import org.springframework.web.bind.annotation.*;
 @AllArgsConstructor
 public class UserController {
 
-    private final UserService userService;
+    private final ProfileService profileService;
 
     @ExceptionHandler(DataIntegrityViolationException.class)
     @ResponseStatus(HttpStatus.CONFLICT)
@@ -31,9 +31,9 @@ public class UserController {
     @PostMapping
     // TODO: Adjust client to problem detail
     @ResponseStatus(HttpStatus.CREATED)
-    public UserResponse registerUser(
+    public ProfileResponse registerUser(
             @RequestBody @Valid SignUpRequest signUpRequest
     ) {
-        return userService.create(signUpRequest, true);
+        return profileService.create(signUpRequest, true);
     }
 }

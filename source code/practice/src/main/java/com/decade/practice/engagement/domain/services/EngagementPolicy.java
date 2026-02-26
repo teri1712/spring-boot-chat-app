@@ -9,15 +9,19 @@ import org.springframework.stereotype.Service;
 @Service
 public class EngagementPolicy {
 
-    public void applyRead(Participant participant, Chat chat) {
-        ParticipantPolicy policy = participant.getParticipantPolicy();
-        if (!policy.read())
-            throw new AccessDeniedException("You do not have permission to read");
-    }
+      public void applyRead(Participant participant, Chat chat) {
+            if (participant == null)
+                  throw new AccessDeniedException("You do not have permission to read");
+            ParticipantPolicy policy = participant.getParticipantPolicy();
+            if (!policy.read())
+                  throw new AccessDeniedException("You do not have permission to read");
+      }
 
-    public void applyWrite(Participant participant, Chat chat) {
-        ParticipantPolicy policy = participant.getParticipantPolicy();
-        if (!policy.write())
-            throw new AccessDeniedException("You do not have permission to read");
-    }
+      public void applyWrite(Participant participant, Chat chat) {
+            if (participant == null)
+                  throw new AccessDeniedException("You do not have permission to write");
+            ParticipantPolicy policy = participant.getParticipantPolicy();
+            if (!policy.write())
+                  throw new AccessDeniedException("You do not have permission to write");
+      }
 }

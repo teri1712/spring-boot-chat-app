@@ -1,9 +1,9 @@
 package com.decade.practice.users.adapter;
 
 import com.decade.practice.users.adapter.validation.StrongPassword;
-import com.decade.practice.users.application.ports.in.UserService;
+import com.decade.practice.users.application.ports.in.ProfileService;
 import com.decade.practice.users.dto.ProfileRequest;
-import com.decade.practice.users.dto.UserResponse;
+import com.decade.practice.users.dto.ProfileResponse;
 import jakarta.persistence.OptimisticLockException;
 import jakarta.validation.Valid;
 import lombok.AllArgsConstructor;
@@ -20,28 +20,28 @@ import java.util.UUID;
 @RequestMapping("/accounts/me")
 public class AccountController {
 
-    private final UserService userService;
+    private final ProfileService profileService;
 
     @GetMapping
-    public UserResponse get(Principal principal) {
-        return userService.findByUsername(principal.getName());
+    public ProfileResponse get(Principal principal) {
+        return profileService.findByUsername(principal.getName());
     }
 
     @PatchMapping("/profile")
-    public UserResponse changeProfile(
+    public ProfileResponse changeProfile(
             @RequestBody @Valid ProfileRequest profile,
             @AuthenticationPrincipal(expression = "id") UUID id
     ) throws OptimisticLockException {
-        return userService.changeProfile(id, profile);
+        return profileService.changeProfile(id, profile);
     }
 
     // TODO: Adjust client url
     @PostMapping("/password")
-    public UserResponse changePassword(
+    public ProfileResponse changePassword(
             @AuthenticationPrincipal(expression = "id") UUID id,
             @RequestParam(value = "password", required = false) String password,
             @StrongPassword @RequestParam("new_password") String newPassword
     ) {
-        return userService.changePassword(id, newPassword, password);
+        return profileService.changePassword(id, newPassword, password);
     }
 }

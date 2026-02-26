@@ -7,16 +7,16 @@ import java.util.UUID;
 
 @Service
 public class TwoParticipantChatIdentifierMaker implements ChatIdentifierMaker {
-    @Override
-    public String make(ChatCreators creators) {
-        UUID smaller, bigger;
-        if (creators.firstCreator().compareTo(creators.secondCreator()) > 0) {
-            smaller = creators.secondCreator();
-            bigger = creators.firstCreator();
-        } else {
-            smaller = creators.firstCreator();
-            bigger = creators.secondCreator();
-        }
-        return smaller + "+" + bigger;
-    }
+      @Override
+      public String make(ChatCreators creators) {
+            UUID smaller, bigger;
+            if (creators.callerId().compareTo(creators.partnerId()) > 0) {
+                  smaller = creators.partnerId();
+                  bigger = creators.callerId();
+            } else {
+                  smaller = creators.callerId();
+                  bigger = creators.partnerId();
+            }
+            return smaller + "+" + bigger;
+      }
 }

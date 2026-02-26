@@ -22,17 +22,18 @@ import java.util.UUID;
 @Transactional
 public class ChatServiceImpl implements ChatService {
 
-    private final ChatRepository chatRepo;
-    private final ChatMapper chatMapper;
-    private final EngagementPolicy engagementPolicy;
-    private final ParticipantRepository participants;
+      private final ChatRepository chatRepo;
+      private final ChatMapper chatMapper;
+      private final EngagementPolicy engagementPolicy;
+      private final ParticipantRepository participants;
 
 
-    @Override
-    public ChatResponse getDetails(String chatId, UUID userId) {
-        Participant participant = participants.findById(new ParticipantId(userId, chatId)).orElseThrow();
-        Chat chat = chatRepo.findById(chatId).orElseThrow();
-        engagementPolicy.applyRead(participant, chat);
-        return chatMapper.toResponse(chat, false);
-    }
+      @Override
+      public ChatResponse find(String chatId, UUID userId) {
+            Participant participant = participants.findById(new ParticipantId(userId, chatId)).orElse(null);
+            Chat chat = chatRepo.findById(chatId).orElseThrow();
+            engagementPolicy.applyRead(participant, chat);
+            return chatMapper.toResponse(chat, false);
+      }
+
 }

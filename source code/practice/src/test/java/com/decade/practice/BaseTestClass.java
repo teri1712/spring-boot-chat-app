@@ -34,85 +34,85 @@ import static org.testcontainers.containers.localstack.LocalStackContainer.Servi
 public abstract class BaseTestClass {
 
 
-    static PostgreSQLContainer<?> POSTGRES =
-            new PostgreSQLContainer<>("postgres:16")
-                    .withDatabaseName("chatapp")
-                    .withUsername("test")
-                    .withPassword("test");
+      static PostgreSQLContainer<?> POSTGRES =
+                new PostgreSQLContainer<>("postgres:16")
+                          .withDatabaseName("chatapp")
+                          .withUsername("test")
+                          .withPassword("test");
 
-    static GenericContainer<?> REDIS =
-            new GenericContainer<>("redis:7")
-                    .withExposedPorts(6379);
+      static GenericContainer<?> REDIS =
+                new GenericContainer<>("redis:7")
+                          .withExposedPorts(6379);
 
-    static LocalStackContainer LOCALSTACK =
-            new LocalStackContainer(
-                    DockerImageName.parse("localstack/localstack:3.0")
-            )
-                    .withServices(LocalStackContainer.Service.S3);
+      static LocalStackContainer LOCALSTACK =
+                new LocalStackContainer(
+                          DockerImageName.parse("localstack/localstack:3.0")
+                )
+                          .withServices(LocalStackContainer.Service.S3);
 
-    static ElasticsearchContainer ELASTICSEARCH =
-            new ElasticsearchContainer("docker.elastic.co/elasticsearch/elasticsearch:8.12.2")
-                    .withEnv("xpack.security.enabled", "false")
-                    .withEnv("discovery.type", "single-node");
+      static ElasticsearchContainer ELASTICSEARCH =
+                new ElasticsearchContainer("docker.elastic.co/elasticsearch/elasticsearch:8.12.2")
+                          .withEnv("xpack.security.enabled", "false")
+                          .withEnv("discovery.type", "single-node");
 
 //
 //    static KafkaContainer KAFKA =
 //            new KafkaContainer(DockerImageName.parse("apache/kafka:3.7.0"));
 
-    static {
-        POSTGRES.start();
-        REDIS.start();
-        LOCALSTACK.start();
-        ELASTICSEARCH.start();
+      static {
+            POSTGRES.start();
+            REDIS.start();
+            LOCALSTACK.start();
+            ELASTICSEARCH.start();
 //        KAFKA.start();
 
-    }
+      }
 
-    @DynamicPropertySource
-    static void registerRedisProperties(DynamicPropertyRegistry registry) {
-        registry.add("spring.data.redis.host", REDIS::getHost);
-        registry.add("spring.data.redis.port", () -> REDIS.getMappedPort(6379));
+      @DynamicPropertySource
+      static void registerRedisProperties(DynamicPropertyRegistry registry) {
+            registry.add("spring.data.redis.host", REDIS::getHost);
+            registry.add("spring.data.redis.port", () -> REDIS.getMappedPort(6379));
 
-        registry.add("spring.datasource.url", POSTGRES::getJdbcUrl);
-        registry.add("spring.datasource.username", POSTGRES::getUsername);
-        registry.add("spring.datasource.password", POSTGRES::getPassword);
+            registry.add("spring.datasource.url", POSTGRES::getJdbcUrl);
+            registry.add("spring.datasource.username", POSTGRES::getUsername);
+            registry.add("spring.datasource.password", POSTGRES::getPassword);
 
-        registry.add("aws.s3.endpoint", () -> LOCALSTACK.getEndpointOverride(S3).toString());
-        registry.add("aws.s3.access.id", () -> LOCALSTACK.getAccessKey());
-        registry.add("aws.s3.access.secret", () -> LOCALSTACK.getSecretKey());
-        registry.add("aws.s3.region", () -> LOCALSTACK.getRegion());
+            registry.add("aws.s3.endpoint", () -> LOCALSTACK.getEndpointOverride(S3).toString());
+            registry.add("aws.s3.access.id", () -> LOCALSTACK.getAccessKey());
+            registry.add("aws.s3.access.secret", () -> LOCALSTACK.getSecretKey());
+            registry.add("aws.s3.region", () -> LOCALSTACK.getRegion());
 
-        registry.add("spring.elasticsearch.uris", ELASTICSEARCH::getHttpHostAddress);
+            registry.add("spring.elasticsearch.uris", ELASTICSEARCH::getHttpHostAddress);
 
 //
 //        registry.add("spring.kafka.bootstrap-servers",
 //                KAFKA::getBootstrapServers);
-    }
+      }
 
 
-    @AfterAll
-    static void cleanUp(@Autowired RedisTemplate<String, Object> redisTemplate) {
-        redisTemplate.getConnectionFactory().getConnection().flushAll();
-    }
+      @AfterAll
+      static void cleanUp(@Autowired RedisTemplate<String, Object> redisTemplate) {
+            redisTemplate.getConnectionFactory().getConnection().flushAll();
+      }
 
-    @BeforeAll
-    static void setUpBucket(@Value("${aws.s3.bucket}") String bucket) {
+      @BeforeAll
+      static void setUpBucket(@Value("${aws.s3.bucket}") String bucket) {
 
-        try (S3Client s3Client = S3Client.builder()
-                .endpointOverride(LOCALSTACK.getEndpointOverride(S3))
-                .region(Region.of(LOCALSTACK.getRegion()))
-                .serviceConfiguration(S3Configuration.builder()
-                        .pathStyleAccessEnabled(true)
-                        .build())
-                .credentialsProvider(StaticCredentialsProvider.create(
-                        AwsBasicCredentials.create(LOCALSTACK.getAccessKey(), LOCALSTACK.getSecretKey())
-                ))
-                .build()) {
-            s3Client.createBucket(CreateBucketRequest.builder()
-                    .bucket(bucket)
-                    .build());
-        }
-    }
+            try (S3Client s3Client = S3Client.builder()
+                      .endpointOverride(LOCALSTACK.getEndpointOverride(S3))
+                      .region(Region.of(LOCALSTACK.getRegion()))
+                      .serviceConfiguration(S3Configuration.builder()
+                                .pathStyleAccessEnabled(true)
+                                .build())
+                      .credentialsProvider(StaticCredentialsProvider.create(
+                                AwsBasicCredentials.create(LOCALSTACK.getAccessKey(), LOCALSTACK.getSecretKey())
+                      ))
+                      .build()) {
+                  s3Client.createBucket(CreateBucketRequest.builder()
+                            .bucket(bucket)
+                            .build());
+            }
+      }
 
 
 }

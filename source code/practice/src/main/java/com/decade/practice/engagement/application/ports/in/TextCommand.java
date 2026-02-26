@@ -7,11 +7,11 @@ import java.util.UUID;
 
 
 @Getter
-public class TextCommand extends EventCommand {
-    private final String content;
+public class TextCommand extends ParticipantCommand {
+      private final String content;
 
-    public TextCommand(String chatId, UUID senderId, UUID idempotentKey, String content) {
-        super(chatId, senderId, idempotentKey);
-        this.content = content;
-    }
+      public TextCommand(String chatId, UUID senderId, UUID idempotentKey, String content) {
+            super(chatId, senderId, idempotentKey);
+            this.content = content;
+      }
 }

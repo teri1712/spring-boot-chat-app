@@ -6,6 +6,5 @@ import java.util.UUID;
 
 public interface ChatService {
 
-    ChatResponse getDetails(String chatId, UUID userId);
-
+      ChatResponse find(String chatId, UUID userId);
 }

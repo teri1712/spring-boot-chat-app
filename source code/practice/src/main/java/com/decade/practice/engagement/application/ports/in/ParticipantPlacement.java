@@ -1,7 +1,7 @@
 package com.decade.practice.engagement.application.ports.in;
 
-import com.decade.practice.engagement.dto.ReceiptResponse;
+import com.decade.practice.engagement.dto.ChatEventResponse;
 
-public interface ParticipantPlacement {
-    ReceiptResponse place(EventCommand eventCommand);
+public interface ParticipantPlacement<C extends ParticipantCommand> {
+      ChatEventResponse place(C participantCommand);
 }

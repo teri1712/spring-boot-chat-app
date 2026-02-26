@@ -16,22 +16,22 @@ import java.util.UUID;
 @AllArgsConstructor
 public class SearchController {
 
-    private final SearchService searchService;
+      private final SearchService searchService;
 
-    @GetMapping("/users")
-    public List<MatchingUserResponse> findUsers(
-            @RequestParam() String query
-    ) {
-        return searchService.searchUsers(query);
-    }
+      @GetMapping("/users")
+      public List<MatchingUserResponse> findUsers(
+                @RequestParam() String query
+      ) {
+            return searchService.searchUsers(query);
+      }
 
 
-    @GetMapping("/me/history/messages")
-    public List<MatchingMessageHistoryResponse> findMessages(
-            @AuthenticationPrincipal(expression = "id") UUID userId,
-            @RequestParam() String query
-    ) {
-        return searchService.searchMessages(userId, query);
-    }
+      @GetMapping("/me/history/messages")
+      public List<MatchingMessageHistoryResponse> findMessages(
+                @AuthenticationPrincipal(expression = "id") UUID userId,
+                @RequestParam String query
+      ) {
+            return searchService.searchMessages(userId, query);
+      }
 
 }

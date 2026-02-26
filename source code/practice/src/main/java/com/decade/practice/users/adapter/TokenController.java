@@ -1,8 +1,8 @@
 package com.decade.practice.users.adapter;
 
 import com.decade.practice.users.adapter.security.strategies.LoginSuccessStrategy;
+import com.decade.practice.users.application.ports.in.ProfileService;
 import com.decade.practice.users.application.ports.in.TokenSessionService;
-import com.decade.practice.users.application.ports.in.UserService;
 import com.decade.practice.users.domain.User;
 import com.decade.practice.users.dto.SignUpRequest;
 import com.decade.practice.users.dto.TokenCredential;
@@ -39,7 +39,7 @@ import java.util.UUID;
 @RequestMapping("/tokens")
 public class TokenController {
 
-    private final UserService userService;
+    private final ProfileService profileService;
     private final LoginSuccessStrategy loginSuccessStrategy;
     private final TokenSessionService tokenSessionService;
 
@@ -64,7 +64,7 @@ public class TokenController {
         signUpRequest.setAvatar(picture);
         signUpRequest.setPassword(UUID.randomUUID().toString());
         try {
-            userService.createIfNotExists(signUpRequest, false);
+            profileService.createIfNotExists(signUpRequest, false);
         } catch (DataIntegrityViolationException ignored) {
             log.debug("Oauth2 user already exists");
         }

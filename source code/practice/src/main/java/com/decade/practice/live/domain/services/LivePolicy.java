@@ -1,6 +1,6 @@
 package com.decade.practice.live.domain.services;
 
-import com.decade.practice.engagement.api.EngagementFacade;
+import com.decade.practice.engagement.api.EngagementApi;
 import com.decade.practice.engagement.api.EngagementRule;
 import com.decade.practice.live.domain.LiveJoiner;
 import lombok.AllArgsConstructor;
@@ -11,7 +11,7 @@ import org.springframework.stereotype.Service;
 @AllArgsConstructor
 public class LivePolicy {
 
-    private final EngagementFacade engagement;
+    private final EngagementApi engagement;
 
     public void leave(LiveJoiner joiner) {
         EngagementRule participant = engagement.find(joiner.getChatId().value(), joiner.getUserId());
