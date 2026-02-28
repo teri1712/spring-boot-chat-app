@@ -2,6 +2,7 @@ package com.decade.practice.inbox.application.services;
 
 import com.decade.practice.engagement.api.EngagementApi;
 import com.decade.practice.engagement.api.EngagementRule;
+import com.decade.practice.engagement.api.RuleNotFoundException;
 import com.decade.practice.inbox.application.ports.out.ConversationRepository;
 import com.decade.practice.inbox.application.ports.out.LogRepository;
 import com.decade.practice.inbox.application.ports.out.projection.LogWithConversation;
@@ -17,6 +18,7 @@ import com.decade.practice.users.api.UserApi;
 import com.decade.practice.users.api.UserInfo;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.security.access.AccessDeniedException;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -42,7 +44,13 @@ public class LogServiceImpl implements LogService {
 
       @Override
       public List<InboxLogResponse> findByChatAndSequenceLessThanEqual(UUID userId, String chatId, Long anchorSequenceId) {
-            EngagementRule engagementRule = engagementApi.find(chatId, userId);
+            EngagementRule engagementRule = null;
+            try {
+                  engagementRule = engagementApi.find(chatId, userId);
+            } catch (RuleNotFoundException e) {
+                  log.warn("Participant not found for chatId: {}, userId: {}", chatId, userId);
+                  throw new AccessDeniedException("You are not allowed to perform this operation");
+            }
             logPolicy.applyRead(engagementRule);
             log.trace("Finding events for ownerId '{}' and chat '{}'", userId, chatId);
             List<InboxLog> logList = logs.findByOwnerIdAndChatIdAndSequenceIdLessThanEqual(userId, chatId, anchorSequenceId, LogUtils.SEQUENCE_LESS_THAN_EQUAL);
@@ -51,7 +59,7 @@ public class LogServiceImpl implements LogService {
                                 .map(InboxLog::getSenderId)
                                 .collect(Collectors.toSet()));
             Conversation conversation = conversations.findById(new ConversationId(chatId, userId)).orElseThrow();
-            return mapper.map(logList, new InboxLogMapper.InboxContext(userMap, conversation.getRoomName(), conversation.getRoomAvatar()));
+            return mapper.map(logList, new InboxLogMapper.InboxContext(userMap, conversation.getRoomName(), conversation.getRoomAvatar(), conversation.getHash().value()));
       }
 
       @Override
@@ -72,7 +80,7 @@ public class LogServiceImpl implements LogService {
 
                   @Override
                   public InboxLogResponse apply(LogWithConversation logWithConversation) {
-                        return mapper.map(logWithConversation.log(), new InboxLogMapper.InboxContext(userMap, logWithConversation.conversation().getRoomName(), logWithConversation.conversation().getRoomAvatar()));
+                        return mapper.map(logWithConversation.log(), new InboxLogMapper.InboxContext(userMap, logWithConversation.conversation().getRoomName(), logWithConversation.conversation().getRoomAvatar(), logWithConversation.conversation().getHash().value()));
                   }
             }).toList();
       }

@@ -2,7 +2,7 @@ package com.decade.practice;
 
 import com.decade.practice.engagement.domain.ChatCreators;
 import com.decade.practice.engagement.domain.services.TwoParticipantChatIdentifierMaker;
-import com.decade.practice.engagement.dto.events.ChatSnapshot;
+import com.decade.practice.engagement.dto.events.IntegrationChatSnapshot;
 import com.decade.practice.engagement.dto.events.TextIntegrationChatEventPlaced;
 import lombok.AllArgsConstructor;
 import org.springframework.boot.test.context.TestComponent;
@@ -38,7 +38,7 @@ public class TestBeans {
                   applicationEventPublisher.publishEvent(TextIntegrationChatEventPlaced.builder()
                             .senderId(senderId)
                             .createdAt(Instant.now())
-                            .snapshot(new ChatSnapshot(chatId, null, null, Stream.of(senderId, recipientId).distinct().toList()))
+                            .snapshot(new IntegrationChatSnapshot(chatId, null, null, Stream.of(senderId, recipientId).distinct().toList(), Stream.of(senderId, recipientId).distinct().toList()))
                             .content(message)
                             .build()
                   );

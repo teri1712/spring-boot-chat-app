@@ -30,8 +30,8 @@ import java.util.UUID;
 })
 public class MessageStateResponse {
 
-      private Long id;
-      private UUID chatEventId;
+      private Long sequenceNumber;
+      private UUID engagementId;
       private PartnerResponse sender;
       private String messageType;
       private String chatId;

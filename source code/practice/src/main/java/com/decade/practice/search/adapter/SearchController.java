@@ -29,9 +29,10 @@ public class SearchController {
       @GetMapping("/me/history/messages")
       public List<MatchingMessageHistoryResponse> findMessages(
                 @AuthenticationPrincipal(expression = "id") UUID userId,
+                @RequestParam String chatId,
                 @RequestParam String query
       ) {
-            return searchService.searchMessages(userId, query);
+            return searchService.searchMessages(userId, chatId, query);
       }
 
 }

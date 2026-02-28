@@ -16,10 +16,10 @@ import java.util.stream.Collectors;
 @AllArgsConstructor
 public class UserApiImpl implements UserApi {
 
-    private final UserRepository users;
+      private final UserRepository users;
 
-    @Override
-    public Map<UUID, UserInfo> getUserInfo(Set<UUID> ids) {
-        return users.findByIdIn(ids).collect(Collectors.toMap(UserInfo::getId, Function.identity()));
-    }
+      @Override
+      public Map<UUID, UserInfo> getUserInfo(Set<UUID> ids) {
+            return users.findByIdIn(ids).stream().collect(Collectors.toMap(UserInfo::getId, Function.identity()));
+      }
 }

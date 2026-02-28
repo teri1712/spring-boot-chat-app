@@ -72,7 +72,7 @@ class MessageListingTest extends BaseTestClass {
 
 
             mockMvc.perform(get("/chats/{chatId}/messages", aliceBobChat)
-                                .param("anchorSequenceId", messages.get(1).getId().toString()))
+                                .param("anchorSequenceId", messages.get(1).getSequenceNumber().toString()))
                       .andExpect(status().isOk())
                       .andExpect(jsonPath("$.length()").value(3))
                       .andExpect(jsonPath("$[0].content").value("dcm"))

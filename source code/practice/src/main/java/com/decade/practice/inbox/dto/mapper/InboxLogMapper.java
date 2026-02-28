@@ -13,13 +13,17 @@ import java.util.UUID;
 
 @Mapper(unmappedTargetPolicy = ReportingPolicy.ERROR, componentModel = MappingConstants.ComponentModel.SPRING, uses = {PartnerMapper.class})
 public interface InboxLogMapper {
+
+
       @Mapping(target = "roomNameSnapshot", expression = "java(context.roomNameSnapshot())")
       @Mapping(target = "roomAvatarSnapshot", expression = "java(context.roomAvatarSnapshot())")
+      @Mapping(target = "revisionNumber", expression = "java(context.chatHash())")
       InboxLogResponse map(InboxLogCreated inboxLogCreated, @Context InboxContext context);
 
 
       @Mapping(target = "roomNameSnapshot", expression = "java(context.roomNameSnapshot())")
       @Mapping(target = "roomAvatarSnapshot", expression = "java(context.roomAvatarSnapshot())")
+      @Mapping(target = "revisionNumber", expression = "java(context.chatHash())")
       InboxLogResponse map(InboxLog inboxLog, @Context InboxContext context);
 
 
@@ -30,6 +34,8 @@ public interface InboxLogMapper {
       @SubclassMapping(source = PreferenceState.class, target = PreferenceStateResponse.class)
       @Mapping(target = "seenBy", source = "message.seenByIds", qualifiedByName = "userResolver")
       @Mapping(target = "sender", source = "message.senderId", qualifiedByName = "userResolver")
+      @Mapping(target = "engagementId", source = "message.chatEventId")
+      @Mapping(target = "sequenceNumber", source = "message.sequenceId")
       MessageStateResponse map(MessageState message, @Context InboxContext context);
 
 
@@ -42,7 +48,7 @@ public interface InboxLogMapper {
             return context.userMap().get(senderId);
       }
 
-      record InboxContext(Map<UUID, UserInfo> userMap, String roomNameSnapshot, String roomAvatarSnapshot) {
+      record InboxContext(Map<UUID, UserInfo> userMap, String roomNameSnapshot, String roomAvatarSnapshot, Long chatHash) {
       }
 
 }

@@ -9,7 +9,7 @@ public record ConversationResponse(
           String identifier,
           String roomName,
           String roomAvatar,
-          Long hashValue,
+          Long revisionNumber,
           Set<PartnerResponse> seenBy,
           List<MessagePreviewResponse> messagePreviews,
           Instant modifiedAt

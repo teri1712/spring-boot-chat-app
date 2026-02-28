@@ -5,9 +5,9 @@ import com.decade.practice.users.application.ports.out.AuthenticationRefreshToke
 import com.decade.practice.users.application.ports.out.TempResource;
 import com.decade.practice.users.application.ports.out.TokenStore;
 import com.decade.practice.users.domain.TokenRetentionPolicy;
-import com.decade.practice.users.domain.User;
 import com.decade.practice.users.domain.events.UserCreated;
 import com.decade.practice.users.domain.events.UserPasswordChangedEvent;
+import com.decade.practice.users.utils.GenderUtils;
 import lombok.AllArgsConstructor;
 import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.stereotype.Service;
@@ -50,13 +50,7 @@ public class UserManagement {
 
       @TransactionalEventListener(phase = TransactionPhase.BEFORE_COMMIT)
       public void on(UserCreated userCreated) {
-            String gender;
-            if (userCreated.gender() == User.MALE) {
-                  gender = "Male";
-            } else if (userCreated.gender() == User.FEMALE) {
-                  gender = "Female";
-            }
-            gender = "Unknown";
+            String gender = GenderUtils.inspect(userCreated.gender());
             applicationEventPublisher.publishEvent(new IntegrationUserCreated(userCreated.userId(), userCreated.username(), userCreated.name(), gender, userCreated.dob(), userCreated.avatar()));
       }
 }

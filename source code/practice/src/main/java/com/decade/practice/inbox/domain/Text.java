@@ -33,7 +33,7 @@ public class Text extends Message {
       public MessageState getState() {
             return TextState.
                       builder()
-                      .id(getSequenceId())
+                      .sequenceId(getSequenceId())
                       .chatEventId(getChatEventId())
                       .senderId(getSenderId())
                       .messageType(getMessageType())

@@ -8,9 +8,9 @@ import com.decade.practice.engagement.domain.*;
 import com.decade.practice.engagement.domain.events.ChatEventPlaced;
 import com.decade.practice.engagement.domain.events.VersionIncremented;
 import com.decade.practice.engagement.domain.services.EngagementPolicy;
-import com.decade.practice.engagement.dto.events.ChatSnapshot;
 import com.decade.practice.engagement.dto.events.EventPlacedMapper;
 import com.decade.practice.engagement.dto.events.IntegrationChatCreated;
+import com.decade.practice.engagement.dto.events.IntegrationChatSnapshot;
 import lombok.AllArgsConstructor;
 import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.context.event.EventListener;
@@ -37,8 +37,12 @@ public class ChatEventListener {
       public void on(ChatCreated chatCreated) {
             IntegrationChatCreated eventPlaced = IntegrationChatCreated.builder()
                       .createdAt(Instant.now())
-                      .senderId(chatCreated.creatorId())
-                      .snapshot(new ChatSnapshot(chatCreated.chatId(), chatCreated.roomName(), chatCreated.roomAvatar(), chatCreated.participants()))
+                      .senderId(chatCreated.callerId())
+                      .snapshot(new IntegrationChatSnapshot(chatCreated.chatId(),
+                                chatCreated.roomName(),
+                                chatCreated.roomAvatar(),
+                                chatCreated.creators(),
+                                chatCreated.participants()))
                       .build();
             publisher.publishEvent(eventPlaced);
       }
@@ -67,7 +71,9 @@ public class ChatEventListener {
             String roomName = preference.roomName();
             String roomAvatar = preference.roomAvatar();
             List<UUID> peers = participants.findByChatId(chatId);
-            ChatSnapshot snapshot = new ChatSnapshot(chatId, roomName, roomAvatar, peers);
+            IntegrationChatSnapshot snapshot = new IntegrationChatSnapshot(chatId, roomName, roomAvatar,
+                      chat.getCreators().members().toList(),
+                      peers);
             publisher.publishEvent(mapper.map(chatEvent, snapshot));
             // TODO: Handle fanout
             events.save(chatEvent);

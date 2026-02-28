@@ -43,7 +43,7 @@ public class Preference extends Message {
       @Override
       public MessageState getState() {
             return PreferenceState.builder()
-                      .id(getSequenceId())
+                      .sequenceId(getSequenceId())
                       .chatEventId(getChatEventId())
                       .senderId(getSenderId())
                       .messageType(getMessageType())

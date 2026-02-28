@@ -3,5 +3,5 @@ package com.decade.practice.engagement.api;
 import java.util.UUID;
 
 public interface EngagementApi {
-    EngagementRule find(String chatId, UUID userId);
+      EngagementRule find(String chatId, UUID userId) throws RuleNotFoundException;
 }

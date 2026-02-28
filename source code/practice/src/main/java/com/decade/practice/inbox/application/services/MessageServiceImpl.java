@@ -44,7 +44,7 @@ public class MessageServiceImpl implements MessageService {
             }).collect(Collectors.toSet()));
 
             return messageList.stream().map(message ->
-                                inboxLogMapper.map(message.getState(), new InboxLogMapper.InboxContext(userMap, null, null)))
+                                inboxLogMapper.map(message.getState(), new InboxLogMapper.InboxContext(userMap, null, null, null)))
                       .toList();
       }
 }

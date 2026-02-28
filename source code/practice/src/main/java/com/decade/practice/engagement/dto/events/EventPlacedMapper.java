@@ -14,6 +14,6 @@ public interface EventPlacedMapper {
       @SubclassMapping(target = PreferenceIntegrationChatEventPlaced.class, source = PreferenceChatEvent.class)
       @Mapping(target = "snapshot", expression = "java(snapshot)")
       @Mapping(target = "chatEventId", source = "id")
-      IntegrationChatEventPlaced map(ChatEvent chatEvent, @Context ChatSnapshot snapshot);
+      IntegrationChatEventPlaced map(ChatEvent chatEvent, @Context IntegrationChatSnapshot snapshot);
 
 }

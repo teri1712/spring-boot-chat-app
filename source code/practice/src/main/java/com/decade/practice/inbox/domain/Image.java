@@ -34,7 +34,7 @@ public class Image extends Message {
       @Override
       public MessageState getState() {
             return ImageState.builder()
-                      .id(getSequenceId())
+                      .sequenceId(getSequenceId())
                       .chatEventId(getChatEventId())
                       .senderId(getSenderId())
                       .messageType(getMessageType())

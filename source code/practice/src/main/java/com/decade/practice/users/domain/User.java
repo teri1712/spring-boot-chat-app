@@ -16,72 +16,68 @@ import java.util.UUID;
 @Table(name = "user_member")
 public class User extends AbstractAggregateRoot<User> {
 
-    public static final float MALE = 1;
-    public static final float FEMALE = 2;
-    public static final float OTHER = 3;
+      @Column(unique = true, nullable = false, updatable = false)
+      private String username;
 
-    @Column(unique = true, nullable = false, updatable = false)
-    private String username;
+      @JsonIgnore
+      @Column(nullable = false)
+      private String password;
 
-    @JsonIgnore
-    @Column(nullable = false)
-    private String password;
+      private String name;
 
-    private String name;
+      @Temporal(value = TemporalType.TIMESTAMP)
+      private Date dob;
 
-    @Temporal(value = TemporalType.TIMESTAMP)
-    private Date dob;
+      @Column(insertable = false, updatable = false)
+      private String role = "ROLE_USER";
 
-    @Column(insertable = false, updatable = false)
-    private String role = "ROLE_USER";
+      @Id
+      private UUID id;
 
-    @Id
-    private UUID id;
+      private String avatar;
 
-    private String avatar;
+      @Version
+      private Integer version;
 
-    @Version
-    private Integer version;
+      @Column(nullable = false)
+      private Float gender;
 
-    @Column(nullable = false)
-    private Float gender;
+      public void changeGender(@NotNull Float gender) {
+            this.gender = gender;
+      }
 
-    public void changeGender(@NotNull Float gender) {
-        this.gender = gender;
-    }
+      public void changeAvatar(@NotNull String avatar) {
+            this.avatar = avatar;
+      }
 
-    public void changeAvatar(@NotNull String avatar) {
-        this.avatar = avatar;
-    }
+      void changePassword(@NotNull String password) {
+            this.password = password;
 
-    void changePassword(@NotNull String password) {
-        this.password = password;
+            registerEvent(new UserPasswordChangedEvent(username));
+      }
 
-        registerEvent(new UserPasswordChangedEvent(username));
-    }
+      public void changeName(@NotNull String name) {
+            this.name = name;
+      }
 
-    public void changeName(@NotNull String name) {
-        this.name = name;
-    }
+      public void changeDob(@NotNull Date dob) {
+            this.dob = dob;
+      }
 
-    public void changeDob(@NotNull Date dob) {
-        this.dob = dob;
-    }
+      protected User() {
+      }
 
-    protected User() {
-    }
+      public User(UUID id, String username, String password, String name, String avatar, Date dob, Float gender) {
+            this.id = id;
+            this.username = username;
+            this.password = password;
+            this.name = name;
+            this.avatar = avatar;
+            this.dob = dob;
+            this.gender = gender;
 
-    public User(UUID id, String username, String password, String name, String avatar, Date dob, Float gender) {
-        this.id = id;
-        this.username = username;
-        this.password = password;
-        this.name = name;
-        this.avatar = avatar;
-        this.dob = dob;
-        this.gender = gender;
-
-        registerEvent(new UserCreated(id, username, name, gender, dob, avatar));
-    }
+            registerEvent(new UserCreated(id, username, name, gender, dob, avatar));
+      }
 
 }
 

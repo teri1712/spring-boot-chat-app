@@ -20,7 +20,7 @@ public class IntegrationChatEventPlaced {
       private final UUID senderId;
       private final UUID chatEventId;
 
-      private final ChatSnapshot snapshot;
+      private final IntegrationChatSnapshot snapshot;
 
       private final Instant createdAt;
 }

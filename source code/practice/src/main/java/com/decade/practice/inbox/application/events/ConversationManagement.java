@@ -1,7 +1,7 @@
 package com.decade.practice.inbox.application.events;
 
-import com.decade.practice.engagement.dto.events.ChatSnapshot;
 import com.decade.practice.engagement.dto.events.IntegrationChatCreated;
+import com.decade.practice.engagement.dto.events.IntegrationChatSnapshot;
 import com.decade.practice.engagement.dto.events.PreferenceIntegrationChatEventPlaced;
 import com.decade.practice.inbox.application.ports.out.ConversationRepository;
 import com.decade.practice.inbox.domain.Conversation;
@@ -21,7 +21,7 @@ public class ConversationManagement {
 
       @ApplicationModuleListener
       public void on(IntegrationChatCreated event) {
-            ChatSnapshot snapshot = event.getSnapshot();
+            IntegrationChatSnapshot snapshot = event.getSnapshot();
             String chatId = snapshot.chatId();
             List<Conversation> conversationList = snapshot.participants().stream()
                       .map(participant -> {
@@ -34,7 +34,7 @@ public class ConversationManagement {
 
       @ApplicationModuleListener
       public void on(PreferenceIntegrationChatEventPlaced prefs) {
-            ChatSnapshot snapshot = prefs.getSnapshot();
+            IntegrationChatSnapshot snapshot = prefs.getSnapshot();
             long rowsAffected = conversations.updateRoomNameAndRoomAvatar(snapshot.chatId(), prefs.getRoomName(), prefs.getRoomAvatar());
             log.info("Updated {} rows for chat {}", rowsAffected, snapshot.chatId());
       }

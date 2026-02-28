@@ -33,7 +33,7 @@ public class Icon extends Message {
       @Override
       public MessageState getState() {
             return IconState.builder()
-                      .id(getSequenceId())
+                      .sequenceId(getSequenceId())
                       .chatEventId(getChatEventId())
                       .senderId(getSenderId())
                       .messageType(getMessageType())

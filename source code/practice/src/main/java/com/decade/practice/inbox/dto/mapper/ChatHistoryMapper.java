@@ -13,7 +13,7 @@ import java.util.UUID;
 public interface ChatHistoryMapper {
 
       @Mapping(source = "conversationId.chatId", target = "identifier")
-      @Mapping(source = "hash.value", target = "hashValue")
+      @Mapping(source = "hash.value", target = "revisionNumber")
       ConversationResponse map(Conversation conversation, @Context Map<UUID, UserInfo> userMap);
 
       default List<ConversationResponse> map(List<Conversation> conversation, @Context Map<UUID, UserInfo> userMap) {

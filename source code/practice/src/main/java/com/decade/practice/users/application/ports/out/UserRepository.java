@@ -4,15 +4,15 @@ import com.decade.practice.users.api.UserInfo;
 import com.decade.practice.users.domain.User;
 import org.springframework.data.repository.CrudRepository;
 
+import java.util.List;
 import java.util.Optional;
 import java.util.Set;
 import java.util.UUID;
-import java.util.stream.Stream;
 
 public interface UserRepository extends CrudRepository<User, UUID> {
 
-    Optional<User> findByUsername(String username);
+      Optional<User> findByUsername(String username);
 
-    Stream<UserInfo> findByIdIn(Set<UUID> ids);
+      List<UserInfo> findByIdIn(Set<UUID> ids);
 
 }

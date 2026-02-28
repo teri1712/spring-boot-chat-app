@@ -1,11 +1,16 @@
 package com.decade.practice.search.application.services;
 
+import com.decade.practice.engagement.api.EngagementApi;
+import com.decade.practice.engagement.api.EngagementRule;
+import com.decade.practice.engagement.api.RuleNotFoundException;
 import com.decade.practice.search.application.queries.SearchService;
 import com.decade.practice.search.domain.MessageDocument;
 import com.decade.practice.search.domain.UserDocument;
 import com.decade.practice.search.dto.MatchingMessageHistoryResponse;
 import com.decade.practice.search.dto.MatchingUserResponse;
+import com.decade.practice.users.api.UserApi;
 import lombok.AllArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.elasticsearch.client.elc.NativeQuery;
 import org.springframework.data.elasticsearch.core.ElasticsearchOperations;
 import org.springframework.data.elasticsearch.core.SearchHit;
@@ -15,16 +20,21 @@ import org.springframework.data.elasticsearch.core.query.Query;
 import org.springframework.data.elasticsearch.core.query.highlight.Highlight;
 import org.springframework.data.elasticsearch.core.query.highlight.HighlightField;
 import org.springframework.data.elasticsearch.core.query.highlight.HighlightFieldParameters;
+import org.springframework.security.access.AccessDeniedException;
 import org.springframework.stereotype.Service;
 
+import java.util.HashSet;
 import java.util.List;
 import java.util.UUID;
 
+@Slf4j
 @Service
 @AllArgsConstructor
 public class SearchServiceImpl implements SearchService {
 
       private final ElasticsearchOperations elasticsearchOperations;
+      private final UserApi userApi;
+      private final EngagementApi engagementApi;
 
       @Override
       public List<MatchingUserResponse> searchUsers(String string) {
@@ -66,17 +76,28 @@ public class SearchServiceImpl implements SearchService {
       }
 
       @Override
-      public List<MatchingMessageHistoryResponse> searchMessages(UUID owner, String string) {
+      public List<MatchingMessageHistoryResponse> searchMessages(UUID userId, String chatId, String string) {
+
+            EngagementRule engagementRule = null;
+            try {
+                  engagementRule = engagementApi.find(chatId, userId);
+            } catch (RuleNotFoundException e) {
+                  log.warn("Participant not found for chatId: {}, userId: {}", chatId, userId);
+                  throw new AccessDeniedException("You are not allowed to perform this operation");
+            }
+            if (!engagementRule.read())
+                  throw new AccessDeniedException("You are not allowed to read this chat messages");
+
             Query query = NativeQuery.builder()
                       .withQuery(q -> q.bool(b -> b
-                                .filter(f -> f.term(t -> t.field("owner").value(owner.toString())))
+                                .filter(f -> f.term(t -> t.field("chatId").value(chatId)))
                                 .should(m -> m.match(mm -> mm.field("content").query(string).fuzziness("AUTO")))
-                                .should(m -> m.match(mm -> mm.field("roomName").query(string).fuzziness("AUTO")))
+                                .should(m -> m.match(mm -> mm.field("chatRoomName").query(string).fuzziness("AUTO")))
                                 .minimumShouldMatch("1")
                       ))
                       .withHighlightQuery(new HighlightQuery(
                                 new Highlight(List.of(
-                                          new HighlightField("roomName",
+                                          new HighlightField("chatRoomName",
                                                     HighlightFieldParameters.builder()
                                                               .withPreTags("<strong>")
                                                               .withPostTags("</strong>")
@@ -97,10 +118,12 @@ public class SearchServiceImpl implements SearchService {
 
             return hits.getSearchHits().stream().map(SearchHit::getContent)
                       .map(document -> MatchingMessageHistoryResponse.builder()
-                                .id(document.getId())
                                 .content(document.getContent())
                                 .chatId(document.getChatId())
-                                .roomName(document.getRoomName())
+                                .roomName(document.getChatRoomName())
+                                .creators(
+                                          userApi.getUserInfo(new HashSet<>(document.getChatCreators()))
+                                                    .values().stream().toList())
                                 .build())
 
                       .toList();

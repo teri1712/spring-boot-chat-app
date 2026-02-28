@@ -10,6 +10,7 @@ import jakarta.validation.constraints.NotNull;
 import lombok.Getter;
 import org.springframework.data.domain.AbstractAggregateRoot;
 
+import java.util.List;
 import java.util.UUID;
 
 @Entity
@@ -34,8 +35,9 @@ public class Chat extends AbstractAggregateRoot<Chat> {
             this.identifier = identifier;
             this.preference = preference;
             this.policy = policy;
+            List<UUID> members = creators.members().toList();
             registerEvent(new ChatCreated(identifier, preference.roomName(), preference.roomAvatar(),
-                      creators.members().toList(), creators.callerId()));
+                      members, members, creators.callerId()));
       }
 
 

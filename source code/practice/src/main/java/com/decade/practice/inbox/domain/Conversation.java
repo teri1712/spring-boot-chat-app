@@ -1,7 +1,6 @@
 package com.decade.practice.inbox.domain;
 
 import com.decade.practice.inbox.apis.events.ConversationCreated;
-import com.decade.practice.inbox.apis.events.MessageAdded;
 import jakarta.persistence.*;
 import lombok.Getter;
 import org.hibernate.annotations.JdbcTypeCode;
@@ -58,12 +57,6 @@ public class Conversation extends AbstractAggregateRoot<Conversation> {
                   pop();
             }
             this.seenBy = new HashSet<>();
-            registerEvent(new MessageAdded(
-                      conversationId.chatId(),
-                      roomName,
-                      conversationId.ownerId(),
-                      messagePreview.content(),
-                      messagePreview.createdAt()));
       }
 
       private void pop() {

@@ -1,8 +1,9 @@
 package com.decade.practice.search.dto;
 
+import com.decade.practice.users.api.UserInfo;
 import lombok.*;
 
-import java.util.UUID;
+import java.util.List;
 
 @Setter
 @Getter
@@ -11,9 +12,9 @@ import java.util.UUID;
 @NoArgsConstructor
 public class MatchingMessageHistoryResponse {
 
-    private UUID id;
-    private String chatId;
+      private String chatId;
 
-    private String roomName;
-    private String content;
+      private String roomName;
+      private String content;
+      private List<UserInfo> creators;
 }

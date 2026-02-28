@@ -1,12 +1,10 @@
 package com.decade.practice.search.application.events;
 
 
-import com.decade.practice.inbox.apis.events.ConversationCreated;
-import com.decade.practice.inbox.apis.events.MessageAdded;
-import com.decade.practice.search.application.ports.out.ChatDocumentRepository;
+import com.decade.practice.engagement.dto.events.IntegrationChatSnapshot;
+import com.decade.practice.engagement.dto.events.TextIntegrationChatEventPlaced;
 import com.decade.practice.search.application.ports.out.MessageDocumentRepository;
 import com.decade.practice.search.application.ports.out.UserDocumentRepository;
-import com.decade.practice.search.domain.ChatDocument;
 import com.decade.practice.search.domain.MessageDocument;
 import com.decade.practice.search.domain.UserDocument;
 import com.decade.practice.users.api.events.IntegrationUserCreated;
@@ -22,17 +20,21 @@ import java.util.UUID;
 @AllArgsConstructor
 public class SearchManagement {
 
-      private final ChatDocumentRepository chatDocuments;
       private final MessageDocumentRepository messageDocuments;
       private final UserDocumentRepository userDocuments;
 
       //    @KafkaListener(topics = "users.user.created", groupId = "search-service")
 //    @RetryableTopic
       @ApplicationModuleListener
-      public void onAccountEvent(IntegrationUserCreated event) {
+      public void on(IntegrationUserCreated event) {
             log.trace("Received user: {}", event);
 
-            UserDocument document = new UserDocument(event.userId(), event.username(), event.name(), event.gender(), event.avatar());
+            UserDocument document = new UserDocument(
+                      event.userId(),
+                      event.username(),
+                      event.name(),
+                      event.gender(),
+                      event.avatar());
             userDocuments.save(document);
       }
 
@@ -40,29 +42,19 @@ public class SearchManagement {
       //    @KafkaListener(topics = "threads.chat-history.currentState-added", groupId = "search-service")
 //    @RetryableTopic
       @ApplicationModuleListener
-      public void onMessageEvent(MessageAdded event) {
+      public void on(TextIntegrationChatEventPlaced event) {
             log.trace("Received currentState: {}", event);
-
-            ChatDocument chatDocument = chatDocuments.findById(ChatDocument.getKey(event.chatId(), event.ownerId()))
-                      .orElse(new ChatDocument(event.chatId(), event.ownerId(), event.roomName()));
-
-            String roomName = event.roomName();
-            chatDocument.setRoomName(roomName);
-            MessageDocument document = new MessageDocument(UUID.randomUUID(), event.ownerId(), event.chatId(), roomName, event.message(), event.createdAt());
+            IntegrationChatSnapshot snapshot = event.getSnapshot();
+            MessageDocument document = new MessageDocument(
+                      UUID.randomUUID(),
+                      event.getContent(),
+                      snapshot.chatId(),
+                      snapshot.creators(),
+                      snapshot.roomName(),
+                      event.getCreatedAt());
             messageDocuments.save(document);
       }
 
-      //    @KafkaListener(topics = "threads.chat-history.created", groupId = "search-service")
-//    @RetryableTopic
-      @ApplicationModuleListener
-      public void onMessageEvent(ConversationCreated event) {
-            log.trace("Received chat: {}", event);
-
-            ChatDocument document = chatDocuments.findById(ChatDocument.getKey(event.chatId(), event.ownerId()))
-                      .orElse(new ChatDocument(event.chatId(), event.ownerId(), event.roomName()));
-            document.setRoomName(event.roomName());
-            chatDocuments.save(document);
-      }
 
       //    @DltHandler
 //    public void handleDlt(

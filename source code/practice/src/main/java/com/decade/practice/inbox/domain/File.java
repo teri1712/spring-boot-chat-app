@@ -32,7 +32,7 @@ public class File extends Message {
       @Override
       public MessageState getState() {
             return FileState.builder()
-                      .id(getSequenceId())
+                      .sequenceId(getSequenceId())
                       .chatEventId(getChatEventId())
                       .senderId(getSenderId())
                       .messageType(getMessageType())

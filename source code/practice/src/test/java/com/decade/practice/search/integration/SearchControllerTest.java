@@ -1,10 +1,12 @@
 package com.decade.practice.search.integration;
 
 import com.decade.practice.BaseTestClass;
+import com.decade.practice.TestBeans;
+import com.decade.practice.engagement.application.ports.in.EngagementService;
 import com.decade.practice.search.application.ports.out.MessageDocumentRepository;
 import com.decade.practice.search.application.ports.out.UserDocumentRepository;
-import com.decade.practice.search.domain.MessageDocument;
 import com.decade.practice.search.domain.UserDocument;
+import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -13,7 +15,6 @@ import org.springframework.security.test.context.support.WithUserDetails;
 import org.springframework.test.context.jdbc.Sql;
 import org.springframework.test.web.servlet.MockMvc;
 
-import java.time.Instant;
 import java.util.UUID;
 
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
@@ -32,6 +33,12 @@ class SearchControllerTest extends BaseTestClass {
 
       @Autowired
       private MessageDocumentRepository messageDocumentRepository;
+
+      @Autowired
+      private EngagementService engagementService;
+
+      @Autowired
+      private TestBeans.PrivateChatSender sender;
 
       @BeforeEach
       void setUp() {
@@ -54,28 +61,42 @@ class SearchControllerTest extends BaseTestClass {
       }
 
       @Test
-      void givenUnauthenticatedUser_whenFindMessages_thenReturnsUnauthorized() throws Exception {
+      @WithUserDetails("charlie")
+      void givenUnParticipatedUser_whenFindMessages_thenReturnsUnauthorized() throws Exception {
+
+            UUID aliceId = UUID.fromString("11111111-1111-1111-1111-111111111111");
+            UUID bobId = UUID.fromString("22222222-2222-2222-2222-222222222222");
+
+            engagementService.getOrCreate(aliceId, bobId);
+
             mockMvc.perform(get("/me/history/messages")
                                 .param("query", "hello")
+                                .param("chatId", aliceId + "+" + bobId)
                                 .contentType(MediaType.APPLICATION_JSON))
-                      .andExpect(status().isUnauthorized());
+                      .andExpect(status().isForbidden());
       }
 
       @Test
       @WithUserDetails("alice")
       void givenAuthenticatedUser_whenFindMessages_thenReturnsMessageHistory() throws Exception {
-            UUID userId = UUID.fromString("11111111-1111-1111-1111-111111111111");
-            UUID partnerId = UUID.randomUUID();
-            MessageDocument message = new MessageDocument(UUID.randomUUID(), userId, userId + "+" + partnerId, "Room", "unique currentState content", Instant.now());
-            messageDocumentRepository.save(message);
+
+            UUID aliceId = UUID.fromString("11111111-1111-1111-1111-111111111111");
+            UUID bobId = UUID.fromString("22222222-2222-2222-2222-222222222222");
+
+            engagementService.getOrCreate(aliceId, bobId);
+            sender.sendPrivateText("unique currentState content", bobId, aliceId);
+
+            Assertions.assertEquals(1, messageDocumentRepository.count());
+            Assertions.assertEquals("unique currentState content", messageDocumentRepository.findAll().iterator().next().getContent());
+
 
             mockMvc.perform(get("/me/history/messages")
-                                .param("query", "unique")
+                                .queryParam("query", "unique")
+                                .queryParam("chatId", aliceId + "+" + bobId)
                                 .contentType(MediaType.APPLICATION_JSON))
                       .andExpect(status().isOk())
                       .andExpect(jsonPath("$.length()").value(1))
-                      .andExpect(jsonPath("$[0].content").value("unique currentState content"))
-                      .andExpect(jsonPath("$[0].roomName").value("Room"));
+                      .andExpect(jsonPath("$[0].content").value("unique currentState content"));
       }
 
       @Test

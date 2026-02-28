@@ -74,6 +74,6 @@ public class InboxLogManagement {
       public void on(InboxLogCreated inboxLogCreated) {
             Conversation conversation = conversations.findById(new ConversationId(inboxLogCreated.chatId(), inboxLogCreated.ownerId())).orElseThrow();
             Map<UUID, UserInfo> infos = userApi.getUserInfo(Set.of(inboxLogCreated.senderId()));
-            deliveryService.send(inboxLogMapper.map(inboxLogCreated, new InboxLogMapper.InboxContext(infos, conversation.getRoomName(), conversation.getRoomAvatar())));
+            deliveryService.send(inboxLogMapper.map(inboxLogCreated, new InboxLogMapper.InboxContext(infos, conversation.getRoomName(), conversation.getRoomAvatar(), conversation.getHash().value())));
       }
 }

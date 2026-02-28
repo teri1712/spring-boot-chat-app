@@ -28,7 +28,7 @@ import java.util.UUID;
 @Getter
 public abstract class MessageState {
 
-      private Long id;
+      private Long sequenceId;
       private UUID chatEventId;
       private UUID senderId;
       private String messageType;

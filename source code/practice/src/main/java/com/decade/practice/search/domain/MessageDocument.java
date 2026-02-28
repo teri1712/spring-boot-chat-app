@@ -9,6 +9,7 @@ import org.springframework.data.elasticsearch.annotations.Field;
 import org.springframework.data.elasticsearch.annotations.FieldType;
 
 import java.time.Instant;
+import java.util.List;
 import java.util.UUID;
 
 @Document(indexName = "messages", createIndex = true)
@@ -19,12 +20,12 @@ public class MessageDocument {
       @Id
       private UUID id;
 
-      @Field(type = FieldType.Keyword)
-      private UUID owner;
-      private String chatId;
-
-      private String roomName;
       private String content;
+
+      @Field(type = FieldType.Keyword)
+      private String chatId;
+      private List<UUID> chatCreators;
+      private String chatRoomName;
 
 
       @Field(type = FieldType.Date,
