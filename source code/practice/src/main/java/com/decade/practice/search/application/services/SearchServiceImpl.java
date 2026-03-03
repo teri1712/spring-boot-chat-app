@@ -1,8 +1,6 @@
 package com.decade.practice.search.application.services;
 
-import com.decade.practice.engagement.api.EngagementApi;
-import com.decade.practice.engagement.api.EngagementRule;
-import com.decade.practice.engagement.api.RuleNotFoundException;
+import com.decade.practice.engagement.api.ReadPolicy;
 import com.decade.practice.search.application.queries.SearchService;
 import com.decade.practice.search.domain.MessageDocument;
 import com.decade.practice.search.domain.UserDocument;
@@ -20,7 +18,6 @@ import org.springframework.data.elasticsearch.core.query.Query;
 import org.springframework.data.elasticsearch.core.query.highlight.Highlight;
 import org.springframework.data.elasticsearch.core.query.highlight.HighlightField;
 import org.springframework.data.elasticsearch.core.query.highlight.HighlightFieldParameters;
-import org.springframework.security.access.AccessDeniedException;
 import org.springframework.stereotype.Service;
 
 import java.util.HashSet;
@@ -34,7 +31,6 @@ public class SearchServiceImpl implements SearchService {
 
       private final ElasticsearchOperations elasticsearchOperations;
       private final UserApi userApi;
-      private final EngagementApi engagementApi;
 
       @Override
       public List<MatchingUserResponse> searchUsers(String string) {
@@ -76,18 +72,8 @@ public class SearchServiceImpl implements SearchService {
       }
 
       @Override
-      public List<MatchingMessageHistoryResponse> searchMessages(UUID userId, String chatId, String string) {
-
-            EngagementRule engagementRule = null;
-            try {
-                  engagementRule = engagementApi.find(chatId, userId);
-            } catch (RuleNotFoundException e) {
-                  log.warn("Participant not found for chatId: {}, userId: {}", chatId, userId);
-                  throw new AccessDeniedException("You are not allowed to perform this operation");
-            }
-            if (!engagementRule.read())
-                  throw new AccessDeniedException("You are not allowed to read this chat messages");
-
+      @ReadPolicy
+      public List<MatchingMessageHistoryResponse> searchMessages(String chatId, UUID userId, String string) {
             Query query = NativeQuery.builder()
                       .withQuery(q -> q.bool(b -> b
                                 .filter(f -> f.term(t -> t.field("chatId").value(chatId)))

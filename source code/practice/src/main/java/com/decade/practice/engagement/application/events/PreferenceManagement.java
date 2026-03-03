@@ -1,9 +1,10 @@
 package com.decade.practice.engagement.application.events;
 
 import com.decade.practice.engagement.application.ports.out.ChatRepository;
+import com.decade.practice.engagement.application.ports.out.PreferenceNotifier;
 import com.decade.practice.engagement.domain.Chat;
 import com.decade.practice.engagement.domain.ParticipantId;
-import com.decade.practice.engagement.dto.events.PreferenceIntegrationChatEventPlaced;
+import com.decade.practice.engagement.domain.events.PreferenceChatEventAccepted;
 import lombok.AllArgsConstructor;
 import org.springframework.modulith.events.ApplicationModuleListener;
 import org.springframework.stereotype.Service;
@@ -14,9 +15,10 @@ import org.springframework.stereotype.Service;
 public class PreferenceManagement {
 
       private final ChatRepository chats;
+      private final PreferenceNotifier notifier;
 
       @ApplicationModuleListener
-      public void on(PreferenceIntegrationChatEventPlaced preferencePlaced) {
+      public void on(PreferenceChatEventAccepted preferencePlaced) {
 
             ParticipantId participantId = new ParticipantId(preferencePlaced.getSenderId(), preferencePlaced.getSnapshot().chatId());
             String chatId = participantId.chatId();
@@ -32,6 +34,7 @@ public class PreferenceManagement {
             if (preferencePlaced.getRoomAvatar() != null)
                   chat.updateAvatar(preferencePlaced.getRoomAvatar());
 
+            notifier.notify(chatId, chat.getPreference());
             chats.save(chat);
       }
 

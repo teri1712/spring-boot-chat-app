@@ -1,54 +1,42 @@
 package com.decade.practice.inbox.dto.mapper;
 
 
-import com.decade.practice.inbox.domain.*;
+import com.decade.practice.inbox.domain.InboxLog;
 import com.decade.practice.inbox.domain.events.InboxLogCreated;
-import com.decade.practice.inbox.dto.*;
+import com.decade.practice.inbox.dto.InboxLogResponse;
 import com.decade.practice.users.api.UserInfo;
 import org.mapstruct.*;
+import org.springframework.beans.factory.annotation.Autowired;
 
 import java.util.List;
 import java.util.Map;
 import java.util.UUID;
 
-@Mapper(unmappedTargetPolicy = ReportingPolicy.ERROR, componentModel = MappingConstants.ComponentModel.SPRING, uses = {PartnerMapper.class})
-public interface InboxLogMapper {
+@Mapper(unmappedTargetPolicy = ReportingPolicy.ERROR, componentModel = MappingConstants.ComponentModel.SPRING, uses = {PartnerMapper.class, MessageMapper.class})
+public abstract class InboxLogMapper {
 
-
-      @Mapping(target = "roomNameSnapshot", expression = "java(context.roomNameSnapshot())")
-      @Mapping(target = "roomAvatarSnapshot", expression = "java(context.roomAvatarSnapshot())")
-      @Mapping(target = "revisionNumber", expression = "java(context.chatHash())")
-      InboxLogResponse map(InboxLogCreated inboxLogCreated, @Context InboxContext context);
-
+      @Autowired
+      protected MessageMapper messageMapper;
 
       @Mapping(target = "roomNameSnapshot", expression = "java(context.roomNameSnapshot())")
       @Mapping(target = "roomAvatarSnapshot", expression = "java(context.roomAvatarSnapshot())")
       @Mapping(target = "revisionNumber", expression = "java(context.chatHash())")
-      InboxLogResponse map(InboxLog inboxLog, @Context InboxContext context);
+      @Mapping(target = "sequenceNumber", source = "inboxLog.sequenceId")
+      @Mapping(target = "messageState", expression = "java(messageMapper.map(inboxLog.messageState(),context.userMap()))")
+      public abstract InboxLogResponse map(InboxLogCreated inboxLog, @Context InboxContext context);
 
+      @Mapping(target = "roomNameSnapshot", expression = "java(context.roomNameSnapshot())")
+      @Mapping(target = "roomAvatarSnapshot", expression = "java(context.roomAvatarSnapshot())")
+      @Mapping(target = "revisionNumber", expression = "java(context.chatHash())")
+      @Mapping(target = "sequenceNumber", source = "inboxLog.sequenceId")
+      @Mapping(target = "messageState", expression = "java(messageMapper.map(inboxLog.getMessageState(),context.userMap()))")
+      public abstract InboxLogResponse map(InboxLog inboxLog, @Context InboxContext context);
 
-      @SubclassMapping(source = TextState.class, target = TextStateResponse.class)
-      @SubclassMapping(source = ImageState.class, target = ImageStateResponse.class)
-      @SubclassMapping(source = IconState.class, target = IconStateResponse.class)
-      @SubclassMapping(source = FileState.class, target = FileStateResponse.class)
-      @SubclassMapping(source = PreferenceState.class, target = PreferenceStateResponse.class)
-      @Mapping(target = "seenBy", source = "message.seenByIds", qualifiedByName = "userResolver")
-      @Mapping(target = "sender", source = "message.senderId", qualifiedByName = "userResolver")
-      @Mapping(target = "engagementId", source = "message.chatEventId")
-      @Mapping(target = "sequenceNumber", source = "message.sequenceId")
-      MessageStateResponse map(MessageState message, @Context InboxContext context);
-
-
-      default List<InboxLogResponse> map(List<InboxLog> inboxLogs, InboxContext context) {
+      public List<InboxLogResponse> map(List<InboxLog> inboxLogs, InboxContext context) {
             return inboxLogs.stream().map(inboxLog -> map(inboxLog, context)).toList();
       }
 
-      @Named("userResolver")
-      default UserInfo resolveUser(UUID senderId, @Context InboxContext context) {
-            return context.userMap().get(senderId);
-      }
-
-      record InboxContext(Map<UUID, UserInfo> userMap, String roomNameSnapshot, String roomAvatarSnapshot, Long chatHash) {
+      public record InboxContext(Map<UUID, UserInfo> userMap, String roomNameSnapshot, String roomAvatarSnapshot, Long chatHash) {
       }
 
 }

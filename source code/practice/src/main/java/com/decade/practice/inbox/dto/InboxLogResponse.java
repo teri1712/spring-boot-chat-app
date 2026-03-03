@@ -5,7 +5,7 @@ import com.decade.practice.inbox.domain.LogAction;
 import java.util.UUID;
 
 public record InboxLogResponse(
-          Long sequenceId,
+          Long sequenceNumber,
           String chatId,
           String roomNameSnapshot,
           String roomAvatarSnapshot,

@@ -40,7 +40,7 @@ public class EventCacheTest extends BaseTestClass {
             log.trace("Calling get events for Chat Id: {}", chatId);
             Instant start = Instant.now();
             mockMvc.perform(get("/chats/{chatId}/logs", chatId)
-                                .param("anchorSequenceId", "1000"))
+                                .param("anchorSequenceNumber", "1000"))
                       .andExpect(status().isOk())
                       .andExpect(jsonPath("$.length()").value(20));
             Instant end = Instant.now();
@@ -49,7 +49,7 @@ public class EventCacheTest extends BaseTestClass {
             log.trace("Calling get events after events already cached for Chat Id: {}", chatId);
             start = Instant.now();
             mockMvc.perform(get("/chats/{chatId}/logs", chatId)
-                                .param("anchorSequenceId", "1000"))
+                                .param("anchorSequenceNumber", "1000"))
                       .andExpect(status().isOk())
                       .andExpect(jsonPath("$.length()").value(20));
             end = Instant.now();
@@ -71,7 +71,7 @@ public class EventCacheTest extends BaseTestClass {
 
             Instant start = Instant.now();
             mockMvc.perform(get("/chats/{chatId}/logs", chatId)
-                                .param("anchorSequenceId", "102"))
+                                .param("anchorSequenceNumber", "102"))
                       .andExpect(status().isOk())
                       .andExpect(jsonPath("$.length()").value(20))
                       .andExpect(jsonPath("$[0].textEvent.content").value("To Bob"));
@@ -82,7 +82,7 @@ public class EventCacheTest extends BaseTestClass {
             log.trace("Calling get events after events already cached for Chat Id: {}", chatId);
             start = Instant.now();
             mockMvc.perform(get("/chats/{chatId}/logs", chatId)
-                                .param("anchorSequenceId", "102"))
+                                .param("anchorSequenceNumber", "102"))
                       .andExpect(status().isOk())
                       .andExpect(jsonPath("$.length()").value(20));
             end = Instant.now();

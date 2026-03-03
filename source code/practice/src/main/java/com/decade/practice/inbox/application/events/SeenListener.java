@@ -1,6 +1,6 @@
 package com.decade.practice.inbox.application.events;
 
-import com.decade.practice.engagement.dto.events.SeenIntegrationChatEventPlaced;
+import com.decade.practice.engagement.domain.events.SeenChatEventAccepted;
 import com.decade.practice.inbox.application.ports.out.MessageRepository;
 import com.decade.practice.inbox.domain.Message;
 import com.decade.practice.inbox.domain.SeenPointer;
@@ -19,7 +19,7 @@ public class SeenListener {
       private final MessageRepository messages;
 
       @ApplicationModuleListener
-      public void on(SeenIntegrationChatEventPlaced event) {
+      public void on(SeenChatEventAccepted event) {
             String chatId = event.getSnapshot().chatId();
             UUID senderId = event.getSenderId();
             Optional<Message> lastSeen = messages.findByLastSeen(chatId, senderId);

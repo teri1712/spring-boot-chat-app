@@ -23,17 +23,17 @@ public class LogController {
       public List<InboxLogResponse> listLog(
                 @AuthenticationPrincipal(expression = "id") UUID userId,
                 @PathVariable @Validated String chatId,
-                @RequestParam Long anchorSequenceId
+                @RequestParam Long anchorSequenceNumber
       ) throws EntityNotFoundException {
-            return logService.findByChatAndSequenceLessThanEqual(userId, chatId, anchorSequenceId);
+            return logService.findByChatAndSequenceGreaterThanEqual(chatId, userId, anchorSequenceNumber);
       }
 
       // TODO: Adjust client to last currentState
       @GetMapping("/users/me/logs")
       public List<InboxLogResponse> listLog(
                 @AuthenticationPrincipal(expression = "id") UUID userId,
-                @RequestParam Long anchorSequenceId
+                @RequestParam Long anchorSequenceNumber
       ) throws EntityNotFoundException {
-            return logService.findBySequenceLessThanEqual(userId, anchorSequenceId);
+            return logService.findBySequenceGreaterThanEqual(userId, anchorSequenceNumber);
       }
 }

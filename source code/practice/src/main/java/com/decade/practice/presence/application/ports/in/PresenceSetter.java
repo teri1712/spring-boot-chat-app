@@ -6,5 +6,5 @@ import java.time.Instant;
 import java.util.UUID;
 
 public interface PresenceSetter {
-    PresenceResponse set(UUID userId, String username, String name, String avatar, Instant at);
+      PresenceResponse set(UUID userId, String name, String avatar, Instant at);
 }

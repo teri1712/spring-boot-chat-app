@@ -1,8 +1,6 @@
 package com.decade.practice.inbox.application.services;
 
-import com.decade.practice.engagement.api.EngagementApi;
-import com.decade.practice.engagement.api.EngagementRule;
-import com.decade.practice.engagement.api.RuleNotFoundException;
+import com.decade.practice.engagement.api.ReadPolicy;
 import com.decade.practice.inbox.application.ports.out.ConversationRepository;
 import com.decade.practice.inbox.application.ports.out.LogRepository;
 import com.decade.practice.inbox.application.ports.out.projection.LogWithConversation;
@@ -10,7 +8,6 @@ import com.decade.practice.inbox.application.query.LogService;
 import com.decade.practice.inbox.domain.Conversation;
 import com.decade.practice.inbox.domain.ConversationId;
 import com.decade.practice.inbox.domain.InboxLog;
-import com.decade.practice.inbox.domain.LogPolicy;
 import com.decade.practice.inbox.dto.InboxLogResponse;
 import com.decade.practice.inbox.dto.mapper.InboxLogMapper;
 import com.decade.practice.inbox.utils.LogUtils;
@@ -18,7 +15,6 @@ import com.decade.practice.users.api.UserApi;
 import com.decade.practice.users.api.UserInfo;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.security.access.AccessDeniedException;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -38,22 +34,13 @@ public class LogServiceImpl implements LogService {
       private final LogRepository logs;
       private final ConversationRepository conversations;
       private final InboxLogMapper mapper;
-      private final EngagementApi engagementApi;
-      private final LogPolicy logPolicy;
       private final UserApi userApi;
 
       @Override
-      public List<InboxLogResponse> findByChatAndSequenceLessThanEqual(UUID userId, String chatId, Long anchorSequenceId) {
-            EngagementRule engagementRule = null;
-            try {
-                  engagementRule = engagementApi.find(chatId, userId);
-            } catch (RuleNotFoundException e) {
-                  log.warn("Participant not found for chatId: {}, userId: {}", chatId, userId);
-                  throw new AccessDeniedException("You are not allowed to perform this operation");
-            }
-            logPolicy.applyRead(engagementRule);
+      @ReadPolicy
+      public List<InboxLogResponse> findByChatAndSequenceGreaterThanEqual(String chatId, UUID userId, Long anchorSequenceNumber) {
             log.trace("Finding events for ownerId '{}' and chat '{}'", userId, chatId);
-            List<InboxLog> logList = logs.findByOwnerIdAndChatIdAndSequenceIdLessThanEqual(userId, chatId, anchorSequenceId, LogUtils.SEQUENCE_LESS_THAN_EQUAL);
+            List<InboxLog> logList = logs.findByOwnerIdAndChatIdAndSequenceIdGreaterThanEqual(userId, chatId, anchorSequenceNumber, LogUtils.SEQUENCE_LESS_THAN_EQUAL);
             Map<UUID, UserInfo> userMap = userApi.getUserInfo(
                       logList.stream()
                                 .map(InboxLog::getSenderId)
@@ -63,9 +50,9 @@ public class LogServiceImpl implements LogService {
       }
 
       @Override
-      public List<InboxLogResponse> findBySequenceLessThanEqual(UUID userId, Long anchorSequenceId) {
+      public List<InboxLogResponse> findBySequenceGreaterThanEqual(UUID userId, Long anchorSequenceNumber) {
             log.trace("Finding events for ownerId '{}'", userId);
-            List<LogWithConversation> logList = logs.findByOwnerIdAndSequenceIdLessThanEqual(userId, anchorSequenceId, LogUtils.SEQUENCE_LESS_THAN_EQUAL);
+            List<LogWithConversation> logList = logs.findByOwnerIdAndSequenceIdGreaterThanEqual(userId, anchorSequenceNumber, LogUtils.SEQUENCE_LESS_THAN_EQUAL);
             Map<UUID, UserInfo> userMap = userApi.getUserInfo(logList.stream().flatMap(new Function<LogWithConversation, Stream<UUID>>() {
                   @Override
                   public Stream<UUID> apply(LogWithConversation logWithConversation) {

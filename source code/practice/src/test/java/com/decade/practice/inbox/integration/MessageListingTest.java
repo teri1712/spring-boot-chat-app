@@ -58,7 +58,7 @@ class MessageListingTest extends BaseTestClass {
 
             // When & Then
             String bodyString = mockMvc.perform(get("/chats/{chatId}/messages", aliceBobChat)
-                                .param("anchorSequenceId", String.valueOf(Long.MAX_VALUE)))
+                                .param("anchorSequenceNumber", String.valueOf(Long.MAX_VALUE)))
                       .andExpect(status().isOk())
                       .andExpect(jsonPath("$.length()").value(4))
                       .andExpect(jsonPath("$[0].content").value("dcm"))
@@ -72,7 +72,7 @@ class MessageListingTest extends BaseTestClass {
 
 
             mockMvc.perform(get("/chats/{chatId}/messages", aliceBobChat)
-                                .param("anchorSequenceId", messages.get(1).getSequenceNumber().toString()))
+                                .param("anchorSequenceNumber", messages.get(1).getSequenceNumber().toString()))
                       .andExpect(status().isOk())
                       .andExpect(jsonPath("$.length()").value(3))
                       .andExpect(jsonPath("$[0].content").value("dcm"))

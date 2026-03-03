@@ -34,6 +34,7 @@ public abstract class MessageState {
       private String messageType;
       private String chatId;
       private Instant createdAt;
+      private Instant updatedAt;
       private Set<UUID> seenByIds;
 
 }

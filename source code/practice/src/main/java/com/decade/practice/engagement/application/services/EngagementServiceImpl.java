@@ -52,7 +52,7 @@ public class EngagementServiceImpl implements EngagementService {
       public ChatResponse getOrCreate(UUID callerId, UUID partnerId) {
             ChatCreators creators = new ChatCreators(callerId, partnerId);
 
-            return chats.findById(privateChatFactory.inspectIdentifier(creators))
+            return chats.findById(privateChatFactory.make(creators))
                       .map(new Function<Chat, ChatResponse>() {
                             @Override
                             public ChatResponse apply(Chat chat) {
@@ -61,7 +61,7 @@ public class EngagementServiceImpl implements EngagementService {
                       }).orElseGet(new Supplier<ChatResponse>() {
                             @Override
                             public ChatResponse get() {
-                                  Chat chat = privateChatFactory.create(creators, 2, null);
+                                  Chat chat = privateChatFactory.create(creators);
                                   try {
                                         chats.saveAndFlush(chat);
                                         creators.members().forEach(pId -> {

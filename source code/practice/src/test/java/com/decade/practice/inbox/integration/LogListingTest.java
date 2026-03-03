@@ -61,7 +61,7 @@ class LogListingTest extends BaseTestClass {
             // When & Then
             // After 2 messages, Alice's eventVersion should be 2 (if it started at 0 and incVersion was called twice)
             String bodyString = mockMvc.perform(get("/chats/{chatId}/logs", aliceBobChat)
-                                .param("anchorSequenceId", String.valueOf(Long.MAX_VALUE)))
+                                .param("anchorSequenceNumber", String.valueOf(Long.MIN_VALUE)))
                       .andExpect(status().isOk())
                       .andExpect(jsonPath("$.length()").value(2))
                       .andExpect(jsonPath("$[0].messageState.content").value("vcl"))
@@ -73,10 +73,10 @@ class LogListingTest extends BaseTestClass {
 
 
             mockMvc.perform(get("/chats/{chatId}/logs", aliceBobChat)
-                                .param("anchorSequenceId", logs.get(1).sequenceId().toString()))
+                                .param("anchorSequenceNumber", logs.get(0).sequenceNumber().toString()))
                       .andExpect(status().isOk())
                       .andExpect(jsonPath("$.length()").value(1))
-                      .andExpect(jsonPath("$[0].messageState.content").value("meo meo"));
+                      .andExpect(jsonPath("$[0].messageState.content").value("vcl"));
       }
 
       @Test
@@ -102,7 +102,7 @@ class LogListingTest extends BaseTestClass {
 
             // When & Then
             String bodyString = mockMvc.perform(get("/users/me/logs")
-                                .param("anchorSequenceId", String.valueOf(Long.MAX_VALUE)))
+                                .param("anchorSequenceNumber", String.valueOf(Long.MIN_VALUE)))
                       .andExpect(status().isOk())
                       .andExpect(jsonPath("$.length()").value(3))
                       .andExpect(jsonPath("$[0].messageState.content").value("vcl"))
@@ -113,11 +113,11 @@ class LogListingTest extends BaseTestClass {
             List<InboxLogResponse> logs = objectMapper.readValue(bodyString, new TypeReference<>() {
             });
             mockMvc.perform(get("/users/me/logs")
-                                .param("anchorSequenceId", logs.get(1).sequenceId().toString()))
+                                .param("anchorSequenceNumber", logs.get(1).sequenceNumber().toString()))
                       .andExpect(status().isOk())
                       .andExpect(jsonPath("$.length()").value(2))
-                      .andExpect(jsonPath("$[0].messageState.content").value("dcm"))
-                      .andExpect(jsonPath("$[1].messageState.content").value("meo meo"))
+                      .andExpect(jsonPath("$[0].messageState.content").value("vcl"))
+                      .andExpect(jsonPath("$[1].messageState.content").value("dcm"))
 
             ;
       }

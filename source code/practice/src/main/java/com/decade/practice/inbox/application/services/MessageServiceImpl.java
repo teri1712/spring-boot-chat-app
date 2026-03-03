@@ -4,7 +4,7 @@ import com.decade.practice.inbox.application.ports.out.MessageRepository;
 import com.decade.practice.inbox.application.query.MessageService;
 import com.decade.practice.inbox.domain.Message;
 import com.decade.practice.inbox.dto.MessageStateResponse;
-import com.decade.practice.inbox.dto.mapper.InboxLogMapper;
+import com.decade.practice.inbox.dto.mapper.MessageMapper;
 import com.decade.practice.inbox.utils.LogUtils;
 import com.decade.practice.users.api.UserApi;
 import com.decade.practice.users.api.UserInfo;
@@ -26,16 +26,16 @@ public class MessageServiceImpl implements MessageService {
 
       private final MessageRepository messages;
       private final UserApi userApi;
-      private final InboxLogMapper inboxLogMapper;
+      private final MessageMapper messageMapper;
 
       @Override
-      public List<MessageStateResponse> findByChatAndSequenceLessThanEqual(UUID owner, String chatId, Long anchorSequenceId) {
+      public List<MessageStateResponse> findByChatAndSequenceLessThanEqual(UUID owner, String chatId, Long anchorSequenceNumber) {
 
-            if (anchorSequenceId == null) {
-                  anchorSequenceId = Long.MAX_VALUE;
+            if (anchorSequenceNumber == null) {
+                  anchorSequenceNumber = Long.MAX_VALUE;
             }
 
-            List<Message> messageList = messages.findByChatIdAndSequenceIdLessThanEqual(chatId, anchorSequenceId, LogUtils.SEQUENCE_LESS_THAN_EQUAL);
+            List<Message> messageList = messages.findByChatIdAndSequenceIdLessThanEqual(chatId, anchorSequenceNumber, LogUtils.SEQUENCE_LESS_THAN_EQUAL);
             Map<UUID, UserInfo> userMap = userApi.getUserInfo(messageList.stream().flatMap(new Function<Message, Stream<UUID>>() {
                   @Override
                   public Stream<UUID> apply(Message message) {
@@ -43,8 +43,6 @@ public class MessageServiceImpl implements MessageService {
                   }
             }).collect(Collectors.toSet()));
 
-            return messageList.stream().map(message ->
-                                inboxLogMapper.map(message.getState(), new InboxLogMapper.InboxContext(userMap, null, null, null)))
-                      .toList();
+            return messageMapper.map(messageList.stream().map(Message::getState).toList(), userMap);
       }
 }

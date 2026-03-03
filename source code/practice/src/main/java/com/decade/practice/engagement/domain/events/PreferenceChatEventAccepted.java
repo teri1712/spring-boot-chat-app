@@ -1,4 +1,4 @@
-package com.decade.practice.engagement.dto.events;
+package com.decade.practice.engagement.domain.events;
 
 import lombok.Getter;
 import lombok.experimental.SuperBuilder;
@@ -6,7 +6,7 @@ import lombok.experimental.SuperBuilder;
 @Getter
 @SuperBuilder
 
-public class PreferenceIntegrationChatEventPlaced extends IntegrationChatEventPlaced {
+public class PreferenceChatEventAccepted extends ChatEventAccepted {
 
 
       private final Integer iconId;

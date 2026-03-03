@@ -44,6 +44,9 @@ public abstract class AbstractParticipantPlacement<Command extends ParticipantCo
             Participant participant = participants.findById(new ParticipantId(chatEvent.getSenderId(), chatEvent.getChatId())).orElse(null);
             engagementPolicy.applyWrite(participant, chat);
             doSave(chatEvent);
+
+            chat.increment(chatEvent.getId());
+            chats.save(chat);
             return chatEventMapper.toResponse(chatEvent);
       }
 

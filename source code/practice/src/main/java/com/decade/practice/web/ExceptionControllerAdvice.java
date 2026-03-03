@@ -17,33 +17,33 @@ import java.util.NoSuchElementException;
 @RestControllerAdvice
 public class ExceptionControllerAdvice {
 
-    @ResponseStatus(value = HttpStatus.NOT_FOUND)
-    @ExceptionHandler({
-            EntityNotFoundException.class,
-            NoSuchElementException.class,
-    })
-    @MessageExceptionHandler({
-            EntityNotFoundException.class,
-            NoSuchElementException.class,
-    })
-    public void handleNoEntity(Exception e) {
-        log.warn("Entity not found", e);
-    }
+      @ResponseStatus(value = HttpStatus.NOT_FOUND)
+      @ExceptionHandler({
+                EntityNotFoundException.class,
+                NoSuchElementException.class,
+      })
+      @MessageExceptionHandler({
+                EntityNotFoundException.class,
+                NoSuchElementException.class,
+      })
+      public void handleNoEntity(Exception e) {
+            log.warn("Entity not found", e);
+      }
 
-    @ExceptionHandler(OptimisticLockException.class)
-    @ResponseStatus(value = HttpStatus.CONFLICT)
-    public void handleLockException(Exception e) {
-        log.warn("Concurrent update on the same resource", e);
-    }
+      @ExceptionHandler(OptimisticLockException.class)
+      @ResponseStatus(value = HttpStatus.CONFLICT)
+      public void handleLockException(Exception e) {
+            log.debug("Concurrent update on the same resource", e);
+      }
 
-    @ExceptionHandler({ConstraintViolationException.class})
-    @ResponseStatus(value = HttpStatus.BAD_REQUEST)
-    public ProblemDetail handleBeanValidationException(Exception e) {
-        log.warn("Validation failure", e);
-        ProblemDetail pd = ProblemDetail.forStatus(HttpStatus.BAD_REQUEST.value());
-        pd.setDetail(e.getMessage());
-        pd.setTitle("Validation failure");
-        return pd;
-    }
+      @ExceptionHandler({ConstraintViolationException.class})
+      @ResponseStatus(value = HttpStatus.BAD_REQUEST)
+      public ProblemDetail handleBeanValidationException(Exception e) {
+            log.warn("Validation failure", e);
+            ProblemDetail pd = ProblemDetail.forStatus(HttpStatus.BAD_REQUEST.value());
+            pd.setDetail(e.getMessage());
+            pd.setTitle("Validation failure");
+            return pd;
+      }
 
 }

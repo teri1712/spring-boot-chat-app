@@ -5,10 +5,10 @@ import org.springframework.security.access.AccessDeniedException;
 
 public interface TokenSessionService {
 
-    AccountResponse login(String username);
+      AccountResponse login(String username);
 
-    String refresh(String refreshToken) throws AccessDeniedException;
+      String refresh(String refreshToken) throws AccessDeniedException;
 
-    void logout(String username, String refreshToken);
+      void logout(String username, String refreshToken);
 
 }

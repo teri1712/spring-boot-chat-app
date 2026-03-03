@@ -1,8 +1,8 @@
 package com.decade.practice.search.application.events;
 
 
-import com.decade.practice.engagement.dto.events.IntegrationChatSnapshot;
-import com.decade.practice.engagement.dto.events.TextIntegrationChatEventPlaced;
+import com.decade.practice.engagement.domain.events.ChatSnapshot;
+import com.decade.practice.engagement.domain.events.TextChatEventAccepted;
 import com.decade.practice.search.application.ports.out.MessageDocumentRepository;
 import com.decade.practice.search.application.ports.out.UserDocumentRepository;
 import com.decade.practice.search.domain.MessageDocument;
@@ -42,9 +42,9 @@ public class SearchManagement {
       //    @KafkaListener(topics = "threads.chat-history.currentState-added", groupId = "search-service")
 //    @RetryableTopic
       @ApplicationModuleListener
-      public void on(TextIntegrationChatEventPlaced event) {
+      public void on(TextChatEventAccepted event) {
             log.trace("Received currentState: {}", event);
-            IntegrationChatSnapshot snapshot = event.getSnapshot();
+            ChatSnapshot snapshot = event.getSnapshot();
             MessageDocument document = new MessageDocument(
                       UUID.randomUUID(),
                       event.getContent(),

@@ -1,14 +1,13 @@
 package com.decade.practice.live.application.ports.out;
 
-import com.decade.practice.live.domain.LiveChatId;
-import com.decade.practice.live.dto.TypeMessage;
+import com.decade.practice.live.domain.events.JoinerTyped;
 
 public interface LiveBroker {
 
-    void send(TypeMessage typeEvent);
+      void send(JoinerTyped joinerTyped);
 
-    void subLive(LiveChatId liveChatId);
+      void subLive(String liveId);
 
-    void unSubLive(LiveChatId liveChatId);
+      void unSubLive(String liveId);
 
 }

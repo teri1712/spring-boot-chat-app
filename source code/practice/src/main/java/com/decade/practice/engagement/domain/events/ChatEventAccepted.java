@@ -1,4 +1,4 @@
-package com.decade.practice.engagement.dto.events;
+package com.decade.practice.engagement.domain.events;
 
 import com.fasterxml.jackson.annotation.JsonTypeInfo;
 import lombok.Getter;
@@ -15,12 +15,12 @@ import java.util.UUID;
 )
 //@Externalized("engagement.currentState.placed::#{#this.ownerId}")
 @SuperBuilder
-public class IntegrationChatEventPlaced {
+public class ChatEventAccepted {
 
       private final UUID senderId;
       private final UUID chatEventId;
 
-      private final IntegrationChatSnapshot snapshot;
+      private final ChatSnapshot snapshot;
 
       private final Instant createdAt;
 }

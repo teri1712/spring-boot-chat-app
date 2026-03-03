@@ -1,9 +1,9 @@
 package com.decade.practice;
 
 import com.decade.practice.engagement.domain.ChatCreators;
+import com.decade.practice.engagement.domain.events.ChatSnapshot;
+import com.decade.practice.engagement.domain.events.TextChatEventAccepted;
 import com.decade.practice.engagement.domain.services.TwoParticipantChatIdentifierMaker;
-import com.decade.practice.engagement.dto.events.IntegrationChatSnapshot;
-import com.decade.practice.engagement.dto.events.TextIntegrationChatEventPlaced;
 import lombok.AllArgsConstructor;
 import org.springframework.boot.test.context.TestComponent;
 import org.springframework.boot.test.context.TestConfiguration;
@@ -35,10 +35,10 @@ public class TestBeans {
             public void sendPrivateText(String message, UUID senderId, UUID recipientId) {
                   String chatId = new TwoParticipantChatIdentifierMaker().make(new ChatCreators(senderId, recipientId));
 
-                  applicationEventPublisher.publishEvent(TextIntegrationChatEventPlaced.builder()
+                  applicationEventPublisher.publishEvent(TextChatEventAccepted.builder()
                             .senderId(senderId)
                             .createdAt(Instant.now())
-                            .snapshot(new IntegrationChatSnapshot(chatId, null, null, Stream.of(senderId, recipientId).distinct().toList(), Stream.of(senderId, recipientId).distinct().toList()))
+                            .snapshot(new ChatSnapshot(chatId, null, null, Stream.of(senderId, recipientId).distinct().toList(), Stream.of(senderId, recipientId).distinct().toList()))
                             .content(message)
                             .build()
                   );

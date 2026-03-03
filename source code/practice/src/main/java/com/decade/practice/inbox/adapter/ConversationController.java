@@ -22,8 +22,8 @@ public class ConversationController {
       @GetMapping("/me/conversations")
       public List<ConversationResponse> list(
                 @AuthenticationPrincipal(expression = "id") UUID userId,
-                @RequestParam Optional<Long> anchor
+                @RequestParam Optional<Long> anchorRevisionNumber
       ) throws Throwable {
-            return conversationService.list(userId, anchor);
+            return conversationService.list(userId, anchorRevisionNumber);
       }
 }

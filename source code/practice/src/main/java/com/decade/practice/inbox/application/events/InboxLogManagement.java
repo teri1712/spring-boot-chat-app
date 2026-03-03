@@ -42,10 +42,13 @@ public class InboxLogManagement {
                                       message.currentState());
                             logs.save(log);
 
-                            MessagePreview messagePreview = new MessagePreview(message.id(), message.senderId(),
-                                      PreviewUtils.getPreviewContent(conversation.getConversationId().ownerId(), message.currentState())
-                                      , message.createdAt());
-                            conversation.addMessagePreview(messagePreview);
+                            MessageState previewState = message.currentState();
+                            MessagePreview messagePreview = new MessagePreview(
+                                      PreviewUtils.getPreviewContent(
+                                                conversation.getConversationId().ownerId(),
+                                                previewState)
+                                      , previewState);
+                            conversation.addPreview(messagePreview);
 
                             conversations.save(conversation);
 
@@ -64,8 +67,8 @@ public class InboxLogManagement {
                                       message.currentState());
                             logs.save(log);
 
-
-                            conversation.setSeenBy(message.id(), message.currentState().getSeenByIds());
+                            MessageState previewState = message.currentState();
+                            conversation.updatePreview(new MessagePreview(PreviewUtils.getPreviewContent(conversation.getConversationId().ownerId(), previewState), previewState));
                             conversations.save(conversation);
                       });
       }

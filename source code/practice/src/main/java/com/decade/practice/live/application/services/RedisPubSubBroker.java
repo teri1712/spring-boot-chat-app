@@ -2,7 +2,7 @@ package com.decade.practice.live.application.services;
 
 import com.decade.practice.live.application.ports.in.QueueService;
 import com.decade.practice.live.application.ports.out.LiveBroker;
-import com.decade.practice.live.domain.LiveChatId;
+import com.decade.practice.live.domain.events.JoinerTyped;
 import com.decade.practice.live.dto.TypeMessage;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -32,22 +32,14 @@ public class RedisPubSubBroker implements LiveBroker, QueueService {
       private final RelayListener listener;
       private final RedisTemplate<String, Object> redisTemplate;
 
-      private String makeLiveTopic(LiveChatId liveChatId) {
-            return liveTopic + ":" + liveChatId.value();
-      }
-
-      private String makeQueueTopic(UUID userId) {
-            return queueTopic + ":" + userId;
+      @Override
+      public void send(JoinerTyped typeEvent) {
+            redisTemplate.convertAndSend(liveTopic + ":" + typeEvent.chatId(), new TypeMessage(typeEvent.userId(), typeEvent.avatar(), typeEvent.chatId(), typeEvent.at()));
       }
 
       @Override
-      public void send(TypeMessage typeMessage) {
-            redisTemplate.convertAndSend(makeLiveTopic(typeMessage.chatId()), typeMessage);
-      }
-
-      @Override
-      public void subLive(LiveChatId liveChatId) {
-            Topic topic = new PatternTopic(makeLiveTopic(liveChatId));
+      public void subLive(String liveChatId) {
+            Topic topic = new PatternTopic(liveTopic + ":" + liveChatId);
             topicCountMap.compute(topic.getTopic(), (s, aLong) -> {
                   if (aLong == null) {
                         container.addMessageListener(listener, topic);
@@ -58,8 +50,8 @@ public class RedisPubSubBroker implements LiveBroker, QueueService {
       }
 
       @Override
-      public void unSubLive(LiveChatId liveChatId) {
-            Topic topic = new PatternTopic(makeLiveTopic(liveChatId));
+      public void unSubLive(String liveChatId) {
+            Topic topic = new PatternTopic(liveTopic + ":" + liveChatId);
             topicCountMap.compute(topic.getTopic(), (s, aLong) -> {
                   if (aLong == null)
                         aLong = 0L;
@@ -74,7 +66,7 @@ public class RedisPubSubBroker implements LiveBroker, QueueService {
 
       @Override
       public void subQueue(UUID userId) {
-            Topic topic = new PatternTopic(makeQueueTopic(userId));
+            Topic topic = new PatternTopic(queueTopic + ":" + userId);
             topicCountMap.compute(topic.getTopic(), (s, aLong) -> {
                   if (aLong == null) {
                         container.addMessageListener(listener, topic);
@@ -86,7 +78,7 @@ public class RedisPubSubBroker implements LiveBroker, QueueService {
 
       @Override
       public void unSubQueue(UUID userId) {
-            Topic topic = new PatternTopic(makeQueueTopic(userId));
+            Topic topic = new PatternTopic(queueTopic + ":" + userId);
             topicCountMap.compute(topic.getTopic(), (s, aLong) -> {
                   if (aLong == null)
                         aLong = 0L;

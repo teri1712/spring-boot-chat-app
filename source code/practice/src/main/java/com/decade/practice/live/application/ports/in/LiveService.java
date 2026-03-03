@@ -1,13 +1,11 @@
 package com.decade.practice.live.application.ports.in;
 
-import com.decade.practice.live.domain.LiveChatId;
-
 import java.util.UUID;
 
 public interface LiveService {
-    void join(LiveChatId liveChatId, UUID userId);
+      void join(String liveChatId, UUID userId, String avatar);
 
-    void send(LiveChatId liveChatId, UUID userId);
+      void send(String liveChatId, UUID userId, String avatar);
 
-    void leave(LiveChatId liveChatId, UUID userId);
+      void leave(String liveChatId, UUID userId, String avatar);
 }

@@ -19,46 +19,48 @@ import java.util.UUID;
 @RedisHash(value = "type")
 public class LiveJoiner extends AbstractAggregateRoot<LiveJoiner> {
 
-    private UUID userId;
-    private LiveChatId chatId;
+      private UUID userId;
+      private String avatar;
+      private String chatId;
 
-    @Nullable
-    private Instant typeTime;
+      @Nullable
+      private Instant typeTime;
 
-    @TimeToLive
-    private Long joinDuration;
+      @TimeToLive
+      private Long joinDuration;
 
-    @Id
-    private String key;
-
-
-    protected LiveJoiner() {
-    }
-
-    public LiveJoiner(LiveChatId chatId, UUID userId) {
-        this.userId = userId;
-        this.chatId = chatId;
-        this.key = determineKey(userId, chatId);
-        this.joinDuration = 0L;
-    }
-
-    public void join() {
-        registerEvent(new LiveJoined(chatId, userId));
-    }
+      @Id
+      private String key;
 
 
-    public void leave() {
-        registerEvent(new JoinerLeaved(chatId, userId));
-    }
+      protected LiveJoiner() {
+      }
 
-    public void type() {
-        this.typeTime = Instant.now();
-        this.joinDuration = 2L;
-        registerEvent(new JoinerTyped(chatId, userId, typeTime));
-    }
+      public LiveJoiner(String chatId, UUID userId, String avatar) {
+            this.userId = userId;
+            this.chatId = chatId;
+            this.avatar = avatar;
+            this.key = determineKey(userId, chatId);
+            this.joinDuration = 0L;
+      }
 
-    public static String determineKey(UUID from, LiveChatId chat) {
-        return chat.value() + ":" + from;
-    }
+      public void join() {
+            registerEvent(new LiveJoined(chatId, userId));
+      }
+
+
+      public void leave() {
+            registerEvent(new JoinerLeaved(chatId, userId));
+      }
+
+      public void type() {
+            this.typeTime = Instant.now();
+            this.joinDuration = 2L;
+            registerEvent(new JoinerTyped(chatId, userId, avatar, typeTime));
+      }
+
+      public static String determineKey(UUID from, String chat) {
+            return chat + ":" + from;
+      }
 
 }

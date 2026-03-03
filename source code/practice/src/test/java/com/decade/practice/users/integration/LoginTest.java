@@ -15,41 +15,41 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 @Sql(scripts = "/sql/clean.sql", executionPhase = Sql.ExecutionPhase.AFTER_TEST_METHOD)
 public class LoginTest extends BaseTestClass {
 
-    @Autowired
-    private MockMvc mockMvc;
+      @Autowired
+      private MockMvc mockMvc;
 
-    @Test
-    @Sql(scripts = {"/sql/clean.sql", "/sql/seed_users.sql"})
-    void givenValidCredentials_whenLogin_thenReturnsAccountAndToken() throws Exception {
-        mockMvc.perform(post("/login")
-                        .contentType(MediaType.APPLICATION_FORM_URLENCODED)
-                        .param("username", "alice")
-                        .param("password", "Password123!"))
-                .andExpect(status().isOk())
-                .andExpect(jsonPath("$.account", notNullValue()))
-                .andExpect(jsonPath("$.tokenCredential", notNullValue()))
-                .andExpect(jsonPath("$.account.username").value("alice"));
-    }
+      @Test
+      @Sql(scripts = {"/sql/clean.sql", "/sql/seed_users.sql"})
+      void givenValidCredentials_whenLogin_thenReturnsAccountAndToken() throws Exception {
+            mockMvc.perform(post("/login")
+                                .contentType(MediaType.APPLICATION_FORM_URLENCODED)
+                                .param("username", "alice")
+                                .param("password", "Password123!"))
+                      .andExpect(status().isOk())
+                      .andExpect(jsonPath("$.account", notNullValue()))
+                      .andExpect(jsonPath("$.accessToken", notNullValue()))
+                      .andExpect(jsonPath("$.account.username").value("alice"));
+      }
 
-    @Test
-    @Sql(scripts = {"/sql/clean.sql", "/sql/seed_users.sql"})
-    void givenInvalidPassword_whenLogin_thenReturnsUnauthorized() throws Exception {
-        mockMvc.perform(post("/login")
-                        .contentType(MediaType.APPLICATION_FORM_URLENCODED)
-                        .param("username", "alice")
-                        .param("password", "wrongpassword"))
-                .andExpect(status().isUnauthorized())
-                .andExpect(jsonPath("$.detail").value("Wrong password"));
-    }
+      @Test
+      @Sql(scripts = {"/sql/clean.sql", "/sql/seed_users.sql"})
+      void givenInvalidPassword_whenLogin_thenReturnsUnauthorized() throws Exception {
+            mockMvc.perform(post("/login")
+                                .contentType(MediaType.APPLICATION_FORM_URLENCODED)
+                                .param("username", "alice")
+                                .param("password", "wrongpassword"))
+                      .andExpect(status().isUnauthorized())
+                      .andExpect(jsonPath("$.detail").value("Wrong password"));
+      }
 
-    @Test
-    @Sql(scripts = {"/sql/clean.sql", "/sql/seed_users.sql"})
-    void givenNonExistentUser_whenLogin_thenReturnsUnauthorized() throws Exception {
-        mockMvc.perform(post("/login")
-                        .contentType(MediaType.APPLICATION_FORM_URLENCODED)
-                        .param("username", "nonexistent")
-                        .param("password", "anypassword"))
-                .andExpect(status().isUnauthorized())
-                .andExpect(jsonPath("$.detail").value("Username not found"));
-    }
+      @Test
+      @Sql(scripts = {"/sql/clean.sql", "/sql/seed_users.sql"})
+      void givenNonExistentUser_whenLogin_thenReturnsUnauthorized() throws Exception {
+            mockMvc.perform(post("/login")
+                                .contentType(MediaType.APPLICATION_FORM_URLENCODED)
+                                .param("username", "nonexistent")
+                                .param("password", "anypassword"))
+                      .andExpect(status().isUnauthorized())
+                      .andExpect(jsonPath("$.detail").value("Username not found"));
+      }
 }

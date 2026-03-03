@@ -13,12 +13,14 @@ import java.util.UUID;
 @Repository
 public interface LogRepository extends JpaRepository<InboxLog, Long> {
 
-      List<InboxLog> findByOwnerIdAndChatIdAndSequenceIdLessThanEqual(UUID ownerId, String chatId, Long sequenceId, Pageable pageable);
+      // TODO: Pagination
+      List<InboxLog> findByOwnerIdAndChatIdAndSequenceIdGreaterThanEqual(UUID ownerId, String chatId, Long sequenceId, Pageable pageable);
 
       @Query("select new com.decade.practice.inbox.application.ports.out.projection.LogWithConversation(l,c) " +
                 "from InboxLog l join Conversation c " +
                 "on l.chatId = c.conversationId.chatId and l.ownerId = c.conversationId.ownerId " +
-                "where l.sequenceId <= :sequenceId and l.ownerId = :ownerId")
-      List<LogWithConversation> findByOwnerIdAndSequenceIdLessThanEqual(UUID ownerId, Long sequenceId, Pageable pageable);
+                "where l.sequenceId >= :sequenceId and l.ownerId = :ownerId")
+      List<LogWithConversation> findByOwnerIdAndSequenceIdGreaterThanEqual(UUID ownerId, Long sequenceId, Pageable pageable);
+
 
 }

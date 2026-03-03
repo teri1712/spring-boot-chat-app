@@ -4,9 +4,8 @@ import java.time.Instant;
 import java.util.UUID;
 
 public record PresenceResponse(
-        String username,
-        UUID userId,
-        Instant at,
-        String name,
-        String avatar) {
+          UUID userId,
+          Instant at,
+          String name,
+          String avatar) {
 }

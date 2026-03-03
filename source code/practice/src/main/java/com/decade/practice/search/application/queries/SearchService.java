@@ -10,5 +10,5 @@ public interface SearchService {
 
       List<MatchingUserResponse> searchUsers(String query);
 
-      List<MatchingMessageHistoryResponse> searchMessages(UUID userId, String chatId, String query);
+      List<MatchingMessageHistoryResponse> searchMessages(String chatId, UUID userId, String query);
 }

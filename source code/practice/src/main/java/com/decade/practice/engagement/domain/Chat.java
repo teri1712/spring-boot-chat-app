@@ -10,6 +10,7 @@ import jakarta.validation.constraints.NotNull;
 import lombok.Getter;
 import org.springframework.data.domain.AbstractAggregateRoot;
 
+import java.time.Instant;
 import java.util.List;
 import java.util.UUID;
 
@@ -27,6 +28,8 @@ public class Chat extends AbstractAggregateRoot<Chat> {
       @NotNull
       private Preference preference;
 
+      private Instant lastActivity;
+
       @Embedded
       private ChatPolicy policy;
 
@@ -36,6 +39,7 @@ public class Chat extends AbstractAggregateRoot<Chat> {
             this.preference = preference;
             this.policy = policy;
             List<UUID> members = creators.members().toList();
+            this.lastActivity = Instant.now();
             registerEvent(new ChatCreated(identifier, preference.roomName(), preference.roomAvatar(),
                       members, members, creators.callerId()));
       }
@@ -46,6 +50,11 @@ public class Chat extends AbstractAggregateRoot<Chat> {
 
       public void increment(UUID eventId) {
             registerEvent(new VersionIncremented(eventId, getIdentifier(), getEventVersion()));
+            refreshActivity();
+      }
+
+      public void refreshActivity() {
+            this.lastActivity = Instant.now();
       }
 
       protected Chat() {

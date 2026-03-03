@@ -2,7 +2,7 @@ package com.decade.practice.inbox.integration;
 
 import com.decade.practice.BaseTestClass;
 import com.decade.practice.TestBeans;
-import com.decade.practice.engagement.dto.events.TextIntegrationChatEventPlaced;
+import com.decade.practice.engagement.domain.events.TextChatEventAccepted;
 import com.decade.practice.inbox.application.ports.out.ConversationRepository;
 import com.decade.practice.inbox.domain.ConversationId;
 import com.decade.practice.inbox.domain.HashValue;
@@ -55,7 +55,7 @@ class ChatListingTest extends BaseTestClass {
             chatSender.sendPrivateText("dcm", charlieId, aliceId);
 
 
-            assertThat(events.stream(TextIntegrationChatEventPlaced.class)).hasSize(2);
+            assertThat(events.stream(TextChatEventAccepted.class)).hasSize(2);
             assertThat(events.stream(MessageCreated.class)).hasSize(2);
             assertThat(events.stream(InboxLogCreated.class)).hasSize(4);
 
@@ -66,9 +66,9 @@ class ChatListingTest extends BaseTestClass {
                       .andExpect(status().isOk())
                       .andExpect(jsonPath("$.length()").value(3))
                       .andExpect(jsonPath("$[0].identifier").value(aliceCharlieChat))
-                      .andExpect(jsonPath("$[0].messagePreviews.size()").value(1))
+                      .andExpect(jsonPath("$[0].previews.size()").value(1))
                       .andExpect(jsonPath("$[1].identifier").value(aliceBobChat))
-                      .andExpect(jsonPath("$[1].messagePreviews.size()").value(1))
+                      .andExpect(jsonPath("$[1].previews.size()").value(1))
             ;
       }
 
@@ -94,7 +94,7 @@ class ChatListingTest extends BaseTestClass {
             chatSender.sendPrivateText("new dcm", charlieId, aliceId);
 
 
-            assertThat(events.stream(TextIntegrationChatEventPlaced.class)).hasSize(3);
+            assertThat(events.stream(TextChatEventAccepted.class)).hasSize(3);
             assertThat(events.stream(MessageCreated.class)).hasSize(3);
             assertThat(events.stream(InboxLogCreated.class)).hasSize(6);
 
@@ -104,11 +104,11 @@ class ChatListingTest extends BaseTestClass {
                       .andExpect(status().isOk())
                       .andExpect(jsonPath("$.length()").value(3))
                       .andExpect(jsonPath("$[0].identifier").value(aliceCharlieChat))
-                      .andExpect(jsonPath("$[0].messagePreviews.size()").value(2))
-                      .andExpect(jsonPath("$[0].messagePreviews[0].content").value("new dcm"))
-                      .andExpect(jsonPath("$[0].messagePreviews[1].content").value("dcm"))
+                      .andExpect(jsonPath("$[0].previews.size()").value(2))
+                      .andExpect(jsonPath("$[0].previews[0].displayContent").value("new dcm"))
+                      .andExpect(jsonPath("$[0].previews[1].displayContent").value("dcm"))
                       .andExpect(jsonPath("$[1].identifier").value(aliceBobChat))
-                      .andExpect(jsonPath("$[1].messagePreviews.size()").value(1))
+                      .andExpect(jsonPath("$[1].previews.size()").value(1))
             ;
       }
 
@@ -128,14 +128,14 @@ class ChatListingTest extends BaseTestClass {
             chatSender.sendPrivateText("vcl", bobId, aliceId);
 
 
-            assertThat(events.stream(TextIntegrationChatEventPlaced.class)).hasSize(2);
+            assertThat(events.stream(TextChatEventAccepted.class)).hasSize(2);
             assertThat(events.stream(MessageCreated.class)).hasSize(2);
             assertThat(events.stream(InboxLogCreated.class)).hasSize(4);
 
             // When & Then: Request with version 1 should fail
             mockMvc.perform(get("/me/conversations")
                                 .queryParam("startAt", aliceBobChat)
-                                .queryParam("anchor", "-1")
+                                .queryParam("anchorRevisionNumber", "-1")
                                 .accept(MediaType.APPLICATION_JSON))
                       .andExpect(status().isConflict());
       }
@@ -163,7 +163,7 @@ class ChatListingTest extends BaseTestClass {
             chatSender.sendPrivateText("vcl", bobId, aliceId);
 
 
-            assertThat(events.stream(TextIntegrationChatEventPlaced.class)).hasSize(7);
+            assertThat(events.stream(TextChatEventAccepted.class)).hasSize(7);
             assertThat(events.stream(MessageCreated.class)).hasSize(7);
             assertThat(events.stream(InboxLogCreated.class)).hasSize(13);
 
@@ -175,22 +175,22 @@ class ChatListingTest extends BaseTestClass {
 
             mockMvc.perform(get("/me/conversations")
                                 .queryParam("startAt", aliceBobChat)
-                                .queryParam("anchor", bobHash.value().toString())
+                                .queryParam("anchorRevisionNumber", bobHash.value().toString())
                                 .accept(MediaType.APPLICATION_JSON))
                       .andExpect(status().isOk())
                       .andExpect(jsonPath("$.length()").value(2))
                       .andExpect(jsonPath("$[0].identifier").value(aliceCharlieChat))
-                      .andExpect(jsonPath("$[0].messagePreviews.size()").value(3))
+                      .andExpect(jsonPath("$[0].previews.size()").value(3))
                       .andExpect(jsonPath("$[1].identifier").value(aliceAliceChat))
-                      .andExpect(jsonPath("$[1].messagePreviews.size()").value(1));
+                      .andExpect(jsonPath("$[1].previews.size()").value(1));
             mockMvc.perform(get("/me/conversations")
                                 .queryParam("startAt", aliceCharlieChat)
-                                .queryParam("anchor", charlieHash.value().toString())
+                                .queryParam("anchorRevisionNumber", charlieHash.value().toString())
                                 .accept(MediaType.APPLICATION_JSON))
                       .andExpect(status().isOk())
                       .andExpect(jsonPath("$.length()").value(1))
                       .andExpect(jsonPath("$[0].identifier").value(aliceAliceChat))
-                      .andExpect(jsonPath("$[0].messagePreviews.size()").value(1))
+                      .andExpect(jsonPath("$[0].previews.size()").value(1))
             ;
       }
 

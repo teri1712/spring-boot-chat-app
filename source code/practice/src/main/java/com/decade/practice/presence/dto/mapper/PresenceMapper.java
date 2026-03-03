@@ -9,5 +9,5 @@ import org.mapstruct.ReportingPolicy;
 @Mapper(unmappedTargetPolicy = ReportingPolicy.ERROR, componentModel = MappingConstants.ComponentModel.SPRING)
 public interface PresenceMapper {
 
-    PresenceResponse toResponse(Presence presence);
+      PresenceResponse map(Presence presence);
 }

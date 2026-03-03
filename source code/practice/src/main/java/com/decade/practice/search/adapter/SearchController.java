@@ -32,7 +32,7 @@ public class SearchController {
                 @RequestParam String chatId,
                 @RequestParam String query
       ) {
-            return searchService.searchMessages(userId, chatId, query);
+            return searchService.searchMessages(chatId, userId, query);
       }
 
 }

@@ -131,7 +131,7 @@
         <!--        </dependency>-->
 
         <!-- Testcontainers for integration tests -->
-        
+
 
         <dependency>
             <groupId>org.testcontainers</groupId>
@@ -192,10 +192,10 @@
 
 
         <!--        &lt;!&ndash; KAFKA &ndash;&gt;-->
-        <!--        <dependency>-->
-        <!--            <groupId>org.springframework.kafka</groupId>-->
-        <!--            <artifactId>spring-kafka</artifactId>-->
-        <!--        </dependency>-->
+        <dependency>
+            <groupId>org.springframework.kafka</groupId>
+            <artifactId>spring-kafka</artifactId>
+        </dependency>
 
         <!--        <dependency>-->
         <!--            <groupId>org.testcontainers</groupId>-->
@@ -247,11 +247,11 @@
             <artifactId>spring-modulith-starter-jdbc</artifactId>
         </dependency>
 
-        <!--        <dependency>-->
-        <!--            <groupId>org.springframework.modulith</groupId>-->
-        <!--            <artifactId>spring-modulith-events-kafka</artifactId>-->
-        <!--            <scope>runtime</scope>-->
-        <!--        </dependency>-->
+        <dependency>
+            <groupId>org.springframework.modulith</groupId>
+            <artifactId>spring-modulith-events-kafka</artifactId>
+            <scope>runtime</scope>
+        </dependency>
 
     </dependencies>
 

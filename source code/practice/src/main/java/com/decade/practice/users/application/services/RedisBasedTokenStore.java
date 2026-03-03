@@ -5,10 +5,6 @@ import lombok.AllArgsConstructor;
 import org.springframework.data.redis.core.StringRedisTemplate;
 import org.springframework.stereotype.Service;
 
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.List;
-import java.util.Set;
 import java.util.concurrent.TimeUnit;
 
 @Service
@@ -31,13 +27,9 @@ public class RedisBasedTokenStore implements TokenStore {
       }
 
       @Override
-      public List<String> evict(String username) {
+      public void evict(String username) {
             String key = generateKey(username);
-            List<String> deletedTokens = getTokens(username);
-            for (String value : deletedTokens) {
-                  redisTemplate.opsForSet().remove(key, value);
-            }
-            return deletedTokens;
+            redisTemplate.opsForSet().remove(key);
       }
 
       @Override
@@ -50,15 +42,6 @@ public class RedisBasedTokenStore implements TokenStore {
       public boolean has(String username, String refreshToken) {
             String key = generateKey(username);
             return Boolean.TRUE.equals(redisTemplate.opsForSet().isMember(key, refreshToken));
-      }
-
-      private List<String> getTokens(String username) {
-            String key = generateKey(username);
-            Set<String> tokens = redisTemplate.opsForSet().members(key);
-            if (tokens == null) {
-                  return Collections.emptyList();
-            }
-            return new ArrayList<>(tokens);
       }
 
 

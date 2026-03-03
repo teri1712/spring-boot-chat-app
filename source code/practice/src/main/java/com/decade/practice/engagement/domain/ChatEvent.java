@@ -1,6 +1,5 @@
 package com.decade.practice.engagement.domain;
 
-import com.decade.practice.engagement.domain.events.ChatEventPlaced;
 import jakarta.persistence.*;
 import lombok.Getter;
 import org.springframework.data.domain.AbstractAggregateRoot;
@@ -26,7 +25,6 @@ public abstract class ChatEvent extends AbstractAggregateRoot<ChatEvent> {
             this.chatId = chatId;
             this.senderId = senderId;
             this.createdAt = Instant.now();
-            registerEvent(new ChatEventPlaced(id, chatId, senderId));
       }
 
       @Version

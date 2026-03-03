@@ -3,8 +3,8 @@ package com.decade.practice.users.adapter;
 import com.decade.practice.users.adapter.security.strategies.LoginSuccessStrategy;
 import com.decade.practice.users.application.ports.in.ProfileService;
 import com.decade.practice.users.application.ports.in.TokenSessionService;
+import com.decade.practice.users.dto.AccessToken;
 import com.decade.practice.users.dto.SignUpRequest;
-import com.decade.practice.users.dto.TokenCredential;
 import com.decade.practice.users.utils.GenderUtils;
 import com.decade.practice.web.security.TokenUtils;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -88,7 +88,7 @@ public class TokenController {
             response.getWriter().write(
                       new ObjectMapper()
                                 .enable(SerializationFeature.INDENT_OUTPUT)
-                                .writeValueAsString(new TokenCredential(accessToken, refreshToken))
+                                .writeValueAsString(new AccessToken(accessToken, refreshToken))
             );
             response.getWriter().flush();
       }

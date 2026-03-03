@@ -23,9 +23,9 @@ public class MessageController {
       public List<MessageStateResponse> listMessages(
                 @AuthenticationPrincipal(expression = "id") UUID userId,
                 @PathVariable @Validated String chatId,
-                @RequestParam Long anchorSequenceId
+                @RequestParam Long anchorSequenceNumber
       ) throws EntityNotFoundException {
-            return messageService.findByChatAndSequenceLessThanEqual(userId, chatId, anchorSequenceId);
+            return messageService.findByChatAndSequenceLessThanEqual(userId, chatId, anchorSequenceNumber);
       }
 
 }

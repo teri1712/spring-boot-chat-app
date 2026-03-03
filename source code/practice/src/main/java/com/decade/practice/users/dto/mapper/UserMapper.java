@@ -10,7 +10,7 @@ import org.mapstruct.ReportingPolicy;
 @Mapper(unmappedTargetPolicy = ReportingPolicy.ERROR, componentModel = MappingConstants.ComponentModel.SPRING)
 public interface UserMapper {
 
-      ProfileResponse toResponse(User user);
+      ProfileResponse map(User user);
 
       default String toGender(Float gender) {
             return GenderUtils.inspect(gender);

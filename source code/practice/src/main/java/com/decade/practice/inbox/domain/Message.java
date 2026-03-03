@@ -37,8 +37,7 @@ public abstract class Message extends AbstractAggregateRoot<Message> {
 
       @Temporal(TemporalType.TIMESTAMP)
       private Instant createdAt;
-
-
+      
       private Instant updatedAt;
 
 

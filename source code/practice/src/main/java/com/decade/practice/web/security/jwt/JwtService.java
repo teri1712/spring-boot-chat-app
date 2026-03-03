@@ -15,45 +15,45 @@ import java.util.Map;
 @Service
 public class JwtService implements TokenService {
 
-    private final String key;
-    private final ObjectMapper objectMapper = new ObjectMapper();
+      private final String key;
+      private final ObjectMapper objectMapper = new ObjectMapper();
 
-    public JwtService(
-            @Value("${jwt.secret}") String secret
-    ) {
-        this.key = Base64.getEncoder().encodeToString(secret.getBytes());
-    }
+      public JwtService(
+                @Value("${jwt.secret}") String secret
+      ) {
+            this.key = Base64.getEncoder().encodeToString(secret.getBytes());
+      }
 
-    private Jws<Claims> parse(String token) throws ExpiredJwtException, UnsupportedJwtException,
-            MalformedJwtException, SignatureException, IllegalArgumentException {
-        return Jwts.parser()
-                .setSigningKey(key)
-                .parseClaimsJws(token);
-    }
+      private Jws<Claims> parse(String token) throws ExpiredJwtException, UnsupportedJwtException,
+                MalformedJwtException, SignatureException, IllegalArgumentException {
+            return Jwts.parser()
+                      .setSigningKey(key)
+                      .parseClaimsJws(token);
+      }
 
-    @Override
-    public UserClaims decodeToken(String token) throws ExpiredJwtException, UnsupportedJwtException,
-            MalformedJwtException, SignatureException, IllegalArgumentException {
-        Claims claims = parse(token).getBody();
-        return objectMapper.convertValue(claims, UserClaims.class);
-    }
+      @Override
+      public UserClaims decodeToken(String token) throws ExpiredJwtException, UnsupportedJwtException,
+                MalformedJwtException, SignatureException, IllegalArgumentException {
+            Claims claims = parse(token).getBody();
+            return objectMapper.convertValue(claims, UserClaims.class);
+      }
 
-    @Override
-    public String encodeToken(UserClaims user, Long duration) {
-        Map<String, Object> claims = objectMapper.convertValue(
-                user,
-                new TypeReference<Map<String, Object>>() {
-                }
-        );
-        Date at = new Date();
-        return Jwts.builder()
-                .setHeaderParam("typ", "JWT")
-                .setHeaderParam("alg", "HS256")
-                .setIssuedAt(at)
-                .setExpiration(new Date(at.getTime() + duration))
-                .setClaims(claims)
-                .signWith(SignatureAlgorithm.HS256, key)
-                .compact();
-    }
+      @Override
+      public String encodeToken(UserClaims user, Long duration) {
+            Map<String, Object> claims = objectMapper.convertValue(
+                      user,
+                      new TypeReference<Map<String, Object>>() {
+                      }
+            );
+            Date at = new Date();
+            return Jwts.builder()
+                      .setHeaderParam("typ", "JWT")
+                      .setHeaderParam("alg", "HS256")
+                      .setIssuedAt(at)
+                      .setExpiration(new Date(at.getTime() + duration))
+                      .setClaims(claims)
+                      .signWith(SignatureAlgorithm.HS256, key)
+                      .compact();
+      }
 
 }

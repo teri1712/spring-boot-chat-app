@@ -8,13 +8,13 @@ import org.springframework.stereotype.Service;
 @AllArgsConstructor
 public class UserPasswordPolicy {
 
-    private final PasswordEncoder passwordEncoder;
+      private final PasswordEncoder passwordEncoder;
 
-    public void change(User user, String oldPassword, String newPassword) {
-        if (!passwordEncoder.matches(oldPassword, user.getPassword())) {
-            throw new WrongPasswordException();
-        }
-        user.changePassword(newPassword);
-    }
+      public void change(User user, String oldPassword, String newPassword) {
+            if (!passwordEncoder.matches(oldPassword, user.getPassword())) {
+                  throw new WrongPasswordException();
+            }
+            user.changePassword(newPassword);
+      }
 
 }

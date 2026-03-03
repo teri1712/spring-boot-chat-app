@@ -1,7 +1,6 @@
 package com.decade.practice.live.adapter.interceptors;
 
 import com.decade.practice.live.application.ports.in.LiveService;
-import com.decade.practice.live.domain.LiveChatId;
 import com.decade.practice.live.infras.security.SocketAuthentication;
 import com.decade.practice.web.security.jwt.JwtUser;
 import lombok.RequiredArgsConstructor;
@@ -30,8 +29,8 @@ public class LiveInterceptor implements ChannelInterceptor {
             return destination != null && destination.contains(liveTopic);
       }
 
-      private LiveChatId extractChatId(String destination) {
-            return new LiveChatId(destination.substring(liveTopic.length() + 1));
+      private String extractChatId(String destination) {
+            return destination.substring(liveTopic.length() + 1);
       }
 
       @Nullable
@@ -44,17 +43,17 @@ public class LiveInterceptor implements ChannelInterceptor {
             if (isLiveDestination(destination)) {
                   StompCommand command = accessor.getCommand();
                   if (command == StompCommand.SUBSCRIBE) {
-                        LiveChatId chatId = extractChatId(accessor.getDestination());
+                        String chatId = extractChatId(accessor.getDestination());
                         JwtUser jwtUser = ((SocketAuthentication) accessor.getUser()).jwtUser();
-                        liveService.join(chatId, jwtUser.getId());
+                        liveService.join(chatId, jwtUser.getId(), jwtUser.getClaims().avatar());
                   } else if (command == StompCommand.UNSUBSCRIBE) {
-                        LiveChatId chatId = extractChatId(accessor.getDestination());
+                        String chatId = extractChatId(accessor.getDestination());
                         JwtUser jwtUser = ((SocketAuthentication) accessor.getUser()).jwtUser();
-                        liveService.leave(chatId, jwtUser.getId());
+                        liveService.leave(chatId, jwtUser.getId(), jwtUser.getClaims().avatar());
                   } else if (command == StompCommand.SEND) {
-                        LiveChatId chatId = extractChatId(accessor.getDestination());
+                        String chatId = extractChatId(accessor.getDestination());
                         JwtUser jwtUser = ((SocketAuthentication) accessor.getUser()).jwtUser();
-                        liveService.send(chatId, jwtUser.getId());
+                        liveService.send(chatId, jwtUser.getId(), jwtUser.getClaims().avatar());
                         return null;
                   }
             }

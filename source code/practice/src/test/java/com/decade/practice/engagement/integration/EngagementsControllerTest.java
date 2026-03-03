@@ -2,8 +2,8 @@ package com.decade.practice.engagement.integration;
 
 import com.decade.practice.BaseTestClass;
 import com.decade.practice.engagement.application.ports.in.EngagementService;
+import com.decade.practice.engagement.domain.events.*;
 import com.decade.practice.engagement.dto.PreferenceRequest;
-import com.decade.practice.engagement.dto.events.*;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -85,7 +85,7 @@ class EngagementsControllerTest extends BaseTestClass {
                       .andExpect(jsonPath("$.id").value(idempotentKey));
 
 
-            assertThat(events.stream(TextIntegrationChatEventPlaced.class)).hasSize(1);
+            assertThat(events.stream(TextChatEventAccepted.class)).hasSize(1);
 
 
             // Idempotent check
@@ -128,7 +128,7 @@ class EngagementsControllerTest extends BaseTestClass {
                       .andExpect(jsonPath("$.preference.iconId").value(99));
 
 
-            assertThat(events.stream(PreferenceIntegrationChatEventPlaced.class)).hasSize(1);
+            assertThat(events.stream(PreferenceChatEventAccepted.class)).hasSize(1);
 
       }
 
@@ -162,7 +162,7 @@ class EngagementsControllerTest extends BaseTestClass {
                                 .content(eventJson))
                       .andExpect(status().isAccepted());
 
-            assertThat(events.stream(ImageIntegrationChatEventPlaced.class)).hasSize(1);
+            assertThat(events.stream(ImageChatEventAccepted.class)).hasSize(1);
       }
 
       @Test
@@ -190,7 +190,7 @@ class EngagementsControllerTest extends BaseTestClass {
                       .andExpect(status().isAccepted());
 
 
-            assertThat(events.stream(IconIntegrationChatEventPlaced.class)).hasSize(1);
+            assertThat(events.stream(IconChatEventAccepted.class)).hasSize(1);
       }
 
       @Test
@@ -219,7 +219,7 @@ class EngagementsControllerTest extends BaseTestClass {
                       .andExpect(status().isAccepted());
 
 
-            assertThat(events.stream(SeenIntegrationChatEventPlaced.class)).hasSize(1);
+            assertThat(events.stream(SeenChatEventAccepted.class)).hasSize(1);
       }
 
       @Test
@@ -250,7 +250,7 @@ class EngagementsControllerTest extends BaseTestClass {
                       .andExpect(status().isAccepted());
 
 
-            assertThat(events.stream(FileIntegrationChatEventPlaced.class)).hasSize(1);
+            assertThat(events.stream(FileChatEventAccepted.class)).hasSize(1);
       }
 
 
@@ -280,7 +280,7 @@ class EngagementsControllerTest extends BaseTestClass {
 
             // When & Then: Alice can't still request it
             mockMvc.perform(get("/chats/{id}", bobCharlieChat)
-                                .param("anchorSequenceId", "0"))
+                                .param("anchorSequenceNumber", "0"))
                       .andExpect(status().isForbidden());
       }
 

@@ -23,16 +23,16 @@ public class CacheableLogService implements LogService {
 
       @Override
       @Cacheable(cacheNames = "events", key = "#owner + ':' + #chatId + ':' + #sequenceId")
-      public List<InboxLogResponse> findByChatAndSequenceLessThanEqual(UUID owner, String chatId, Long sequenceId) {
+      public List<InboxLogResponse> findByChatAndSequenceGreaterThanEqual(String chatId, UUID owner, Long sequenceId) {
             log.trace("Events for identifier: {} and ownerId : {} are about to be cached", chatId, owner);
-            return logService.findByChatAndSequenceLessThanEqual(owner, chatId, sequenceId);
+            return logService.findByChatAndSequenceGreaterThanEqual(chatId, owner, sequenceId);
       }
 
       @Override
       @Cacheable(cacheNames = "events", key = "#owner + ':' + #sequenceId")
-      public List<InboxLogResponse> findBySequenceLessThanEqual(UUID owner, Long sequenceId) {
+      public List<InboxLogResponse> findBySequenceGreaterThanEqual(UUID owner, Long sequenceId) {
             log.trace("Events for ownerId: {} are about to be cached", owner);
-            return logService.findBySequenceLessThanEqual(owner, sequenceId);
+            return logService.findBySequenceGreaterThanEqual(owner, sequenceId);
       }
 
 }

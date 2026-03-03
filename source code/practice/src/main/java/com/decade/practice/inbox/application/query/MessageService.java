@@ -10,7 +10,7 @@ public interface MessageService {
       List<MessageStateResponse> findByChatAndSequenceLessThanEqual(
                 UUID owner,
                 String chatId,
-                Long anchorSequenceId
+                Long anchorSequenceNumber
       );
 
 }

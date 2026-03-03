@@ -8,6 +8,6 @@ import java.util.UUID;
 
 public interface ConversationService {
 
-      List<ConversationResponse> list(UUID userId, Optional<Long> anchor) throws Throwable;
+      List<ConversationResponse> list(UUID userId, Optional<Long> anchorRevisionNumber) throws Throwable;
 
 }

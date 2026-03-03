@@ -36,6 +36,7 @@ public class MessageStateResponse {
       private String messageType;
       private String chatId;
       private Instant createdAt;
+      private Instant updatedAt;
       private Set<PartnerResponse> seenBy;
 
 }

@@ -23,30 +23,30 @@ import java.time.Instant;
 @Order(Ordered.HIGHEST_PRECEDENCE)
 @AllArgsConstructor
 public class PresenceListener implements ChannelInterceptor, WebMvcConfigurer {
-    private final PresenceSetter presenceSetter;
+      private final PresenceSetter presenceSetter;
 
-    @Override
-    public void addInterceptors(InterceptorRegistry registry) {
-        registry.addInterceptor(new HandlerInterceptor() {
-            @Override
-            public boolean preHandle(HttpServletRequest request, HttpServletResponse response, Object handler) throws Exception {
-                if (request.getUserPrincipal() != null && request.getUserPrincipal() instanceof JwtUserAuthentication authentication) {
-                    UserClaims user = authentication.getPrincipal().getClaims();
-                    presenceSetter.set(user.id(), user.username(), user.name(), user.avatar(), Instant.now());
-                }
-                return true;
+      @Override
+      public void addInterceptors(InterceptorRegistry registry) {
+            registry.addInterceptor(new HandlerInterceptor() {
+                  @Override
+                  public boolean preHandle(HttpServletRequest request, HttpServletResponse response, Object handler) throws Exception {
+                        if (request.getUserPrincipal() != null && request.getUserPrincipal() instanceof JwtUserAuthentication authentication) {
+                              UserClaims user = authentication.getPrincipal().getClaims();
+                              presenceSetter.set(user.id(), user.name(), user.avatar(), Instant.now());
+                        }
+                        return true;
+                  }
+            });
+      }
+
+      @Override
+      public Message<?> preSend(Message<?> message, MessageChannel channel) {
+            var principal = SimpMessageHeaderAccessor.getUser(message.getHeaders());
+            if (principal instanceof JwtUserAuthentication authentication) {
+                  UserClaims user = authentication.getPrincipal().getClaims();
+                  presenceSetter.set(user.id(), user.name(), user.avatar(), Instant.now());
             }
-        });
-    }
-
-    @Override
-    public Message<?> preSend(Message<?> message, MessageChannel channel) {
-        var principal = SimpMessageHeaderAccessor.getUser(message.getHeaders());
-        if (principal instanceof JwtUserAuthentication authentication) {
-            UserClaims user = authentication.getPrincipal().getClaims();
-            presenceSetter.set(user.id(), user.username(), user.name(), user.avatar(), Instant.now());
-        }
-        return message;
-    }
+            return message;
+      }
 
 }

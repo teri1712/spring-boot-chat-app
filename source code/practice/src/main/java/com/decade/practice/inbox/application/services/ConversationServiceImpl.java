@@ -5,8 +5,9 @@ import com.decade.practice.inbox.application.query.ConversationService;
 import com.decade.practice.inbox.domain.Conversation;
 import com.decade.practice.inbox.domain.HashValue;
 import com.decade.practice.inbox.domain.MessagePreview;
+import com.decade.practice.inbox.domain.MessageState;
 import com.decade.practice.inbox.dto.ConversationResponse;
-import com.decade.practice.inbox.dto.mapper.ChatHistoryMapper;
+import com.decade.practice.inbox.dto.mapper.ConversationMapper;
 import com.decade.practice.users.api.UserApi;
 import com.decade.practice.users.api.UserInfo;
 import lombok.RequiredArgsConstructor;
@@ -29,21 +30,21 @@ import java.util.stream.Stream;
 public class ConversationServiceImpl implements ConversationService {
 
       private final ConversationListing conversationListing;
-      private final ChatHistoryMapper historyMapper;
+      private final ConversationMapper historyMapper;
       private final UserApi userApi;
 
 
       @Override
       @Transactional(isolation = Isolation.REPEATABLE_READ, readOnly = true)
-      public List<ConversationResponse> list(UUID userId, Optional<Long> anchor) throws Throwable {
+      public List<ConversationResponse> list(UUID userId, Optional<Long> anchorRevisionNumber) throws Throwable {
             PageRequest pageRequest = PageRequest.of(0, 20);
-            if (anchor.isEmpty()) {
+            if (anchorRevisionNumber.isEmpty()) {
                   List<Conversation> historyList = conversationListing.findByModifiedAtLessThan(userId, Instant.now().plusSeconds(60), pageRequest);
                   Map<UUID, UserInfo> allNeededUsers = userApi.getUserInfo(aggregateAllNeededUsers(historyList));
                   return historyMapper.map(historyList, allNeededUsers);
 
             }
-            List<Conversation> historyList = conversationListing.findByModifiedAtLessThan(new HashValue(anchor.get()), userId, pageRequest);
+            List<Conversation> historyList = conversationListing.findByModifiedAtLessThan(new HashValue(anchorRevisionNumber.get()), userId, pageRequest);
             Map<UUID, UserInfo> allNeededUsers = userApi.getUserInfo(aggregateAllNeededUsers(historyList));
             return historyMapper.map(historyList, allNeededUsers);
       }
@@ -51,13 +52,15 @@ public class ConversationServiceImpl implements ConversationService {
       private static Set<UUID> aggregateAllNeededUsers(List<Conversation> historyList) {
             Set<UUID> allNeededUsers = historyList.stream()
                       .flatMap((Function<Conversation, Stream<MessagePreview>>)
-                                history -> history.getMessagePreviews().stream())
-                      .map(MessagePreview::sentBy)
+                                history -> history.getPreviews().stream())
+                      .map(MessagePreview::messageState)
+                      .flatMap(new Function<MessageState, Stream<UUID>>() {
+                            @Override
+                            public Stream<UUID> apply(MessageState messageState) {
+                                  return Stream.concat(messageState.getSeenByIds().stream(), Stream.of(messageState.getSenderId()));
+                            }
+                      })
                       .collect(Collectors.toSet());
-            allNeededUsers.addAll(historyList.stream()
-                      .flatMap((Function<Conversation, Stream<UUID>>)
-                                history -> history.getSeenBy().stream())
-                      .collect(Collectors.toSet()));
             return allNeededUsers;
       }
 

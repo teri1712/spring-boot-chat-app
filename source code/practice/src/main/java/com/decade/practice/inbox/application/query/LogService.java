@@ -7,15 +7,15 @@ import java.util.UUID;
 
 public interface LogService {
 
-      List<InboxLogResponse> findBySequenceLessThanEqual(
+      List<InboxLogResponse> findBySequenceGreaterThanEqual(
                 UUID owner,
-                Long anchorSequenceId
+                Long anchorSequenceNumber
       );
 
-      List<InboxLogResponse> findByChatAndSequenceLessThanEqual(
-                UUID owner,
+      List<InboxLogResponse> findByChatAndSequenceGreaterThanEqual(
                 String chatId,
-                Long anchorSequenceId
+                UUID owner,
+                Long anchorSequenceNumber
       );
 
 

@@ -10,7 +10,7 @@ import org.mapstruct.ReportingPolicy;
 @Mapper(unmappedTargetPolicy = ReportingPolicy.ERROR, componentModel = MappingConstants.ComponentModel.SPRING, uses = {PreferenceMapper.class})
 public interface ChatMapper {
 
-    @Mapping(source = "chat.preference", target = "preference")
-    ChatResponse toResponse(Chat chat, Boolean freshOne);
+      @Mapping(source = "chat.preference", target = "preference")
+      ChatResponse toResponse(Chat chat, Boolean freshOne);
 
 }

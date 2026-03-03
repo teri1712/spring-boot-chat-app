@@ -9,8 +9,8 @@ import java.util.List;
 import java.util.Map;
 import java.util.UUID;
 
-@Mapper(unmappedTargetPolicy = ReportingPolicy.ERROR, componentModel = MappingConstants.ComponentModel.SPRING, uses = PartnerMapper.class)
-public interface ChatHistoryMapper {
+@Mapper(unmappedTargetPolicy = ReportingPolicy.ERROR, componentModel = MappingConstants.ComponentModel.SPRING, uses = {PartnerMapper.class, MessageMapper.class})
+public interface ConversationMapper {
 
       @Mapping(source = "conversationId.chatId", target = "identifier")
       @Mapping(source = "hash.value", target = "revisionNumber")

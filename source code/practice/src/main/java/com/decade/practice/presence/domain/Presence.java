@@ -13,17 +13,14 @@ import java.util.UUID;
 @AllArgsConstructor
 public class Presence {
 
-    @Id
-    private String username;
-
-    // TODO: Adjust client to new schema
-    private UUID userId;
-    private Instant at;
-    private String avatar;
-    private String name;
+      @Id
+      private UUID userId;
+      private Instant at;
+      private String avatar;
+      private String name;
 
 
-    protected Presence() {
-    }
+      protected Presence() {
+      }
 
 }
