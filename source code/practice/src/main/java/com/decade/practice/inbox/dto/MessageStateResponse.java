@@ -1,5 +1,6 @@
 package com.decade.practice.inbox.dto;
 
+import com.decade.practice.users.api.UserInfo;
 import com.fasterxml.jackson.annotation.JsonSubTypes;
 import com.fasterxml.jackson.annotation.JsonTypeInfo;
 import lombok.Getter;
@@ -32,11 +33,11 @@ public class MessageStateResponse {
 
       private Long sequenceNumber;
       private UUID engagementId;
-      private PartnerResponse sender;
+      private UserInfo sender;
       private String messageType;
       private String chatId;
       private Instant createdAt;
       private Instant updatedAt;
-      private Set<PartnerResponse> seenBy;
+      private Set<UserInfo> seenBy;
 
 }

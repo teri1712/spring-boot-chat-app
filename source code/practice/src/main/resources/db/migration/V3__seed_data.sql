@@ -27,29 +27,29 @@ VALUES ('00000000-0000-0000-0000-000000000002', 'Luffy',
         'https://i.pinimg.com/736x/79/e2/c9/79e2c9402014ead1eebf6c9f184c5bf8.jpg');
 
 
--- Private chat: Luffy & Nami
-INSERT INTO chat (identifier, event_version, caller_id, partner_id, icon_id,
+-- Private setting: Luffy & Nami
+insert into chat (identifier, event_version, caller_id, partner_id, icon_id,
                   room_name, room_avatar, theme, max_participants)
 VALUES ('00000000-0000-0000-0000-000000000002+00000000-0000-0000-0000-000000000003', 0,
         '00000000-0000-0000-0000-000000000002',
         '00000000-0000-0000-0000-000000000003',
         1, 'Luffy & Nami', NULL, '1', 2);
 
--- Group chat
-INSERT INTO chat (identifier, event_version, icon_id,
+-- Group setting
+insert into chat (identifier, event_version, icon_id,
                   room_name, theme, max_participants)
 VALUES ('chat_group_1', 0,
         2, 'Straw Hat Crew', '2', 10);
 
 
--- Private chat participants
+-- Private setting participants
 INSERT INTO participant (join_date, version, user_id, chat_id, write, read)
 VALUES (CURRENT_TIMESTAMP, 0, '00000000-0000-0000-0000-000000000002',
         '00000000-0000-0000-0000-000000000002+00000000-0000-0000-0000-000000000003', true, true),
        (CURRENT_TIMESTAMP, 0, '00000000-0000-0000-0000-000000000003',
         '00000000-0000-0000-0000-000000000002+00000000-0000-0000-0000-000000000003', true, true);
 
--- Group chat participants
+-- Group setting participants
 INSERT INTO participant (join_date, version, user_id, chat_id, write, read)
 VALUES (CURRENT_TIMESTAMP, 0, '00000000-0000-0000-0000-000000000002', 'chat_group_1', true, true),
        (CURRENT_TIMESTAMP, 0, '00000000-0000-0000-0000-000000000003', 'chat_group_1', true, true),

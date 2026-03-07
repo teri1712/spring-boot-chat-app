@@ -1,7 +1,7 @@
 package com.decade.practice.live;
 
 import com.decade.practice.BaseTestClass;
-import com.decade.practice.engagement.application.ports.in.EngagementService;
+import com.decade.practice.chat.application.ports.in.ChatService;
 import com.decade.practice.engagement.domain.ChatCreators;
 import com.decade.practice.engagement.domain.services.TwoParticipantChatIdentifierMaker;
 import com.decade.practice.live.dto.TypeMessage;
@@ -51,7 +51,7 @@ public class LiveJoinerTest extends BaseTestClass {
       private String liveTopic;
 
       @Autowired
-      private EngagementService engagementService;
+      private ChatService chatService;
 
       @Test
       @Timeout(5)
@@ -68,7 +68,7 @@ public class LiveJoinerTest extends BaseTestClass {
                   UUID aliceId = UUID.fromString("11111111-1111-1111-1111-111111111111");
                   UUID bobId = UUID.fromString("22222222-2222-2222-2222-222222222222");
 
-                  engagementService.getOrCreate(aliceId, bobId);
+                  chatService.getDirect(aliceId, bobId);
 
                   UserClaims alice = new UserClaims(
                             UUID.fromString("11111111-1111-1111-1111-111111111111"),

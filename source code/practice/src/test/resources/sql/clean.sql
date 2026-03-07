@@ -1,1 +1,1 @@
-TRUNCATE user_member, message, chat, image_chat_event, text_chat_event, file_chat_event, seen_chat_event, preference_chat_event, icon_chat_event, theme, conversation, participant, inbox_log CASCADE;
+TRUNCATE user_member, message, chat, setting, image_chat_event, text_chat_event, file_chat_event, seen_chat_event, preference_chat_event, icon_chat_event, theme, conversation, participant, inbox_log CASCADE;

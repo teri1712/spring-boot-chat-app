@@ -1,12 +1,16 @@
 package com.decade.practice.presence;
 
 import com.decade.practice.BaseTestClass;
-import com.decade.practice.engagement.application.ports.in.EngagementService;
-import com.decade.practice.engagement.dto.ChatResponse;
+import com.decade.practice.TestBeans;
+import com.decade.practice.chat.application.ports.in.ChatService;
 import com.decade.practice.presence.application.ports.in.PresenceSetter;
+import com.decade.practice.presence.application.ports.out.PresenceRepository;
+import com.decade.practice.presence.dto.ChatPresenceResponse;
 import com.decade.practice.web.security.UserClaims;
 import com.decade.practice.web.security.jwt.JwtUser;
+import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -39,14 +43,21 @@ public class PresenceControllerTest extends BaseTestClass {
 
 
       @Autowired
-      private EngagementService engagementService;
+      private ChatService chatService;
 
       @Autowired
       private ObjectMapper objectMapper;
 
+      @Autowired
+      private TestBeans.PrivateChatSender chatSender;
+
+      @Autowired
+      private PresenceRepository presences;
+
 
       @BeforeEach
-      void setUp() {
+      @AfterEach
+      void clean() {
             // Strict isolation: clear Redis before each test
             redisTemplate.getConnectionFactory().getConnection().flushAll();
       }
@@ -68,7 +79,7 @@ public class PresenceControllerTest extends BaseTestClass {
                                 .accept(MediaType.APPLICATION_JSON))
                       .andExpect(status().isOk())
                       .andExpect(jsonPath("$.length()").value(1))
-                      .andExpect(jsonPath("$[0].username").value("bob"))
+                      .andExpect(jsonPath("$[0].userId").value(bob.getId().toString()))
                       .andExpect(jsonPath("$[0].name").value("Bob Builder"));
       }
 
@@ -83,8 +94,11 @@ public class PresenceControllerTest extends BaseTestClass {
 
             presenceSetter.set(bob.getId(), bob.getClaims().name(), bob.getClaims().avatar(), Instant.now());
             presenceSetter.set(alice.getId(), alice.getClaims().name(), alice.getClaims().avatar(), Instant.now());
-            engagementService.getOrCreate(bob.getId(), alice.getId());
-            engagementService.getOrCreate(charlie.getId(), alice.getId());
+            assertEquals(2, presences.count());
+            chatService.getDirect(bob.getId(), alice.getId());
+            chatService.getDirect(charlie.getId(), alice.getId());
+            assertEquals(2, presences.count());
+
             // When & Then
             String bobChatId = alice.getId() + "+" + bob.getId();
             String charlieChatId = alice.getId() + "+" + charlie.getId();
@@ -94,9 +108,10 @@ public class PresenceControllerTest extends BaseTestClass {
                                 .accept(MediaType.APPLICATION_JSON))
                       .andExpect(status().isOk()).andExpect(result -> {
                             String json = result.getResponse().getContentAsString();
-                            Map<String, ChatResponse> map = objectMapper.readValue(json, Map.class);
+                            Map<String, ChatPresenceResponse> map = objectMapper.readValue(json, new TypeReference<Map<String, ChatPresenceResponse>>() {
+                            });
                             assertNotNull(map.get(bobChatId));
-                            assertTrue(map.get(bobChatId).lastActivity()
+                            assertTrue(map.get(bobChatId).at()
                                       .isAfter(Instant.now().minusSeconds(10)));
 
                             // bc charlie doesn't onlien
@@ -116,8 +131,9 @@ public class PresenceControllerTest extends BaseTestClass {
             presenceSetter.set(bob.getId(), bob.getClaims().name(), bob.getClaims().avatar(), Instant.now());
             presenceSetter.set(alice.getId(), alice.getClaims().name(), alice.getClaims().avatar(), Instant.now());
             presenceSetter.set(charlie.getId(), charlie.getClaims().name(), charlie.getClaims().avatar(), Instant.now());
-            engagementService.getOrCreate(bob.getId(), alice.getId());
-            engagementService.getOrCreate(charlie.getId(), alice.getId());
+            chatService.getDirect(bob.getId(), alice.getId());
+            chatService.getDirect(charlie.getId(), alice.getId());
+            chatSender.sendPrivateText("meo meo", bob.getId(), alice.getId());
             // When & Then
             String bobChatId = alice.getId() + "+" + bob.getId();
             String charlieChatId = alice.getId() + "+" + charlie.getId();
@@ -127,13 +143,14 @@ public class PresenceControllerTest extends BaseTestClass {
                                 .accept(MediaType.APPLICATION_JSON))
                       .andExpect(status().isOk()).andExpect(result -> {
                             String json = result.getResponse().getContentAsString();
-                            Map<String, ChatResponse> map = objectMapper.readValue(json, Map.class);
+                            Map<String, ChatPresenceResponse> map = objectMapper.readValue(json, new TypeReference<Map<String, ChatPresenceResponse>>() {
+                            });
                             assertNotNull(map.get(bobChatId));
-                            assertTrue(map.get(bobChatId).lastActivity()
+                            assertTrue(map.get(bobChatId).at()
                                       .isAfter(Instant.now().minusSeconds(10)));
 
                             assertNotNull(map.get(charlieChatId));
-                            assertTrue(map.get(charlieChatId).lastActivity()
+                            assertTrue(map.get(charlieChatId).at()
                                       .isAfter(Instant.now().minusSeconds(10)));
                       });
       }

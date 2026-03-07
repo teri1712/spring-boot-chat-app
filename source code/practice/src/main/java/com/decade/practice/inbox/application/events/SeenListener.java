@@ -1,9 +1,9 @@
 package com.decade.practice.inbox.application.events;
 
-import com.decade.practice.engagement.domain.events.SeenChatEventAccepted;
 import com.decade.practice.inbox.application.ports.out.MessageRepository;
 import com.decade.practice.inbox.domain.Message;
 import com.decade.practice.inbox.domain.SeenPointer;
+import com.decade.practice.inbox.domain.events.SeenChatEventCreated;
 import lombok.AllArgsConstructor;
 import org.springframework.modulith.events.ApplicationModuleListener;
 import org.springframework.stereotype.Service;
@@ -19,8 +19,8 @@ public class SeenListener {
       private final MessageRepository messages;
 
       @ApplicationModuleListener
-      public void on(SeenChatEventAccepted event) {
-            String chatId = event.getSnapshot().chatId();
+      public void on(SeenChatEventCreated event) {
+            String chatId = event.getChatId();
             UUID senderId = event.getSenderId();
             Optional<Message> lastSeen = messages.findByLastSeen(chatId, senderId);
             lastSeen.ifPresent(new Consumer<Message>() {

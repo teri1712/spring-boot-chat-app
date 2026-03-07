@@ -1,8 +1,7 @@
 package com.decade.practice.presence.application.events;
 
-import com.decade.practice.engagement.domain.events.ChatCreatedAccepted;
-import com.decade.practice.engagement.domain.events.ChatEventAccepted;
-import com.decade.practice.engagement.domain.events.ChatSnapshot;
+import com.decade.practice.engagement.domain.events.ChatCreated;
+import com.decade.practice.inbox.domain.events.ChatEventCreated;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.modulith.events.ApplicationModuleListener;
@@ -21,9 +20,9 @@ public class EnthusiastHandler {
       private final RedisTemplate<String, Object> redisTemplate;
 
       @ApplicationModuleListener
-      public void on(ChatEventAccepted event) {
+      public void on(ChatEventCreated event) {
             UUID userId = event.getSenderId();
-            String chatId = event.getSnapshot().chatId();
+            String chatId = event.getChatId();
 
 
             redisTemplate.opsForZSet().addIfAbsent(determineEnthusiastId(chatId), userId, getCurrentTime());
@@ -45,14 +44,12 @@ public class EnthusiastHandler {
       }
 
       @ApplicationModuleListener
-      public void on(ChatCreatedAccepted event) {
-            ChatSnapshot snapshot = event.getSnapshot();
-            String chatId = snapshot.chatId();
-            UUID user = snapshot.creators().get(0);
-            UUID partner = snapshot.creators().get(1);
+      public void on(ChatCreated event) {
+            String chatId = event.chatId();
 
-            redisTemplate.opsForZSet().add(determineEnthusiastId(chatId), user, getCurrentTime());
-            redisTemplate.opsForZSet().add(determineEnthusiastId(chatId), partner, getCurrentTime());
+            event.participants().forEach(participant ->
+                      redisTemplate.opsForZSet()
+                                .addIfAbsent(determineEnthusiastId(chatId), participant, getCurrentTime()));
             resetActivity(chatId);
       }
 }

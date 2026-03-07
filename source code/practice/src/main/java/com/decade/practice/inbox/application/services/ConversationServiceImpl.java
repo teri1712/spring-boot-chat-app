@@ -4,7 +4,6 @@ import com.decade.practice.inbox.application.ports.out.ConversationListing;
 import com.decade.practice.inbox.application.query.ConversationService;
 import com.decade.practice.inbox.domain.Conversation;
 import com.decade.practice.inbox.domain.HashValue;
-import com.decade.practice.inbox.domain.MessagePreview;
 import com.decade.practice.inbox.domain.MessageState;
 import com.decade.practice.inbox.dto.ConversationResponse;
 import com.decade.practice.inbox.dto.mapper.ConversationMapper;
@@ -51,9 +50,8 @@ public class ConversationServiceImpl implements ConversationService {
 
       private static Set<UUID> aggregateAllNeededUsers(List<Conversation> historyList) {
             Set<UUID> allNeededUsers = historyList.stream()
-                      .flatMap((Function<Conversation, Stream<MessagePreview>>)
-                                history -> history.getPreviews().stream())
-                      .map(MessagePreview::messageState)
+                      .flatMap((Function<Conversation, Stream<MessageState>>)
+                                history -> history.getRecents().stream())
                       .flatMap(new Function<MessageState, Stream<UUID>>() {
                             @Override
                             public Stream<UUID> apply(MessageState messageState) {

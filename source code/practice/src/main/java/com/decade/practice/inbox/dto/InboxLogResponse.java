@@ -7,8 +7,8 @@ import java.util.UUID;
 public record InboxLogResponse(
           Long sequenceNumber,
           String chatId,
-          String roomNameSnapshot,
-          String roomAvatarSnapshot,
+          String conversationName,
+          String conversationAvatar,
           Long revisionNumber,
           UUID senderId,
           UUID ownerId,

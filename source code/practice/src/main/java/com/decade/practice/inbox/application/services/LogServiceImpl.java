@@ -46,7 +46,7 @@ public class LogServiceImpl implements LogService {
                                 .map(InboxLog::getSenderId)
                                 .collect(Collectors.toSet()));
             Conversation conversation = conversations.findById(new ConversationId(chatId, userId)).orElseThrow();
-            return mapper.map(logList, new InboxLogMapper.InboxContext(userMap, conversation.getRoomName(), conversation.getRoomAvatar(), conversation.getHash().value()));
+            return mapper.map(logList, new InboxLogMapper.InboxContext(userId, userMap, conversation.getName(), conversation.getAvatar(), conversation.getHash().value()));
       }
 
       @Override
@@ -67,7 +67,7 @@ public class LogServiceImpl implements LogService {
 
                   @Override
                   public InboxLogResponse apply(LogWithConversation logWithConversation) {
-                        return mapper.map(logWithConversation.log(), new InboxLogMapper.InboxContext(userMap, logWithConversation.conversation().getRoomName(), logWithConversation.conversation().getRoomAvatar(), logWithConversation.conversation().getHash().value()));
+                        return mapper.map(logWithConversation.log(), new InboxLogMapper.InboxContext(userId, userMap, logWithConversation.conversation().getName(), logWithConversation.conversation().getAvatar(), logWithConversation.conversation().getHash().value()));
                   }
             }).toList();
       }

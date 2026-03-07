@@ -1,8 +1,8 @@
 package com.decade.practice.inbox.application.events;
 
-import com.decade.practice.engagement.domain.events.FileChatEventAccepted;
 import com.decade.practice.inbox.application.ports.out.MessageRepository;
 import com.decade.practice.inbox.domain.File;
+import com.decade.practice.inbox.domain.events.FileChatEventCreated;
 import lombok.AllArgsConstructor;
 import org.springframework.modulith.events.ApplicationModuleListener;
 import org.springframework.stereotype.Service;
@@ -15,8 +15,8 @@ public class FileListener {
       private final MessageRepository messages;
 
       @ApplicationModuleListener
-      public void on(FileChatEventAccepted eventPlaced) {
-            messages.save(new File(eventPlaced.getChatEventId(), eventPlaced.getSenderId(), eventPlaced.getSnapshot().chatId(), eventPlaced.getCreatedAt(), eventPlaced.getFilename(), eventPlaced.getSize(), eventPlaced.getUri()));
+      public void on(FileChatEventCreated eventPlaced) {
+            messages.save(new File(eventPlaced.getChatEventId(), eventPlaced.getSenderId(), eventPlaced.getChatId(), eventPlaced.getCreatedAt(), eventPlaced.getFilename(), eventPlaced.getSize(), eventPlaced.getUri()));
       }
 
 }

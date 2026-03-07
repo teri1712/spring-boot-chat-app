@@ -5,14 +5,13 @@ import com.decade.practice.presence.application.ports.out.PresenceRepository;
 import com.decade.practice.presence.application.query.PresenceService;
 import com.decade.practice.presence.domain.Presence;
 import com.decade.practice.presence.dto.ChatPresenceResponse;
-import com.decade.practice.presence.dto.PresenceResponse;
+import com.decade.practice.presence.dto.PresenceRecommendationResponse;
 import com.decade.practice.presence.dto.mapper.PresenceMapper;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.redis.core.RedisCallback;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.data.redis.core.ZSetOperations;
 import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
 
 import java.nio.charset.StandardCharsets;
 import java.time.Instant;
@@ -50,15 +49,20 @@ public class PresenceManager implements PresenceService, PresenceSetter {
             Map<String, ChatPresenceResponse> result = new HashMap<>();
             Map<UUID, List<String>> enthusiastMap = new HashMap<>();
 
-            List<UUID> allEnthusiasts = new ArrayList<>();
+            Set<UUID> allEnthusiasts = new HashSet<>();
 
             for (int i = 0; i < rawResults.size(); i++) {
-                  Set<byte[]> rawSet = (Set<byte[]>) rawResults.get(i);
+                  Set<Object> rawSet = (Set<Object>) rawResults.get(i);
 
                   String chatId = chatList.get(i);
 
                   List<UUID> enthusiasts = rawSet.stream()
-                            .map(bytes -> new String(bytes, StandardCharsets.UTF_8))
+                            .map(obj -> {
+                                  if (obj instanceof byte[] bytes) {
+                                        return new String(bytes, StandardCharsets.UTF_8);
+                                  }
+                                  return (String) obj;
+                            })
                             .map(UUID::fromString)
                             .toList();
 
@@ -112,7 +116,7 @@ public class PresenceManager implements PresenceService, PresenceSetter {
       }
 
       @Override
-      public List<PresenceResponse> getOnlineList(UUID userId) {
+      public List<PresenceRecommendationResponse> findRecommendation(UUID userId) {
             evict();
             Set<ZSetOperations.TypedTuple<Object>> rangeWithScores = redisTemplate.opsForZSet().rangeWithScores(KEYSPACE, 0, -1);
 
@@ -135,12 +139,11 @@ public class PresenceManager implements PresenceService, PresenceSetter {
       }
 
       @Override
-      @Transactional
-      public PresenceResponse set(UUID userId, String name, String avatar, Instant at) {
+      public PresenceRecommendationResponse set(UUID userId, String name, String avatar, Instant at) {
             evict();
             Presence presence = new Presence(userId, at, avatar, name);
-            presences.save(presence);
             redisTemplate.opsForZSet().add(KEYSPACE, presence.getUserId().toString(), presence.getAt().getEpochSecond());
+            presences.save(presence);
             return presenceMapper.map(presence);
       }
 }

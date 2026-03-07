@@ -23,6 +23,6 @@ public interface ConversationRepository extends JpaRepository<Conversation, Conv
       List<Conversation> findByConversationId_ChatId(String chatId);
 
       @Modifying
-      @Query("update Conversation c set c.roomName = :roomName, c.roomAvatar = :roomAvatar where c.conversationId.chatId = :chatId")
+      @Query("update Conversation c set c.name = :roomName, c.avatar = :roomAvatar where c.conversationId.chatId = :chatId")
       long updateRoomNameAndRoomAvatar(String chatId, String roomName, String roomAvatar);
 }

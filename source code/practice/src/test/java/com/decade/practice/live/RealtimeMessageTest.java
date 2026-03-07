@@ -2,7 +2,7 @@ package com.decade.practice.live;
 
 import com.decade.practice.BaseTestClass;
 import com.decade.practice.TestBeans;
-import com.decade.practice.engagement.application.ports.in.EngagementService;
+import com.decade.practice.chat.application.ports.in.ChatService;
 import com.decade.practice.inbox.domain.events.InboxLogCreated;
 import com.decade.practice.inbox.domain.events.MessageCreated;
 import com.decade.practice.inbox.dto.InboxLogResponse;
@@ -64,7 +64,7 @@ public class RealtimeMessageTest extends BaseTestClass {
       private ApplicationEvents events;
 
       @Autowired
-      private EngagementService engagementService;
+      private ChatService chatService;
 
       @Test
       @Timeout(value = 10, unit = TimeUnit.SECONDS)
@@ -80,7 +80,7 @@ public class RealtimeMessageTest extends BaseTestClass {
                   UUID aliceId = UUID.fromString("11111111-1111-1111-1111-111111111111");
                   UUID bobId = UUID.fromString("22222222-2222-2222-2222-222222222222");
 
-                  engagementService.getOrCreate(aliceId, bobId);
+                  chatService.getDirect(aliceId, bobId);
 
                   UserClaims alice = new UserClaims(
                             UUID.fromString("11111111-1111-1111-1111-111111111111"),

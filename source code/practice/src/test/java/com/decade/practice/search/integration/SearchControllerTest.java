@@ -2,7 +2,7 @@ package com.decade.practice.search.integration;
 
 import com.decade.practice.BaseTestClass;
 import com.decade.practice.TestBeans;
-import com.decade.practice.engagement.application.ports.in.EngagementService;
+import com.decade.practice.chat.application.ports.in.ChatService;
 import com.decade.practice.search.application.ports.out.MessageDocumentRepository;
 import com.decade.practice.search.application.ports.out.UserDocumentRepository;
 import com.decade.practice.search.domain.UserDocument;
@@ -35,7 +35,7 @@ class SearchControllerTest extends BaseTestClass {
       private MessageDocumentRepository messageDocumentRepository;
 
       @Autowired
-      private EngagementService engagementService;
+      private ChatService chatService;
 
       @Autowired
       private TestBeans.PrivateChatSender sender;
@@ -67,7 +67,7 @@ class SearchControllerTest extends BaseTestClass {
             UUID aliceId = UUID.fromString("11111111-1111-1111-1111-111111111111");
             UUID bobId = UUID.fromString("22222222-2222-2222-2222-222222222222");
 
-            engagementService.getOrCreate(aliceId, bobId);
+            chatService.getDirect(aliceId, bobId);
 
             mockMvc.perform(get("/me/history/messages")
                                 .param("query", "hello")
@@ -83,7 +83,7 @@ class SearchControllerTest extends BaseTestClass {
             UUID aliceId = UUID.fromString("11111111-1111-1111-1111-111111111111");
             UUID bobId = UUID.fromString("22222222-2222-2222-2222-222222222222");
 
-            engagementService.getOrCreate(aliceId, bobId);
+            chatService.getDirect(aliceId, bobId);
             sender.sendPrivateText("unique currentState content", bobId, aliceId);
 
             Assertions.assertEquals(1, messageDocumentRepository.count());

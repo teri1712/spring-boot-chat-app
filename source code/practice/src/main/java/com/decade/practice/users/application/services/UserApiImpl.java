@@ -20,6 +20,6 @@ public class UserApiImpl implements UserApi {
 
       @Override
       public Map<UUID, UserInfo> getUserInfo(Set<UUID> ids) {
-            return users.findByIdIn(ids).stream().collect(Collectors.toMap(UserInfo::getId, Function.identity()));
+            return users.findByIdIn(ids).stream().collect(Collectors.toMap(UserInfo::id, Function.identity()));
       }
 }

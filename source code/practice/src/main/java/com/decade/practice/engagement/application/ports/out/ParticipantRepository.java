@@ -12,8 +12,8 @@ import java.util.UUID;
 @Repository
 public interface ParticipantRepository extends JpaRepository<Participant, ParticipantId> {
 
-    @Query("select p.participantId.userId from Participant p where p.participantId.chatId = :chatId")
-    List<UUID> findByChatId(String chatId);
+      @Query("select p.participantId.userId from Participant p where p.participantId.chatId = :chatId")
+      List<UUID> findByChatId(String chatId);
 
-    long countByParticipantId_ChatId(String chatId);
+      long countByParticipantId_ChatId(String chatId);
 }

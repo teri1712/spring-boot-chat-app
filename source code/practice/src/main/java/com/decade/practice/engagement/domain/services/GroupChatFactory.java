@@ -2,8 +2,6 @@ package com.decade.practice.engagement.domain.services;
 
 import com.decade.practice.engagement.domain.Chat;
 import com.decade.practice.engagement.domain.ChatCreators;
-import com.decade.practice.engagement.domain.ChatPolicy;
-import com.decade.practice.engagement.domain.Preference;
 import jakarta.validation.constraints.NotNull;
 import org.springframework.stereotype.Service;
 
@@ -17,8 +15,8 @@ public class GroupChatFactory implements ChatIdentifierMaker {
             return UUID.randomUUID().toString();
       }
 
-      public Chat create(@NotNull ChatCreators creators, Integer maximumParticipants, String roomName) {
+      public Chat create(@NotNull ChatCreators creators, Integer maximumParticipants) {
             String chatId = make(creators);
-            return new Chat(creators, chatId, new Preference(1, roomName, null, null), new ChatPolicy(maximumParticipants));
+            return new Chat(chatId, maximumParticipants, creators);
       }
 }

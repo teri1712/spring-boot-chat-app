@@ -1,7 +1,7 @@
 package com.decade.practice.presence.application.query;
 
 import com.decade.practice.presence.dto.ChatPresenceResponse;
-import com.decade.practice.presence.dto.PresenceResponse;
+import com.decade.practice.presence.dto.PresenceRecommendationResponse;
 
 import java.util.List;
 import java.util.Map;
@@ -12,5 +12,5 @@ public interface PresenceService {
 
       Map<String, ChatPresenceResponse> find(UUID caller, Set<String> chatIds);
 
-      List<PresenceResponse> getOnlineList(UUID userId);
+      List<PresenceRecommendationResponse> findRecommendation(UUID userId);
 }

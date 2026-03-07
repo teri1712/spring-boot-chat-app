@@ -12,21 +12,21 @@ import java.util.List;
 import java.util.Map;
 import java.util.UUID;
 
-@Mapper(unmappedTargetPolicy = ReportingPolicy.ERROR, componentModel = MappingConstants.ComponentModel.SPRING, uses = {PartnerMapper.class, MessageMapper.class})
+@Mapper(unmappedTargetPolicy = ReportingPolicy.ERROR, componentModel = MappingConstants.ComponentModel.SPRING, uses = {MessageMapper.class})
 public abstract class InboxLogMapper {
 
       @Autowired
       protected MessageMapper messageMapper;
 
-      @Mapping(target = "roomNameSnapshot", expression = "java(context.roomNameSnapshot())")
-      @Mapping(target = "roomAvatarSnapshot", expression = "java(context.roomAvatarSnapshot())")
+      @Mapping(target = "conversationName", expression = "java(context.conversationName())")
+      @Mapping(target = "conversationAvatar", expression = "java(context.conversationAvatar())")
       @Mapping(target = "revisionNumber", expression = "java(context.chatHash())")
       @Mapping(target = "sequenceNumber", source = "inboxLog.sequenceId")
       @Mapping(target = "messageState", expression = "java(messageMapper.map(inboxLog.messageState(),context.userMap()))")
       public abstract InboxLogResponse map(InboxLogCreated inboxLog, @Context InboxContext context);
 
-      @Mapping(target = "roomNameSnapshot", expression = "java(context.roomNameSnapshot())")
-      @Mapping(target = "roomAvatarSnapshot", expression = "java(context.roomAvatarSnapshot())")
+      @Mapping(target = "conversationName", expression = "java(context.conversationName())")
+      @Mapping(target = "conversationAvatar", expression = "java(context.conversationAvatar())")
       @Mapping(target = "revisionNumber", expression = "java(context.chatHash())")
       @Mapping(target = "sequenceNumber", source = "inboxLog.sequenceId")
       @Mapping(target = "messageState", expression = "java(messageMapper.map(inboxLog.getMessageState(),context.userMap()))")
@@ -36,7 +36,7 @@ public abstract class InboxLogMapper {
             return inboxLogs.stream().map(inboxLog -> map(inboxLog, context)).toList();
       }
 
-      public record InboxContext(Map<UUID, UserInfo> userMap, String roomNameSnapshot, String roomAvatarSnapshot, Long chatHash) {
+      public record InboxContext(UUID ownerId, Map<UUID, UserInfo> userMap, String conversationName, String conversationAvatar, Long chatHash) {
       }
 
 }

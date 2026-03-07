@@ -1,6 +1,5 @@
 package com.decade.practice.inbox.domain;
 
-import com.decade.practice.inbox.apis.events.ConversationCreated;
 import jakarta.persistence.*;
 import lombok.Getter;
 import org.hibernate.annotations.JdbcTypeCode;
@@ -20,15 +19,15 @@ public class Conversation extends AbstractAggregateRoot<Conversation> {
       @EmbeddedId
       private ConversationId conversationId;
 
-      private String roomName;
-      private String roomAvatar;
+      private String name;
+      private String avatar;
 
       @Version
       private Integer version;
 
       @JdbcTypeCode(SqlTypes.JSON)
       @Column(columnDefinition = "jsonb")
-      private List<MessagePreview> previews;
+      private List<MessageState> recents;
 
       private Instant modifiedAt;
 
@@ -38,45 +37,43 @@ public class Conversation extends AbstractAggregateRoot<Conversation> {
       protected Conversation() {
       }
 
-      public Conversation(String chatId, UUID ownerId, String roomName, String roomAvatar) {
+      public Conversation(String chatId, UUID ownerId, String name, String avatar) {
             this.conversationId = new ConversationId(chatId, ownerId);
-            this.previews = new ArrayList<>();
-            this.roomName = roomName;
-            this.roomAvatar = roomAvatar;
+            this.recents = new ArrayList<>();
+            this.name = name;
+            this.avatar = avatar;
             this.hash = new HashValue((long) conversationId.hashCode());
-            registerEvent(new ConversationCreated(chatId, ownerId, roomName));
       }
 
-      public void addPreview(MessagePreview messagePreview) {
-            this.previews.add(0, messagePreview);
+      public void addRecent(MessageState messageState) {
+            this.recents.add(0, messageState);
             this.modifiedAt = Instant.now();
-            this.hash = hash.plus(computeHash(messagePreview));
-            if (this.previews.size() > 20) {
+            this.hash = hash.plus(computeHash(messageState));
+            if (this.recents.size() > 20) {
                   pop();
             }
       }
 
       private void pop() {
-            this.previews.remove(this.previews.size() - 1);
+            this.recents.remove(this.recents.size() - 1);
       }
 
 
       public void update(String roomName, String roomAvatar) {
-            this.roomName = roomName;
-            this.roomAvatar = roomAvatar;
+            this.name = roomName;
+            this.avatar = roomAvatar;
       }
 
-      public void updatePreview(MessagePreview preview) {
-            if (previews.isEmpty()) return;
-            MessageState latest = previews.get(0).messageState();
-            if (Objects.equals(latest.getSequenceId(), preview.messageState().getSequenceId()))
-                  previews.set(0, preview);
+      public void updateRecent(MessageState messageState) {
+            if (recents.isEmpty()) return;
+            MessageState latest = recents.get(0);
+            if (Objects.equals(latest.getSequenceId(), messageState.getSequenceId()))
+                  recents.set(0, messageState);
       }
 
-      private static HashValue computeHash(MessagePreview preview) {
-            MessageState messageState = preview.messageState();
+      private static HashValue computeHash(MessageState messageState) {
             HashValue hashValue = new HashValue(messageState.getCreatedAt().toEpochMilli());
-            hashValue = hashValue.plus(new HashValue((long) preview.displayContent().hashCode()));
+            hashValue = hashValue.plus(new HashValue((long) messageState.getChatEventId().hashCode()));
             return hashValue;
       }
 

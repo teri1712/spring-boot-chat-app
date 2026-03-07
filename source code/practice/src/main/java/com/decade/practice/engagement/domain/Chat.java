@@ -1,82 +1,33 @@
 package com.decade.practice.engagement.domain;
 
-import com.decade.practice.engagement.application.events.ChatCreated;
-import com.decade.practice.engagement.domain.events.VersionIncremented;
-import jakarta.persistence.Embedded;
-import jakarta.persistence.Entity;
-import jakarta.persistence.Id;
-import jakarta.persistence.Version;
-import jakarta.validation.constraints.NotNull;
+import com.decade.practice.engagement.domain.events.ChatCreated;
+import jakarta.persistence.*;
 import lombok.Getter;
+import lombok.NoArgsConstructor;
 import org.springframework.data.domain.AbstractAggregateRoot;
-
-import java.time.Instant;
-import java.util.List;
-import java.util.UUID;
 
 @Entity
 @Getter
+@NoArgsConstructor
 public class Chat extends AbstractAggregateRoot<Chat> {
+
+      @Id
+      private String chatId;
+
+      @Column(updatable = false)
+      private Integer maxParticipants;
 
       @Embedded
       private ChatCreators creators;
 
-      @Id
-      private String identifier;
-
-      @Embedded
-      @NotNull
-      private Preference preference;
-
-      private Instant lastActivity;
-
-      @Embedded
-      private ChatPolicy policy;
-
-      public Chat(ChatCreators creators, String identifier, Preference preference, ChatPolicy policy) {
-            this.creators = creators;
-            this.identifier = identifier;
-            this.preference = preference;
-            this.policy = policy;
-            List<UUID> members = creators.members().toList();
-            this.lastActivity = Instant.now();
-            registerEvent(new ChatCreated(identifier, preference.roomName(), preference.roomAvatar(),
-                      members, members, creators.callerId()));
-      }
-
-
       @Version
-      private Integer eventVersion;
+      private Integer version;
 
-      public void increment(UUID eventId) {
-            registerEvent(new VersionIncremented(eventId, getIdentifier(), getEventVersion()));
-            refreshActivity();
-      }
+      public Chat(String chatId, Integer maxParticipants, ChatCreators creators) {
+            this.chatId = chatId;
+            this.maxParticipants = maxParticipants;
+            this.creators = creators;
+            registerEvent(new ChatCreated(chatId, creators.members().toList(), creators.callerId()));
 
-      public void refreshActivity() {
-            this.lastActivity = Instant.now();
-      }
-
-      protected Chat() {
-      }
-
-      public Chat updateIcon(Integer iconId) {
-            this.preference = new Preference(iconId, preference.roomName(), preference.roomAvatar(), preference.theme());
-            return this;
-      }
-
-      public Chat updateRoomName(String roomName) {
-            this.preference = new Preference(preference.iconId(), roomName, preference.roomAvatar(), preference.theme());
-            return this;
-      }
-
-      public Chat updateTheme(String theme) {
-            this.preference = new Preference(preference.iconId(), preference.roomName(), preference.roomAvatar(), theme);
-            return this;
-      }
-
-      public Chat updateAvatar(String roomAvatar) {
-            this.preference = new Preference(preference.iconId(), preference.roomName(), roomAvatar, preference.theme());
-            return this;
       }
 }

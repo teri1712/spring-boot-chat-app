@@ -2,7 +2,7 @@ package com.decade.practice.presence.adapter;
 
 import com.decade.practice.presence.application.query.PresenceService;
 import com.decade.practice.presence.dto.ChatPresenceResponse;
-import com.decade.practice.presence.dto.PresenceResponse;
+import com.decade.practice.presence.dto.PresenceRecommendationResponse;
 import jakarta.validation.constraints.Size;
 import lombok.AllArgsConstructor;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
@@ -28,10 +28,10 @@ public class PresenceController {
       // TODO: Adjust client
       // TODO: Migrate to chat presence only
       @GetMapping("/me/presences")
-      public List<PresenceResponse> listOnline(
+      public List<PresenceRecommendationResponse> listOnline(
                 @AuthenticationPrincipal(expression = "id") UUID caller
       ) {
-            return presenceService.getOnlineList(caller);
+            return presenceService.findRecommendation(caller);
       }
 
       @GetMapping("/presences")

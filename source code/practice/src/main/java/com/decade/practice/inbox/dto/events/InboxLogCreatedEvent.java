@@ -8,8 +8,8 @@ import java.util.UUID;
 public record InboxLogCreatedEvent(
           Long sequenceId,
           String chatId,
-          String roomNameSnapshot,
-          String roomAvatarSnapshot,
+          String roomName,
+          String roomAvatar,
           UUID senderId,
           UUID ownerId,
           LogAction action,

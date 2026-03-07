@@ -29,7 +29,7 @@ public class RedisBasedTokenStore implements TokenStore {
       @Override
       public void evict(String username) {
             String key = generateKey(username);
-            redisTemplate.opsForSet().remove(key);
+            redisTemplate.delete(key);
       }
 
       @Override

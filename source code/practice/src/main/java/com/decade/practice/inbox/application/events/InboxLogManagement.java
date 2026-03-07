@@ -1,17 +1,19 @@
 package com.decade.practice.inbox.application.events;
 
+import com.decade.practice.engagement.domain.events.PreferenceChanged;
 import com.decade.practice.inbox.application.ports.out.ConversationRepository;
 import com.decade.practice.inbox.application.ports.out.DeliveryService;
 import com.decade.practice.inbox.application.ports.out.LogRepository;
+import com.decade.practice.inbox.application.ports.out.MessageRepository;
 import com.decade.practice.inbox.domain.*;
 import com.decade.practice.inbox.domain.events.InboxLogCreated;
 import com.decade.practice.inbox.domain.events.MessageCreated;
 import com.decade.practice.inbox.domain.events.MessageUpdated;
 import com.decade.practice.inbox.dto.mapper.InboxLogMapper;
-import com.decade.practice.inbox.utils.PreviewUtils;
 import com.decade.practice.users.api.UserApi;
 import com.decade.practice.users.api.UserInfo;
 import lombok.AllArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.context.event.EventListener;
 import org.springframework.modulith.events.ApplicationModuleListener;
 import org.springframework.stereotype.Service;
@@ -20,6 +22,7 @@ import java.util.Map;
 import java.util.Set;
 import java.util.UUID;
 
+@Slf4j
 @Service
 @AllArgsConstructor
 public class InboxLogManagement {
@@ -28,6 +31,7 @@ public class InboxLogManagement {
       private final DeliveryService deliveryService;
       private final InboxLogMapper inboxLogMapper;
       private final ConversationRepository conversations;
+      private final MessageRepository messages;
       private final UserApi userApi;
 
       @EventListener
@@ -42,13 +46,7 @@ public class InboxLogManagement {
                                       message.currentState());
                             logs.save(log);
 
-                            MessageState previewState = message.currentState();
-                            MessagePreview messagePreview = new MessagePreview(
-                                      PreviewUtils.getPreviewContent(
-                                                conversation.getConversationId().ownerId(),
-                                                previewState)
-                                      , previewState);
-                            conversation.addPreview(messagePreview);
+                            conversation.addRecent(message.currentState());
 
                             conversations.save(conversation);
 
@@ -67,8 +65,7 @@ public class InboxLogManagement {
                                       message.currentState());
                             logs.save(log);
 
-                            MessageState previewState = message.currentState();
-                            conversation.updatePreview(new MessagePreview(PreviewUtils.getPreviewContent(conversation.getConversationId().ownerId(), previewState), previewState));
+                            conversation.updateRecent(message.currentState());
                             conversations.save(conversation);
                       });
       }
@@ -77,6 +74,24 @@ public class InboxLogManagement {
       public void on(InboxLogCreated inboxLogCreated) {
             Conversation conversation = conversations.findById(new ConversationId(inboxLogCreated.chatId(), inboxLogCreated.ownerId())).orElseThrow();
             Map<UUID, UserInfo> infos = userApi.getUserInfo(Set.of(inboxLogCreated.senderId()));
-            deliveryService.send(inboxLogMapper.map(inboxLogCreated, new InboxLogMapper.InboxContext(infos, conversation.getRoomName(), conversation.getRoomAvatar(), conversation.getHash().value())));
+            deliveryService.send(inboxLogMapper.map(inboxLogCreated, new InboxLogMapper.InboxContext(inboxLogCreated.ownerId(), infos, conversation.getName(), conversation.getAvatar(), conversation.getHash().value())));
+      }
+
+
+      @ApplicationModuleListener
+      public void on(PreferenceChanged event) {
+            long rowsAffected = conversations.updateRoomNameAndRoomAvatar(event.getChatId(), event.getRoomName(), event.getRoomAvatar());
+            log.info("Updated {} rows for chat {}", rowsAffected, event.getChatId());
+
+
+            messages.save(new Preference(
+                      UUID.randomUUID(),
+                      event.getMakerId(),
+                      event.getChatId(),
+                      event.getCreatedAt(),
+                      event.getIconId(),
+                      event.getRoomAvatar(),
+                      event.getRoomName(),
+                      event.getTheme()));
       }
 }

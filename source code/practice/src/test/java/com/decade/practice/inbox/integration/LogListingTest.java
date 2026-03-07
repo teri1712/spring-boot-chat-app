@@ -2,7 +2,7 @@ package com.decade.practice.inbox.integration;
 
 import com.decade.practice.BaseTestClass;
 import com.decade.practice.TestBeans;
-import com.decade.practice.engagement.application.ports.in.EngagementService;
+import com.decade.practice.chat.application.ports.in.ChatService;
 import com.decade.practice.inbox.dto.InboxLogResponse;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -33,7 +33,7 @@ class LogListingTest extends BaseTestClass {
       private ObjectMapper objectMapper;
 
       @Autowired
-      private EngagementService engagementService;
+      private ChatService chatService;
 
       @Test
       @Sql(scripts = {"/sql/clean.sql", "/sql/seed_users.sql"})
@@ -91,9 +91,9 @@ class LogListingTest extends BaseTestClass {
             String aliceBobChat = aliceId + "+" + bobId;
             String aliceCharlieChat = aliceId + "+" + charlieId;
 
-            engagementService.getOrCreate(aliceId, bobId);
-            engagementService.getOrCreate(aliceId, charlieId);
-            engagementService.getOrCreate(aliceId, aliceId);
+            chatService.getDirect(aliceId, bobId);
+            chatService.getDirect(aliceId, charlieId);
+            chatService.getDirect(aliceId, aliceId);
 
             chatSender.sendPrivateText("meo meo", bobId, aliceId);
             chatSender.sendPrivateText("dcm", charlieId, aliceId);

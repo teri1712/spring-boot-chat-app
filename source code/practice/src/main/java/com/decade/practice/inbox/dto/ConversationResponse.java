@@ -6,10 +6,10 @@ import java.util.List;
 
 public record ConversationResponse(
           String identifier,
-          String roomName,
-          String roomAvatar,
+          String name,
+          String avatar,
           Long revisionNumber,
-          List<MessagePreviewResponse> previews,
+          List<MessageStateResponse> recents,
           Instant modifiedAt
 ) {
 

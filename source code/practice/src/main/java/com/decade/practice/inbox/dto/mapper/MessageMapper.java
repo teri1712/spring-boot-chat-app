@@ -9,7 +9,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.UUID;
 
-@Mapper(unmappedTargetPolicy = ReportingPolicy.ERROR, componentModel = MappingConstants.ComponentModel.SPRING, uses = {PartnerMapper.class})
+@Mapper(unmappedTargetPolicy = ReportingPolicy.ERROR, componentModel = MappingConstants.ComponentModel.SPRING)
 public interface MessageMapper {
 
 
@@ -24,6 +24,10 @@ public interface MessageMapper {
       @Mapping(target = "sequenceNumber", source = "message.sequenceId")
       MessageStateResponse map(MessageState message, @Context Map<UUID, UserInfo> userMap);
 
+
+      default UserInfo map(UUID userId, @Context Map<UUID, UserInfo> userMap) {
+            return userMap.get(userId);
+      }
 
       default List<MessageStateResponse> map(List<MessageState> messages, @Context Map<UUID, UserInfo> userMap) {
             return messages.stream().map(message -> map(message, userMap)).toList();

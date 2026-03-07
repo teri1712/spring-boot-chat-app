@@ -22,10 +22,10 @@ CREATE TABLE chat
 
 CREATE TABLE conversation
 (
-    room_name   VARCHAR(255),
-    room_avatar VARCHAR(255),
+    name        VARCHAR(255),
+    avatar      VARCHAR(255),
     version     INTEGER,
-    previews    JSONB,
+    recents     JSONB,
     modified_at TIMESTAMPTZ,
     chat_id     VARCHAR(255) NOT NULL,
     owner_id    UUID         NOT NULL,
@@ -130,8 +130,8 @@ CREATE TABLE preference_chat_event
     version       INTEGER,
     event_version INTEGER,
     icon_id       INTEGER,
-    room_name     VARCHAR(255),
-    room_avatar   VARCHAR(255),
+    name          VARCHAR(255),
+    avatar        VARCHAR(255),
     theme         VARCHAR(255),
     CONSTRAINT pk_preferencechatevent PRIMARY KEY (id)
 );

@@ -10,6 +10,8 @@ import org.springframework.stereotype.Service;
 public class EngagementPolicy {
 
       public void applyRead(Participant participant, Chat chat) {
+            if (chat == null)
+                  return;
             if (participant == null)
                   throw new AccessDeniedException("You do not have permission to read");
             ParticipantPolicy policy = participant.getParticipantPolicy();
@@ -18,6 +20,8 @@ public class EngagementPolicy {
       }
 
       public void applyWrite(Participant participant, Chat chat) {
+            if (chat == null)
+                  return;
             if (participant == null)
                   throw new AccessDeniedException("You do not have permission to write");
             ParticipantPolicy policy = participant.getParticipantPolicy();
