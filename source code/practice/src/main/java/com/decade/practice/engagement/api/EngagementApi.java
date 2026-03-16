@@ -1,6 +1,7 @@
 package com.decade.practice.engagement.api;
 
 import java.util.Optional;
+import java.util.Set;
 import java.util.UUID;
 
 public interface EngagementApi {
@@ -8,11 +9,11 @@ public interface EngagementApi {
 
       boolean canWrite(String chatId, UUID userId);
 
-      ChatPolicyInfo createGroup(UUID callerId, UUID partnerId);
+      ChatPolicyInfo createGroup(UUID callerId, Set<UUID> participants);
 
-      ChatPolicyInfo createDirect(UUID callerId, UUID partnerId) throws ChatIdentifierUniqueException;
+      DirectInfo createDirect(UUID callerId, UUID partnerId) throws ChatIdentifierUniqueException;
 
-      Optional<ChatPolicyInfo> findDirect(UUID userId, UUID partnerId);
+      Optional<DirectMapping> findDirectMapping(UUID userId, UUID partnerId);
 
       Optional<ChatPolicyInfo> find(String chatId, UUID userId);
 }

@@ -2,7 +2,7 @@ package com.decade.practice.inbox.integration;
 
 import com.decade.practice.BaseTestClass;
 import com.decade.practice.TestBeans;
-import com.decade.practice.chat.application.ports.in.ChatService;
+import com.decade.practice.chatorchestrator.application.ports.in.ChatService;
 import com.decade.practice.inbox.dto.InboxLogResponse;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -16,7 +16,7 @@ import java.util.List;
 import java.util.UUID;
 
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.put;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
@@ -41,8 +41,7 @@ class LogListingTest extends BaseTestClass {
       void givenChatHasLogs_whenAliceListsLogsForChat_thenReturnsLogsOrderedBySequenceIdDesc() throws Exception {
             // Given
 
-            mockMvc.perform(post("/chats")
-                                .param("partnerId", "22222222-2222-2222-2222-222222222222")
+            mockMvc.perform(put("/direct-chats/{partnerId}", "22222222-2222-2222-2222-222222222222")
                       )
                       .andExpect(status().isCreated());
 
@@ -64,8 +63,8 @@ class LogListingTest extends BaseTestClass {
                                 .param("anchorSequenceNumber", String.valueOf(Long.MIN_VALUE)))
                       .andExpect(status().isOk())
                       .andExpect(jsonPath("$.length()").value(2))
-                      .andExpect(jsonPath("$[0].messageState.content").value("vcl"))
-                      .andExpect(jsonPath("$[1].messageState.content").value("meo meo"))
+                      .andExpect(jsonPath("$[0].messageState.content").value("meo meo"))
+                      .andExpect(jsonPath("$[1].messageState.content").value("vcl"))
                       .andReturn().getResponse().getContentAsString();
 
             List<InboxLogResponse> logs = objectMapper.readValue(bodyString, new TypeReference<>() {
@@ -73,7 +72,7 @@ class LogListingTest extends BaseTestClass {
 
 
             mockMvc.perform(get("/chats/{chatId}/logs", aliceBobChat)
-                                .param("anchorSequenceNumber", logs.get(0).sequenceNumber().toString()))
+                                .param("anchorSequenceNumber", logs.get(1).sequenceNumber().toString()))
                       .andExpect(status().isOk())
                       .andExpect(jsonPath("$.length()").value(1))
                       .andExpect(jsonPath("$[0].messageState.content").value("vcl"));
@@ -105,9 +104,9 @@ class LogListingTest extends BaseTestClass {
                                 .param("anchorSequenceNumber", String.valueOf(Long.MIN_VALUE)))
                       .andExpect(status().isOk())
                       .andExpect(jsonPath("$.length()").value(3))
-                      .andExpect(jsonPath("$[0].messageState.content").value("vcl"))
+                      .andExpect(jsonPath("$[0].messageState.content").value("meo meo"))
                       .andExpect(jsonPath("$[1].messageState.content").value("dcm"))
-                      .andExpect(jsonPath("$[2].messageState.content").value("meo meo"))
+                      .andExpect(jsonPath("$[2].messageState.content").value("vcl"))
                       .andReturn().getResponse().getContentAsString();
 
             List<InboxLogResponse> logs = objectMapper.readValue(bodyString, new TypeReference<>() {
@@ -116,8 +115,8 @@ class LogListingTest extends BaseTestClass {
                                 .param("anchorSequenceNumber", logs.get(1).sequenceNumber().toString()))
                       .andExpect(status().isOk())
                       .andExpect(jsonPath("$.length()").value(2))
-                      .andExpect(jsonPath("$[0].messageState.content").value("vcl"))
-                      .andExpect(jsonPath("$[1].messageState.content").value("dcm"))
+                      .andExpect(jsonPath("$[0].messageState.content").value("dcm"))
+                      .andExpect(jsonPath("$[1].messageState.content").value("vcl"))
 
             ;
       }

@@ -26,9 +26,9 @@ public class LoginTest extends BaseTestClass {
                                 .param("username", "alice")
                                 .param("password", "Password123!"))
                       .andExpect(status().isOk())
-                      .andExpect(jsonPath("$.account", notNullValue()))
+                      .andExpect(jsonPath("$.profile", notNullValue()))
                       .andExpect(jsonPath("$.accessToken", notNullValue()))
-                      .andExpect(jsonPath("$.account.username").value("alice"));
+                      .andExpect(jsonPath("$.profile.username").value("alice"));
       }
 
       @Test

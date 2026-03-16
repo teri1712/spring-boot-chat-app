@@ -1,6 +1,6 @@
 filebeat.inputs:
   - type: filestream
-    id: messenger-clone-logs
+    id: chat-app-logs
     paths:
       - /logs/*.log
     parsers:
@@ -9,19 +9,12 @@ filebeat.inputs:
           add_error_key: true
 
 processors:
-  - add_host_metadata: { }
-  - add_docker_metadata: { }
-  - timestamp:
-      field: "@timestamp"
-      layouts:
-        - ISO8601
+  - add_host_metadata: ~
 
 output.elasticsearch:
   hosts: [ "http://elasticsearch:9200" ]
-  index: "messenger-clone-%{+yyyy.MM.dd}"
 
-setup.template.enabled: true
-setup.template.name: "messenger-clone"
-setup.template.pattern: "messenger-clone-*"
 
-logging.level: info
+
+setup.kibana:
+  host: "localhost:5601"

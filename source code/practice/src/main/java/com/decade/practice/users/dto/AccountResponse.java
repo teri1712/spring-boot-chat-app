@@ -8,6 +8,6 @@ import lombok.Setter;
 @Getter
 @Setter
 public class AccountResponse {
-      private ProfileResponse account;
+      private ProfileResponse profile;
       private AccessToken accessToken;
 }

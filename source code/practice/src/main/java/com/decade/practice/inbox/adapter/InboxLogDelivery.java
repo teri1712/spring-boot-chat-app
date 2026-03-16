@@ -1,13 +1,13 @@
 package com.decade.practice.inbox.adapter;
 
 import com.decade.practice.inbox.application.ports.out.DeliveryService;
-import com.decade.practice.inbox.dto.InboxLogResponse;
+import com.decade.practice.inbox.domain.messages.InboxLogMessage;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.redis.core.RedisTemplate;
-import org.springframework.stereotype.Service;
+import org.springframework.stereotype.Component;
 
-@Service
+@Component
 @RequiredArgsConstructor
 public class InboxLogDelivery implements DeliveryService {
       private final RedisTemplate<String, Object> redisTemplate;
@@ -17,7 +17,7 @@ public class InboxLogDelivery implements DeliveryService {
 
 
       @Override
-      public void send(InboxLogResponse inboxLogCreated) {
-            redisTemplate.convertAndSend(queueTopic + ":" + inboxLogCreated.ownerId(), inboxLogCreated);
+      public void send(InboxLogMessage message) {
+            redisTemplate.convertAndSend(queueTopic + ":" + message.ownerId(), message);
       }
 }

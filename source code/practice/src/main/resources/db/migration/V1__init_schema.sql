@@ -33,7 +33,7 @@ CREATE TABLE conversation
     CONSTRAINT pk_conversation PRIMARY KEY (chat_id, owner_id)
 );
 
-CREATE TABLE file_chat_event
+CREATE TABLE file_room_event
 (
     id            UUID NOT NULL,
     chat_id       VARCHAR(255),
@@ -47,7 +47,7 @@ CREATE TABLE file_chat_event
     CONSTRAINT pk_filechatevent PRIMARY KEY (id)
 );
 
-CREATE TABLE icon_chat_event
+CREATE TABLE icon_room_event
 (
     id            UUID NOT NULL,
     chat_id       VARCHAR(255),
@@ -59,7 +59,7 @@ CREATE TABLE icon_chat_event
     CONSTRAINT pk_iconchatevent PRIMARY KEY (id)
 );
 
-CREATE TABLE image_chat_event
+CREATE TABLE image_room_event
 (
     id            UUID NOT NULL,
     chat_id       VARCHAR(255),
@@ -121,7 +121,7 @@ CREATE TABLE participant
     CONSTRAINT pk_participant PRIMARY KEY (user_id, chat_id)
 );
 
-CREATE TABLE preference_chat_event
+CREATE TABLE preference_room_event
 (
     id            UUID NOT NULL,
     chat_id       VARCHAR(255),
@@ -136,7 +136,7 @@ CREATE TABLE preference_chat_event
     CONSTRAINT pk_preferencechatevent PRIMARY KEY (id)
 );
 
-CREATE TABLE seen_chat_event
+CREATE TABLE seen_room_event
 (
     id            UUID NOT NULL,
     chat_id       VARCHAR(255),
@@ -158,7 +158,7 @@ CREATE TABLE seen_pointer
     CONSTRAINT pk_seenpointer PRIMARY KEY (id)
 );
 
-CREATE TABLE text_chat_event
+CREATE TABLE text_room_event
 (
     id            UUID NOT NULL,
     chat_id       VARCHAR(255),

@@ -1,6 +1,6 @@
 package com.decade.practice.search.application.queries;
 
-import com.decade.practice.search.dto.MatchingMessageHistoryResponse;
+import com.decade.practice.search.dto.MatchingMessageResponse;
 import com.decade.practice.search.dto.MatchingUserResponse;
 
 import java.util.List;
@@ -10,5 +10,5 @@ public interface SearchService {
 
       List<MatchingUserResponse> searchUsers(String query);
 
-      List<MatchingMessageHistoryResponse> searchMessages(String chatId, UUID userId, String query);
+      List<MatchingMessageResponse> searchMessages(String chatId, UUID userId, String query);
 }

@@ -3,7 +3,7 @@ package com.decade.practice.users.application.services;
 import com.decade.practice.users.api.UserApi;
 import com.decade.practice.users.api.UserInfo;
 import com.decade.practice.users.application.ports.out.UserRepository;
-import lombok.AllArgsConstructor;
+import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
 import java.util.Map;
@@ -13,7 +13,7 @@ import java.util.function.Function;
 import java.util.stream.Collectors;
 
 @Service
-@AllArgsConstructor
+@RequiredArgsConstructor
 public class UserApiImpl implements UserApi {
 
       private final UserRepository users;

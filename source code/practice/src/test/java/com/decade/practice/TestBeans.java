@@ -1,8 +1,8 @@
 package com.decade.practice;
 
 import com.decade.practice.engagement.domain.ChatCreators;
-import com.decade.practice.engagement.domain.services.TwoParticipantChatIdentifierMaker;
-import com.decade.practice.inbox.domain.events.TextChatEventCreated;
+import com.decade.practice.engagement.domain.services.DirectChatFactory;
+import com.decade.practice.inbox.domain.events.TextRoomEventCreated;
 import lombok.AllArgsConstructor;
 import org.springframework.boot.test.context.TestComponent;
 import org.springframework.boot.test.context.TestConfiguration;
@@ -14,6 +14,7 @@ import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.time.Instant;
+import java.util.Set;
 import java.util.UUID;
 
 @TestConfiguration
@@ -31,9 +32,9 @@ public class TestBeans {
             private final TransactionalApplicationEventPublisher applicationEventPublisher;
 
             public void sendPrivateText(String message, UUID senderId, UUID recipientId) {
-                  String chatId = new TwoParticipantChatIdentifierMaker().make(new ChatCreators(senderId, recipientId));
+                  String chatId = new DirectChatFactory().make(new ChatCreators(senderId, Set.of(recipientId)));
 
-                  applicationEventPublisher.publishEvent(TextChatEventCreated.builder()
+                  applicationEventPublisher.publishEvent(TextRoomEventCreated.builder()
                             .senderId(senderId)
                             .chatId(chatId)
                             .chatEventId(UUID.randomUUID())

@@ -34,12 +34,12 @@ public class Icon extends Message {
       public MessageState getState() {
             return IconState.builder()
                       .sequenceId(getSequenceId())
-                      .chatEventId(getChatEventId())
+                      .postingId(getPostingId())
                       .senderId(getSenderId())
                       .messageType(getMessageType())
                       .chatId(getChatId())
                       .createdAt(getCreatedAt())
-                      .seenByIds(getSeenPointers().keySet())
+                      .seenByIds(getAllSeenPointers().keySet())
                       .iconId(getIconId())
                       .build();
       }

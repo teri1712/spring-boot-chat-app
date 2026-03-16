@@ -17,6 +17,7 @@ import java.net.URI;
 import java.util.UUID;
 
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.put;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
@@ -77,8 +78,7 @@ class S3PresignedTest extends BaseTestClass {
                       }
                       """.formatted(response.getDownloadUrl());
 
-            mockMvc.perform(post("/chats/{chatIdentifier}/image-events", chatIdentifier)
-                                .header("Idempotency-key", UUID.randomUUID())
+            mockMvc.perform(put("/chats/{chatIdentifier}/image-events/{postingId}", chatIdentifier, UUID.randomUUID())
                                 .contentType(MediaType.APPLICATION_JSON)
                                 .content(eventJson))
                       .andExpect(status().isAccepted());

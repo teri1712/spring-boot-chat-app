@@ -10,8 +10,8 @@ public class IconCommand extends ParticipantCommand {
 
       private final Integer iconId;
 
-      public IconCommand(String chatId, UUID senderId, UUID idempotentKey, Integer iconId) {
-            super(chatId, senderId, idempotentKey);
+      public IconCommand(String chatId, UUID senderId, UUID postingId, Integer iconId) {
+            super(chatId, senderId, postingId);
             this.iconId = iconId;
       }
 }

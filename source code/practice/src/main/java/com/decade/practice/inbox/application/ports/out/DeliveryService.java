@@ -1,9 +1,9 @@
 package com.decade.practice.inbox.application.ports.out;
 
-import com.decade.practice.inbox.dto.InboxLogResponse;
+import com.decade.practice.inbox.domain.messages.InboxLogMessage;
 
 public interface DeliveryService {
 
-      void send(InboxLogResponse inboxLogResponse);
+      void send(InboxLogMessage message);
 
 }

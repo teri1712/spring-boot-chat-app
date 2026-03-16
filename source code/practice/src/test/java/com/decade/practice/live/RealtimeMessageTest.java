@@ -2,7 +2,7 @@ package com.decade.practice.live;
 
 import com.decade.practice.BaseTestClass;
 import com.decade.practice.TestBeans;
-import com.decade.practice.chat.application.ports.in.ChatService;
+import com.decade.practice.chatorchestrator.application.ports.in.ChatService;
 import com.decade.practice.inbox.domain.events.InboxLogCreated;
 import com.decade.practice.inbox.domain.events.MessageCreated;
 import com.decade.practice.inbox.dto.InboxLogResponse;

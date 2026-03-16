@@ -22,15 +22,15 @@ public class LiveInterceptor implements ChannelInterceptor {
 
       private final LiveService liveService;
 
-      @Value("${websocket.topics.live}")
-      private String liveTopic;
+      @Value("${websocket.topics.room}")
+      private String roomTopic;
 
-      private boolean isLiveDestination(String destination) {
-            return destination != null && destination.contains(liveTopic);
+      private boolean isRoomDestination(String destination) {
+            return destination != null && destination.contains(roomTopic);
       }
 
       private String extractChatId(String destination) {
-            return destination.substring(liveTopic.length() + 1);
+            return destination.substring(roomTopic.length() + 1);
       }
 
       @Nullable
@@ -40,7 +40,7 @@ public class LiveInterceptor implements ChannelInterceptor {
             StompHeaderAccessor accessor =
                       MessageHeaderAccessor.getAccessor(message, StompHeaderAccessor.class);
             String destination = accessor.getDestination();
-            if (isLiveDestination(destination)) {
+            if (isRoomDestination(destination)) {
                   StompCommand command = accessor.getCommand();
                   if (command == StompCommand.SUBSCRIBE) {
                         String chatId = extractChatId(accessor.getDestination());

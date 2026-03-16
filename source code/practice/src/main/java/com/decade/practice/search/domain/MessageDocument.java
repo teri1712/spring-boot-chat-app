@@ -21,11 +21,12 @@ public class MessageDocument {
 
       private String content;
 
+      @Field(type = FieldType.Long, index = false)
+      private Long sequenceNumber;
+
       @Field(type = FieldType.Keyword)
       private String chatId;
 
-
-      @Field(type = FieldType.Date,
-                format = DateFormat.date_time)
+      @Field(type = FieldType.Date, format = DateFormat.date_time)
       private Instant createdAt;
 }

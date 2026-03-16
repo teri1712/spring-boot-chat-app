@@ -1,7 +1,6 @@
 package com.decade.practice.chatsettings.dto;
 
 import jakarta.annotation.Nullable;
-import jakarta.validation.constraints.NotBlank;
 
 public record PreferenceRequest(
 
@@ -9,15 +8,14 @@ public record PreferenceRequest(
           Integer iconId,
 
           @Nullable
-          @NotBlank
-          String roomName,
+          String customName,
 
           @Nullable
           Long themeId,
 
           @Nullable
           // todo: fix client
-          String roomAvatar
+          String customAvatar
 
 ) {
 }

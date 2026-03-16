@@ -25,7 +25,7 @@ alter table chat
 create table setting
 (
     id            bigint primary key,
-    identifier    varchar(255) not null,
+    identifier    varchar(255) not null unique,
     icon_id       int,
     room_name     varchar(255),
     room_avatar   varchar(255),

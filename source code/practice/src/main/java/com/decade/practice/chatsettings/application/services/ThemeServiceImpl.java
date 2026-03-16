@@ -1,8 +1,8 @@
 package com.decade.practice.chatsettings.application.services;
 
+import com.decade.practice.chatsettings.application.ports.out.ThemeRepository;
 import com.decade.practice.chatsettings.dto.ThemeMapper;
 import com.decade.practice.chatsettings.dto.ThemeResponse;
-import com.decade.practice.chatsettings.ports.out.ThemeRepository;
 import lombok.AllArgsConstructor;
 import org.springframework.stereotype.Service;
 

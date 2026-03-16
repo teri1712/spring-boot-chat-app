@@ -12,7 +12,8 @@ import java.util.UUID;
 
 @RestController
 @AllArgsConstructor
-public class SettingsController {
+public class
+SettingsController {
 
       private final SettingsService settingsService;
 

@@ -35,12 +35,12 @@ public class Image extends Message {
       public MessageState getState() {
             return ImageState.builder()
                       .sequenceId(getSequenceId())
-                      .chatEventId(getChatEventId())
+                      .postingId(getPostingId())
                       .senderId(getSenderId())
                       .messageType(getMessageType())
                       .chatId(getChatId())
                       .createdAt(getCreatedAt())
-                      .seenByIds(getSeenPointers().keySet())
+                      .seenByIds(getAllSeenPointers().keySet())
                       .image(getImage())
                       .build();
       }

@@ -2,7 +2,7 @@ package com.decade.practice.search.integration;
 
 import com.decade.practice.BaseTestClass;
 import com.decade.practice.TestBeans;
-import com.decade.practice.chat.application.ports.in.ChatService;
+import com.decade.practice.chatorchestrator.application.ports.in.ChatService;
 import com.decade.practice.search.application.ports.out.MessageDocumentRepository;
 import com.decade.practice.search.application.ports.out.UserDocumentRepository;
 import com.decade.practice.search.domain.UserDocument;
@@ -69,10 +69,9 @@ class SearchControllerTest extends BaseTestClass {
 
             chatService.getDirect(aliceId, bobId);
 
-            mockMvc.perform(get("/me/history/messages")
-                                .param("query", "hello")
-                                .param("chatId", aliceId + "+" + bobId)
-                                .contentType(MediaType.APPLICATION_JSON))
+            mockMvc.perform(get("/chats/{chatId}/history", aliceId + "+" + bobId)
+
+                                .param("query", "hello").contentType(MediaType.APPLICATION_JSON))
                       .andExpect(status().isForbidden());
       }
 
@@ -90,9 +89,8 @@ class SearchControllerTest extends BaseTestClass {
             Assertions.assertEquals("unique currentState content", messageDocumentRepository.findAll().iterator().next().getContent());
 
 
-            mockMvc.perform(get("/me/history/messages")
+            mockMvc.perform(get("/chats/{chatId}/history", aliceId + "+" + bobId)
                                 .queryParam("query", "unique")
-                                .queryParam("chatId", aliceId + "+" + bobId)
                                 .contentType(MediaType.APPLICATION_JSON))
                       .andExpect(status().isOk())
                       .andExpect(jsonPath("$.length()").value(1))

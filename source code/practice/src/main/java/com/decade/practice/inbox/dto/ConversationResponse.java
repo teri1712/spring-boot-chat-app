@@ -6,8 +6,8 @@ import java.util.List;
 
 public record ConversationResponse(
           String identifier,
-          String name,
-          String avatar,
+          String roomName,
+          String roomAvatar,
           Long revisionNumber,
           List<MessageStateResponse> recents,
           Instant modifiedAt

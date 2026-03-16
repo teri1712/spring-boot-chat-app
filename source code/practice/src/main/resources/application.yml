@@ -1,11 +1,13 @@
 spring:
+  profiles:
+    active: dev
   security:
     oauth2:
       resourceserver:
         jwt:
           issuer-uri: https://profiles.google.com
   application:
-    name: messenger-clone
+    name: chat-app
   datasource:
     type: com.zaxxer.hikari.HikariDataSource
     url: jdbc:postgresql://localhost:5432/chatapp
@@ -73,12 +75,6 @@ spring:
         schema-initialization:
           enabled: true
 
-logging:
-  level:
-    root: INFO
-    com.decade.practice: DEBUG
-    org.springframework: TRACE
-
 
 actuator:
   user:
@@ -127,13 +123,13 @@ aws:
 broker:
   topics:
     queue: queue
-    live: live
+    room: room
 
 
 websocket:
   topics:
     user: /user
     queue: /queue
-    live: /live
+    room: /room
 
 

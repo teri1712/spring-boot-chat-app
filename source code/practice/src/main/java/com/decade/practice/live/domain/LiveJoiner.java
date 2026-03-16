@@ -1,8 +1,8 @@
 package com.decade.practice.live.domain;
 
+import com.decade.practice.live.domain.events.JoinerJoined;
 import com.decade.practice.live.domain.events.JoinerLeaved;
 import com.decade.practice.live.domain.events.JoinerTyped;
-import com.decade.practice.live.domain.events.LiveJoined;
 import jakarta.annotation.Nullable;
 import lombok.Getter;
 import lombok.Setter;
@@ -11,6 +11,7 @@ import org.springframework.data.domain.AbstractAggregateRoot;
 import org.springframework.data.redis.core.RedisHash;
 import org.springframework.data.redis.core.TimeToLive;
 
+import java.time.Duration;
 import java.time.Instant;
 import java.util.UUID;
 
@@ -45,7 +46,7 @@ public class LiveJoiner extends AbstractAggregateRoot<LiveJoiner> {
       }
 
       public void join() {
-            registerEvent(new LiveJoined(chatId, userId));
+            registerEvent(new JoinerJoined(chatId, userId));
       }
 
 
@@ -54,9 +55,18 @@ public class LiveJoiner extends AbstractAggregateRoot<LiveJoiner> {
       }
 
       public void type() {
-            this.typeTime = Instant.now();
-            this.joinDuration = 2L;
-            registerEvent(new JoinerTyped(chatId, userId, avatar, typeTime));
+            this.joinDuration = 10L;
+            Instant now = Instant.now();
+            Instant prev = this.typeTime;
+
+            if (prev != null) {
+                  Duration typeDuration = Duration.between(prev, now);
+                  if (typeDuration.toSeconds() <= 1) {
+                        return;
+                  }
+            }
+            this.typeTime = now;
+            registerEvent(new JoinerTyped(chatId, userId, avatar, now));
       }
 
       public static String determineKey(UUID from, String chat) {

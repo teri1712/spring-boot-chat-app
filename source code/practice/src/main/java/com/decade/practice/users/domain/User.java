@@ -1,7 +1,8 @@
 package com.decade.practice.users.domain;
 
 import com.decade.practice.users.domain.events.UserCreated;
-import com.decade.practice.users.domain.events.UserPasswordChangedEvent;
+import com.decade.practice.users.domain.events.UserPasswordChanged;
+import com.decade.practice.users.utils.GenderUtils;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotNull;
@@ -53,7 +54,7 @@ public class User extends AbstractAggregateRoot<User> {
       void changePassword(@NotNull String password) {
             this.password = password;
 
-            registerEvent(new UserPasswordChangedEvent(username));
+            registerEvent(new UserPasswordChanged(username));
       }
 
       public void changeName(@NotNull String name) {
@@ -76,7 +77,11 @@ public class User extends AbstractAggregateRoot<User> {
             this.dob = dob;
             this.gender = gender;
 
-            registerEvent(new UserCreated(id, username, name, gender, dob, avatar));
+      }
+
+      @PrePersist
+      void onCreated() {
+            registerEvent(new UserCreated(id, username, name, GenderUtils.inspect(gender), dob, avatar));
       }
 
 }

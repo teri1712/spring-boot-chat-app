@@ -11,7 +11,7 @@ import org.mapstruct.ReportingPolicy;
 public interface ChatPolicyMapper {
 
       @Mapping(source = "policy.chatId", target = "identifier")
-      @Mapping(target = "creators", expression = "java(policy.getCreators().members().toList())")
+      @Mapping(target = "creators", source = "creators.members")
       ChatPolicyInfo map(Chat policy);
 
 }

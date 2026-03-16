@@ -1,6 +1,6 @@
 package com.decade.practice.inbox.application.services;
 
-import com.decade.practice.inbox.application.ports.out.ChatEventRepository;
+import com.decade.practice.inbox.application.ports.out.RoomEventRepository;
 import com.decade.practice.inbox.application.query.ChatEventService;
 import com.decade.practice.inbox.dto.ChatEventResponse;
 import com.decade.practice.inbox.dto.mapper.ChatEventMapper;
@@ -13,7 +13,7 @@ import java.util.UUID;
 @AllArgsConstructor
 public class ChatEventServiceImpl implements ChatEventService {
 
-      private final ChatEventRepository receipts;
+      private final RoomEventRepository receipts;
       private final ChatEventMapper chatEventMapper;
 
 

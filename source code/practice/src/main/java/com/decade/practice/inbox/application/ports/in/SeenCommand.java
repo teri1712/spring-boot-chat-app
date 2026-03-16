@@ -9,8 +9,8 @@ import java.util.UUID;
 public class SeenCommand extends ParticipantCommand {
       private final Instant at;
 
-      public SeenCommand(String chatId, UUID senderId, UUID idempotentKey, Instant at) {
-            super(chatId, senderId, idempotentKey);
+      public SeenCommand(String chatId, UUID senderId, UUID postingId, Instant at) {
+            super(chatId, senderId, postingId);
             this.at = at;
       }
 }

@@ -47,7 +47,7 @@ class ProfileServiceImplTest {
 //    @Test
 //    void givenProfileRequest_whenChangeProfile_thenProfileIsUpdated() {
 //        UUID userId = UUID.randomUUID();
-//        User user = new User(userId, "username", "password", "Old name", null, new Date(), 1.0f);
+//        User user = new User(userId, "username", "password", "Old customName", null, new Date(), 1.0f);
 //
 //        ProfileRequest request = new ProfileRequest();
 //        request.setName("New Name");
@@ -56,7 +56,7 @@ class ProfileServiceImplTest {
 //
 //        UserResponse result = userService.changeProfile(userId, request);
 //
-//        assertEquals("New Name", result.name());
+//        assertEquals("New Name", result.customName());
 //    }
 //
 //    @Test

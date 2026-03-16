@@ -16,7 +16,7 @@ import java.time.Instant;
 import java.util.UUID;
 
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.put;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
@@ -63,8 +63,7 @@ public class EventCacheTest extends BaseTestClass {
       public void givenEventsOnCached_whenAliceSendNewMessage_thenReturnEventsAreNotInCached() throws Exception {
             String chatId = "11111111-1111-1111-1111-111111111111+22222222-2222-2222-2222-222222222222";
 
-            mockMvc.perform(post("/chats/{chatIdentifier}/text-events", chatId)
-                                .header("Idempotency-key", UUID.randomUUID())
+            mockMvc.perform(put("/chats/{chatIdentifier}/text-events/{postingId}", chatId, UUID.randomUUID())
                                 .contentType(MediaType.APPLICATION_JSON)
                                 .content("{ \"content\": \"To Bob\" }"))
                       .andExpect(status().isCreated());

@@ -15,15 +15,15 @@ import java.util.UUID;
 @Mapper(unmappedTargetPolicy = ReportingPolicy.ERROR, componentModel = MappingConstants.ComponentModel.SPRING)
 public interface CommandMappers {
 
-      TextCommand toText(TextRequest request, UUID idempotentKey, UUID senderId, String chatId);
+      TextCommand toText(TextRequest request, UUID postingId, UUID senderId, String chatId);
 
-      ImageCommand toImage(ImageRequest request, UUID idempotentKey, UUID senderId, String chatId);
+      ImageCommand toImage(ImageRequest request, UUID postingId, UUID senderId, String chatId);
 
-      IconCommand toIcon(IconRequest request, UUID idempotentKey, UUID senderId, String chatId);
+      IconCommand toIcon(IconRequest request, UUID postingId, UUID senderId, String chatId);
 
-      SeenCommand toSeen(SeenRequest request, UUID idempotentKey, UUID senderId, String chatId);
+      SeenCommand toSeen(SeenRequest request, UUID postingId, UUID senderId, String chatId);
 
-      FileCommand toFile(FileRequest request, UUID idempotentKey, UUID senderId, String chatId);
+      FileCommand toFile(FileRequest request, UUID postingId, UUID senderId, String chatId);
 
 
 }

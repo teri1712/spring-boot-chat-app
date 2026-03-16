@@ -1,9 +1,10 @@
 package com.decade.practice.inbox.application.events;
 
-import com.decade.practice.engagement.domain.events.PreferenceChanged;
-import com.decade.practice.inbox.application.ports.out.ConversationRepository;
+import com.decade.practice.chatsettings.domain.events.PreferenceChanged;
 import com.decade.practice.inbox.application.ports.out.MessageRepository;
+import com.decade.practice.inbox.application.ports.out.RoomRepository;
 import com.decade.practice.inbox.domain.Preference;
+import com.decade.practice.inbox.domain.Room;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.modulith.events.ApplicationModuleListener;
@@ -18,24 +19,25 @@ public class PreferenceListener {
 
 
       private final MessageRepository messages;
-      private final ConversationRepository conversations;
+      private final RoomRepository rooms;
 
 
       @ApplicationModuleListener
       public void on(PreferenceChanged event) {
 
-            long rowsAffected = conversations.updateRoomNameAndRoomAvatar(event.getChatId(), event.getRoomName(), event.getRoomAvatar());
-            log.info("Updated {} rows for chat {}", rowsAffected, event.getChatId());
-
-
+            Room room = rooms.findById(event.getChatId()).orElseThrow();
+            room.update(event.getCustomName(), event.getCustomAvatar());
+            room.refreshLastActivity();
+            rooms.save(room);
+            
             messages.save(new Preference(
                       UUID.randomUUID(),
                       event.getMakerId(),
                       event.getChatId(),
                       event.getCreatedAt(),
                       event.getIconId(),
-                      event.getRoomAvatar(),
-                      event.getRoomName(),
+                      event.getCustomAvatar(),
+                      event.getCustomName(),
                       event.getTheme()));
       }
 }

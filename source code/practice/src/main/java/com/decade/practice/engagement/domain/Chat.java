@@ -27,7 +27,7 @@ public class Chat extends AbstractAggregateRoot<Chat> {
             this.chatId = chatId;
             this.maxParticipants = maxParticipants;
             this.creators = creators;
-            registerEvent(new ChatCreated(chatId, creators.members().toList(), creators.callerId()));
+            registerEvent(new ChatCreated(chatId, creators.getMembers(), creators.callerId()));
 
       }
 }

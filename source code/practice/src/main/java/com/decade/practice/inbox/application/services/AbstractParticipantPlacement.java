@@ -3,8 +3,10 @@ package com.decade.practice.inbox.application.services;
 import com.decade.practice.inbox.application.MessageAlreadySentException;
 import com.decade.practice.inbox.application.ports.in.ParticipantCommand;
 import com.decade.practice.inbox.application.ports.in.ParticipantPlacement;
-import com.decade.practice.inbox.application.ports.out.ChatEventRepository;
-import com.decade.practice.inbox.domain.ChatEvent;
+import com.decade.practice.inbox.application.ports.out.RoomEventRepository;
+import com.decade.practice.inbox.application.ports.out.RoomRepository;
+import com.decade.practice.inbox.domain.Room;
+import com.decade.practice.inbox.domain.RoomEvent;
 import com.decade.practice.inbox.dto.ChatEventResponse;
 import com.decade.practice.inbox.dto.mapper.ChatEventMapper;
 import lombok.RequiredArgsConstructor;
@@ -18,24 +20,28 @@ import org.springframework.transaction.annotation.Transactional;
 @Transactional
 public abstract class AbstractParticipantPlacement<Command extends ParticipantCommand> implements ParticipantPlacement<Command> {
 
-      private final ChatEventRepository events;
+      private final RoomEventRepository events;
+      private final RoomRepository rooms;
       private final ChatEventMapper chatEventMapper;
 
 
-      private void doSave(ChatEvent chatEvent) {
+      private void doSave(RoomEvent roomEvent) {
             try {
-                  events.saveAndFlush(chatEvent.getChatId(), chatEvent.getSenderId(), chatEvent);
+                  events.saveAndFlush(roomEvent.getChatId(), roomEvent.getSenderId(), roomEvent);
             } catch (DataIntegrityViolationException e) {
-                  throw new MessageAlreadySentException(chatEvent.getId());
+                  throw new MessageAlreadySentException(roomEvent.getPostingId());
             }
       }
 
       @Override
       public ChatEventResponse place(Command participantCommand) {
-            ChatEvent chatEvent = newInstance(participantCommand);
-            doSave(chatEvent);
-            return chatEventMapper.toResponse(chatEvent);
+            RoomEvent roomEvent = newInstance(participantCommand);
+            Room room = rooms.findById(participantCommand.getChatId()).orElseThrow();
+            room.refreshLastActivity();
+            rooms.save(room);
+            doSave(roomEvent);
+            return chatEventMapper.toResponse(roomEvent);
       }
 
-      protected abstract ChatEvent newInstance(Command participantCommand);
+      protected abstract RoomEvent newInstance(Command participantCommand);
 }

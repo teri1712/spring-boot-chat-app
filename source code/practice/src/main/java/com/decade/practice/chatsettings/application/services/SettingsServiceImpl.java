@@ -2,13 +2,12 @@ package com.decade.practice.chatsettings.application.services;
 
 import com.decade.practice.chatsettings.api.SettingApi;
 import com.decade.practice.chatsettings.api.SettingsInfo;
+import com.decade.practice.chatsettings.application.ports.out.SettingRepository;
+import com.decade.practice.chatsettings.application.ports.out.ThemeRepository;
 import com.decade.practice.chatsettings.domain.Preference;
 import com.decade.practice.chatsettings.domain.Setting;
 import com.decade.practice.chatsettings.dto.PreferenceRequest;
 import com.decade.practice.chatsettings.dto.SettingsMapper;
-import com.decade.practice.chatsettings.ports.out.PreferenceNotifier;
-import com.decade.practice.chatsettings.ports.out.SettingRepository;
-import com.decade.practice.chatsettings.ports.out.ThemeRepository;
 import com.decade.practice.engagement.api.WritePolicy;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -32,7 +31,6 @@ public class SettingsServiceImpl implements SettingsService, SettingApi {
 
       private final ThemeRepository themes;
       private final SettingsMapper settingsMapper;
-      private final PreferenceNotifier notifier;
 
 
       @Override
@@ -47,15 +45,14 @@ public class SettingsServiceImpl implements SettingsService, SettingApi {
             if (request.themeId() != null)
                   chain = chain.theme(themes.findById(request.themeId()).orElseThrow());
 
-            if (request.roomName() != null)
-                  chain = chain.roomName(request.roomName());
+            if (request.customName() != null)
+                  chain = chain.roomName(request.customName());
 
-            if (request.roomAvatar() != null)
-                  chain = chain.roomAvatar(request.roomAvatar());
+            if (request.customAvatar() != null)
+                  chain = chain.roomAvatar(request.customAvatar());
 
             chain.complete();
             settings.save(setting);
-            notifier.notify(chatId, setting.getPreference());
       }
 
 

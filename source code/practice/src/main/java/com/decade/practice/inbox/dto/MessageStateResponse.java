@@ -32,7 +32,7 @@ import java.util.UUID;
 public class MessageStateResponse {
 
       private Long sequenceNumber;
-      private UUID engagementId;
+      private UUID postingId;
       private UserInfo sender;
       private String messageType;
       private String chatId;

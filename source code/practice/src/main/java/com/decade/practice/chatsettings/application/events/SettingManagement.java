@@ -1,21 +1,23 @@
 package com.decade.practice.chatsettings.application.events;
 
-import com.decade.practice.chatsettings.domain.Setting;
-import com.decade.practice.chatsettings.ports.out.SettingRepository;
-import com.decade.practice.inbox.domain.events.ChatEventCreated;
+import com.decade.practice.chatsettings.application.ports.out.PreferenceNotifier;
+import com.decade.practice.chatsettings.domain.events.PreferenceChanged;
+import com.decade.practice.chatsettings.dto.PreferenceMapper;
 import lombok.AllArgsConstructor;
-import org.springframework.modulith.events.ApplicationModuleListener;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.event.TransactionPhase;
+import org.springframework.transaction.event.TransactionalEventListener;
 
 @Service
 @AllArgsConstructor
 public class SettingManagement {
 
-      private final SettingRepository settings;
+      private final PreferenceMapper preferenceMapper;
+      private final PreferenceNotifier notifier;
 
-      @ApplicationModuleListener
-      public void on(ChatEventCreated event) {
-            settings.findByIdentifier(event.getChatId())
-                      .ifPresent(Setting::refreshLastActivity);
+
+      @TransactionalEventListener(phase = TransactionPhase.AFTER_COMMIT)
+      public void on(PreferenceChanged event) {
+            notifier.notify(event.getChatId(), preferenceMapper.map(event));
       }
 }

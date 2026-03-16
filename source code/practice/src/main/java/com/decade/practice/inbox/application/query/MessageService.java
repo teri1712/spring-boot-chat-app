@@ -8,8 +8,8 @@ import java.util.UUID;
 public interface MessageService {
 
       List<MessageStateResponse> findByChatAndSequenceLessThanEqual(
-                UUID owner,
                 String chatId,
+                UUID owner,
                 Long anchorSequenceNumber
       );
 

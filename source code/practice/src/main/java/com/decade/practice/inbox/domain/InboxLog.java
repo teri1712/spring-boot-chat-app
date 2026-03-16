@@ -16,7 +16,8 @@ import java.util.UUID;
 public class InboxLog extends AbstractAggregateRoot<InboxLog> {
 
       @Id
-      @GeneratedValue(strategy = GenerationType.SEQUENCE)
+      @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "inbox_log_sequence")
+      @SequenceGenerator(name = "inbox_log_sequence", sequenceName = "inbox_log_seq", initialValue = 1000)
       private Long sequenceId;
 
       private String chatId;
@@ -35,8 +36,7 @@ public class InboxLog extends AbstractAggregateRoot<InboxLog> {
 
       @PrePersist
       void onPersisted() {
-            assert sequenceId != null;
-            registerEvent(new InboxLogCreated(sequenceId, chatId, senderId, ownerId, action, getMessageState()));
+            registerEvent(new InboxLogCreated(sequenceId, chatId, messageId, senderId, ownerId, action, getMessageState()));
       }
 
       @Enumerated(EnumType.STRING)

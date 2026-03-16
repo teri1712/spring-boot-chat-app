@@ -9,7 +9,6 @@ import org.springframework.data.domain.AbstractAggregateRoot;
 import java.time.Instant;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Objects;
 import java.util.UUID;
 
 @Entity
@@ -18,9 +17,6 @@ public class Conversation extends AbstractAggregateRoot<Conversation> {
 
       @EmbeddedId
       private ConversationId conversationId;
-
-      private String name;
-      private String avatar;
 
       @Version
       private Integer version;
@@ -37,18 +33,16 @@ public class Conversation extends AbstractAggregateRoot<Conversation> {
       protected Conversation() {
       }
 
-      public Conversation(String chatId, UUID ownerId, String name, String avatar) {
+      public Conversation(String chatId, UUID ownerId) {
             this.conversationId = new ConversationId(chatId, ownerId);
             this.recents = new ArrayList<>();
-            this.name = name;
-            this.avatar = avatar;
             this.hash = new HashValue((long) conversationId.hashCode());
       }
 
       public void addRecent(MessageState messageState) {
             this.recents.add(0, messageState);
             this.modifiedAt = Instant.now();
-            this.hash = hash.plus(computeHash(messageState));
+            this.hash = hash.shift().plus(computeHash(messageState));
             if (this.recents.size() > 20) {
                   pop();
             }
@@ -58,23 +52,33 @@ public class Conversation extends AbstractAggregateRoot<Conversation> {
             this.recents.remove(this.recents.size() - 1);
       }
 
-
-      public void update(String roomName, String roomAvatar) {
-            this.name = roomName;
-            this.avatar = roomAvatar;
-      }
-
       public void updateRecent(MessageState messageState) {
             if (recents.isEmpty()) return;
-            MessageState latest = recents.get(0);
-            if (Objects.equals(latest.getSequenceId(), messageState.getSequenceId()))
-                  recents.set(0, messageState);
+            Long sequenceId = messageState.getSequenceId();
+            int left = 0, right = recents.size();
+            while (left < right) {
+                  int mid = (left + right) / 2;
+                  MessageState midState = recents.get(mid);
+                  if (midState.getSequenceId() > sequenceId) {
+                        left = mid + 1;
+                  } else {
+                        right = mid;
+                  }
+            }
+            if (left < recents.size()) {
+                  hash = hash.minus(HashValue.ONE
+                            .shift(left)
+                            .times(computeHash(recents.get(left))));
+
+                  hash = hash.plus(HashValue.ONE
+                            .shift(left).times(computeHash(messageState)));
+
+                  recents.set(left, messageState);
+            }
       }
 
       private static HashValue computeHash(MessageState messageState) {
-            HashValue hashValue = new HashValue(messageState.getCreatedAt().toEpochMilli());
-            hashValue = hashValue.plus(new HashValue((long) messageState.getChatEventId().hashCode()));
-            return hashValue;
+            return new HashValue((long) messageState.getPostingId().hashCode());
       }
 
 }

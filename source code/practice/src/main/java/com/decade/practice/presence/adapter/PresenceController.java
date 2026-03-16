@@ -1,8 +1,8 @@
 package com.decade.practice.presence.adapter;
 
 import com.decade.practice.presence.application.query.PresenceService;
-import com.decade.practice.presence.dto.ChatPresenceResponse;
-import com.decade.practice.presence.dto.PresenceRecommendationResponse;
+import com.decade.practice.presence.dto.BuddyResponse;
+import com.decade.practice.presence.dto.RoomPresenceResponse;
 import jakarta.validation.constraints.Size;
 import lombok.AllArgsConstructor;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
@@ -25,17 +25,15 @@ public class PresenceController {
 
       private final PresenceService presenceService;
 
-      // TODO: Adjust client
-      // TODO: Migrate to chat presence only
-      @GetMapping("/me/presences")
-      public List<PresenceRecommendationResponse> listOnline(
+      @GetMapping("/buddy-presences")
+      public List<BuddyResponse> listBuddies(
                 @AuthenticationPrincipal(expression = "id") UUID caller
       ) {
-            return presenceService.findRecommendation(caller);
+            return presenceService.findMyBuddies(caller);
       }
 
       @GetMapping("/presences")
-      public Map<String, ChatPresenceResponse> get(
+      public Map<String, RoomPresenceResponse> find(
                 @AuthenticationPrincipal(expression = "id") UUID caller,
                 @Size(min = 1, max = 50)
                 @RequestParam(name = "chatId")

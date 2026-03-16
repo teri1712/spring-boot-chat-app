@@ -1,7 +1,7 @@
 package com.decade.practice.users.integration;
 
 import com.decade.practice.BaseTestClass;
-import com.decade.practice.users.domain.events.UserPasswordChangedEvent;
+import com.decade.practice.users.domain.events.UserPasswordChanged;
 import com.decade.practice.users.dto.ProfileRequest;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.junit.jupiter.api.Test;
@@ -53,7 +53,7 @@ class ProfileControllerTest extends BaseTestClass {
             request.setDob(new Date());
             request.setGender(2.0f);
 
-            mockMvc.perform(patch("/profiles/me/profile")
+            mockMvc.perform(patch("/profiles/me")
                                 .contentType(MediaType.APPLICATION_JSON)
                                 .content(objectMapper.writeValueAsString(request)))
                       .andExpect(status().isOk())
@@ -70,7 +70,7 @@ class ProfileControllerTest extends BaseTestClass {
                       .andExpect(status().isOk());
 
 
-            assertThat(events.stream(UserPasswordChangedEvent.class)).hasSize(1);
+            assertThat(events.stream(UserPasswordChanged.class)).hasSize(1);
       }
 
       @Test

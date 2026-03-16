@@ -12,11 +12,11 @@ public record Preference(
           Integer iconId,
 
           @Nullable
-          String roomName,
+          String customName,
 
           @Nullable
           // TODO: Adjust client
-          String roomAvatar,
+          String customAvatar,
 
           @ManyToOne
           Theme theme

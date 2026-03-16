@@ -26,10 +26,12 @@ import java.util.UUID;
 })
 @SuperBuilder
 @Getter
+
+// TODO: Will be migrated to runtime state resolution later
 public abstract class MessageState {
 
       private Long sequenceId;
-      private UUID chatEventId;
+      private UUID postingId;
       private UUID senderId;
       private String messageType;
       private String chatId;

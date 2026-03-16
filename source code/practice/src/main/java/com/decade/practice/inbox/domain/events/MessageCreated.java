@@ -7,7 +7,7 @@ import java.util.UUID;
 
 public record MessageCreated(
           Long id,
-          UUID chatEventId,
+          UUID postingId,
           UUID senderId,
           String chatId,
           Instant createdAt,

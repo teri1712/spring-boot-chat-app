@@ -1,12 +1,14 @@
 package com.decade.practice.inbox.dto.mapper;
 
 
-import com.decade.practice.inbox.domain.InboxLog;
+import com.decade.practice.inbox.application.ports.out.UserLookUp;
+import com.decade.practice.inbox.application.ports.out.projection.LogView;
+import com.decade.practice.inbox.domain.Conversation;
+import com.decade.practice.inbox.domain.ConversationInfo;
 import com.decade.practice.inbox.domain.events.InboxLogCreated;
+import com.decade.practice.inbox.domain.messages.InboxLogMessage;
 import com.decade.practice.inbox.dto.InboxLogResponse;
-import com.decade.practice.users.api.UserInfo;
 import org.mapstruct.*;
-import org.springframework.beans.factory.annotation.Autowired;
 
 import java.util.List;
 import java.util.Map;
@@ -15,28 +17,31 @@ import java.util.UUID;
 @Mapper(unmappedTargetPolicy = ReportingPolicy.ERROR, componentModel = MappingConstants.ComponentModel.SPRING, uses = {MessageMapper.class})
 public abstract class InboxLogMapper {
 
-      @Autowired
-      protected MessageMapper messageMapper;
-
-      @Mapping(target = "conversationName", expression = "java(context.conversationName())")
-      @Mapping(target = "conversationAvatar", expression = "java(context.conversationAvatar())")
-      @Mapping(target = "revisionNumber", expression = "java(context.chatHash())")
+      @Mapping(target = "roomName", expression = "java(info.name())")
+      @Mapping(target = "roomAvatar", expression = "java(info.avatar())")
+      @Mapping(target = "revisionNumber", expression = "java(conversation.getHash().value())")
       @Mapping(target = "sequenceNumber", source = "inboxLog.sequenceId")
-      @Mapping(target = "messageState", expression = "java(messageMapper.map(inboxLog.messageState(),context.userMap()))")
-      public abstract InboxLogResponse map(InboxLogCreated inboxLog, @Context InboxContext context);
+      @Mapping(target = "sender", source = "inboxLog.senderId")
+      public abstract InboxLogMessage map(InboxLogCreated inboxLog,
+                                          UUID postingId,
+                                          @Context UserLookUp lookUp,
+                                          @Context Conversation conversation,
+                                          @Context ConversationInfo info);
 
-      @Mapping(target = "conversationName", expression = "java(context.conversationName())")
-      @Mapping(target = "conversationAvatar", expression = "java(context.conversationAvatar())")
-      @Mapping(target = "revisionNumber", expression = "java(context.chatHash())")
-      @Mapping(target = "sequenceNumber", source = "inboxLog.sequenceId")
-      @Mapping(target = "messageState", expression = "java(messageMapper.map(inboxLog.getMessageState(),context.userMap()))")
-      public abstract InboxLogResponse map(InboxLog inboxLog, @Context InboxContext context);
+      @Mapping(target = "roomName", expression = "java(infoMap.get(inboxLog.log().getChatId()).name())")
+      @Mapping(target = "roomAvatar", expression = "java(infoMap.get(inboxLog.log().getChatId()).avatar())")
+      @Mapping(target = "revisionNumber", source = "conversationView.conversation.hash.value")
+      @Mapping(target = "sequenceNumber", source = "log.sequenceId")
+      @Mapping(target = "messageState", source = "log.messageState")
+      @Mapping(target = "sender", source = "log.senderId")
+      @Mapping(target = "chatId", source = "log.chatId")
+      @Mapping(target = "ownerId", source = "log.ownerId")
+      @Mapping(target = "action", source = "log.action")
+      @Mapping(target = "postingId", source = "message.postingId")
+      public abstract InboxLogResponse map(LogView inboxLog, @Context UserLookUp lookUp, @Context Map<String, ConversationInfo> infoMap);
 
-      public List<InboxLogResponse> map(List<InboxLog> inboxLogs, InboxContext context) {
-            return inboxLogs.stream().map(inboxLog -> map(inboxLog, context)).toList();
-      }
-
-      public record InboxContext(UUID ownerId, Map<UUID, UserInfo> userMap, String conversationName, String conversationAvatar, Long chatHash) {
+      public List<InboxLogResponse> map(List<LogView> inboxLogs, UserLookUp lookUp, Map<String, ConversationInfo> infoMap) {
+            return inboxLogs.stream().map(inboxLog -> map(inboxLog, lookUp, infoMap)).toList();
       }
 
 }

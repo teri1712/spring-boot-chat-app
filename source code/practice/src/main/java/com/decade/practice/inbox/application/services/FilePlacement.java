@@ -1,9 +1,10 @@
 package com.decade.practice.inbox.application.services;
 
 import com.decade.practice.inbox.application.ports.in.FileCommand;
-import com.decade.practice.inbox.application.ports.out.ChatEventRepository;
-import com.decade.practice.inbox.domain.ChatEvent;
-import com.decade.practice.inbox.domain.FileChatEvent;
+import com.decade.practice.inbox.application.ports.out.RoomEventRepository;
+import com.decade.practice.inbox.application.ports.out.RoomRepository;
+import com.decade.practice.inbox.domain.FileRoomEvent;
+import com.decade.practice.inbox.domain.RoomEvent;
 import com.decade.practice.inbox.dto.mapper.ChatEventMapper;
 import org.springframework.stereotype.Service;
 
@@ -11,14 +12,14 @@ import org.springframework.stereotype.Service;
 public class FilePlacement extends AbstractParticipantPlacement<FileCommand> {
 
 
-      public FilePlacement(ChatEventRepository events, ChatEventMapper chatEventMapper) {
-            super(events, chatEventMapper);
+      public FilePlacement(RoomEventRepository events, RoomRepository rooms, ChatEventMapper chatEventMapper) {
+            super(events, rooms, chatEventMapper);
       }
 
       @Override
-      protected ChatEvent newInstance(FileCommand participantCommand) {
-            return new FileChatEvent(
-                      participantCommand.getIdempotentKey(),
+      protected RoomEvent newInstance(FileCommand participantCommand) {
+            return new FileRoomEvent(
+                      participantCommand.getPostingId(),
                       participantCommand.getChatId(),
                       participantCommand.getSenderId(),
                       participantCommand.getUri(),

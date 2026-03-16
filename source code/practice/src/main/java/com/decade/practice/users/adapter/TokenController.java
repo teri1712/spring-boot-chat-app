@@ -53,7 +53,7 @@ public class TokenController {
             String username = jwt.getSubject();
 
             var claims = jwt.getClaims();
-            String name = claims.get("name").toString();
+            String name = claims.get("customName").toString();
             String picture = claims.get("picture").toString();
 
             SignUpRequest signUpRequest = new SignUpRequest();

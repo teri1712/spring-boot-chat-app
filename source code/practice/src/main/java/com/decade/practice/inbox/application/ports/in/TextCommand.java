@@ -10,8 +10,8 @@ import java.util.UUID;
 public class TextCommand extends ParticipantCommand {
       private final String content;
 
-      public TextCommand(String chatId, UUID senderId, UUID idempotentKey, String content) {
-            super(chatId, senderId, idempotentKey);
+      public TextCommand(String chatId, UUID senderId, UUID postingId, String content) {
+            super(chatId, senderId, postingId);
             this.content = content;
       }
 }

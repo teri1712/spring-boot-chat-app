@@ -13,11 +13,13 @@ import java.util.UUID;
 @Repository
 public interface MessageRepository extends JpaRepository<Message, Long> {
 
-      Optional<Message> findFirstByChatIdOrderByCreatedAtDesc(String chatId);
+      Optional<Message> findFirstByChatIdOrderBySequenceIdDesc(String chatId);
 
-      @Query("select distinct m from Message m join fetch m.seenPointers p where p.senderId = :senderId and p.senderId = :senderId and p.chatId = :chatId")
+      @Query("select distinct m from Message m join m.seenPointers p join fetch m.seenPointers pp " +
+                "where p.senderId = :senderId and p.chatId = :chatId")
       Optional<Message> findByLastSeen(String chatId, UUID senderId);
 
       List<Message> findByChatIdAndSequenceIdLessThanEqual(String chatId, Long sequenceId, Pageable pageable);
+
 
 }

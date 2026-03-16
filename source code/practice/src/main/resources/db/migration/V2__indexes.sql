@@ -1,6 +1,6 @@
 -- CREATE INDEX idx_user_name ON user_member USING HASH (username);
 -- TODO
--- CREATE INDEX idx_chat_event_look_up ON chat_event (first_user, second_user, owner_id, event_version);
+-- CREATE INDEX idx_room_event_look_up ON chat_event (first_user, second_user, owner_id, event_version);
 --
 -- CREATE INDEX idx_user_event_look_up ON chat_event (owner_id, event_version);
 --

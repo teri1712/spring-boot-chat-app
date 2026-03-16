@@ -10,5 +10,5 @@ import java.util.UUID;
 public abstract class ParticipantCommand {
       private final String chatId;
       private final UUID senderId;
-      private final UUID idempotentKey;
+      private final UUID postingId;
 }

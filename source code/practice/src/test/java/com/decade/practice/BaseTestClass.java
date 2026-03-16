@@ -78,7 +78,7 @@ public abstract class BaseTestClass {
             registry.add("spring.datasource.password", POSTGRES::getPassword);
 
             registry.add("aws.s3.endpoint", () -> LOCALSTACK.getEndpointOverride(S3).toString());
-            registry.add("aws.s3.access.id", () -> LOCALSTACK.getAccessKey());
+            registry.add("aws.s3.access.userId", () -> LOCALSTACK.getAccessKey());
             registry.add("aws.s3.access.secret", () -> LOCALSTACK.getSecretKey());
             registry.add("aws.s3.region", () -> LOCALSTACK.getRegion());
 

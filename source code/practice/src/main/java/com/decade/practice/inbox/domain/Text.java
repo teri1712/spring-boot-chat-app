@@ -1,5 +1,6 @@
 package com.decade.practice.inbox.domain;
 
+import com.decade.practice.inbox.domain.events.TextAdded;
 import jakarta.persistence.Column;
 import jakarta.persistence.DiscriminatorValue;
 import jakarta.persistence.Entity;
@@ -30,16 +31,22 @@ public class Text extends Message {
       }
 
       @Override
+      protected void onPersisted() {
+            super.onPersisted();
+            registerEvent(new TextAdded(getSequenceId(), getContent(), getChatId(), getCreatedAt(), getPostingId(), getSenderId()));
+      }
+
+      @Override
       public MessageState getState() {
             return TextState.
                       builder()
                       .sequenceId(getSequenceId())
-                      .chatEventId(getChatEventId())
+                      .postingId(getPostingId())
                       .senderId(getSenderId())
                       .messageType(getMessageType())
                       .chatId(getChatId())
                       .createdAt(getCreatedAt())
-                      .seenByIds(getSeenPointers().keySet())
+                      .seenByIds(getAllSeenPointers().keySet())
                       .content(getContent())
                       .build();
       }

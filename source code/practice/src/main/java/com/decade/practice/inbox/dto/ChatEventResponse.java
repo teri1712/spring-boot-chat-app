@@ -4,7 +4,7 @@ import java.time.Instant;
 import java.util.UUID;
 
 public record ChatEventResponse(
-          UUID id,
+          UUID postingId,
           UUID senderId,
           String chatId,
           Instant createdAt

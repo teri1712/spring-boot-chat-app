@@ -13,8 +13,8 @@ public class ImageCommand extends ParticipantCommand {
       private final String filename;
       private final String format;
 
-      public ImageCommand(String chatId, UUID senderId, UUID idempotentKey, String uri, Integer width, Integer height, String filename, String format) {
-            super(chatId, senderId, idempotentKey);
+      public ImageCommand(String chatId, UUID senderId, UUID postingId, String uri, Integer width, Integer height, String filename, String format) {
+            super(chatId, senderId, postingId);
             this.uri = uri;
             this.width = width;
             this.height = height;

@@ -41,54 +41,54 @@ public class EventController {
       }
 
 
-      @PostMapping(path = "/chats/{chatId}/text-events", consumes = {MediaType.APPLICATION_JSON_VALUE})
+      @PutMapping(path = "/chats/{chatId}/text-events/{postingId}", consumes = {MediaType.APPLICATION_JSON_VALUE})
       @ResponseStatus(HttpStatus.ACCEPTED)
       public ChatEventResponse createTextEvent(
                 @AuthenticationPrincipal(expression = "id") UUID senderId,
-                @RequestHeader("Idempotency-key") UUID key,
+                @PathVariable UUID postingId,
                 @PathVariable String chatId,
                 @RequestBody @Valid TextRequest body) {
-            return textPlacement.place(commandMappers.toText(body, key, senderId, chatId));
+            return textPlacement.place(commandMappers.toText(body, postingId, senderId, chatId));
       }
 
-      @PostMapping(path = "/chats/{chatId}/image-events", consumes = {MediaType.APPLICATION_JSON_VALUE})
+      @PutMapping(path = "/chats/{chatId}/image-events/{postingId}", consumes = {MediaType.APPLICATION_JSON_VALUE})
       @ResponseStatus(HttpStatus.ACCEPTED)
       public ChatEventResponse createImageEvent(
                 @PathVariable String chatId,
                 @AuthenticationPrincipal(expression = "id") UUID senderId,
-                @RequestHeader("Idempotency-key") UUID key,
+                @PathVariable UUID postingId,
                 @RequestBody @Valid ImageRequest body) {
-            return imagePlacement.place(commandMappers.toImage(body, key, senderId, chatId));
+            return imagePlacement.place(commandMappers.toImage(body, postingId, senderId, chatId));
       }
 
-      @PostMapping(path = "/chats/{chatId}/icon-events", consumes = {MediaType.APPLICATION_JSON_VALUE})
+      @PutMapping(path = "/chats/{chatId}/icon-events/{postingId}", consumes = {MediaType.APPLICATION_JSON_VALUE})
       @ResponseStatus(HttpStatus.ACCEPTED)
       public ChatEventResponse createIconEvent(
                 @PathVariable String chatId,
                 @AuthenticationPrincipal(expression = "id") UUID senderId,
-                @RequestHeader("Idempotency-key") UUID key,
+                @PathVariable UUID postingId,
                 @RequestBody @Valid IconRequest body) {
-            return iconPlacement.place(commandMappers.toIcon(body, key, senderId, chatId));
+            return iconPlacement.place(commandMappers.toIcon(body, postingId, senderId, chatId));
 
       }
 
-      @PostMapping(path = "/chats/{chatId}/file-events", consumes = {MediaType.APPLICATION_JSON_VALUE})
+      @PutMapping(path = "/chats/{chatId}/file-events/{postingId}", consumes = {MediaType.APPLICATION_JSON_VALUE})
       @ResponseStatus(HttpStatus.ACCEPTED)
       public ChatEventResponse createFileEvent(
                 @PathVariable String chatId,
                 @AuthenticationPrincipal(expression = "id") UUID senderId,
-                @RequestHeader("Idempotency-key") UUID key,
+                @PathVariable UUID postingId,
                 @RequestBody @Valid FileRequest body) {
-            return filePlacement.place(commandMappers.toFile(body, key, senderId, chatId));
+            return filePlacement.place(commandMappers.toFile(body, postingId, senderId, chatId));
       }
 
-      @PostMapping(path = "/chats/{chatId}/seen-events", consumes = {MediaType.APPLICATION_JSON_VALUE})
+      @PutMapping(path = "/chats/{chatId}/seen-events/{postingId}", consumes = {MediaType.APPLICATION_JSON_VALUE})
       @ResponseStatus(HttpStatus.ACCEPTED)
       public ChatEventResponse createSeenEvent(
                 @PathVariable String chatId,
                 @AuthenticationPrincipal(expression = "id") UUID senderId,
-                @RequestHeader("Idempotency-key") UUID key,
+                @PathVariable UUID postingId,
                 @RequestBody @Valid SeenRequest body) {
-            return seenPlacement.place(commandMappers.toSeen(body, key, senderId, chatId));
+            return seenPlacement.place(commandMappers.toSeen(body, postingId, senderId, chatId));
       }
 }

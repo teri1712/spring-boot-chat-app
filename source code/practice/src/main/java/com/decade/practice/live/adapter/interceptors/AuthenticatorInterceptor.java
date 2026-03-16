@@ -21,30 +21,30 @@ import org.springframework.stereotype.Component;
 @AllArgsConstructor
 @Order
 public class AuthenticatorInterceptor implements ChannelInterceptor {
-    private final TokenService tokenService;
+      private final TokenService tokenService;
 
-    @Nullable
-    @Override
-    public Message<?> preSend(Message<?> message, MessageChannel channel) {
+      @Nullable
+      @Override
+      public Message<?> preSend(Message<?> message, MessageChannel channel) {
 
-        StompHeaderAccessor accessor =
-                MessageHeaderAccessor.getAccessor(message, StompHeaderAccessor.class);
+            StompHeaderAccessor accessor =
+                      MessageHeaderAccessor.getAccessor(message, StompHeaderAccessor.class);
 
-        if (StompCommand.CONNECT.equals(accessor.getCommand())) {
+            if (StompCommand.CONNECT.equals(accessor.getCommand())) {
 
-            String authHeader = accessor.getFirstNativeHeader("Authorization");
-            String accessToken = TokenUtils.extractToken(authHeader);
+                  String authHeader = accessor.getFirstNativeHeader("Authorization");
+                  String accessToken = TokenUtils.extractToken(authHeader);
 
-            if (accessToken == null) {
-                throw new AccessDeniedException("Invalid access token");
+                  if (accessToken == null) {
+                        throw new AccessDeniedException("Invalid access token");
+                  }
+
+                  UserClaims userClaims = tokenService.decodeToken(accessToken);
+                  SocketAuthentication authentication = new SocketAuthentication(new JwtUser(userClaims), accessToken);
+                  accessor.setUser(authentication);
             }
 
-            UserClaims userClaims = tokenService.decodeToken(accessToken);
-            SocketAuthentication authentication = new SocketAuthentication(new JwtUser(userClaims), accessToken);
-            accessor.setUser(authentication);
-        }
+            return message;
 
-        return message;
-
-    }
+      }
 }

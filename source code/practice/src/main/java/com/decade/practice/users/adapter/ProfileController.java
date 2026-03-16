@@ -28,7 +28,7 @@ public class ProfileController {
             return profileService.findByUsername(principal.getName());
       }
 
-      @PatchMapping("/profile")
+      @PatchMapping
       public ProfileResponse changeProfile(
                 @RequestBody @Valid ProfileRequest profile,
                 @AuthenticationPrincipal(expression = "id") UUID id

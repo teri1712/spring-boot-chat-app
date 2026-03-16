@@ -6,13 +6,13 @@ import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import io.jsonwebtoken.*;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.stereotype.Service;
+import org.springframework.stereotype.Component;
 
 import java.util.Base64;
 import java.util.Date;
 import java.util.Map;
 
-@Service
+@Component
 public class JwtService implements TokenService {
 
       private final String key;

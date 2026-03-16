@@ -8,16 +8,19 @@ import org.springframework.stereotype.Service;
 import java.util.UUID;
 
 @Service
-public class DirectChatFactory implements ChatIdentifierMaker {
+public class DirectChatFactory implements IdempotentIdentifierMaker {
       @Override
       public String make(ChatCreators creators) {
             UUID smaller, bigger;
-            if (creators.callerId().compareTo(creators.partnerId()) > 0) {
-                  smaller = creators.partnerId();
+            UUID callerId = creators.callerId();
+            UUID partnerId = creators.partners().stream().findFirst().orElse(callerId);
+
+            if (creators.callerId().compareTo(partnerId) > 0) {
+                  smaller = partnerId;
                   bigger = creators.callerId();
             } else {
                   smaller = creators.callerId();
-                  bigger = creators.partnerId();
+                  bigger = partnerId;
             }
             return smaller + "+" + bigger;
       }

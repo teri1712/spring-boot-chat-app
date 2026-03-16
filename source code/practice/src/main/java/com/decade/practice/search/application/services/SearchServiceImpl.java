@@ -4,7 +4,7 @@ import com.decade.practice.engagement.api.ReadPolicy;
 import com.decade.practice.search.application.queries.SearchService;
 import com.decade.practice.search.domain.MessageDocument;
 import com.decade.practice.search.domain.UserDocument;
-import com.decade.practice.search.dto.MatchingMessageHistoryResponse;
+import com.decade.practice.search.dto.MatchingMessageResponse;
 import com.decade.practice.search.dto.MatchingUserResponse;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -33,7 +33,7 @@ public class SearchServiceImpl implements SearchService {
       public List<MatchingUserResponse> searchUsers(String string) {
             Query query = NativeQuery.builder()
                       .withQuery(q -> q.bool(b -> b
-                                .should(f -> f.term(t -> t.field("gender").value("Female")))
+                                .should(f -> f.term(t -> t.field("gender").value("female").caseInsensitive(true)))
                                 .should(m -> m.match(mm -> mm.field("username").query(string)))
                                 .should(m -> m.match(mm -> mm.field("name").query(string)))
                                 .minimumShouldMatch("1")
@@ -70,7 +70,7 @@ public class SearchServiceImpl implements SearchService {
 
       @Override
       @ReadPolicy
-      public List<MatchingMessageHistoryResponse> searchMessages(String chatId, UUID userId, String string) {
+      public List<MatchingMessageResponse> searchMessages(String chatId, UUID userId, String string) {
             Query query = NativeQuery.builder()
                       .withQuery(q -> q.bool(b -> b
                                 .filter(f -> f.term(t -> t.field("chatId").value(chatId)))
@@ -93,8 +93,10 @@ public class SearchServiceImpl implements SearchService {
                       elasticsearchOperations.search(query, MessageDocument.class);
 
             return hits.getSearchHits().stream().map(SearchHit::getContent)
-                      .map(document -> MatchingMessageHistoryResponse.builder()
+                      .map(document -> MatchingMessageResponse.builder()
                                 .content(document.getContent())
+                                .sequenceNumber(document.getSequenceNumber())
+                                .createdAt(document.getCreatedAt())
                                 .chatId(document.getChatId())
                                 .build())
 

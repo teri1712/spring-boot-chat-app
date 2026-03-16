@@ -2,7 +2,7 @@ version: '2.40.3'
 
 services:
   server:
-    image: teri1712/decade-chat-app:latest
+    image: teri1712/chat-app:latest
     build:
       context: .
       dockerfile: Dockerfile
@@ -106,11 +106,11 @@ services:
     mem_limit: 500m
 
   filebeat:
-    image: docker.elastic.co/beats/filebeat:8.12.2
+    image: docker.elastic.co/beats/filebeat:8.11.0
     user: root
     volumes:
-      - ./filebeat/filebeat.yml:/usr/share/filebeat/filebeat.yml:ro
-      - ./logs:/logs:ro
+      - ./filebeat/filebeat.yml:/usr/share/filebeat/filebeat.yml
+      - ./logs:/logs
     depends_on:
       - elasticsearch
     cpus: 0.3

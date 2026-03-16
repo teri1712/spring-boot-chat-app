@@ -12,7 +12,7 @@
     </parent>
 
     <groupId>com.decade</groupId>
-    <artifactId>messenger-clone-server</artifactId>
+    <artifactId>chat-app-server</artifactId>
     <version>0.0.1-SNAPSHOT</version>
 
     <properties>
@@ -260,6 +260,12 @@
             <plugin>
                 <groupId>org.springframework.boot</groupId>
                 <artifactId>spring-boot-maven-plugin</artifactId>
+
+                <configuration>
+                    <image>
+                        <name>teri1712/chat-app:latest</name>
+                    </image>
+                </configuration>
             </plugin>
 
             <plugin>

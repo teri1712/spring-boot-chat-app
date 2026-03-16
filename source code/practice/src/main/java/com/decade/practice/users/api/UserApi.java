@@ -5,5 +5,5 @@ import java.util.Set;
 import java.util.UUID;
 
 public interface UserApi {
-    Map<UUID, UserInfo> getUserInfo(Set<UUID> ids);
+      Map<UUID, UserInfo> getUserInfo(Set<UUID> ids);
 }
