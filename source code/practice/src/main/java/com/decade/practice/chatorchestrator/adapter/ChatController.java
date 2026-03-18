@@ -42,7 +42,6 @@ public class ChatController {
       }
 
       @PutMapping("/direct-chats/{partnerId}")
-      // TODO: quick lookup by partner postingId
       public ResponseEntity<DirectChatResponse> getChat(
                 @AuthenticationPrincipal(expression = "id") UUID userId,
                 @PathVariable UUID partnerId

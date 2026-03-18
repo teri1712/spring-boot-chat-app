@@ -9,16 +9,14 @@ import com.decade.practice.chatsettings.api.SettingApi;
 import com.decade.practice.chatsettings.api.SettingsInfo;
 import com.decade.practice.engagement.api.ChatPolicyInfo;
 import com.decade.practice.engagement.api.DirectInfo;
+import com.decade.practice.engagement.api.DirectMappingApi;
 import com.decade.practice.engagement.api.EngagementApi;
 import com.decade.practice.inbox.apis.ConversationApi;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.util.HashSet;
-import java.util.List;
-import java.util.Set;
-import java.util.UUID;
+import java.util.*;
 
 @Service
 @RequiredArgsConstructor
@@ -27,6 +25,7 @@ import java.util.UUID;
 public class ChatOrchestrator implements ChatService {
 
       private final EngagementApi engagementApi;
+      private final DirectMappingApi directMappingApi;
       private final SettingApi settingApi;
       private final ConversationApi conversationApi;
       private final ChatMapper chatMapper;
@@ -41,7 +40,7 @@ public class ChatOrchestrator implements ChatService {
 
       @Override
       public DirectChatResponse getDirect(UUID callerId, UUID partnerId) {
-            return engagementApi.findDirectMapping(callerId, partnerId)
+            return Optional.ofNullable(directMappingApi.findDirectMapping(callerId, partnerId))
                       .map(mapping -> new DirectChatResponse(mapping, false))
                       .orElseGet(() -> {
                             DirectInfo direct = engagementApi.createDirect(callerId, partnerId);

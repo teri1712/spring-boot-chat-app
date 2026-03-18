@@ -25,4 +25,6 @@ public class IconPlacement extends AbstractParticipantPlacement<IconCommand> {
                       participantCommand.getIconId()
             );
       }
+
+
 }

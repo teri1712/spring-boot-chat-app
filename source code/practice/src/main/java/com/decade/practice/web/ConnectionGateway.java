@@ -27,7 +27,7 @@ import java.util.UUID;
 @Component
 @Order(Ordered.HIGHEST_PRECEDENCE)
 @AllArgsConstructor
-public class WebConnectionGateway implements ChannelInterceptor, WebMvcConfigurer, HandshakeInterceptor {
+public class ConnectionGateway implements ChannelInterceptor, WebMvcConfigurer, HandshakeInterceptor {
 
       private final ConnectionInteractionService interactionService;
 

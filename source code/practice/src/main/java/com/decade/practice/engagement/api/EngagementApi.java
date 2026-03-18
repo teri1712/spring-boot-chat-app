@@ -13,7 +13,5 @@ public interface EngagementApi {
 
       DirectInfo createDirect(UUID callerId, UUID partnerId) throws ChatIdentifierUniqueException;
 
-      Optional<DirectMapping> findDirectMapping(UUID userId, UUID partnerId);
-
       Optional<ChatPolicyInfo> find(String chatId, UUID userId);
 }

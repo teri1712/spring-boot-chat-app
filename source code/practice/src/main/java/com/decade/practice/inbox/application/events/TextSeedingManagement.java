@@ -23,9 +23,8 @@ public class TextSeedingManagement {
       @EventListener(ApplicationReadyEvent.class)
       @Transactional
       public void onApplicationReady() {
-            texts.findAll().forEach(text -> {
-                  publisher.publishEvent(new TextAdded(text.getSequenceId(), text.getContent(), text.getChatId(), text.getCreatedAt(), text.getPostingId(), text.getSenderId()));
-            });
-            log.debug("Seeding complete" + texts.count());
+            texts.findAll().forEach(text ->
+                      publisher.publishEvent(new TextAdded(text.getSequenceId(), text.getContent(), text.getChatId(), text.getCreatedAt(), text.getPostingId(), text.getSenderId())));
+            log.debug("Seeding complete {}", texts.count());
       }
 }

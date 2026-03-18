@@ -192,10 +192,10 @@
 
 
         <!--        &lt;!&ndash; KAFKA &ndash;&gt;-->
-        <dependency>
-            <groupId>org.springframework.kafka</groupId>
-            <artifactId>spring-kafka</artifactId>
-        </dependency>
+        <!--        <dependency>-->
+        <!--            <groupId>org.springframework.kafka</groupId>-->
+        <!--            <artifactId>spring-kafka</artifactId>-->
+        <!--        </dependency>-->
 
         <!--        <dependency>-->
         <!--            <groupId>org.testcontainers</groupId>-->
@@ -247,11 +247,11 @@
             <artifactId>spring-modulith-starter-jdbc</artifactId>
         </dependency>
 
-        <dependency>
-            <groupId>org.springframework.modulith</groupId>
-            <artifactId>spring-modulith-events-kafka</artifactId>
-            <scope>runtime</scope>
-        </dependency>
+        <!--        <dependency>-->
+        <!--            <groupId>org.springframework.modulith</groupId>-->
+        <!--            <artifactId>spring-modulith-events-kafka</artifactId>-->
+        <!--            <scope>runtime</scope>-->
+        <!--        </dependency>-->
 
     </dependencies>
 
@@ -261,11 +261,12 @@
                 <groupId>org.springframework.boot</groupId>
                 <artifactId>spring-boot-maven-plugin</artifactId>
 
-                <configuration>
-                    <image>
-                        <name>teri1712/chat-app:latest</name>
-                    </image>
-                </configuration>
+                <!--                <configuration>-->
+                <!--                    <image>-->
+                <!--                        <name>teri1712/chat-app:latest</name>-->
+                <!--                        <builder>paketobuildpacks/builder:base</builder>-->
+                <!--                    </image>-->
+                <!--                </configuration>-->
             </plugin>
 
             <plugin>
@@ -344,6 +345,17 @@
                         </path>
                     </annotationProcessorPaths>
 
+                </configuration>
+            </plugin>
+
+            <plugin>
+                <groupId>com.google.cloud.tools</groupId>
+                <artifactId>jib-maven-plugin</artifactId>
+                <version>3.4.0</version>
+                <configuration>
+                    <to>
+                        <image>teri1712/chat-app:latest</image>
+                    </to>
                 </configuration>
             </plugin>
 

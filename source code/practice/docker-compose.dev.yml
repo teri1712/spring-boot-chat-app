@@ -9,6 +9,8 @@ services:
       POSTGRES_PASSWORD: root
     ports:
       - "5432:5432"
+    networks:
+      - backend
     healthcheck:
       test: [ "CMD-SHELL", "pg_isready -U root -d chatapp" ]
       interval: 10s
@@ -19,6 +21,8 @@ services:
     ports:
       - "6379:6379"
       - "8001:8001"
+    networks:
+      - backend
     healthcheck:
       test: [ "CMD", "redis-cli", "ping" ]
       interval: 5s
@@ -34,6 +38,8 @@ services:
       - ./prometheus/prometheus.yml:/etc/prometheus/prometheus.yml
     cpus: 0.5
     mem_limit: 500m
+    networks:
+      - backend
 
   grafana:
     image: grafana/grafana
@@ -45,6 +51,8 @@ services:
       - prometheus
     cpus: 0.3
     mem_limit: 300m
+    networks:
+      - backend
 
   elasticsearch:
     image: docker.elastic.co/elasticsearch/elasticsearch:8.12.2
@@ -55,8 +63,10 @@ services:
       network.host: 0.0.0.0
     ports:
       - "9200:9200"
-    cpus: 0.5
-    mem_limit: 500m
+    cpus: 1
+    mem_limit: 1g
+    networks:
+      - backend
     healthcheck:
       test: [ "CMD-SHELL", "curl -s http://127.0.0.1:9200/_cluster/health?wait_for_status=yellow&timeout=5s > /dev/null || exit 1" ]
       interval: 10s
@@ -73,6 +83,8 @@ services:
       ELASTICSEARCH_HOSTS: http://elasticsearch:9200
     cpus: 0.5
     mem_limit: 500m
+    networks:
+      - backend
 
   filebeat:
     image: docker.elastic.co/beats/filebeat:8.11.0
@@ -84,6 +96,8 @@ services:
       - elasticsearch
     cpus: 0.3
     mem_limit: 300m
+    networks:
+      - backend
 
   s3:
     image: localstack/localstack:latest
@@ -98,33 +112,39 @@ services:
       - ./s3/init:/etc/localstack/init/ready.d
     cpus: 0.5
     mem_limit: 500m
+    networks:
+      - backend
 
-  kafka:
-    image: apache/kafka:3.7.0
-    environment:
-      KAFKA_NODE_ID: 1
-      KAFKA_PROCESS_ROLES: broker,controller
-      KAFKA_LISTENERS: PLAINTEXT://0.0.0.0:9092,CONTROLLER://0.0.0.0:9093
-      KAFKA_ADVERTISED_LISTENERS: PLAINTEXT://localhost:9092
-      KAFKA_CONTROLLER_LISTENER_NAMES: CONTROLLER
-      KAFKA_LISTENER_SECURITY_PROTOCOL_MAP: CONTROLLER:PLAINTEXT,PLAINTEXT:PLAINTEXT
-      KAFKA_CONTROLLER_QUORUM_VOTERS: 1@kafka:9093
-      KAFKA_OFFSETS_TOPIC_REPLICATION_FACTOR: 1
-      KAFKA_TRANSACTION_STATE_LOG_REPLICATION_FACTOR: 1
-      KAFKA_TRANSACTION_STATE_LOG_MIN_ISR: 1
-      KAFKA_GROUP_INITIAL_REBALANCE_DELAY_MS: 0
-      CLUSTER_ID: 'MkU3OEVBNTcwNTJENDM2Qk'
-    cpus: 0.5
-    mem_limit: 500m
-    ports:
-      - "9092:9092"
-    healthcheck:
-      test: [ "CMD", "/opt/kafka/bin/kafka-broker-api-versions.sh",
-              "--bootstrap-server", "localhost:9092" ]
-      interval: 30s
-      timeout: 10s
-      retries: 5
-      start_period: 60s
+#  kafka:
+#    image: apache/kafka:3.7.0
+#    environment:
+#      KAFKA_NODE_ID: 1
+#      KAFKA_PROCESS_ROLES: broker,controller
+#      KAFKA_LISTENERS: PLAINTEXT://0.0.0.0:9092,CONTROLLER://0.0.0.0:9093
+#      KAFKA_ADVERTISED_LISTENERS: PLAINTEXT://localhost:9092
+#      KAFKA_CONTROLLER_LISTENER_NAMES: CONTROLLER
+#      KAFKA_LISTENER_SECURITY_PROTOCOL_MAP: CONTROLLER:PLAINTEXT,PLAINTEXT:PLAINTEXT
+#      KAFKA_CONTROLLER_QUORUM_VOTERS: 1@kafka:9093
+#      KAFKA_OFFSETS_TOPIC_REPLICATION_FACTOR: 1
+#      KAFKA_TRANSACTION_STATE_LOG_REPLICATION_FACTOR: 1
+#      KAFKA_TRANSACTION_STATE_LOG_MIN_ISR: 1
+#      KAFKA_GROUP_INITIAL_REBALANCE_DELAY_MS: 0
+#      CLUSTER_ID: 'MkU3OEVBNTcwNTJENDM2Qk'
+#    cpus: 0.5
+#    mem_limit: 500m
+#    ports:
+#      - "9092:9092"
+#    healthcheck:
+#      test: [ "CMD", "/opt/kafka/bin/kafka-broker-api-versions.sh",
+#              "--bootstrap-server", "localhost:9092" ]
+#      interval: 30s
+#      timeout: 10s
+#      retries: 5
+#      start_period: 60s
 
 volumes:
   grafana-data:
+
+networks:
+  backend:
+    name: backend

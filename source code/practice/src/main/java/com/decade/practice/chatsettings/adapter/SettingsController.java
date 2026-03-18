@@ -27,5 +27,4 @@ SettingsController {
 
             settingsService.setPreference(identifier, userId, request);
       }
-
 }

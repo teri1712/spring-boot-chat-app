@@ -9,6 +9,7 @@ import com.decade.practice.engagement.domain.*;
 import com.decade.practice.engagement.domain.services.*;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -16,7 +17,6 @@ import org.springframework.transaction.annotation.Transactional;
 import java.util.Optional;
 import java.util.Set;
 import java.util.UUID;
-import java.util.function.Function;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
@@ -24,7 +24,8 @@ import java.util.stream.Stream;
 @Slf4j
 @Transactional
 @RequiredArgsConstructor
-public class EngagementServiceImpl implements EngagementService, EngagementApi {
+@Qualifier("defaultDirectMappingApi")
+public class EngagementServiceImpl implements EngagementService, EngagementApi, DirectMappingApi {
 
       private final ParticipantRepository participants;
       private final ChatPolicyRepository chatPolicies;
@@ -48,18 +49,14 @@ public class EngagementServiceImpl implements EngagementService, EngagementApi {
       }
 
       @Override
-//      @Cacheable(cacheNames = "directMapping", key = "#userId + '_' + #partnerId", unless = "#result.isEmpty()")
-      public Optional<DirectMapping> findDirectMapping(UUID userId, UUID partnerId) {
+      public DirectMapping findDirectMapping(UUID userId, UUID partnerId) {
             String chatId = directChatFactory.make(new ChatCreators(userId, Set.of(partnerId)));
-            return chatPolicies.findById(chatId).map(new Function<Chat, DirectMapping>() {
-                  @Override
-                  public DirectMapping apply(Chat chat) {
-                        Participant participant = participants.findById(new ParticipantId(userId, chatId)).orElse(null);
-                        engagementPolicy.applyRead(participant, chat);
-                        stalkPolicy.apply(userId, partnerId);
-                        return new DirectMapping(userId, partnerId, chat.getChatId());
-                  }
-            });
+            return chatPolicies.findById(chatId).map(chat -> {
+                  Participant participant = participants.findById(new ParticipantId(userId, chatId)).orElse(null);
+                  engagementPolicy.applyRead(participant, chat);
+                  stalkPolicy.apply(userId, partnerId);
+                  return new DirectMapping(userId, partnerId, chat.getChatId());
+            }).orElse(null);
       }
 
       @Override

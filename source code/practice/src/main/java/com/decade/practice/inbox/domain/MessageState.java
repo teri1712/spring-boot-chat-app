@@ -27,7 +27,6 @@ import java.util.UUID;
 @SuperBuilder
 @Getter
 
-// TODO: Will be migrated to runtime state resolution later
 public abstract class MessageState {
 
       private Long sequenceId;

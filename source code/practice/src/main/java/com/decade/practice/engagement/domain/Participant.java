@@ -10,26 +10,26 @@ import java.util.UUID;
 @Entity
 @Getter
 public class Participant extends AbstractAggregateRoot<Participant> {
-    @EmbeddedId
-    private ParticipantId participantId;
+      @EmbeddedId
+      private ParticipantId participantId;
 
-    @Embedded
-    private ParticipantPolicy participantPolicy;
+      @Embedded
+      private ParticipantPolicy participantPolicy;
 
-    @Column(nullable = false, updatable = false)
-    private Instant joinDate;
+      @Column(nullable = false, updatable = false)
+      private Instant joinDate;
 
-    @Version
-    private Integer version;
+      @Version
+      private Integer version;
 
-    protected Participant() {
-    }
+      protected Participant() {
+      }
 
-    public Participant(UUID userId, String chatId) {
-        this.participantId = new ParticipantId(userId, chatId);
-        this.participantPolicy = new ParticipantPolicy(true, true);
-        this.joinDate = Instant.now();
-    }
+      public Participant(UUID userId, String chatId) {
+            this.participantId = new ParticipantId(userId, chatId);
+            this.participantPolicy = new ParticipantPolicy(true, true);
+            this.joinDate = Instant.now();
+      }
 
 
 }

@@ -14,7 +14,7 @@ public class UserPasswordPolicy {
             if (!passwordEncoder.matches(oldPassword, user.getPassword())) {
                   throw new WrongPasswordException();
             }
-            user.changePassword(newPassword);
+            user.changePassword(passwordEncoder.encode(newPassword));
       }
 
 }

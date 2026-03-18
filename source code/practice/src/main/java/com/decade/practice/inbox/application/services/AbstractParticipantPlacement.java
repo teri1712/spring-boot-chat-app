@@ -7,7 +7,7 @@ import com.decade.practice.inbox.application.ports.out.RoomEventRepository;
 import com.decade.practice.inbox.application.ports.out.RoomRepository;
 import com.decade.practice.inbox.domain.Room;
 import com.decade.practice.inbox.domain.RoomEvent;
-import com.decade.practice.inbox.dto.ChatEventResponse;
+import com.decade.practice.inbox.dto.PostingResponse;
 import com.decade.practice.inbox.dto.mapper.ChatEventMapper;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -18,7 +18,7 @@ import org.springframework.transaction.annotation.Transactional;
 @Slf4j
 @RequiredArgsConstructor
 @Transactional
-public abstract class AbstractParticipantPlacement<Command extends ParticipantCommand> implements ParticipantPlacement<Command> {
+public abstract class AbstractParticipantPlacement<C extends ParticipantCommand> implements ParticipantPlacement<C> {
 
       private final RoomEventRepository events;
       private final RoomRepository rooms;
@@ -34,7 +34,7 @@ public abstract class AbstractParticipantPlacement<Command extends ParticipantCo
       }
 
       @Override
-      public ChatEventResponse place(Command participantCommand) {
+      public PostingResponse place(C participantCommand) {
             RoomEvent roomEvent = newInstance(participantCommand);
             Room room = rooms.findById(participantCommand.getChatId()).orElseThrow();
             room.refreshLastActivity();
@@ -43,5 +43,5 @@ public abstract class AbstractParticipantPlacement<Command extends ParticipantCo
             return chatEventMapper.toResponse(roomEvent);
       }
 
-      protected abstract RoomEvent newInstance(Command participantCommand);
+      protected abstract RoomEvent newInstance(C participantCommand);
 }

@@ -78,7 +78,7 @@ class S3PresignedTest extends BaseTestClass {
                       }
                       """.formatted(response.getDownloadUrl());
 
-            mockMvc.perform(put("/chats/{chatIdentifier}/image-events/{postingId}", chatIdentifier, UUID.randomUUID())
+            mockMvc.perform(put("/chats/{chatIdentifier}/images/{postingId}", chatIdentifier, UUID.randomUUID())
                                 .contentType(MediaType.APPLICATION_JSON)
                                 .content(eventJson))
                       .andExpect(status().isAccepted());

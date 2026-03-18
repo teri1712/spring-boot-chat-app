@@ -21,7 +21,7 @@ public abstract class RoomEvent extends AbstractAggregateRoot<RoomEvent> {
       private UUID senderId;
       private Instant createdAt;
 
-      public RoomEvent(UUID postingId, String chatId, UUID senderId) {
+      protected RoomEvent(UUID postingId, String chatId, UUID senderId) {
             this.postingId = postingId;
             this.chatId = chatId;
             this.senderId = senderId;
@@ -30,8 +30,6 @@ public abstract class RoomEvent extends AbstractAggregateRoot<RoomEvent> {
 
       @Version
       private Integer version;
-
-      private Integer eventVersion = 0;
 
       protected RoomEvent() {
 

@@ -5,10 +5,10 @@ import com.decade.practice.inbox.application.query.ChatEventService;
 import com.decade.practice.inbox.application.services.*;
 import com.decade.practice.inbox.domain.SeenRequest;
 import com.decade.practice.inbox.domain.TextRequest;
-import com.decade.practice.inbox.dto.ChatEventResponse;
 import com.decade.practice.inbox.dto.FileRequest;
 import com.decade.practice.inbox.dto.IconRequest;
 import com.decade.practice.inbox.dto.ImageRequest;
+import com.decade.practice.inbox.dto.PostingResponse;
 import com.decade.practice.inbox.dto.mapper.CommandMappers;
 import jakarta.validation.Valid;
 import lombok.AllArgsConstructor;
@@ -23,7 +23,7 @@ import java.util.UUID;
 @Slf4j
 @RestController
 @AllArgsConstructor
-public class EventController {
+public class PostingController {
 
       private final ChatEventService chatEventService;
       private final CommandMappers commandMappers;
@@ -34,16 +34,16 @@ public class EventController {
       private final SeenPlacement seenPlacement;
 
       @ExceptionHandler(MessageAlreadySentException.class)
-      public ChatEventResponse handle(MessageAlreadySentException e) {
+      public PostingResponse handle(MessageAlreadySentException e) {
             UUID idempotentKey = e.getIdempotentId();
             log.debug("Concurrent insert encountered for receipt: {}", idempotentKey, e);
             return chatEventService.find(idempotentKey);
       }
 
 
-      @PutMapping(path = "/chats/{chatId}/text-events/{postingId}", consumes = {MediaType.APPLICATION_JSON_VALUE})
+      @PutMapping(path = "/chats/{chatId}/texts/{postingId}", consumes = {MediaType.APPLICATION_JSON_VALUE})
       @ResponseStatus(HttpStatus.ACCEPTED)
-      public ChatEventResponse createTextEvent(
+      public PostingResponse createText(
                 @AuthenticationPrincipal(expression = "id") UUID senderId,
                 @PathVariable UUID postingId,
                 @PathVariable String chatId,
@@ -51,9 +51,9 @@ public class EventController {
             return textPlacement.place(commandMappers.toText(body, postingId, senderId, chatId));
       }
 
-      @PutMapping(path = "/chats/{chatId}/image-events/{postingId}", consumes = {MediaType.APPLICATION_JSON_VALUE})
+      @PutMapping(path = "/chats/{chatId}/images/{postingId}", consumes = {MediaType.APPLICATION_JSON_VALUE})
       @ResponseStatus(HttpStatus.ACCEPTED)
-      public ChatEventResponse createImageEvent(
+      public PostingResponse createImage(
                 @PathVariable String chatId,
                 @AuthenticationPrincipal(expression = "id") UUID senderId,
                 @PathVariable UUID postingId,
@@ -61,9 +61,9 @@ public class EventController {
             return imagePlacement.place(commandMappers.toImage(body, postingId, senderId, chatId));
       }
 
-      @PutMapping(path = "/chats/{chatId}/icon-events/{postingId}", consumes = {MediaType.APPLICATION_JSON_VALUE})
+      @PutMapping(path = "/chats/{chatId}/icons/{postingId}", consumes = {MediaType.APPLICATION_JSON_VALUE})
       @ResponseStatus(HttpStatus.ACCEPTED)
-      public ChatEventResponse createIconEvent(
+      public PostingResponse createIcon(
                 @PathVariable String chatId,
                 @AuthenticationPrincipal(expression = "id") UUID senderId,
                 @PathVariable UUID postingId,
@@ -72,9 +72,9 @@ public class EventController {
 
       }
 
-      @PutMapping(path = "/chats/{chatId}/file-events/{postingId}", consumes = {MediaType.APPLICATION_JSON_VALUE})
+      @PutMapping(path = "/chats/{chatId}/files/{postingId}", consumes = {MediaType.APPLICATION_JSON_VALUE})
       @ResponseStatus(HttpStatus.ACCEPTED)
-      public ChatEventResponse createFileEvent(
+      public PostingResponse createFile(
                 @PathVariable String chatId,
                 @AuthenticationPrincipal(expression = "id") UUID senderId,
                 @PathVariable UUID postingId,
@@ -82,9 +82,9 @@ public class EventController {
             return filePlacement.place(commandMappers.toFile(body, postingId, senderId, chatId));
       }
 
-      @PutMapping(path = "/chats/{chatId}/seen-events/{postingId}", consumes = {MediaType.APPLICATION_JSON_VALUE})
+      @PutMapping(path = "/chats/{chatId}/seens/{postingId}", consumes = {MediaType.APPLICATION_JSON_VALUE})
       @ResponseStatus(HttpStatus.ACCEPTED)
-      public ChatEventResponse createSeenEvent(
+      public PostingResponse createSeen(
                 @PathVariable String chatId,
                 @AuthenticationPrincipal(expression = "id") UUID senderId,
                 @PathVariable UUID postingId,

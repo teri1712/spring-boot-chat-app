@@ -29,12 +29,8 @@ public class ConversationInfoService {
 
       @Transactional
       public Map<String, ConversationInfo> getInfo(UUID caller, List<Room> rooms) {
-            userLookUp.registerLookUp(rooms.stream().flatMap(new Function<Room, Stream<UUID>>() {
-                  @Override
-                  public Stream<UUID> apply(Room room) {
-                        return pickRepresentatives(caller, room).stream();
-                  }
-            }).collect(Collectors.toSet()));
+            userLookUp.registerLookUp(rooms.stream().flatMap((Function<Room, Stream<UUID>>)
+                      room -> pickRepresentatives(caller, room).stream()).collect(Collectors.toSet()));
             Map<String, ConversationInfo> roomInfoMap = new HashMap<>();
             rooms.forEach(room -> roomInfoMap.put(room.getChatId(), fromRepresentative(pickRepresentatives(caller, room), room)));
             return roomInfoMap;
@@ -51,7 +47,10 @@ public class ConversationInfoService {
                         while (iterator.hasNext()) {
                               roomName.append(", ").append(userLookUp.lookUp(iterator.next()).name());
                         }
-                        roomName.append(" and ").append(room.getParticipantCount() - representatives.size()).append(" partners");
+                        int remaining = room.getParticipantCount() - 1 - representatives.size();
+                        if (remaining > 0) {
+                              roomName.append(" and ").append(remaining).append(" partners");
+                        }
                   }
             }
 

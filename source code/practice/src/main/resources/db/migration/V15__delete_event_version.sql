@@ -1,0 +1,10 @@
+alter table preference_room_event
+    drop column event_version;
+alter table icon_room_event
+    drop column event_version;
+alter table text_room_event
+    drop column event_version;
+alter table seen_room_event
+    drop column event_version;
+alter table image_room_event
+    drop column event_version;

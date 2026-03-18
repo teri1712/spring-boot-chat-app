@@ -12,12 +12,11 @@ import org.springframework.web.bind.annotation.RestController;
 @AllArgsConstructor
 public class PresignController {
 
-    private final PresignedUrlService service;
+      private final PresignedUrlService service;
 
-    // TODO: adjust client method
-    @PostMapping("/upload-urls")
-    public S3PresignedResponse uploadUrl(@RequestParam String filename) {
-        String user = SecurityContextHolder.getContextHolderStrategy().getContext().getAuthentication().getName();
-        return service.generateUploadUrl(filename, user);
-    }
+      @PostMapping("/upload-urls")
+      public S3PresignedResponse uploadUrl(@RequestParam String filename) {
+            String user = SecurityContextHolder.getContextHolderStrategy().getContext().getAuthentication().getName();
+            return service.generateUploadUrl(filename, user);
+      }
 }

@@ -75,7 +75,7 @@ class EngagementsControllerTest extends BaseTestClass {
 
             // When & Then
             String idempotentKey = UUID.randomUUID().toString();
-            mockMvc.perform(put("/chats/{chatIdentifier}/text-events/{postingId}", chatIdentifier, idempotentKey)
+            mockMvc.perform(put("/chats/{chatIdentifier}/texts/{postingId}", chatIdentifier, idempotentKey)
                                 .contentType(MediaType.APPLICATION_JSON)
                                 .content(eventJson))
                       .andExpect(status().isAccepted())
@@ -89,7 +89,7 @@ class EngagementsControllerTest extends BaseTestClass {
 
 
             // Idempotent check
-            mockMvc.perform(put("/chats/{chatIdentifier}/text-events/{postingId}", chatIdentifier, idempotentKey)
+            mockMvc.perform(put("/chats/{chatIdentifier}/texts/{postingId}", chatIdentifier, idempotentKey)
                                 .contentType(MediaType.APPLICATION_JSON)
                                 .content(eventJson))
                       .andExpect(status().isOk())
@@ -157,7 +157,7 @@ class EngagementsControllerTest extends BaseTestClass {
                       """;
 
             // When & Then
-            mockMvc.perform(put("/chats/{chatIdentifier}/image-events/{postingId}", chatIdentifier, UUID.randomUUID())
+            mockMvc.perform(put("/chats/{chatIdentifier}/images/{postingId}", chatIdentifier, UUID.randomUUID())
                                 .contentType(MediaType.APPLICATION_JSON)
                                 .content(eventJson))
                       .andExpect(status().isAccepted());
@@ -185,7 +185,7 @@ class EngagementsControllerTest extends BaseTestClass {
                       }
                       """;
             // When & Then
-            mockMvc.perform(put("/chats/{chatIdentifier}/icon-events/{postingId}", chatIdentifier, UUID.randomUUID())
+            mockMvc.perform(put("/chats/{chatIdentifier}/icons/{postingId}", chatIdentifier, UUID.randomUUID())
                                 .contentType(MediaType.APPLICATION_JSON)
                                 .content(eventJson))
                       .andExpect(status().isAccepted());
@@ -213,7 +213,7 @@ class EngagementsControllerTest extends BaseTestClass {
                           "iconId": 5
                       }
                       """;
-            mockMvc.perform(put("/chats/{chatIdentifier}/icon-events/{postingId}", chatIdentifier, UUID.randomUUID())
+            mockMvc.perform(put("/chats/{chatIdentifier}/icons/{postingId}", chatIdentifier, UUID.randomUUID())
                                 .contentType(MediaType.APPLICATION_JSON)
                                 .content(iconJson))
                       .andExpect(status().isAccepted());
@@ -224,18 +224,18 @@ class EngagementsControllerTest extends BaseTestClass {
                       }
                       """;
 
-            mockMvc.perform(put("/chats/{chatIdentifier}/seen-events/{postingId}", chatIdentifier, UUID.randomUUID())
+            mockMvc.perform(put("/chats/{chatIdentifier}/seens/{postingId}", chatIdentifier, UUID.randomUUID())
                                 .contentType(MediaType.APPLICATION_JSON)
                                 .content(eventJson))
                       .andExpect(status().isAccepted());
             // When
 
-            mockMvc.perform(put("/chats/{chatIdentifier}/icon-events/{postingId}", chatIdentifier, UUID.randomUUID())
+            mockMvc.perform(put("/chats/{chatIdentifier}/icons/{postingId}", chatIdentifier, UUID.randomUUID())
                                 .contentType(MediaType.APPLICATION_JSON)
                                 .content(iconJson))
                       .andExpect(status().isAccepted());
 
-            mockMvc.perform(put("/chats/{chatIdentifier}/seen-events/{postingId}", chatIdentifier, UUID.randomUUID())
+            mockMvc.perform(put("/chats/{chatIdentifier}/seens/{postingId}", chatIdentifier, UUID.randomUUID())
                                 .contentType(MediaType.APPLICATION_JSON)
                                 .content(eventJson))
                       .andExpect(status().isAccepted());
@@ -275,7 +275,7 @@ class EngagementsControllerTest extends BaseTestClass {
                           "iconId": 5
                       }
                       """;
-            mockMvc.perform(put("/chats/{chatIdentifier}/icon-events/{postingId}", chatIdentifier, UUID.randomUUID())
+            mockMvc.perform(put("/chats/{chatIdentifier}/icons/{postingId}", chatIdentifier, UUID.randomUUID())
                                 .contentType(MediaType.APPLICATION_JSON)
                                 .content(iconJson))
                       .andExpect(status().isAccepted());
@@ -287,7 +287,7 @@ class EngagementsControllerTest extends BaseTestClass {
                       }
                       """;
 
-            mockMvc.perform(put("/chats/{chatIdentifier}/seen-events/{postingId}", chatIdentifier, UUID.randomUUID())
+            mockMvc.perform(put("/chats/{chatIdentifier}/seens/{postingId}", chatIdentifier, UUID.randomUUID())
                                 .contentType(MediaType.APPLICATION_JSON)
                                 .content(eventJson))
                       .andExpect(status().isAccepted());
@@ -334,7 +334,7 @@ class EngagementsControllerTest extends BaseTestClass {
                       }
                       """;
             // When & Then
-            mockMvc.perform(put("/chats/{chatIdentifier}/file-events/{postingId}", chatIdentifier, UUID.randomUUID())
+            mockMvc.perform(put("/chats/{chatIdentifier}/files/{postingId}", chatIdentifier, UUID.randomUUID())
 
                                 .contentType(MediaType.APPLICATION_JSON)
                                 .content(eventJson))
@@ -395,7 +395,7 @@ class EngagementsControllerTest extends BaseTestClass {
 //                      """;
 //
 //            // When & Then
-//            mockMvc.perform(put("/chats/{chatIdentifier}/text-events", chatIdentifier)
+//            mockMvc.perform(put("/chats/{chatIdentifier}/texts", chatIdentifier)
 //                                .header("Idempotency-key", UUID.randomUUID())
 //                                .contentType(MediaType.APPLICATION_JSON)
 //                                .content(eventJson))
@@ -411,7 +411,7 @@ class EngagementsControllerTest extends BaseTestClass {
             String malformedJson = "{ \"textEvent\": { ... } }";
 
             // When & Then
-            mockMvc.perform(put("/chats/{chatIdentifier}/text-events/{postingId}", chatIdentifier, UUID.randomUUID())
+            mockMvc.perform(put("/chats/{chatIdentifier}/texts/{postingId}", chatIdentifier, UUID.randomUUID())
                                 .contentType(MediaType.APPLICATION_JSON)
                                 .content(malformedJson))
                       .andExpect(status().isBadRequest());
