@@ -23,12 +23,14 @@ public class InboxLog extends AbstractAggregateRoot<InboxLog> {
       private String chatId;
       private UUID senderId;
       private UUID ownerId;
+      private Long conversationId;
       private Long messageId;
 
-      public InboxLog(LogAction action, String chatId, UUID senderId, UUID ownerId, Long messageId, MessageState messageState) {
+      public InboxLog(LogAction action, String chatId, UUID senderId, UUID ownerId, Long conversationId, Long messageId, MessageState messageState) {
             this.action = action;
             this.chatId = chatId;
             this.senderId = senderId;
+            this.conversationId = conversationId;
             this.messageId = messageId;
             this.messageState = messageState;
             this.ownerId = ownerId;
@@ -36,7 +38,7 @@ public class InboxLog extends AbstractAggregateRoot<InboxLog> {
 
       @PrePersist
       void onPersisted() {
-            registerEvent(new InboxLogCreated(sequenceId, chatId, messageId, senderId, ownerId, action, getMessageState()));
+            registerEvent(new InboxLogCreated(sequenceId, chatId, conversationId, messageId, senderId, ownerId, action, getMessageState()));
       }
 
       @Enumerated(EnumType.STRING)

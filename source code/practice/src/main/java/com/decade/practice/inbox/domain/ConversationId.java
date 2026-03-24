@@ -5,6 +5,7 @@ import jakarta.persistence.Embeddable;
 
 import java.util.UUID;
 
+// technical debt
 @Embeddable
 public record ConversationId(
           String chatId,

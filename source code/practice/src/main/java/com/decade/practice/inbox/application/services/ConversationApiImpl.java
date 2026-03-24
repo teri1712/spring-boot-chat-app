@@ -10,7 +10,6 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.util.List;
 import java.util.Set;
 import java.util.UUID;
 
@@ -25,12 +24,12 @@ public class ConversationApiImpl implements ConversationApi {
 
       @Override
       public void create(String chatId, UUID caller, Set<UUID> participants, String name) {
-            List<Conversation> conversationList = participants.stream()
-                      .map(participant -> {
-                            return new Conversation(chatId, participant);
-                      }).toList();
             Room room = new Room(chatId, caller, name, null, participants);
             rooms.save(room);
-            conversations.saveAll(conversationList);
+            int index = 0;
+            for (UUID participant : participants) {
+                  Conversation conversation = new Conversation(chatId, participant, room.getId(), index++);
+                  conversations.save(conversation);
+            }
       }
 }

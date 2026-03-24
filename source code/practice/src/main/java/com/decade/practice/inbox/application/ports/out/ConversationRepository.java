@@ -13,21 +13,21 @@ import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
 
-public interface ConversationRepository extends JpaRepository<Conversation, ConversationId> {
-
+public interface ConversationRepository extends JpaRepository<Conversation, Long> {
 
       Optional<Conversation> findFirstByHash(HashValue hash);
-      
+
       @Query("select new com.decade.practice.inbox.application.ports.out.projection.ConversationView(c,r) " +
                 "from Conversation c " +
                 "join fetch Room r on r.chatId = c.conversationId.chatId " +
                 "where c.modifiedAt <= :modifiedAt and c.conversationId.ownerId = :ownerId")
-      List<ConversationView> findByConversationId_OwnerIdAndModifiedAtLessThanOrderByModifiedAtDesc(UUID ownerId, Instant modifiedAt, Pageable pageable);
+      List<ConversationView> findByOwnerIdAndModifiedAtLessThanOrderByModifiedAtDesc(UUID ownerId, Instant modifiedAt, Pageable pageable);
+
+      Optional<Conversation> findByConversationId(ConversationId conversationId);
 
       @Query("select new com.decade.practice.inbox.application.ports.out.projection.ConversationView(c,r) " +
                 "from Conversation c " +
-                "join fetch Room r on r.chatId = c.conversationId.chatId " +
-                "where r.chatId = :chatId")
-      List<ConversationView> findByConversationId_ChatId(String chatId);
-
+                "join Room r on r.chatId = c.conversationId.chatId " +
+                "where c.conversationId.chatId = :chatId and c.roundRobin >= :lowerBound and c.roundRobin < :upperBound")
+      List<ConversationView> findByChatIdBetweenRoundRobin(String chatId, Integer lowerBound, Integer upperBound);
 }

@@ -33,7 +33,7 @@ class ConversationListingTest extends BaseTestClass {
       private TestBeans.PrivateChatSender chatSender;
 
       @Autowired
-      private ConversationRepository conversation;
+      private ConversationRepository conversations;
 
       @Autowired
       private ApplicationEvents events;
@@ -174,8 +174,8 @@ class ConversationListingTest extends BaseTestClass {
 
             // When & Then: Request with version 1 should fail
 
-            HashValue bobHash = conversation.findById(new ConversationId(aliceBobChat, aliceId)).orElseThrow().getHash();
-            HashValue charlieHash = conversation.findById(new ConversationId(aliceCharlieChat, aliceId)).orElseThrow().getHash();
+            HashValue bobHash = conversations.findByConversationId(new ConversationId(aliceBobChat, aliceId)).orElseThrow().getHash();
+            HashValue charlieHash = conversations.findByConversationId(new ConversationId(aliceCharlieChat, aliceId)).orElseThrow().getHash();
 
             mockMvc.perform(get("/me/conversations")
                                 .queryParam("startAt", aliceBobChat)

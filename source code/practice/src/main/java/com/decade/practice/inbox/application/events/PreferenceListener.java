@@ -25,11 +25,11 @@ public class PreferenceListener {
       @ApplicationModuleListener
       public void on(PreferenceChanged event) {
 
-            Room room = rooms.findById(event.getChatId()).orElseThrow();
+            Room room = rooms.findByChatId(event.getChatId()).orElseThrow();
             room.update(event.getCustomName(), event.getCustomAvatar());
             room.refreshLastActivity();
             rooms.save(room);
-            
+
             messages.save(new Preference(
                       UUID.randomUUID(),
                       event.getMakerId(),

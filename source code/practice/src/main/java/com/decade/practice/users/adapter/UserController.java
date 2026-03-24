@@ -17,23 +17,22 @@ import org.springframework.web.bind.annotation.*;
 @AllArgsConstructor
 public class UserController {
 
-    private final ProfileService profileService;
+      private final ProfileService profileService;
 
-    @ExceptionHandler(DataIntegrityViolationException.class)
-    @ResponseStatus(HttpStatus.CONFLICT)
-    public ProblemDetail handleException(DataIntegrityViolationException ex) {
-        log.debug("Integrity violation", ex);
-        ProblemDetail pd = ProblemDetail.forStatus(HttpStatus.CONFLICT);
-        pd.setDetail("Username already exists");
-        return pd;
-    }
+      @ExceptionHandler(DataIntegrityViolationException.class)
+      @ResponseStatus(HttpStatus.CONFLICT)
+      public ProblemDetail handleException(DataIntegrityViolationException ex) {
+            log.debug("Integrity violation", ex);
+            ProblemDetail pd = ProblemDetail.forStatus(HttpStatus.CONFLICT);
+            pd.setDetail("Username already exists");
+            return pd;
+      }
 
-    @PostMapping
-    // TODO: Adjust client to problem detail
-    @ResponseStatus(HttpStatus.CREATED)
-    public ProfileResponse registerUser(
-            @RequestBody @Valid SignUpRequest signUpRequest
-    ) {
-        return profileService.create(signUpRequest, true);
-    }
+      @PostMapping
+      @ResponseStatus(HttpStatus.CREATED)
+      public ProfileResponse registerUser(@RequestBody @Valid SignUpRequest signUpRequest) {
+            return profileService.create(signUpRequest, true);
+      }
+
+
 }

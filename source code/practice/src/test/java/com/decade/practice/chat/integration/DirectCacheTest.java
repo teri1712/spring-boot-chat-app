@@ -1,4 +1,4 @@
-package com.decade.practice.engagement.integration;
+package com.decade.practice.chat.integration;
 
 import com.decade.practice.BaseTestClass;
 import lombok.extern.slf4j.Slf4j;

@@ -60,26 +60,26 @@ public class CacheableUserApi implements UserApi {
                   missingIds.add(idList.get(index));
             }
 
-            Map<UUID, UserInfo> missingUsers = userApi.getUserInfo(missingIds);
-            result.putAll(missingUsers);
+            if (!missingIds.isEmpty()) {
+                  Map<UUID, UserInfo> missingUsers = userApi.getUserInfo(missingIds);
+                  result.putAll(missingUsers);
 
-            redisTemplate.executePipelined(new RedisCallback<Object>() {
-                  @Nullable
-                  @Override
-                  public Object doInRedis(RedisConnection connection) throws DataAccessException {
-                        missingUsers.forEach((id, userInfo) -> {
-                              try {
-                                    String userString = objectMapper.writeValueAsString(userInfo);
-                                    connection.stringCommands().setEx(makeUserKey(id).getBytes(), TTL.toSeconds(), userString.getBytes());
-                              } catch (Exception e) {
-                                    log.warn("Failed to cache user info for " + id, e);
-                              }
-                        });
-                        invalidKeys.forEach(key -> connection.keyCommands().del(key.getBytes()));
-                        return null;
-                  }
-            });
-
+                  redisTemplate.executePipelined(new RedisCallback<Object>() {
+                        @Nullable
+                        @Override
+                        public Object doInRedis(RedisConnection connection) throws DataAccessException {
+                              missingUsers.forEach((id, userInfo) -> {
+                                    try {
+                                          String userString = objectMapper.writeValueAsString(userInfo);
+                                          connection.stringCommands().setEx(makeUserKey(id).getBytes(), TTL.toSeconds(), userString.getBytes());
+                                    } catch (Exception e) {
+                                          log.warn("Failed to cache user info for " + id, e);
+                                    }
+                              });
+                              return null;
+                        }
+                  });
+            }
             return result;
       }
 }

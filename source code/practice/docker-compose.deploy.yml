@@ -1,12 +1,11 @@
-version: '2.40.3'
-
 services:
   server:
     image: teri1712/chat-app
     environment:
+      LOGGING_LEVEL_ROOT: WARN
+      SPRING_PROFILES_ACTIVE: redis-cache, dev
       SPRING_DATASOURCE_USERNAME: root
       SPRING_DATASOURCE_PASSWORD: root
-
       ACTUATOR_USER_NAME: admin
       ACTUATOR_USER_PASSWORD: admin
       ACTUATOR_USER_ROLES: OPS
@@ -15,25 +14,37 @@ services:
       SPRING_ELASTICSEARCH_URIS: http://elasticsearch:9200
       SPRING_DATA_ELASTICSEARCH_URIS: http://elasticsearch:9200
       SPRING_KAFKA_BOOTSTRAP_SERVERS: kafka:9092
-
-    networks:
-      - backend
     ports:
       - "8080:8080"
-      - "8081:8081"
-    #    depends_on:
-    #      postgres:
-    #        condition: service_healthy
-    #      redis:
-    #        condition: service_healthy
-    #      #      kafka:
-    #      #        condition: service_healthy
-    #      elasticsearch:
-    #        condition: service_healthy
+      - "8091:8081"
+    depends_on:
+      postgres:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+      es-init:
+        condition: service_completed_successfully
     volumes:
-      - ./logs:/app/logs
+      - ./logs:/logs
+    networks:
+      - backend
+    healthcheck:
+      test: [ "CMD-SHELL", "curl -f http://localhost:8081/actuator/health/readiness -u admin:admin || exit 1" ]
+      interval: 10s
+      timeout: 30s
+      retries: 5
+  es-init:
+    image: curlimages/curl
+    depends_on:
+      elasticsearch:
+        condition: service_healthy
+    volumes:
+      - ./es:/es
+    entrypoint: [ "sh", "-c", "cd /es && sh ./init.sh" ]
+    networks:
+      - backend
 
-
+# TODO: Nginx + logs mount
 networks:
   backend:
     external: true

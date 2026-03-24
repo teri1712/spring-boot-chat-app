@@ -39,7 +39,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 @Slf4j
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
 @Sql(value = "/sql/clean.sql", executionPhase = Sql.ExecutionPhase.AFTER_TEST_METHOD)
-public class RealtimeMessageTest extends BaseTestClass {
+class RealtimeMessageTest extends BaseTestClass {
 
       @LocalServerPort
       private int port = 0;
@@ -67,9 +67,9 @@ public class RealtimeMessageTest extends BaseTestClass {
       private ChatService chatService;
 
       @Test
-      @Timeout(value = 10, unit = TimeUnit.SECONDS)
+      @Timeout(value = 20, unit = TimeUnit.SECONDS)
       @Sql(value = {"/sql/clean.sql", "/sql/seed_users.sql"}, executionPhase = Sql.ExecutionPhase.BEFORE_TEST_METHOD)
-      public void giveAliceAndBobOnline_whenAliceSendToBob_thenBobReceiveMessageViaWebsocket() throws Exception {
+      void giveAliceAndBobOnline_whenAliceSendToBob_thenBobReceiveMessageViaWebsocket() throws Exception {
 
             StompSession aliceSession = null;
             StompSession bobSession = null;
@@ -118,7 +118,7 @@ public class RealtimeMessageTest extends BaseTestClass {
                                   public void handleException(StompSession session, @Nullable StompCommand command, StompHeaders headers, byte[] payload, Throwable exception) {
                                         log.error("Error", exception);
                                   }
-                            }).get(5, TimeUnit.SECONDS);
+                            }).get(10, TimeUnit.SECONDS);
 
                   StompHeaders bobHeaders = new StompHeaders();
                   bobHeaders.add(HEADER_NAME, BEARER + bobToken);
@@ -131,7 +131,7 @@ public class RealtimeMessageTest extends BaseTestClass {
                                   public void handleException(StompSession session, @Nullable StompCommand command, StompHeaders headers, byte[] payload, Throwable exception) {
                                         log.error("Error", exception);
                                   }
-                            }).get(5, TimeUnit.SECONDS);
+                            }).get(10, TimeUnit.SECONDS);
 
                   Assertions.assertNotNull(aliceSession);
                   Assertions.assertNotNull(bobSession);

@@ -2,7 +2,8 @@ package com.decade.practice.inbox.application.services;
 
 import com.decade.practice.engagement.api.ReadPolicy;
 import com.decade.practice.inbox.application.ports.out.LogRepository;
-import com.decade.practice.inbox.application.ports.out.UserLookUp;
+import com.decade.practice.inbox.application.ports.out.LookUpRegistry;
+import com.decade.practice.inbox.application.ports.out.PartnerLookUp;
 import com.decade.practice.inbox.application.ports.out.projection.ConversationView;
 import com.decade.practice.inbox.application.ports.out.projection.LogView;
 import com.decade.practice.inbox.application.query.LogService;
@@ -32,7 +33,7 @@ public class LogServiceImpl implements LogService {
       private final LogRepository logs;
       private final InboxLogMapper mapper;
       private final ConversationInfoService conversationInfoService;
-      private final UserLookUp userLookUp;
+      private final LookUpRegistry lookUpRegistry;
 
       @Override
       @ReadPolicy
@@ -47,17 +48,22 @@ public class LogServiceImpl implements LogService {
                   @Override
                   public Stream<UUID> apply(LogView logWithConversation) {
                         InboxLog log = logWithConversation.log();
-                        return Stream.concat(
-                                  log.getMessageState().getSeenByIds().stream(),
-                                  Stream.of(log.getSenderId())
-                        ).distinct();
+                        return log.getMessageState().getAllPartners();
                   }
             });
 
-            userLookUp.registerLookUp(allLogUsers.collect(Collectors.toSet()));
             List<Room> roomList = logList.stream().map(LogView::conversationView).map(ConversationView::room).toList();
 
-            return mapper.map(logList, userLookUp, conversationInfoService.getInfo(userId, roomList));
+            Stream<UUID> allRoomUsers = roomList.stream().flatMap(new Function<Room, Stream<UUID>>() {
+                  @Override
+                  public Stream<UUID> apply(Room room) {
+                        return Stream.concat(room.getRepresentatives().stream(), Stream.of(room.getCreator()));
+                  }
+            });
+
+            PartnerLookUp lookUp = lookUpRegistry.registerLookUp(Stream.concat(allLogUsers, allRoomUsers).collect(Collectors.toSet()));
+
+            return mapper.map(logList, lookUp, conversationInfoService.getInfo(userId, roomList, lookUp));
       }
 
       @Override

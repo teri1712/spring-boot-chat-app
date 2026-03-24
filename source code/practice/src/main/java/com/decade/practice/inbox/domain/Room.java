@@ -17,7 +17,13 @@ import java.util.UUID;
 @Getter
 @NoArgsConstructor
 public class Room extends AbstractAggregateRoot<Room> {
+
+
       @Id
+      @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "room_seq_gen")
+      @SequenceGenerator(name = "room_seq_gen", sequenceName = "room_seq")
+      private Long id;
+
       private String chatId;
 
       @Embedded
@@ -29,9 +35,6 @@ public class Room extends AbstractAggregateRoot<Room> {
 
       private Instant lastActivity;
 
-      @Version
-      private Integer version;
-
       public Room(String chatId, UUID creator, String name, String avatar, Set<UUID> participants) {
             this.chatId = chatId;
             this.info = new RoomInfo(name, avatar);
@@ -40,7 +43,7 @@ public class Room extends AbstractAggregateRoot<Room> {
             this.representatives = new HashSet<>();
             this.participantCount = participants.size();
             participants.forEach(this::addRepresentative);
-            registerEvent(new RoomCreated(chatId, Set.copyOf(representatives)));
+            registerEvent(new RoomCreated(chatId, creator, lastActivity, Set.copyOf(representatives)));
       }
 
       @JdbcTypeCode(SqlTypes.JSON)
@@ -63,10 +66,12 @@ public class Room extends AbstractAggregateRoot<Room> {
 
       public void incParticipantCount() {
             participantCount++;
+            refreshLastActivity();
       }
 
       public void decParticipantCount() {
             participantCount--;
+            refreshLastActivity();
       }
 
       public void refreshLastActivity() {

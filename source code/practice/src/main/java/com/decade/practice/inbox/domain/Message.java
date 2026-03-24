@@ -88,7 +88,7 @@ public abstract class Message extends AbstractAggregateRoot<Message> {
 
       private void onUpdated() {
             updatedAt = Instant.now();
-            registerEvent(new MessageUpdated(sequenceId, chatId, senderId, updatedAt, getState()));
+            registerEvent(new MessageUpdated(sequenceId, postingId, chatId, senderId, updatedAt, getState()));
       }
 
       public abstract MessageState getState();

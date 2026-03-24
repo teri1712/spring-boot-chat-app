@@ -1,18 +1,17 @@
 package com.decade.practice.inbox.dto.mapper;
 
 
-import com.decade.practice.inbox.application.ports.out.UserLookUp;
+import com.decade.practice.inbox.application.ports.out.PartnerLookUp;
 import com.decade.practice.inbox.application.ports.out.projection.LogView;
 import com.decade.practice.inbox.domain.Conversation;
 import com.decade.practice.inbox.domain.ConversationInfo;
-import com.decade.practice.inbox.domain.events.InboxLogCreated;
+import com.decade.practice.inbox.domain.InboxLog;
 import com.decade.practice.inbox.domain.messages.InboxLogMessage;
 import com.decade.practice.inbox.dto.InboxLogResponse;
 import org.mapstruct.*;
 
 import java.util.List;
 import java.util.Map;
-import java.util.UUID;
 
 @Mapper(unmappedTargetPolicy = ReportingPolicy.ERROR, componentModel = MappingConstants.ComponentModel.SPRING, uses = {MessageMapper.class})
 public abstract class InboxLogMapper {
@@ -22,9 +21,8 @@ public abstract class InboxLogMapper {
       @Mapping(target = "revisionNumber", expression = "java(conversation.getHash().value())")
       @Mapping(target = "sequenceNumber", source = "inboxLog.sequenceId")
       @Mapping(target = "sender", source = "inboxLog.senderId")
-      public abstract InboxLogMessage map(InboxLogCreated inboxLog,
-                                          UUID postingId,
-                                          @Context UserLookUp lookUp,
+      public abstract InboxLogMessage map(InboxLog inboxLog,
+                                          @Context PartnerLookUp lookUp,
                                           @Context Conversation conversation,
                                           @Context ConversationInfo info);
 
@@ -37,10 +35,9 @@ public abstract class InboxLogMapper {
       @Mapping(target = "chatId", source = "log.chatId")
       @Mapping(target = "ownerId", source = "log.ownerId")
       @Mapping(target = "action", source = "log.action")
-      @Mapping(target = "postingId", source = "message.postingId")
-      public abstract InboxLogResponse map(LogView inboxLog, @Context UserLookUp lookUp, @Context Map<String, ConversationInfo> infoMap);
+      public abstract InboxLogResponse map(LogView inboxLog, @Context PartnerLookUp lookUp, @Context Map<String, ConversationInfo> infoMap);
 
-      public List<InboxLogResponse> map(List<LogView> inboxLogs, UserLookUp lookUp, Map<String, ConversationInfo> infoMap) {
+      public List<InboxLogResponse> map(List<LogView> inboxLogs, PartnerLookUp lookUp, Map<String, ConversationInfo> infoMap) {
             return inboxLogs.stream().map(inboxLog -> map(inboxLog, lookUp, infoMap)).toList();
       }
 

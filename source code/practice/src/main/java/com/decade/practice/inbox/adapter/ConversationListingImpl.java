@@ -24,11 +24,11 @@ public class ConversationListingImpl implements ConversationListing {
       public List<ConversationView> findByAnchor(HashValue anchorHash, UUID ownerId, Pageable pageable) throws Throwable {
             Conversation anchor = conversations.findFirstByHash(anchorHash)
                       .orElseThrow((Supplier<Throwable>) MismatchHashException::new);
-            return conversations.findByConversationId_OwnerIdAndModifiedAtLessThanOrderByModifiedAtDesc(ownerId, anchor.getModifiedAt(), pageable);
+            return conversations.findByOwnerIdAndModifiedAtLessThanOrderByModifiedAtDesc(ownerId, anchor.getModifiedAt(), pageable);
       }
 
       @Override
       public List<ConversationView> findByModifiedAtLessThan(UUID ownerId, Instant modifiedAt, Pageable pageable) {
-            return conversations.findByConversationId_OwnerIdAndModifiedAtLessThanOrderByModifiedAtDesc(ownerId, modifiedAt, pageable);
+            return conversations.findByOwnerIdAndModifiedAtLessThanOrderByModifiedAtDesc(ownerId, modifiedAt, pageable);
       }
 }

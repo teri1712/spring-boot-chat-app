@@ -30,7 +30,7 @@ public class Preference extends Message {
       @Nullable
       private String theme;
 
-      public Preference(UUID chatEventId, UUID senderId, String chatId, Instant createdAt, Integer iconId, @Nullable String roomAvatar, @Nullable String roomName, @Nullable String theme) {
+      public Preference(UUID chatEventId, UUID senderId, String chatId, Instant createdAt, Integer iconId, String roomAvatar, String roomName, String theme) {
             super(chatEventId, senderId, chatId, createdAt, PREFERENCE_TYPE);
             this.iconId = iconId;
             this.roomAvatar = roomAvatar;

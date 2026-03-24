@@ -1,9 +1,7 @@
-package com.decade.practice.engagement.integration;
+package com.decade.practice.inbox.integration;
 
 import com.decade.practice.BaseTestClass;
 import com.decade.practice.chatorchestrator.application.ports.in.ChatService;
-import com.decade.practice.chatsettings.domain.events.PreferenceChanged;
-import com.decade.practice.chatsettings.dto.PreferenceRequest;
 import com.decade.practice.inbox.domain.events.*;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.junit.jupiter.api.Test;
@@ -17,12 +15,13 @@ import org.springframework.test.web.servlet.MockMvc;
 import java.util.UUID;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.put;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 @Sql(scripts = "/sql/clean.sql", executionPhase = Sql.ExecutionPhase.AFTER_TEST_METHOD)
-class EngagementsControllerTest extends BaseTestClass {
+class PostingControllerTest extends BaseTestClass {
 
       @Autowired
       private MockMvc mockMvc;
@@ -35,25 +34,6 @@ class EngagementsControllerTest extends BaseTestClass {
 
       @Autowired
       private ChatService chatService;
-
-
-      @Test
-      @Sql(scripts = {"/sql/clean.sql", "/sql/seed_users.sql"})
-      @WithUserDetails("alice")
-      void givenAliceAndBobChatNotExists_whenAliceGetChatWithBob_thenCreated() throws Exception {
-            mockMvc.perform(put("/direct-chats/{partnerId}", "22222222-2222-2222-2222-222222222222")
-                      )
-                      .andExpect(status().isCreated());
-
-            mockMvc.perform(put("/direct-chats/{partnerId}", "22222222-2222-2222-2222-222222222222")
-                      )
-                      .andExpect(status().isOk());
-
-            String chatId = "11111111-1111-1111-1111-111111111111+22222222-2222-2222-2222-222222222222";
-            mockMvc.perform(get("/chats/{id}", chatId))
-                      .andExpect(status().isOk())
-                      .andExpect(jsonPath("$.identifier").value(chatId));
-      }
 
 
       @Test
@@ -96,44 +76,6 @@ class EngagementsControllerTest extends BaseTestClass {
                       .andExpect(jsonPath("$.postingId").value(idempotentKey));
 
       }
-
-
-      @Test
-      @Sql(scripts = {"/sql/clean.sql", "/sql/seed_users.sql", "/sql/seed_themes.sql"})
-      @WithUserDetails("alice")
-      void givenExistingChat_whenAliceUpdatesPreference_thenPreferenceIsStored() throws Exception {
-            // Given
-            // Correct order: 1111... < 2222...
-            // Create chat first
-            mockMvc.perform(put("/direct-chats/{partnerId}", "22222222-2222-2222-2222-222222222222")
-                      )
-                      .andExpect(status().isCreated());
-
-            String chatId = "11111111-1111-1111-1111-111111111111+22222222-2222-2222-2222-222222222222";
-            PreferenceRequest preference = new PreferenceRequest(99, "My pookie bob", 3L, "Vcl");
-
-            // When
-            mockMvc.perform(patch("/chats/{id}/preference", chatId)
-                                .contentType(MediaType.APPLICATION_JSON)
-                                .content(objectMapper.writeValueAsString(preference)))
-                      .andExpect(status().isAccepted());
-
-            assertThat(events.stream(PreferenceChanged.class)).hasSize(1);
-
-            // Then
-            mockMvc.perform(get("/chats/{id}", chatId))
-                      .andExpect(status().isOk())
-                      .andExpect(jsonPath("$.preference.customName").value("My pookie bob"))
-                      .andExpect(jsonPath("$.preference.iconId").value(99));
-
-
-            assertThat(events.stream(PreferenceChanged.class)).hasSize(1);
-
-            assertThat(events.stream(MessageCreated.class)).hasSize(1);
-            assertThat(events.stream(InboxLogCreated.class)).hasSize(2);
-
-      }
-
 
       @Test
       @Sql(scripts = {"/sql/clean.sql", "/sql/seed_users.sql"})
@@ -347,60 +289,6 @@ class EngagementsControllerTest extends BaseTestClass {
             assertThat(events.stream(InboxLogCreated.class)).hasSize(2);
       }
 
-
-      @Test
-      @Sql(scripts = {"/sql/clean.sql", "/sql/seed_users.sql"})
-      @WithUserDetails("alice")
-      void givenAliceRequestChatWithNonExistentUser_whenGetChat_thenReturnsNotFoundError() throws Exception {
-            // Given: Alice exists, but we request a chat with a random UUID
-            String randomUser = UUID.randomUUID().toString();
-            String chatId = "11111111-1111-1111-1111-111111111111+" + randomUser;
-
-            // When & Then: getOrCreateChat will fail to find the second user
-            mockMvc.perform(get("/chats/{id}", chatId))
-                      .andExpect(status().isNotFound());
-      }
-
-      @Test
-      @Sql(scripts = {"/sql/clean.sql", "/sql/seed_users.sql"})
-      @WithUserDetails("alice")
-      void givenUserNotPartOfChat_whenGetChat_thenReturnsForbidden() throws Exception {
-            // Given: Alice is not part of Bob-Charlie chat
-
-            chatService.getDirect(UUID.fromString("22222222-2222-2222-2222-222222222222"), UUID.fromString("33333333-3333-3333-3333-333333333333"));
-
-            // Let's assume Bob-Charlie chat is created.
-            String bobCharlieChat = "22222222-2222-2222-2222-222222222222+33333333-3333-3333-3333-333333333333";
-
-            // When & Then: Alice can't still request it
-            mockMvc.perform(get("/chats/{id}", bobCharlieChat)
-                                .param("anchorSequenceNumber", "0"))
-                      .andExpect(status().isForbidden());
-      }
-//
-//      @Test
-//      @Sql(scripts = {"/sql/clean.sql", "/sql/seed_users.sql"})
-//      @WithUserDetails("charlie")
-//      void givenCharlieSendsToAliceBobChat_whenCreateTextEvent_thenReturnsForbidden() throws Exception {
-//            // Given: Charlie is not part of Alice-Bob chat
-//
-//            chatService.getOrCreate(UUID.fromString("22222222-2222-2222-2222-222222222222"), UUID.fromString("11111111-1111-1111-1111-111111111111"));
-//
-//
-//            String chatIdentifier = "11111111-1111-1111-1111-111111111111+22222222-2222-2222-2222-222222222222";
-//            String eventJson = """
-//                      {
-//                          "content": "Intruding messagePreview"
-//                      }3
-//                      """;
-//
-//            // When & Then
-//            mockMvc.perform(put("/chats/{chatIdentifier}/texts", chatIdentifier)
-//                                .header("Idempotency-key", UUID.randomUUID())
-//                                .contentType(MediaType.APPLICATION_JSON)
-//                                .content(eventJson))
-//                      .andExpect(status().isForbidden());
-//      }
 
       @Test
       @Sql(scripts = {"/sql/clean.sql", "/sql/seed_users.sql"})

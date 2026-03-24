@@ -27,7 +27,6 @@ public class TextRoomEvent extends RoomEvent {
             registerEvent(TextRoomEventCreated.builder()
                       .chatEventId(getPostingId())
                       .chatId(getChatId())
-
                       .senderId(getSenderId())
                       .content(content)
                       .build());

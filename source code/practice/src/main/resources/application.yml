@@ -14,6 +14,10 @@ spring:
     driver-class-name: org.postgresql.Driver
     username: root
     password: root
+    hikari:
+      maximum-pool-size: 15
+      connection-timeout: 30000
+      minimum-idle: 5
   jpa:
     database: POSTGRESQL
     show-sql: true
@@ -30,7 +34,7 @@ spring:
       hibernate:
         format_sql: true
         highlight_sql: true
-    # open-in-view: true
+        order_updates: true
   data:
     redis:
       host: localhost
@@ -108,6 +112,8 @@ management:
         include: health,env,bean,info,prometheus
   endpoint:
     health:
+      probes:
+        enabled: true
       show-details: ALWAYS
 
 aws:

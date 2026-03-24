@@ -3,7 +3,7 @@
 
     <!-- App customName -->
     <property name="APP_NAME" value="chat-app"/>
-    <property name="LOG_PATH" value="logs"/>
+    <property name="LOG_PATH" value="./logs"/>
 
     <!-- Console appender (for local + Docker) -->
 

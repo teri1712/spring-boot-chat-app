@@ -1,0 +1,145 @@
+services:
+  server1:
+    image: teri1712/chat-app
+    environment: &common-env
+      LOGGING_LEVEL_ROOT: ERROR
+      SPRING_PROFILES_ACTIVE: 5instances
+      SPRING_DATASOURCE_USERNAME: root
+      SPRING_DATASOURCE_PASSWORD: root
+      ACTUATOR_USER_NAME: admin
+      ACTUATOR_USER_PASSWORD: admin
+      ACTUATOR_USER_ROLES: OPS
+      SPRING_DATA_REDIS_HOST: redis
+      SPRING_DATASOURCE_URL: jdbc:postgresql://postgres:5432/chatapp
+      SPRING_ELASTICSEARCH_URIS: http://elasticsearch:9200
+      SPRING_DATA_ELASTICSEARCH_URIS: http://elasticsearch:9200
+      SPRING_KAFKA_BOOTSTRAP_SERVERS: kafka:9092
+    ports:
+      - "8081:8080"
+      - "8091:8081"
+    networks:
+      - backend
+    volumes:
+      - ./logs:/logs
+    depends_on:
+
+      postgres:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+      es-init:
+        condition: service_completed_successfully
+    healthcheck:
+      test: [ "CMD-SHELL", "curl -f http://localhost:8081/actuator/health/readiness -u admin:admin || exit 1" ]
+      interval: 10s
+      timeout: 30s
+      retries: 5
+
+  
+  
+  server2:
+    image: teri1712/chat-app
+    environment: *common-env
+    ports:
+      - "8082:8080"
+      - "8092:8081"
+    networks:
+      - backend
+    volumes:
+      - ./logs:/logs
+    depends_on:
+      postgres:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+      es-init:
+        condition: service_completed_successfully
+    healthcheck:
+      test: [ "CMD-SHELL", "curl -f http://localhost:8081/actuator/health/readiness -u admin:admin || exit 1" ]
+      interval: 10s
+      timeout: 30s
+      retries: 5
+
+
+  server3:
+    image: teri1712/chat-app
+    environment:
+      <<: *common-env
+      SPRING_PROFILES_ACTIVE: redis-cache
+    ports:
+      - "8083:8080"
+      - "8093:8081"
+    networks:
+      - backend
+    volumes:
+      - ./logs:/logs
+    depends_on:
+
+      postgres:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+      es-init:
+        condition: service_completed_successfully
+    healthcheck:
+      test: [ "CMD-SHELL", "curl -f http://localhost:8081/actuator/health/readiness -u admin:admin || exit 1" ]
+      interval: 10s
+      timeout: 30s
+      retries: 5
+
+
+  server4:
+    image: teri1712/chat-app
+    environment:
+      <<: *common-env
+      SPRING_PROFILES_ACTIVE: redis-cache
+    ports:
+      - "8084:8080"
+      - "8094:8081"
+    networks:
+      - backend
+    volumes:
+      - ./logs:/logs
+    depends_on:
+
+      postgres:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+      es-init:
+        condition: service_completed_successfully
+    healthcheck:
+      test: [ "CMD-SHELL", "curl -f http://localhost:8081/actuator/health/readiness -u admin:admin || exit 1" ]
+      interval: 10s
+      timeout: 30s
+      retries: 5
+
+
+  server5:
+    image: teri1712/chat-app
+    environment: *common-env
+    ports:
+      - "8085:8080"
+      - "8095:8081"
+    networks:
+      - backend
+    volumes:
+      - ./logs:/logs
+    depends_on:
+
+      postgres:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+      es-init:
+        condition: service_completed_successfully
+    healthcheck:
+      test: [ "CMD-SHELL", "curl -f http://localhost:8081/actuator/health/readiness -u admin:admin || exit 1" ]
+      interval: 10s
+      timeout: 30s
+      retries: 5
+
+
+networks:
+  backend:
+    external: true

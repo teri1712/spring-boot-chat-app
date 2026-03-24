@@ -55,7 +55,7 @@ public class ChatController {
       @ResponseStatus(HttpStatus.CREATED)
       public ChatResponse createGroupChat(
                 @AuthenticationPrincipal(expression = "id") UUID userId,
-                @Size(min = 1, max = 50)
+                @Size(min = 2, max = 50)
                 @RequestParam(name = "partnerId") Set<UUID> partnerIds,
                 @RequestParam String roomName
       ) {

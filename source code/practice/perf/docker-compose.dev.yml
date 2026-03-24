@@ -1,0 +1,90 @@
+version: '2.40.3'
+
+services:
+  postgres:
+    image: postgres:16
+    environment:
+      POSTGRES_DB: chatapp
+      POSTGRES_USER: root
+      POSTGRES_PASSWORD: root
+    ports:
+      - "5432:5432"
+    networks:
+      - backend
+    healthcheck:
+      test: [ "CMD-SHELL", "pg_isready -U root -d chatapp" ]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+  redis:
+    image: redis/redis-stack:latest
+    ports:
+      - "6379:6379"
+      - "8001:8001"
+    networks:
+      - backend
+    healthcheck:
+      test: [ "CMD", "redis-cli", "ping" ]
+      interval: 5s
+      timeout: 3s
+      retries: 20
+      start_period: 5s
+
+  elasticsearch:
+    image: docker.elastic.co/elasticsearch/elasticsearch:8.12.2
+    environment:
+      discovery.type: single-node
+      ES_JAVA_OPTS: "-Xms512m -Xmx512m"
+      xpack.security.enabled: "false"
+      network.host: 0.0.0.0
+    ports:
+      - "9200:9200"
+    cpus: 1
+    mem_limit: 1g
+    networks:
+      - backend
+    healthcheck:
+      test: [ "CMD-SHELL", "curl -f http://localhost:9200/_cluster/health || exit 1" ]
+      interval: 10s
+      timeout: 5s
+      retries: 10
+      start_period: 30s
+  es-init:
+    image: curlimages/curl
+    depends_on:
+      elasticsearch:
+        condition: service_healthy
+    volumes:
+      - ../es:/es
+    entrypoint: [ "sh", "-c", "cd /es && sh ./init.sh" ]
+    networks:
+      - backend
+  kibana:
+    image: docker.elastic.co/kibana/kibana:8.12.2
+    ports:
+      - "5601:5601"
+    depends_on:
+      - elasticsearch
+    environment:
+      ELASTICSEARCH_HOSTS: http://elasticsearch:9200
+    cpus: 0.5
+    mem_limit: 500m
+    networks:
+      - backend
+
+  filebeat:
+    image: docker.elastic.co/beats/filebeat:8.11.0
+    user: root
+    volumes:
+      - ../filebeat/filebeat.yml:/usr/share/filebeat/filebeat.yml
+      - ./logs:/logs
+    depends_on:
+      - elasticsearch
+    cpus: 0.3
+    mem_limit: 300m
+    networks:
+      - backend
+
+networks:
+  backend:
+    name: backend

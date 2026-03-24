@@ -1,14 +1,13 @@
 package com.decade.practice.inbox.unit;
 
-import com.decade.practice.inbox.application.ports.out.UserLookUp;
+import com.decade.practice.inbox.application.ports.out.PartnerLookUp;
 import com.decade.practice.inbox.domain.ConversationInfo;
+import com.decade.practice.inbox.domain.Partner;
 import com.decade.practice.inbox.domain.Room;
 import com.decade.practice.inbox.domain.services.ConversationInfoService;
-import com.decade.practice.users.api.UserInfo;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
-import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.mockito.junit.jupiter.MockitoExtension;
 
@@ -20,29 +19,28 @@ import static org.assertj.core.api.Assertions.assertThat;
 @ExtendWith(MockitoExtension.class)
 class ConversationInfoServiceTest {
 
-      @Mock
-      UserLookUp userLookUp;
-
       @InjectMocks
       ConversationInfoService conversationInfoService;
 
       @Test
       void givenRoomHas2RepresentativesIncludingMe_whenGettingThatRoomInfo_thenConversationNameIsTheOtherName() {
-            UserInfo me = new UserInfo(
+            Partner me = new Partner(
+                      UUID.randomUUID(),
                       "teri",
-                      "teri",
-                      "teri.jpg",
-                      UUID.randomUUID());
-            UserInfo other = new UserInfo(
+                      "teri.jpg"
+            );
+            Partner other = new Partner(
+                      UUID.randomUUID(),
                       "other",
-                      "other",
-                      "other.jpg",
-                      UUID.randomUUID());
+                      "other.jpg"
+            );
             Room room = new Room("123", me.id(), null, null, Set.of(me.id(), other.id()));
 
-            Mockito.when(userLookUp.lookUp(other.id())).thenReturn(other);
 
-            ConversationInfo info = conversationInfoService.getInfo(me.id(), room);
+            PartnerLookUp lookUp = Mockito.mock(PartnerLookUp.class);
+            Mockito.when(lookUp.lookUp(other.id())).thenReturn(other);
+
+            ConversationInfo info = conversationInfoService.getInfo(me.id(), room, lookUp);
 
             assertThat(info.name()).isEqualTo("other");
             assertThat(info.avatar()).isEqualTo("other.jpg");
@@ -51,27 +49,29 @@ class ConversationInfoServiceTest {
 
       @Test
       void givenRoomHas2RepresentativesNotIncludingMe_whenGettingThatRoomInfo_thenConversationNameIsTheOtherNames() {
-            UserInfo me = new UserInfo(
+            Partner me = new Partner(
+                      UUID.nameUUIDFromBytes("teri".getBytes()),
                       "teri",
-                      "teri",
-                      "teri.jpg",
-                      UUID.nameUUIDFromBytes("teri".getBytes()));
-            UserInfo other1 = new UserInfo(
+                      "teri.jpg"
+            );
+            Partner other1 = new Partner(
+                      UUID.nameUUIDFromBytes("other1".getBytes()),
                       "other1",
-                      "other1",
-                      "other1.jpg",
-                      UUID.nameUUIDFromBytes("other1".getBytes()));
-            UserInfo other2 = new UserInfo(
+                      "other1.jpg"
+            );
+            Partner other2 = new Partner(
+                      UUID.nameUUIDFromBytes("other2".getBytes()),
                       "other2",
-                      "other2",
-                      "other2.jpg",
-                      UUID.nameUUIDFromBytes("other2".getBytes()));
+                      "other2.jpg"
+            );
             Room room = new Room("123", me.id(), null, null, Set.of(other1.id(), other2.id(), me.id()));
 
-            Mockito.when(userLookUp.lookUp(other1.id())).thenReturn(other1);
-            Mockito.when(userLookUp.lookUp(other2.id())).thenReturn(other2);
+            PartnerLookUp lookUp = Mockito.mock(PartnerLookUp.class);
 
-            ConversationInfo info = conversationInfoService.getInfo(me.id(), room);
+            Mockito.when(lookUp.lookUp(other1.id())).thenReturn(other1);
+            Mockito.when(lookUp.lookUp(other2.id())).thenReturn(other2);
+
+            ConversationInfo info = conversationInfoService.getInfo(me.id(), room, lookUp);
 
             assertThat(Set.of("other2, other1", "other1, other2")).contains(info.name());
       }

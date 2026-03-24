@@ -8,6 +8,7 @@ import java.util.UUID;
 public record InboxLogCreated(
           Long sequenceId,
           String chatId,
+          Long conversationId,
           Long messageId,
           UUID senderId,
           UUID ownerId,

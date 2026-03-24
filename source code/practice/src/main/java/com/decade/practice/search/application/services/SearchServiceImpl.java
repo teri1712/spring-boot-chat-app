@@ -63,6 +63,7 @@ public class SearchServiceImpl implements SearchService {
                       .map(SearchHit::getContent)
                       .map(document -> new MatchingUserResponse(
                                 document.getId(),
+                                document.getUsername(),
                                 document.getName(),
                                 document.getAvatar()
                       )).toList();

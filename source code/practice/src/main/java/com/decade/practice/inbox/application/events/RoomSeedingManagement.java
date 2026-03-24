@@ -22,7 +22,7 @@ public class RoomSeedingManagement {
       @Transactional
       public void onApplicationReady() {
             rooms.findAll().forEach(room -> {
-                  publisher.publishEvent(new RoomCreated(room.getChatId(), room.getRepresentatives()));
+                  publisher.publishEvent(new RoomCreated(room.getChatId(), room.getCreator(), room.getLastActivity(), room.getRepresentatives()));
             });
 
       }

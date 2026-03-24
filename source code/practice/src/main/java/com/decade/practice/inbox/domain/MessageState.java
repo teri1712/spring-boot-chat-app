@@ -8,6 +8,7 @@ import lombok.experimental.SuperBuilder;
 import java.time.Instant;
 import java.util.Set;
 import java.util.UUID;
+import java.util.stream.Stream;
 
 
 @JsonTypeInfo(
@@ -23,6 +24,7 @@ import java.util.UUID;
           @JsonSubTypes.Type(value = ImageState.class, name = "image"),
           @JsonSubTypes.Type(value = FileState.class, name = "file"),
           @JsonSubTypes.Type(value = PreferenceState.class, name = "preference"),
+          @JsonSubTypes.Type(value = HelloGroupState.class, name = "group"),
 })
 @SuperBuilder
 @Getter
@@ -37,5 +39,10 @@ public abstract class MessageState {
       private Instant createdAt;
       private Instant updatedAt;
       private Set<UUID> seenByIds;
+
+
+      public Stream<UUID> getAllPartners() {
+            return Stream.concat(seenByIds.stream(), Stream.of(senderId));
+      }
 
 }

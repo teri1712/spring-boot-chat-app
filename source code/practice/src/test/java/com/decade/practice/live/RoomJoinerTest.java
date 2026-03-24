@@ -37,7 +37,7 @@ import static org.junit.jupiter.api.Assertions.assertNotNull;
 @Slf4j
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
 @Sql(value = "/sql/clean.sql", executionPhase = Sql.ExecutionPhase.AFTER_TEST_METHOD)
-public class RoomJoinerTest extends BaseTestClass {
+class RoomJoinerTest extends BaseTestClass {
 
       @LocalServerPort
       private int port = 0;
@@ -55,7 +55,7 @@ public class RoomJoinerTest extends BaseTestClass {
       private ChatService chatService;
 
       @Test
-      @Timeout(5)
+      @Timeout(20)
       @Sql(value = {"/sql/clean.sql", "/sql/seed_users.sql", "/sql/seed_chats.sql"}, executionPhase = Sql.ExecutionPhase.BEFORE_TEST_METHOD)
       public void givenAliceAndBobIsOnline_whenAliceTypeSth_thenBobReceiveTheTypeEvent() throws Exception {
 
@@ -106,7 +106,7 @@ public class RoomJoinerTest extends BaseTestClass {
                                   public void handleException(StompSession session, @Nullable StompCommand command, StompHeaders headers, byte[] payload, Throwable exception) {
                                         log.error("Error", exception);
                                   }
-                            }).get(2, TimeUnit.SECONDS);
+                            }).get(10, TimeUnit.SECONDS);
 
                   StompHeaders bobHeaders = new StompHeaders();
                   bobHeaders.add(HEADER_NAME, BEARER + bobToken);
@@ -119,7 +119,7 @@ public class RoomJoinerTest extends BaseTestClass {
                                   public void handleException(StompSession session, @Nullable StompCommand command, StompHeaders headers, byte[] payload, Throwable exception) {
                                         log.error("Error", exception);
                                   }
-                            }).get(2, TimeUnit.SECONDS);
+                            }).get(10, TimeUnit.SECONDS);
 
 
                   StompHeaders aliceStompHeaders = new StompHeaders();

@@ -36,7 +36,7 @@ public abstract class AbstractParticipantPlacement<C extends ParticipantCommand>
       @Override
       public PostingResponse place(C participantCommand) {
             RoomEvent roomEvent = newInstance(participantCommand);
-            Room room = rooms.findById(participantCommand.getChatId()).orElseThrow();
+            Room room = rooms.findByChatId(participantCommand.getChatId()).orElseThrow();
             room.refreshLastActivity();
             rooms.save(room);
             doSave(roomEvent);

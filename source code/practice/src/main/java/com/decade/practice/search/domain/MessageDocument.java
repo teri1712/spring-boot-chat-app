@@ -11,7 +11,7 @@ import org.springframework.data.elasticsearch.annotations.FieldType;
 import java.time.Instant;
 import java.util.UUID;
 
-@Document(indexName = "messages", createIndex = true)
+@Document(indexName = "messages")
 @AllArgsConstructor
 @Getter
 public class MessageDocument {

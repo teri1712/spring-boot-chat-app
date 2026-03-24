@@ -15,11 +15,16 @@ import java.util.UUID;
 @Getter
 public class Conversation extends AbstractAggregateRoot<Conversation> {
 
-      @EmbeddedId
-      private ConversationId conversationId;
+      public static final int MAX_ROUND = 100;
 
-      @Version
-      private Integer version;
+      @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "conversation_seq_gen")
+      @SequenceGenerator(name = "conversation_seq_gen", sequenceName = "conversation_seq")
+      @Id
+      private Long id;
+
+      @Embedded
+      private ConversationId conversationId;
+      private Long roomId;
 
       @JdbcTypeCode(SqlTypes.JSON)
       @Column(columnDefinition = "jsonb")
@@ -27,14 +32,21 @@ public class Conversation extends AbstractAggregateRoot<Conversation> {
 
       private Instant modifiedAt;
 
+      private Integer roundRobin;
+      private Integer participantIndex;
+
       @Embedded
       private HashValue hash;
 
       protected Conversation() {
       }
 
-      public Conversation(String chatId, UUID ownerId) {
+      public Conversation(String chatId, UUID ownerId, Long roomId, Integer participantIndex) {
+            this.roomId = roomId;
             this.conversationId = new ConversationId(chatId, ownerId);
+            this.modifiedAt = Instant.now();
+            this.participantIndex = participantIndex;
+            this.roundRobin = participantIndex % MAX_ROUND;
             this.recents = new ArrayList<>();
             this.hash = new HashValue((long) conversationId.hashCode());
       }

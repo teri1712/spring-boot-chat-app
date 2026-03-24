@@ -12,6 +12,7 @@ import com.decade.practice.engagement.api.DirectInfo;
 import com.decade.practice.engagement.api.DirectMappingApi;
 import com.decade.practice.engagement.api.EngagementApi;
 import com.decade.practice.inbox.apis.ConversationApi;
+import jakarta.validation.ConstraintViolationException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -32,9 +33,15 @@ public class ChatOrchestrator implements ChatService {
 
       @Override
       public ChatResponse createGroup(CreateGroupChatCommand command) {
-            ChatPolicyInfo policyInfo = engagementApi.createGroup(command.callerId(), command.partnerIds());
-            SettingsInfo settingsInfo = settingApi.create(policyInfo.identifier(), command.roomName());
-            conversationApi.create(policyInfo.identifier(), command.callerId(), policyInfo.creators(), command.roomName());
+            Set<UUID> participants = new HashSet<>(command.partnerIds());
+            participants.add(command.callerId());
+            if (participants.size() == 2) {
+                  throw new ConstraintViolationException("Exactly two participants should be provided for a direct chat. Use the direct chat endpoint instead.", new HashSet<>());
+            }
+            ChatPolicyInfo policyInfo = engagementApi.createGroup(command.callerId(), participants);
+            String chatId = policyInfo.identifier();
+            SettingsInfo settingsInfo = settingApi.create(chatId, command.roomName());
+            conversationApi.create(chatId, command.callerId(), policyInfo.creators(), command.roomName());
             return chatMapper.map(policyInfo, settingsInfo);
       }
 
