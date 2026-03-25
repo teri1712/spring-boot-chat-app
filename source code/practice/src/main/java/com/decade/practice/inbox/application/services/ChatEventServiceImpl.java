@@ -1,0 +1,25 @@
+package com.decade.practice.inbox.application.services;
+
+import com.decade.practice.inbox.application.ports.out.RoomEventRepository;
+import com.decade.practice.inbox.application.query.ChatEventService;
+import com.decade.practice.inbox.dto.PostingResponse;
+import com.decade.practice.inbox.dto.mapper.ChatEventMapper;
+import lombok.AllArgsConstructor;
+import org.springframework.stereotype.Service;
+
+import java.util.UUID;
+
+@Service
+@AllArgsConstructor
+public class ChatEventServiceImpl implements ChatEventService {
+
+      private final RoomEventRepository receipts;
+      private final ChatEventMapper chatEventMapper;
+
+
+      @Override
+      public PostingResponse find(UUID idempotentKey) {
+            return chatEventMapper.toResponse(receipts.findById(idempotentKey).orElseThrow());
+      }
+
+}

@@ -1,0 +1,19 @@
+{
+  "mappings": {
+    "properties": {
+      "name": {
+        "type": "text"
+      },
+      "username": {
+        "type": "keyword"
+      },
+      "gender": {
+        "type": "keyword"
+      },
+      "avatar": {
+        "type": "keyword",
+        "index": false
+      }
+    }
+  }
+}

@@ -1,0 +1,115 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>ProfileServiceImpl.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">chat-app-server</a> &gt; <a href="index.source.html" class="el_package">com.decade.practice.users.application.services</a> &gt; <span class="el_source">ProfileServiceImpl.java</span></div><h1>ProfileServiceImpl.java</h1><pre class="source lang-java linenums">package com.decade.practice.users.application.services;
+
+import com.decade.practice.users.application.ports.in.ProfileService;
+import com.decade.practice.users.application.ports.out.TokenGenerator;
+import com.decade.practice.users.application.ports.out.TokenStore;
+import com.decade.practice.users.application.ports.out.UserRepository;
+import com.decade.practice.users.domain.DefaultAvatar;
+import com.decade.practice.users.domain.User;
+import com.decade.practice.users.domain.UserFactory;
+import com.decade.practice.users.domain.UserPasswordPolicy;
+import com.decade.practice.users.dto.*;
+import com.decade.practice.users.dto.mapper.UserMapper;
+import com.decade.practice.web.security.UserClaims;
+import jakarta.persistence.OptimisticLockException;
+import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
+import org.springframework.dao.DataIntegrityViolationException;
+import org.springframework.security.access.AccessDeniedException;
+import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
+
+import java.util.Date;
+import java.util.Optional;
+import java.util.UUID;
+
+<span class="fc" id="L26">@Slf4j</span>
+@Service
+@Transactional
+<span class="fc" id="L29">@RequiredArgsConstructor</span>
+public class ProfileServiceImpl implements ProfileService {
+
+      private final UserFactory userFactory;
+      private final UserRepository users;
+      private final TokenStore tokens;
+      private final TokenGenerator tokenGenerator;
+      private final UserMapper userMapper;
+
+      private final UserPasswordPolicy passwordPolicy;
+
+
+      @Override
+      public ProfileResponse createIfNotExists(SignUpRequest signUpRequest, boolean usernameAsIdentifier) throws DataIntegrityViolationException {
+<span class="nc" id="L43">            return users.findByUsername(signUpRequest.getUsername())</span>
+<span class="nc" id="L44">                      .map(userMapper::map)</span>
+<span class="nc" id="L45">                      .orElseGet(() -&gt; create(signUpRequest, usernameAsIdentifier));</span>
+      }
+
+      @Override
+      public ProfileResponse create(SignUpRequest signUpRequest, boolean usernameAsIdentifier) {
+<span class="pc bpc" id="L50" title="1 of 2 branches missed.">            UUID id = usernameAsIdentifier ?</span>
+<span class="fc" id="L51">                      UUID.nameUUIDFromBytes(signUpRequest.getUsername().getBytes()) :</span>
+<span class="pc" id="L52">                      UUID.randomUUID();</span>
+
+<span class="fc" id="L54">            String username = signUpRequest.getUsername();</span>
+<span class="fc" id="L55">            String password = signUpRequest.getPassword();</span>
+<span class="fc" id="L56">            String name = signUpRequest.getName();</span>
+<span class="fc" id="L57">            Float gender = signUpRequest.getGender();</span>
+<span class="fc" id="L58">            Date dob = signUpRequest.getDob();</span>
+<span class="fc" id="L59">            String avatar = Optional.ofNullable(signUpRequest.getAvatar())</span>
+<span class="fc" id="L60">                      .orElse(DefaultAvatar.URL);</span>
+<span class="fc" id="L61">            User user = userFactory.createUser(id, username, password, name, avatar, dob, gender);</span>
+<span class="fc" id="L62">            users.save(user);</span>
+
+<span class="fc" id="L64">            return userMapper.map(user);</span>
+      }
+
+      @Override
+      public ProfileResponse changeProfile(UUID id, ProfileRequest profileRequest) throws OptimisticLockException {
+<span class="fc" id="L69">            User user = users.findById(id).orElseThrow();</span>
+<span class="fc bfc" id="L70" title="All 2 branches covered.">            if (profileRequest.getName() != null)</span>
+<span class="fc" id="L71">                  user.changeName(profileRequest.getName());</span>
+<span class="pc bpc" id="L72" title="1 of 2 branches missed.">            if (profileRequest.getDob() != null)</span>
+<span class="nc" id="L73">                  user.changeDob(profileRequest.getDob());</span>
+<span class="fc bfc" id="L74" title="All 2 branches covered.">            if (profileRequest.getGender() != null)</span>
+<span class="fc" id="L75">                  user.changeGender(profileRequest.getGender());</span>
+<span class="fc bfc" id="L76" title="All 2 branches covered.">            if (profileRequest.getAvatar() != null) {</span>
+<span class="fc" id="L77">                  user.changeAvatar(profileRequest.getAvatar());</span>
+            }
+<span class="fc" id="L79">            return userMapper.map(user);</span>
+      }
+
+
+      @Override
+      public AccountResponse changePassword(UUID id, String newPassword, String password) throws AccessDeniedException, OptimisticLockException {
+<span class="fc" id="L85">            User user = users.findById(id).orElseThrow();</span>
+
+<span class="fc" id="L87">            passwordPolicy.change(user, password, newPassword);</span>
+
+<span class="fc" id="L89">            users.save(user);</span>
+<span class="fc" id="L90">            tokens.evict(user.getUsername());</span>
+
+<span class="fc" id="L92">            UserClaims claims = new UserClaims(</span>
+<span class="fc" id="L93">                      user.getId(),</span>
+<span class="fc" id="L94">                      user.getUsername(),</span>
+<span class="fc" id="L95">                      user.getName(),</span>
+<span class="fc" id="L96">                      user.getAvatar());</span>
+<span class="fc" id="L97">            AccessToken credential = tokenGenerator.generate(claims);</span>
+<span class="fc" id="L98">            tokens.add(user.getUsername(), credential.refreshToken());</span>
+            
+<span class="fc" id="L100">            ProfileResponse profileResponse = userMapper.map(user);</span>
+<span class="fc" id="L101">            return new AccountResponse(profileResponse, credential);</span>
+      }
+
+      @Override
+      public ProfileResponse findById(UUID id) {
+<span class="nc" id="L106">            return users.findById(id).map(userMapper::map).orElseThrow();</span>
+      }
+
+      @Override
+      public ProfileResponse findByUsername(String username) {
+<span class="fc" id="L111">            return users.findByUsername(username).map(userMapper::map).orElseThrow();</span>
+      }
+
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.11.202310140853</span></div></body></html>

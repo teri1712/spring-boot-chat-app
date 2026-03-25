@@ -1,0 +1,77 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>LiveJoiner.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">chat-app-server</a> &gt; <a href="index.source.html" class="el_package">com.decade.practice.live.domain</a> &gt; <span class="el_source">LiveJoiner.java</span></div><h1>LiveJoiner.java</h1><pre class="source lang-java linenums">package com.decade.practice.live.domain;
+
+import com.decade.practice.live.domain.events.JoinerJoined;
+import com.decade.practice.live.domain.events.JoinerLeaved;
+import com.decade.practice.live.domain.events.JoinerTyped;
+import jakarta.annotation.Nullable;
+import lombok.Getter;
+import lombok.Setter;
+import org.springframework.data.annotation.Id;
+import org.springframework.data.domain.AbstractAggregateRoot;
+import org.springframework.data.redis.core.RedisHash;
+import org.springframework.data.redis.core.TimeToLive;
+
+import java.time.Duration;
+import java.time.Instant;
+import java.util.UUID;
+
+@Getter
+<span class="nc" id="L19">@Setter</span>
+@RedisHash(value = &quot;type&quot;)
+public class LiveJoiner extends AbstractAggregateRoot&lt;LiveJoiner&gt; {
+
+<span class="nc" id="L23">      private UUID userId;</span>
+<span class="nc" id="L24">      private String avatar;</span>
+<span class="nc" id="L25">      private String chatId;</span>
+
+      @Nullable
+<span class="nc" id="L28">      private Instant typeTime;</span>
+
+      @TimeToLive
+<span class="nc" id="L31">      private Long joinDuration;</span>
+
+      @Id
+<span class="nc" id="L34">      private String key;</span>
+
+
+<span class="fc" id="L37">      protected LiveJoiner() {</span>
+<span class="fc" id="L38">      }</span>
+
+<span class="fc" id="L40">      public LiveJoiner(String chatId, UUID userId, String avatar) {</span>
+<span class="fc" id="L41">            this.userId = userId;</span>
+<span class="fc" id="L42">            this.chatId = chatId;</span>
+<span class="fc" id="L43">            this.avatar = avatar;</span>
+<span class="fc" id="L44">            this.key = determineKey(userId, chatId);</span>
+<span class="fc" id="L45">            this.joinDuration = 0L;</span>
+<span class="fc" id="L46">      }</span>
+
+      public void join() {
+<span class="fc" id="L49">            registerEvent(new JoinerJoined(chatId, userId));</span>
+<span class="fc" id="L50">      }</span>
+
+
+      public void leave() {
+<span class="nc" id="L54">            registerEvent(new JoinerLeaved(chatId, userId));</span>
+<span class="nc" id="L55">      }</span>
+
+      public void type() {
+<span class="fc" id="L58">            this.joinDuration = 10L;</span>
+<span class="fc" id="L59">            Instant now = Instant.now();</span>
+<span class="fc" id="L60">            Instant prev = this.typeTime;</span>
+
+<span class="pc bpc" id="L62" title="1 of 2 branches missed.">            if (prev != null) {</span>
+<span class="nc" id="L63">                  Duration typeDuration = Duration.between(prev, now);</span>
+<span class="nc bnc" id="L64" title="All 2 branches missed.">                  if (typeDuration.toSeconds() &lt;= 1) {</span>
+<span class="nc" id="L65">                        return;</span>
+                  }
+            }
+<span class="fc" id="L68">            this.typeTime = now;</span>
+<span class="fc" id="L69">            registerEvent(new JoinerTyped(chatId, userId, avatar, now));</span>
+<span class="fc" id="L70">      }</span>
+
+      public static String determineKey(UUID from, String chat) {
+<span class="fc" id="L73">            return chat + &quot;:&quot; + from;</span>
+      }
+
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.11.202310140853</span></div></body></html>

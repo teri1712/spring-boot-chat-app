@@ -1,0 +1,38 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>SettingsMapperImpl.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">chat-app-server</a> &gt; <a href="index.source.html" class="el_package">com.decade.practice.chatsettings.dto</a> &gt; <span class="el_source">SettingsMapperImpl.java</span></div><h1>SettingsMapperImpl.java</h1><pre class="source lang-java linenums">package com.decade.practice.chatsettings.dto;
+
+import com.decade.practice.chatsettings.api.PreferenceInfo;
+import com.decade.practice.chatsettings.api.SettingsInfo;
+import com.decade.practice.chatsettings.domain.Setting;
+import javax.annotation.processing.Generated;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Component;
+
+@Generated(
+    value = &quot;org.mapstruct.ap.MappingProcessor&quot;,
+    date = &quot;2026-03-25T16:47:05+0700&quot;,
+    comments = &quot;version: 1.5.5.Final, compiler: javac, environment: Java 21.0.10 (Ubuntu)&quot;
+)
+@Component
+<span class="fc" id="L16">public class SettingsMapperImpl implements SettingsMapper {</span>
+
+    @Autowired
+    private PreferenceMapper preferenceMapper;
+
+    @Override
+    public SettingsInfo map(Setting setting) {
+<span class="pc bpc" id="L23" title="1 of 2 branches missed.">        if ( setting == null ) {</span>
+<span class="nc" id="L24">            return null;</span>
+        }
+
+<span class="fc" id="L27">        String id = null;</span>
+<span class="fc" id="L28">        PreferenceInfo preference = null;</span>
+
+<span class="fc" id="L30">        id = setting.getIdentifier();</span>
+<span class="fc" id="L31">        preference = preferenceMapper.map( setting.getPreference() );</span>
+
+<span class="fc" id="L33">        SettingsInfo settingsInfo = new SettingsInfo( id, preference );</span>
+
+<span class="fc" id="L35">        return settingsInfo;</span>
+    }
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.11.202310140853</span></div></body></html>

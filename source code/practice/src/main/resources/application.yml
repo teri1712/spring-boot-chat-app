@@ -1,17 +1,23 @@
 spring:
+  profiles:
+    active: dev
   security:
     oauth2:
       resourceserver:
         jwt:
           issuer-uri: https://accounts.google.com
   application:
-    name: messenger-clone
+    name: chat-app
   datasource:
     type: com.zaxxer.hikari.HikariDataSource
     url: jdbc:postgresql://localhost:5432/chatapp
     driver-class-name: org.postgresql.Driver
     username: root
     password: root
+    hikari:
+      maximum-pool-size: 15
+      connection-timeout: 30000
+      minimum-idle: 5
   jpa:
     database: POSTGRESQL
     show-sql: true
@@ -28,7 +34,7 @@ spring:
       hibernate:
         format_sql: true
         highlight_sql: true
-    # open-in-view: true
+        order_updates: true
   data:
     redis:
       host: localhost
@@ -66,13 +72,12 @@ spring:
       key-deserializer: org.apache.kafka.common.serialization.StringDeserializer
       value-deserializer: org.apache.kafka.common.serialization.StringDeserializer
       properties:
-        spring.json.trusted.packages: "com.decade.practice.dto.events"
-
-logging:
-  level:
-    root: INFO
-    com.decade.practice: DEBUG
-    org.springframework: INFO
+        spring.json.add.type.headers: false
+  modulith:
+    events:
+      jdbc:
+        schema-initialization:
+          enabled: true
 
 
 actuator:
@@ -107,6 +112,8 @@ management:
         include: health,env,bean,info,prometheus
   endpoint:
     health:
+      probes:
+        enabled: true
       show-details: ALWAYS
 
 aws:
@@ -117,4 +124,18 @@ aws:
     access:
       id: decade
       secret: decade
+
+
+broker:
+  topics:
+    queue: queue
+    room: room
+
+
+websocket:
+  topics:
+    user: /user
+    queue: /queue
+    room: /room
+
 

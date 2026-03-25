@@ -1,0 +1,235 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>MessageMapperImpl.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">chat-app-server</a> &gt; <a href="index.source.html" class="el_package">com.decade.practice.inbox.dto.mapper</a> &gt; <span class="el_source">MessageMapperImpl.java</span></div><h1>MessageMapperImpl.java</h1><pre class="source lang-java linenums">package com.decade.practice.inbox.dto.mapper;
+
+import com.decade.practice.inbox.application.ports.out.PartnerLookUp;
+import com.decade.practice.inbox.domain.FileState;
+import com.decade.practice.inbox.domain.HelloGroupState;
+import com.decade.practice.inbox.domain.IconState;
+import com.decade.practice.inbox.domain.ImageSpec;
+import com.decade.practice.inbox.domain.ImageState;
+import com.decade.practice.inbox.domain.MessageState;
+import com.decade.practice.inbox.domain.PreferenceState;
+import com.decade.practice.inbox.domain.TextState;
+import com.decade.practice.inbox.dto.FileStateResponse;
+import com.decade.practice.inbox.dto.HelloGroupStateResponse;
+import com.decade.practice.inbox.dto.IconStateResponse;
+import com.decade.practice.inbox.dto.ImageSpecResponse;
+import com.decade.practice.inbox.dto.ImageStateResponse;
+import com.decade.practice.inbox.dto.MessageStateResponse;
+import com.decade.practice.inbox.dto.PartnerResponse;
+import com.decade.practice.inbox.dto.PreferenceStateResponse;
+import com.decade.practice.inbox.dto.TextStateResponse;
+import java.util.LinkedHashSet;
+import java.util.Set;
+import java.util.UUID;
+import javax.annotation.processing.Generated;
+import org.springframework.stereotype.Component;
+
+@Generated(
+    value = &quot;org.mapstruct.ap.MappingProcessor&quot;,
+    date = &quot;2026-03-25T16:47:04+0700&quot;,
+    comments = &quot;version: 1.5.5.Final, compiler: javac, environment: Java 21.0.10 (Ubuntu)&quot;
+)
+@Component
+<span class="fc" id="L33">public class MessageMapperImpl implements MessageMapper {</span>
+
+    @Override
+    public MessageStateResponse map(MessageState message, PartnerLookUp partnerLookUp) {
+<span class="pc bpc" id="L37" title="1 of 2 branches missed.">        if ( message == null ) {</span>
+<span class="nc" id="L38">            return null;</span>
+        }
+
+<span class="fc bfc" id="L41" title="All 2 branches covered.">        if (message instanceof TextState) {</span>
+<span class="fc" id="L42">            return textStateToTextStateResponse( (TextState) message, partnerLookUp );</span>
+        }
+<span class="fc bfc" id="L44" title="All 2 branches covered.">        else if (message instanceof ImageState) {</span>
+<span class="fc" id="L45">            return imageStateToImageStateResponse( (ImageState) message, partnerLookUp );</span>
+        }
+<span class="fc bfc" id="L47" title="All 2 branches covered.">        else if (message instanceof IconState) {</span>
+<span class="fc" id="L48">            return iconStateToIconStateResponse( (IconState) message, partnerLookUp );</span>
+        }
+<span class="fc bfc" id="L50" title="All 2 branches covered.">        else if (message instanceof FileState) {</span>
+<span class="fc" id="L51">            return fileStateToFileStateResponse( (FileState) message, partnerLookUp );</span>
+        }
+<span class="fc bfc" id="L53" title="All 2 branches covered.">        else if (message instanceof PreferenceState) {</span>
+<span class="fc" id="L54">            return preferenceStateToPreferenceStateResponse( (PreferenceState) message, partnerLookUp );</span>
+        }
+<span class="pc bpc" id="L56" title="1 of 2 branches missed.">        else if (message instanceof HelloGroupState) {</span>
+<span class="fc" id="L57">            return helloGroupStateToHelloGroupStateResponse( (HelloGroupState) message, partnerLookUp );</span>
+        }
+        else {
+<span class="nc" id="L60">            MessageStateResponse.MessageStateResponseBuilder&lt;?, ?&gt; messageStateResponse = MessageStateResponse.builder();</span>
+
+<span class="nc" id="L62">            messageStateResponse.seenBy( uUIDSetToPartnerResponseSet( message.getSeenByIds(), partnerLookUp ) );</span>
+<span class="nc" id="L63">            messageStateResponse.sender( map( message.getSenderId(), partnerLookUp ) );</span>
+<span class="nc" id="L64">            messageStateResponse.postingId( message.getPostingId() );</span>
+<span class="nc" id="L65">            messageStateResponse.sequenceNumber( message.getSequenceId() );</span>
+<span class="nc" id="L66">            messageStateResponse.messageType( message.getMessageType() );</span>
+<span class="nc" id="L67">            messageStateResponse.chatId( message.getChatId() );</span>
+<span class="nc" id="L68">            messageStateResponse.createdAt( message.getCreatedAt() );</span>
+<span class="nc" id="L69">            messageStateResponse.updatedAt( message.getUpdatedAt() );</span>
+
+<span class="nc" id="L71">            return messageStateResponse.build();</span>
+        }
+    }
+
+    protected Set&lt;PartnerResponse&gt; uUIDSetToPartnerResponseSet(Set&lt;UUID&gt; set, PartnerLookUp partnerLookUp) {
+<span class="pc bpc" id="L76" title="1 of 2 branches missed.">        if ( set == null ) {</span>
+<span class="nc" id="L77">            return null;</span>
+        }
+
+<span class="fc" id="L80">        Set&lt;PartnerResponse&gt; set1 = new LinkedHashSet&lt;PartnerResponse&gt;( Math.max( (int) ( set.size() / .75f ) + 1, 16 ) );</span>
+<span class="fc bfc" id="L81" title="All 2 branches covered.">        for ( UUID uUID : set ) {</span>
+<span class="fc" id="L82">            set1.add( map( uUID, partnerLookUp ) );</span>
+<span class="fc" id="L83">        }</span>
+
+<span class="fc" id="L85">        return set1;</span>
+    }
+
+    protected TextStateResponse textStateToTextStateResponse(TextState textState, PartnerLookUp partnerLookUp) {
+<span class="pc bpc" id="L89" title="1 of 2 branches missed.">        if ( textState == null ) {</span>
+<span class="nc" id="L90">            return null;</span>
+        }
+
+<span class="fc" id="L93">        TextStateResponse.TextStateResponseBuilder&lt;?, ?&gt; textStateResponse = TextStateResponse.builder();</span>
+
+<span class="fc" id="L95">        textStateResponse.seenBy( uUIDSetToPartnerResponseSet( textState.getSeenByIds(), partnerLookUp ) );</span>
+<span class="fc" id="L96">        textStateResponse.sender( map( textState.getSenderId(), partnerLookUp ) );</span>
+<span class="fc" id="L97">        textStateResponse.postingId( textState.getPostingId() );</span>
+<span class="fc" id="L98">        textStateResponse.sequenceNumber( textState.getSequenceId() );</span>
+<span class="fc" id="L99">        textStateResponse.messageType( textState.getMessageType() );</span>
+<span class="fc" id="L100">        textStateResponse.chatId( textState.getChatId() );</span>
+<span class="fc" id="L101">        textStateResponse.createdAt( textState.getCreatedAt() );</span>
+<span class="fc" id="L102">        textStateResponse.updatedAt( textState.getUpdatedAt() );</span>
+<span class="fc" id="L103">        textStateResponse.content( textState.getContent() );</span>
+
+<span class="fc" id="L105">        return textStateResponse.build();</span>
+    }
+
+    protected ImageSpecResponse imageSpecToImageSpecResponse(ImageSpec imageSpec, PartnerLookUp partnerLookUp) {
+<span class="pc bpc" id="L109" title="1 of 2 branches missed.">        if ( imageSpec == null ) {</span>
+<span class="nc" id="L110">            return null;</span>
+        }
+
+<span class="fc" id="L113">        String uri = null;</span>
+<span class="fc" id="L114">        String filename = null;</span>
+<span class="fc" id="L115">        Integer width = null;</span>
+<span class="fc" id="L116">        Integer height = null;</span>
+<span class="fc" id="L117">        String format = null;</span>
+
+<span class="fc" id="L119">        uri = imageSpec.uri();</span>
+<span class="fc" id="L120">        filename = imageSpec.filename();</span>
+<span class="fc" id="L121">        width = imageSpec.width();</span>
+<span class="fc" id="L122">        height = imageSpec.height();</span>
+<span class="fc" id="L123">        format = imageSpec.format();</span>
+
+<span class="fc" id="L125">        ImageSpecResponse imageSpecResponse = new ImageSpecResponse( uri, filename, width, height, format );</span>
+
+<span class="fc" id="L127">        return imageSpecResponse;</span>
+    }
+
+    protected ImageStateResponse imageStateToImageStateResponse(ImageState imageState, PartnerLookUp partnerLookUp) {
+<span class="pc bpc" id="L131" title="1 of 2 branches missed.">        if ( imageState == null ) {</span>
+<span class="nc" id="L132">            return null;</span>
+        }
+
+<span class="fc" id="L135">        ImageStateResponse.ImageStateResponseBuilder&lt;?, ?&gt; imageStateResponse = ImageStateResponse.builder();</span>
+
+<span class="fc" id="L137">        imageStateResponse.seenBy( uUIDSetToPartnerResponseSet( imageState.getSeenByIds(), partnerLookUp ) );</span>
+<span class="fc" id="L138">        imageStateResponse.sender( map( imageState.getSenderId(), partnerLookUp ) );</span>
+<span class="fc" id="L139">        imageStateResponse.postingId( imageState.getPostingId() );</span>
+<span class="fc" id="L140">        imageStateResponse.sequenceNumber( imageState.getSequenceId() );</span>
+<span class="fc" id="L141">        imageStateResponse.messageType( imageState.getMessageType() );</span>
+<span class="fc" id="L142">        imageStateResponse.chatId( imageState.getChatId() );</span>
+<span class="fc" id="L143">        imageStateResponse.createdAt( imageState.getCreatedAt() );</span>
+<span class="fc" id="L144">        imageStateResponse.updatedAt( imageState.getUpdatedAt() );</span>
+<span class="fc" id="L145">        imageStateResponse.image( imageSpecToImageSpecResponse( imageState.getImage(), partnerLookUp ) );</span>
+
+<span class="fc" id="L147">        return imageStateResponse.build();</span>
+    }
+
+    protected IconStateResponse iconStateToIconStateResponse(IconState iconState, PartnerLookUp partnerLookUp) {
+<span class="pc bpc" id="L151" title="1 of 2 branches missed.">        if ( iconState == null ) {</span>
+<span class="nc" id="L152">            return null;</span>
+        }
+
+<span class="fc" id="L155">        IconStateResponse.IconStateResponseBuilder&lt;?, ?&gt; iconStateResponse = IconStateResponse.builder();</span>
+
+<span class="fc" id="L157">        iconStateResponse.seenBy( uUIDSetToPartnerResponseSet( iconState.getSeenByIds(), partnerLookUp ) );</span>
+<span class="fc" id="L158">        iconStateResponse.sender( map( iconState.getSenderId(), partnerLookUp ) );</span>
+<span class="fc" id="L159">        iconStateResponse.postingId( iconState.getPostingId() );</span>
+<span class="fc" id="L160">        iconStateResponse.sequenceNumber( iconState.getSequenceId() );</span>
+<span class="fc" id="L161">        iconStateResponse.messageType( iconState.getMessageType() );</span>
+<span class="fc" id="L162">        iconStateResponse.chatId( iconState.getChatId() );</span>
+<span class="fc" id="L163">        iconStateResponse.createdAt( iconState.getCreatedAt() );</span>
+<span class="fc" id="L164">        iconStateResponse.updatedAt( iconState.getUpdatedAt() );</span>
+<span class="fc" id="L165">        iconStateResponse.iconId( iconState.getIconId() );</span>
+
+<span class="fc" id="L167">        return iconStateResponse.build();</span>
+    }
+
+    protected FileStateResponse fileStateToFileStateResponse(FileState fileState, PartnerLookUp partnerLookUp) {
+<span class="pc bpc" id="L171" title="1 of 2 branches missed.">        if ( fileState == null ) {</span>
+<span class="nc" id="L172">            return null;</span>
+        }
+
+<span class="fc" id="L175">        FileStateResponse.FileStateResponseBuilder&lt;?, ?&gt; fileStateResponse = FileStateResponse.builder();</span>
+
+<span class="fc" id="L177">        fileStateResponse.seenBy( uUIDSetToPartnerResponseSet( fileState.getSeenByIds(), partnerLookUp ) );</span>
+<span class="fc" id="L178">        fileStateResponse.sender( map( fileState.getSenderId(), partnerLookUp ) );</span>
+<span class="fc" id="L179">        fileStateResponse.postingId( fileState.getPostingId() );</span>
+<span class="fc" id="L180">        fileStateResponse.sequenceNumber( fileState.getSequenceId() );</span>
+<span class="fc" id="L181">        fileStateResponse.messageType( fileState.getMessageType() );</span>
+<span class="fc" id="L182">        fileStateResponse.chatId( fileState.getChatId() );</span>
+<span class="fc" id="L183">        fileStateResponse.createdAt( fileState.getCreatedAt() );</span>
+<span class="fc" id="L184">        fileStateResponse.updatedAt( fileState.getUpdatedAt() );</span>
+<span class="fc" id="L185">        fileStateResponse.filename( fileState.getFilename() );</span>
+<span class="fc" id="L186">        fileStateResponse.size( fileState.getSize() );</span>
+<span class="fc" id="L187">        fileStateResponse.uri( fileState.getUri() );</span>
+
+<span class="fc" id="L189">        return fileStateResponse.build();</span>
+    }
+
+    protected PreferenceStateResponse preferenceStateToPreferenceStateResponse(PreferenceState preferenceState, PartnerLookUp partnerLookUp) {
+<span class="pc bpc" id="L193" title="1 of 2 branches missed.">        if ( preferenceState == null ) {</span>
+<span class="nc" id="L194">            return null;</span>
+        }
+
+<span class="fc" id="L197">        PreferenceStateResponse.PreferenceStateResponseBuilder&lt;?, ?&gt; preferenceStateResponse = PreferenceStateResponse.builder();</span>
+
+<span class="fc" id="L199">        preferenceStateResponse.seenBy( uUIDSetToPartnerResponseSet( preferenceState.getSeenByIds(), partnerLookUp ) );</span>
+<span class="fc" id="L200">        preferenceStateResponse.sender( map( preferenceState.getSenderId(), partnerLookUp ) );</span>
+<span class="fc" id="L201">        preferenceStateResponse.postingId( preferenceState.getPostingId() );</span>
+<span class="fc" id="L202">        preferenceStateResponse.sequenceNumber( preferenceState.getSequenceId() );</span>
+<span class="fc" id="L203">        preferenceStateResponse.messageType( preferenceState.getMessageType() );</span>
+<span class="fc" id="L204">        preferenceStateResponse.chatId( preferenceState.getChatId() );</span>
+<span class="fc" id="L205">        preferenceStateResponse.createdAt( preferenceState.getCreatedAt() );</span>
+<span class="fc" id="L206">        preferenceStateResponse.updatedAt( preferenceState.getUpdatedAt() );</span>
+<span class="fc" id="L207">        preferenceStateResponse.iconId( preferenceState.getIconId() );</span>
+<span class="fc" id="L208">        preferenceStateResponse.roomName( preferenceState.getRoomName() );</span>
+<span class="fc" id="L209">        preferenceStateResponse.roomAvatar( preferenceState.getRoomAvatar() );</span>
+<span class="fc" id="L210">        preferenceStateResponse.theme( preferenceState.getTheme() );</span>
+
+<span class="fc" id="L212">        return preferenceStateResponse.build();</span>
+    }
+
+    protected HelloGroupStateResponse helloGroupStateToHelloGroupStateResponse(HelloGroupState helloGroupState, PartnerLookUp partnerLookUp) {
+<span class="pc bpc" id="L216" title="1 of 2 branches missed.">        if ( helloGroupState == null ) {</span>
+<span class="nc" id="L217">            return null;</span>
+        }
+
+<span class="fc" id="L220">        HelloGroupStateResponse.HelloGroupStateResponseBuilder&lt;?, ?&gt; helloGroupStateResponse = HelloGroupStateResponse.builder();</span>
+
+<span class="fc" id="L222">        helloGroupStateResponse.seenBy( uUIDSetToPartnerResponseSet( helloGroupState.getSeenByIds(), partnerLookUp ) );</span>
+<span class="fc" id="L223">        helloGroupStateResponse.sender( map( helloGroupState.getSenderId(), partnerLookUp ) );</span>
+<span class="fc" id="L224">        helloGroupStateResponse.postingId( helloGroupState.getPostingId() );</span>
+<span class="fc" id="L225">        helloGroupStateResponse.sequenceNumber( helloGroupState.getSequenceId() );</span>
+<span class="fc" id="L226">        helloGroupStateResponse.messageType( helloGroupState.getMessageType() );</span>
+<span class="fc" id="L227">        helloGroupStateResponse.chatId( helloGroupState.getChatId() );</span>
+<span class="fc" id="L228">        helloGroupStateResponse.createdAt( helloGroupState.getCreatedAt() );</span>
+<span class="fc" id="L229">        helloGroupStateResponse.updatedAt( helloGroupState.getUpdatedAt() );</span>
+<span class="fc" id="L230">        helloGroupStateResponse.creator( map( helloGroupState.getCreator(), partnerLookUp ) );</span>
+
+<span class="fc" id="L232">        return helloGroupStateResponse.build();</span>
+    }
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.11.202310140853</span></div></body></html>

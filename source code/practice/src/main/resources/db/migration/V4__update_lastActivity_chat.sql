@@ -1,0 +1,2 @@
+ALTER TABLE chat
+    ADD COLUMN last_activity TIMESTAMPTZ DEFAULT NOW();

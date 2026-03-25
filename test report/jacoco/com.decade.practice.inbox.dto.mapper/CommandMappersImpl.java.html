@@ -1,0 +1,148 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>CommandMappersImpl.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">chat-app-server</a> &gt; <a href="index.source.html" class="el_package">com.decade.practice.inbox.dto.mapper</a> &gt; <span class="el_source">CommandMappersImpl.java</span></div><h1>CommandMappersImpl.java</h1><pre class="source lang-java linenums">package com.decade.practice.inbox.dto.mapper;
+
+import com.decade.practice.inbox.application.ports.in.FileCommand;
+import com.decade.practice.inbox.application.ports.in.IconCommand;
+import com.decade.practice.inbox.application.ports.in.ImageCommand;
+import com.decade.practice.inbox.application.ports.in.SeenCommand;
+import com.decade.practice.inbox.application.ports.in.TextCommand;
+import com.decade.practice.inbox.domain.SeenRequest;
+import com.decade.practice.inbox.domain.TextRequest;
+import com.decade.practice.inbox.dto.FileRequest;
+import com.decade.practice.inbox.dto.IconRequest;
+import com.decade.practice.inbox.dto.ImageRequest;
+import java.time.Instant;
+import java.util.UUID;
+import javax.annotation.processing.Generated;
+import org.springframework.stereotype.Component;
+
+@Generated(
+    value = &quot;org.mapstruct.ap.MappingProcessor&quot;,
+    date = &quot;2026-03-25T16:47:04+0700&quot;,
+    comments = &quot;version: 1.5.5.Final, compiler: javac, environment: Java 21.0.10 (Ubuntu)&quot;
+)
+@Component
+<span class="fc" id="L24">public class CommandMappersImpl implements CommandMappers {</span>
+
+    @Override
+    public TextCommand toText(TextRequest request, UUID postingId, UUID senderId, String chatId) {
+<span class="pc bpc" id="L28" title="7 of 8 branches missed.">        if ( request == null &amp;&amp; postingId == null &amp;&amp; senderId == null &amp;&amp; chatId == null ) {</span>
+<span class="nc" id="L29">            return null;</span>
+        }
+
+<span class="fc" id="L32">        String content = null;</span>
+<span class="pc bpc" id="L33" title="1 of 2 branches missed.">        if ( request != null ) {</span>
+<span class="fc" id="L34">            content = request.content();</span>
+        }
+<span class="fc" id="L36">        UUID postingId1 = null;</span>
+<span class="fc" id="L37">        postingId1 = postingId;</span>
+<span class="fc" id="L38">        UUID senderId1 = null;</span>
+<span class="fc" id="L39">        senderId1 = senderId;</span>
+<span class="fc" id="L40">        String chatId1 = null;</span>
+<span class="fc" id="L41">        chatId1 = chatId;</span>
+
+<span class="fc" id="L43">        TextCommand textCommand = new TextCommand( chatId1, senderId1, postingId1, content );</span>
+
+<span class="fc" id="L45">        return textCommand;</span>
+    }
+
+    @Override
+    public ImageCommand toImage(ImageRequest request, UUID postingId, UUID senderId, String chatId) {
+<span class="pc bpc" id="L50" title="7 of 8 branches missed.">        if ( request == null &amp;&amp; postingId == null &amp;&amp; senderId == null &amp;&amp; chatId == null ) {</span>
+<span class="nc" id="L51">            return null;</span>
+        }
+
+<span class="fc" id="L54">        String uri = null;</span>
+<span class="fc" id="L55">        Integer width = null;</span>
+<span class="fc" id="L56">        Integer height = null;</span>
+<span class="fc" id="L57">        String filename = null;</span>
+<span class="fc" id="L58">        String format = null;</span>
+<span class="pc bpc" id="L59" title="1 of 2 branches missed.">        if ( request != null ) {</span>
+<span class="fc" id="L60">            uri = request.uri();</span>
+<span class="fc" id="L61">            width = request.width();</span>
+<span class="fc" id="L62">            height = request.height();</span>
+<span class="fc" id="L63">            filename = request.filename();</span>
+<span class="fc" id="L64">            format = request.format();</span>
+        }
+<span class="fc" id="L66">        UUID postingId1 = null;</span>
+<span class="fc" id="L67">        postingId1 = postingId;</span>
+<span class="fc" id="L68">        UUID senderId1 = null;</span>
+<span class="fc" id="L69">        senderId1 = senderId;</span>
+<span class="fc" id="L70">        String chatId1 = null;</span>
+<span class="fc" id="L71">        chatId1 = chatId;</span>
+
+<span class="fc" id="L73">        ImageCommand imageCommand = new ImageCommand( chatId1, senderId1, postingId1, uri, width, height, filename, format );</span>
+
+<span class="fc" id="L75">        return imageCommand;</span>
+    }
+
+    @Override
+    public IconCommand toIcon(IconRequest request, UUID postingId, UUID senderId, String chatId) {
+<span class="pc bpc" id="L80" title="7 of 8 branches missed.">        if ( request == null &amp;&amp; postingId == null &amp;&amp; senderId == null &amp;&amp; chatId == null ) {</span>
+<span class="nc" id="L81">            return null;</span>
+        }
+
+<span class="fc" id="L84">        Integer iconId = null;</span>
+<span class="pc bpc" id="L85" title="1 of 2 branches missed.">        if ( request != null ) {</span>
+<span class="fc" id="L86">            iconId = request.iconId();</span>
+        }
+<span class="fc" id="L88">        UUID postingId1 = null;</span>
+<span class="fc" id="L89">        postingId1 = postingId;</span>
+<span class="fc" id="L90">        UUID senderId1 = null;</span>
+<span class="fc" id="L91">        senderId1 = senderId;</span>
+<span class="fc" id="L92">        String chatId1 = null;</span>
+<span class="fc" id="L93">        chatId1 = chatId;</span>
+
+<span class="fc" id="L95">        IconCommand iconCommand = new IconCommand( chatId1, senderId1, postingId1, iconId );</span>
+
+<span class="fc" id="L97">        return iconCommand;</span>
+    }
+
+    @Override
+    public SeenCommand toSeen(SeenRequest request, UUID postingId, UUID senderId, String chatId) {
+<span class="pc bpc" id="L102" title="7 of 8 branches missed.">        if ( request == null &amp;&amp; postingId == null &amp;&amp; senderId == null &amp;&amp; chatId == null ) {</span>
+<span class="nc" id="L103">            return null;</span>
+        }
+
+<span class="fc" id="L106">        Instant at = null;</span>
+<span class="pc bpc" id="L107" title="1 of 2 branches missed.">        if ( request != null ) {</span>
+<span class="fc" id="L108">            at = request.at();</span>
+        }
+<span class="fc" id="L110">        UUID postingId1 = null;</span>
+<span class="fc" id="L111">        postingId1 = postingId;</span>
+<span class="fc" id="L112">        UUID senderId1 = null;</span>
+<span class="fc" id="L113">        senderId1 = senderId;</span>
+<span class="fc" id="L114">        String chatId1 = null;</span>
+<span class="fc" id="L115">        chatId1 = chatId;</span>
+
+<span class="fc" id="L117">        SeenCommand seenCommand = new SeenCommand( chatId1, senderId1, postingId1, at );</span>
+
+<span class="fc" id="L119">        return seenCommand;</span>
+    }
+
+    @Override
+    public FileCommand toFile(FileRequest request, UUID postingId, UUID senderId, String chatId) {
+<span class="pc bpc" id="L124" title="7 of 8 branches missed.">        if ( request == null &amp;&amp; postingId == null &amp;&amp; senderId == null &amp;&amp; chatId == null ) {</span>
+<span class="nc" id="L125">            return null;</span>
+        }
+
+<span class="fc" id="L128">        String uri = null;</span>
+<span class="fc" id="L129">        String filename = null;</span>
+<span class="fc" id="L130">        Integer size = null;</span>
+<span class="pc bpc" id="L131" title="1 of 2 branches missed.">        if ( request != null ) {</span>
+<span class="fc" id="L132">            uri = request.uri();</span>
+<span class="fc" id="L133">            filename = request.filename();</span>
+<span class="fc" id="L134">            size = request.size();</span>
+        }
+<span class="fc" id="L136">        UUID postingId1 = null;</span>
+<span class="fc" id="L137">        postingId1 = postingId;</span>
+<span class="fc" id="L138">        UUID senderId1 = null;</span>
+<span class="fc" id="L139">        senderId1 = senderId;</span>
+<span class="fc" id="L140">        String chatId1 = null;</span>
+<span class="fc" id="L141">        chatId1 = chatId;</span>
+
+<span class="fc" id="L143">        FileCommand fileCommand = new FileCommand( chatId1, senderId1, postingId1, uri, filename, size );</span>
+
+<span class="fc" id="L145">        return fileCommand;</span>
+    }
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.11.202310140853</span></div></body></html>

@@ -1,0 +1,95 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>PostingController.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">chat-app-server</a> &gt; <a href="index.source.html" class="el_package">com.decade.practice.inbox.adapter</a> &gt; <span class="el_source">PostingController.java</span></div><h1>PostingController.java</h1><pre class="source lang-java linenums">package com.decade.practice.inbox.adapter;
+
+import com.decade.practice.inbox.application.MessageAlreadySentException;
+import com.decade.practice.inbox.application.query.ChatEventService;
+import com.decade.practice.inbox.application.services.*;
+import com.decade.practice.inbox.domain.SeenRequest;
+import com.decade.practice.inbox.domain.TextRequest;
+import com.decade.practice.inbox.dto.FileRequest;
+import com.decade.practice.inbox.dto.IconRequest;
+import com.decade.practice.inbox.dto.ImageRequest;
+import com.decade.practice.inbox.dto.PostingResponse;
+import com.decade.practice.inbox.dto.mapper.CommandMappers;
+import jakarta.validation.Valid;
+import lombok.AllArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
+import org.springframework.web.bind.annotation.*;
+
+import java.util.UUID;
+
+<span class="fc" id="L23">@Slf4j</span>
+@RestController
+<span class="fc" id="L25">@AllArgsConstructor</span>
+public class PostingController {
+
+      private final ChatEventService chatEventService;
+      private final CommandMappers commandMappers;
+      private final TextPlacement textPlacement;
+      private final ImagePlacement imagePlacement;
+      private final IconPlacement iconPlacement;
+      private final FilePlacement filePlacement;
+      private final SeenPlacement seenPlacement;
+
+      @ExceptionHandler(MessageAlreadySentException.class)
+      public PostingResponse handle(MessageAlreadySentException e) {
+<span class="fc" id="L38">            UUID idempotentKey = e.getIdempotentId();</span>
+<span class="fc" id="L39">            log.debug(&quot;Concurrent insert encountered for receipt: {}&quot;, idempotentKey, e);</span>
+<span class="fc" id="L40">            return chatEventService.find(idempotentKey);</span>
+      }
+
+
+      @PutMapping(path = &quot;/chats/{chatId}/texts/{postingId}&quot;, consumes = {MediaType.APPLICATION_JSON_VALUE})
+      @ResponseStatus(HttpStatus.ACCEPTED)
+      public PostingResponse createText(
+                @AuthenticationPrincipal(expression = &quot;id&quot;) UUID senderId,
+                @PathVariable UUID postingId,
+                @PathVariable String chatId,
+                @RequestBody @Valid TextRequest body) {
+<span class="fc" id="L51">            return textPlacement.place(commandMappers.toText(body, postingId, senderId, chatId));</span>
+      }
+
+      @PutMapping(path = &quot;/chats/{chatId}/images/{postingId}&quot;, consumes = {MediaType.APPLICATION_JSON_VALUE})
+      @ResponseStatus(HttpStatus.ACCEPTED)
+      public PostingResponse createImage(
+                @PathVariable String chatId,
+                @AuthenticationPrincipal(expression = &quot;id&quot;) UUID senderId,
+                @PathVariable UUID postingId,
+                @RequestBody @Valid ImageRequest body) {
+<span class="fc" id="L61">            return imagePlacement.place(commandMappers.toImage(body, postingId, senderId, chatId));</span>
+      }
+
+      @PutMapping(path = &quot;/chats/{chatId}/icons/{postingId}&quot;, consumes = {MediaType.APPLICATION_JSON_VALUE})
+      @ResponseStatus(HttpStatus.ACCEPTED)
+      public PostingResponse createIcon(
+                @PathVariable String chatId,
+                @AuthenticationPrincipal(expression = &quot;id&quot;) UUID senderId,
+                @PathVariable UUID postingId,
+                @RequestBody @Valid IconRequest body) {
+<span class="fc" id="L71">            return iconPlacement.place(commandMappers.toIcon(body, postingId, senderId, chatId));</span>
+
+      }
+
+      @PutMapping(path = &quot;/chats/{chatId}/files/{postingId}&quot;, consumes = {MediaType.APPLICATION_JSON_VALUE})
+      @ResponseStatus(HttpStatus.ACCEPTED)
+      public PostingResponse createFile(
+                @PathVariable String chatId,
+                @AuthenticationPrincipal(expression = &quot;id&quot;) UUID senderId,
+                @PathVariable UUID postingId,
+                @RequestBody @Valid FileRequest body) {
+<span class="fc" id="L82">            return filePlacement.place(commandMappers.toFile(body, postingId, senderId, chatId));</span>
+      }
+
+      @PutMapping(path = &quot;/chats/{chatId}/seens/{postingId}&quot;, consumes = {MediaType.APPLICATION_JSON_VALUE})
+      @ResponseStatus(HttpStatus.ACCEPTED)
+      public PostingResponse createSeen(
+                @PathVariable String chatId,
+                @AuthenticationPrincipal(expression = &quot;id&quot;) UUID senderId,
+                @PathVariable UUID postingId,
+                @RequestBody @Valid SeenRequest body) {
+<span class="fc" id="L92">            return seenPlacement.place(commandMappers.toSeen(body, postingId, senderId, chatId));</span>
+      }
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.11.202310140853</span></div></body></html>

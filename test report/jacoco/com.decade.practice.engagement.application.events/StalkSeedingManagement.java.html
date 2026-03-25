@@ -1,0 +1,49 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>StalkSeedingManagement.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">chat-app-server</a> &gt; <a href="index.source.html" class="el_package">com.decade.practice.engagement.application.events</a> &gt; <span class="el_source">StalkSeedingManagement.java</span></div><h1>StalkSeedingManagement.java</h1><pre class="source lang-java linenums">package com.decade.practice.engagement.application.events;
+
+import com.decade.practice.engagement.domain.services.StalkPolicy;
+import com.decade.practice.web.events.ConnectionInteracted;
+import lombok.RequiredArgsConstructor;
+import org.springframework.boot.context.event.ApplicationReadyEvent;
+import org.springframework.context.ApplicationEventPublisher;
+import org.springframework.context.annotation.Profile;
+import org.springframework.context.event.EventListener;
+import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
+
+import java.time.Instant;
+import java.util.UUID;
+
+@Profile(&quot;dev&quot;)
+@Service
+<span class="fc" id="L18">@RequiredArgsConstructor</span>
+public class StalkSeedingManagement {
+
+      private final StalkPolicy stalkPolicy;
+      private final ApplicationEventPublisher publisher;
+
+      @EventListener(ApplicationReadyEvent.class)
+      @Transactional
+      public void onApplicationReady() {
+<span class="fc" id="L27">            UUID luffy = UUID.fromString(&quot;00000000-0000-0000-0000-000000000001&quot;);</span>
+<span class="fc" id="L28">            UUID nami = UUID.fromString(&quot;00000000-0000-0000-0000-000000000003&quot;);</span>
+<span class="fc" id="L29">            UUID chopper = UUID.fromString(&quot;00000000-0000-0000-0000-000000000004&quot;);</span>
+<span class="fc" id="L30">            UUID zoro = UUID.fromString(&quot;00000000-0000-0000-0000-000000000005&quot;);</span>
+
+<span class="fc bfc" id="L32" title="All 2 branches covered.">            for (int i = 0; i &lt; 10; i++) {</span>
+<span class="fc" id="L33">                  stalkPolicy.apply(luffy, nami);</span>
+            }
+<span class="fc bfc" id="L35" title="All 2 branches covered.">            for (int i = 0; i &lt; 5; i++) {</span>
+<span class="fc" id="L36">                  stalkPolicy.apply(luffy, chopper);</span>
+            }
+<span class="fc bfc" id="L38" title="All 2 branches covered.">            for (int i = 0; i &lt; 5; i++) {</span>
+<span class="fc" id="L39">                  stalkPolicy.apply(luffy, zoro);</span>
+            }
+
+<span class="fc" id="L42">            publisher.publishEvent(new ConnectionInteracted(luffy, null, Instant.now(), null));</span>
+<span class="fc" id="L43">            publisher.publishEvent(new ConnectionInteracted(nami, null, Instant.now(), null));</span>
+<span class="fc" id="L44">            publisher.publishEvent(new ConnectionInteracted(zoro, null, Instant.now(), null));</span>
+<span class="fc" id="L45">            publisher.publishEvent(new ConnectionInteracted(chopper, null, Instant.now(), null));</span>
+
+<span class="fc" id="L47">      }</span>
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.11.202310140853</span></div></body></html>

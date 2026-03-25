@@ -1,0 +1,34 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>MessageController.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">chat-app-server</a> &gt; <a href="index.source.html" class="el_package">com.decade.practice.inbox.adapter</a> &gt; <span class="el_source">MessageController.java</span></div><h1>MessageController.java</h1><pre class="source lang-java linenums">package com.decade.practice.inbox.adapter;
+
+import com.decade.practice.inbox.application.query.MessageService;
+import com.decade.practice.inbox.dto.MessageStateResponse;
+import jakarta.persistence.EntityNotFoundException;
+import lombok.AllArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
+import org.springframework.web.bind.annotation.*;
+
+import java.util.List;
+import java.util.UUID;
+
+<span class="fc" id="L14">@Slf4j</span>
+@RestController
+@RequestMapping
+<span class="fc" id="L17">@AllArgsConstructor</span>
+// TODO: refactor client
+public class MessageController {
+
+      private final MessageService messageService;
+
+      @GetMapping(&quot;/chats/{chatId}/messages&quot;)
+      public List&lt;MessageStateResponse&gt; listMessages(
+                @AuthenticationPrincipal(expression = &quot;id&quot;) UUID userId,
+                @PathVariable String chatId,
+                @RequestParam Long anchorSequenceNumber
+      ) throws EntityNotFoundException {
+<span class="fc" id="L29">            log.debug(&quot;Fetching messages for chat: {} at anchor {} by user {}&quot;, chatId, anchorSequenceNumber, userId);</span>
+<span class="fc" id="L30">            return messageService.findByChatAndSequenceLessThanEqual(chatId, userId, anchorSequenceNumber);</span>
+      }
+
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.11.202310140853</span></div></body></html>

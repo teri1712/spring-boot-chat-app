@@ -1,0 +1,19 @@
+package com.decade.practice.inbox.application.ports.in;
+
+import lombok.Getter;
+
+import java.util.UUID;
+
+@Getter
+public class FileCommand extends ParticipantCommand {
+      private final String uri;
+      private final String filename;
+      private final Integer size;
+
+      public FileCommand(String chatId, UUID senderId, UUID postingId, String uri, String filename, Integer size) {
+            super(chatId, senderId, postingId);
+            this.uri = uri;
+            this.filename = filename;
+            this.size = size;
+      }
+}

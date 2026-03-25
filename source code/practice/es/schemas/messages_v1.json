@@ -1,0 +1,23 @@
+{
+  "mappings": {
+    "properties": {
+      "id": {
+        "type": "keyword"
+      },
+      "content": {
+        "type": "text"
+      },
+      "createdAt": {
+        "type": "date",
+        "format": "strict_date_time"
+      },
+      "chatId": {
+        "type": "keyword"
+      },
+      "sequenceNumber": {
+        "type": "long",
+        "index": false
+      }
+    }
+  }
+}

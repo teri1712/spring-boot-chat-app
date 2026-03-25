@@ -31,10 +31,7 @@ jacoco/
 # ===== Local config / secrets =====
 .env
 .env.*
-application-local.yml
-application-dev.yml
-application-test.yml
-
+**/*.md
 # ===== Docker files =====
 docker-compose.deploy.yml
 docker-compose.*.yml

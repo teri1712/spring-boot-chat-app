@@ -1,0 +1,67 @@
+package com.decade.practice.chatorchestrator.application.services;
+
+import com.decade.practice.chatorchestrator.application.ports.in.ChatService;
+import com.decade.practice.chatorchestrator.application.ports.in.CreateGroupChatCommand;
+import com.decade.practice.chatorchestrator.dto.ChatResponse;
+import com.decade.practice.chatorchestrator.dto.DirectChatResponse;
+import com.decade.practice.chatorchestrator.dto.mappers.ChatMapper;
+import com.decade.practice.chatsettings.api.SettingApi;
+import com.decade.practice.chatsettings.api.SettingsInfo;
+import com.decade.practice.engagement.api.ChatPolicyInfo;
+import com.decade.practice.engagement.api.DirectInfo;
+import com.decade.practice.engagement.api.DirectMappingApi;
+import com.decade.practice.engagement.api.EngagementApi;
+import com.decade.practice.inbox.apis.ConversationApi;
+import jakarta.validation.ConstraintViolationException;
+import lombok.RequiredArgsConstructor;
+import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
+
+import java.util.*;
+
+@Service
+@RequiredArgsConstructor
+@Transactional
+// TODO: SAGA
+public class ChatOrchestrator implements ChatService {
+
+      private final EngagementApi engagementApi;
+      private final DirectMappingApi directMappingApi;
+      private final SettingApi settingApi;
+      private final ConversationApi conversationApi;
+      private final ChatMapper chatMapper;
+
+      @Override
+      public ChatResponse createGroup(CreateGroupChatCommand command) {
+            Set<UUID> participants = new HashSet<>(command.partnerIds());
+            participants.add(command.callerId());
+            if (participants.size() == 2) {
+                  throw new ConstraintViolationException("Exactly two participants should be provided for a direct chat. Use the direct chat endpoint instead.", new HashSet<>());
+            }
+            ChatPolicyInfo policyInfo = engagementApi.createGroup(command.callerId(), participants);
+            String chatId = policyInfo.identifier();
+            SettingsInfo settingsInfo = settingApi.create(chatId, command.roomName());
+            conversationApi.create(chatId, command.callerId(), policyInfo.creators(), command.roomName());
+            return chatMapper.map(policyInfo, settingsInfo);
+      }
+
+      @Override
+      public DirectChatResponse getDirect(UUID callerId, UUID partnerId) {
+            return Optional.ofNullable(directMappingApi.findDirectMapping(callerId, partnerId))
+                      .map(mapping -> new DirectChatResponse(mapping, false))
+                      .orElseGet(() -> {
+                            DirectInfo direct = engagementApi.createDirect(callerId, partnerId);
+                            ChatPolicyInfo policy = direct.policy();
+                            settingApi.create(policy.identifier(), null);
+                            conversationApi.create(policy.identifier(), callerId, new HashSet<>(List.of(callerId, partnerId)), null);
+                            return new DirectChatResponse(direct.mapping(), true);
+                      });
+      }
+
+      @Override
+      public ChatResponse find(String chatId, UUID userId) {
+            ChatPolicyInfo policyInfo = engagementApi.find(chatId, userId).orElseThrow();
+            SettingsInfo settingsInfo = settingApi.find(Set.of(chatId)).get(chatId);
+            return chatMapper.map(policyInfo, settingsInfo);
+      }
+}

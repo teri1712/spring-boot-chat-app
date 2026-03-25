@@ -1,0 +1,47 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>Icon.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">chat-app-server</a> &gt; <a href="index.source.html" class="el_package">com.decade.practice.inbox.domain</a> &gt; <span class="el_source">Icon.java</span></div><h1>Icon.java</h1><pre class="source lang-java linenums">package com.decade.practice.inbox.domain;
+
+import jakarta.persistence.Column;
+import jakarta.persistence.DiscriminatorValue;
+import jakarta.persistence.Entity;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
+
+import java.time.Instant;
+import java.util.UUID;
+
+import static com.decade.practice.inbox.domain.Icon.ICON_TYPE;
+
+@Entity
+@DiscriminatorValue(ICON_TYPE)
+<span class="nc" id="L17">@Setter</span>
+@Getter
+<span class="fc" id="L19">@NoArgsConstructor</span>
+public class Icon extends Message {
+
+      @Column(updatable = false)
+<span class="fc" id="L23">      private Integer iconId;</span>
+
+      public Icon(UUID chatEventId, UUID senderId, String chatId, Instant createdAt, Integer iconId) {
+<span class="fc" id="L26">            super(chatEventId, senderId, chatId, createdAt, ICON_TYPE);</span>
+<span class="fc" id="L27">            this.iconId = iconId;</span>
+<span class="fc" id="L28">      }</span>
+
+
+      public static final String ICON_TYPE = &quot;ICON&quot;;
+
+      @Override
+      public MessageState getState() {
+<span class="fc" id="L35">            return IconState.builder()</span>
+<span class="fc" id="L36">                      .sequenceId(getSequenceId())</span>
+<span class="fc" id="L37">                      .postingId(getPostingId())</span>
+<span class="fc" id="L38">                      .senderId(getSenderId())</span>
+<span class="fc" id="L39">                      .messageType(getMessageType())</span>
+<span class="fc" id="L40">                      .chatId(getChatId())</span>
+<span class="fc" id="L41">                      .createdAt(getCreatedAt())</span>
+<span class="fc" id="L42">                      .seenByIds(getAllSeenPointers().keySet())</span>
+<span class="fc" id="L43">                      .iconId(getIconId())</span>
+<span class="fc" id="L44">                      .build();</span>
+      }
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.11.202310140853</span></div></body></html>

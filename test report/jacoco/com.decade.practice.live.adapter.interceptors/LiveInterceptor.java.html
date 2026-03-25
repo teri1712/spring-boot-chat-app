@@ -1,0 +1,63 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>LiveInterceptor.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">chat-app-server</a> &gt; <a href="index.source.html" class="el_package">com.decade.practice.live.adapter.interceptors</a> &gt; <span class="el_source">LiveInterceptor.java</span></div><h1>LiveInterceptor.java</h1><pre class="source lang-java linenums">package com.decade.practice.live.adapter.interceptors;
+
+import com.decade.practice.live.application.ports.in.LiveService;
+import com.decade.practice.live.infras.security.SocketAuthentication;
+import com.decade.practice.web.security.jwt.JwtUser;
+import lombok.RequiredArgsConstructor;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.core.annotation.Order;
+import org.springframework.lang.Nullable;
+import org.springframework.messaging.Message;
+import org.springframework.messaging.MessageChannel;
+import org.springframework.messaging.simp.stomp.StompCommand;
+import org.springframework.messaging.simp.stomp.StompHeaderAccessor;
+import org.springframework.messaging.support.ChannelInterceptor;
+import org.springframework.messaging.support.MessageHeaderAccessor;
+import org.springframework.stereotype.Component;
+
+@Component
+<span class="fc" id="L19">@RequiredArgsConstructor</span>
+@Order(0)
+public class LiveInterceptor implements ChannelInterceptor {
+
+      private final LiveService liveService;
+
+      @Value(&quot;${websocket.topics.room}&quot;)
+      private String roomTopic;
+
+      private boolean isRoomDestination(String destination) {
+<span class="fc bfc" id="L29" title="All 4 branches covered.">            return destination != null &amp;&amp; destination.contains(roomTopic);</span>
+      }
+
+      private String extractChatId(String destination) {
+<span class="fc" id="L33">            return destination.substring(roomTopic.length() + 1);</span>
+      }
+
+      @Nullable
+      @Override
+      public Message&lt;?&gt; preSend(Message&lt;?&gt; message, MessageChannel channel) {
+
+<span class="fc" id="L40">            StompHeaderAccessor accessor =</span>
+<span class="fc" id="L41">                      MessageHeaderAccessor.getAccessor(message, StompHeaderAccessor.class);</span>
+<span class="fc" id="L42">            String destination = accessor.getDestination();</span>
+<span class="fc bfc" id="L43" title="All 2 branches covered.">            if (isRoomDestination(destination)) {</span>
+<span class="fc" id="L44">                  StompCommand command = accessor.getCommand();</span>
+<span class="fc bfc" id="L45" title="All 2 branches covered.">                  if (command == StompCommand.SUBSCRIBE) {</span>
+<span class="fc" id="L46">                        String chatId = extractChatId(accessor.getDestination());</span>
+<span class="fc" id="L47">                        JwtUser jwtUser = ((SocketAuthentication) accessor.getUser()).jwtUser();</span>
+<span class="fc" id="L48">                        liveService.join(chatId, jwtUser.getId(), jwtUser.getClaims().avatar());</span>
+<span class="pc bpc" id="L49" title="1 of 2 branches missed.">                  } else if (command == StompCommand.UNSUBSCRIBE) {</span>
+<span class="nc" id="L50">                        String chatId = extractChatId(accessor.getDestination());</span>
+<span class="nc" id="L51">                        JwtUser jwtUser = ((SocketAuthentication) accessor.getUser()).jwtUser();</span>
+<span class="nc" id="L52">                        liveService.leave(chatId, jwtUser.getId(), jwtUser.getClaims().avatar());</span>
+<span class="pc bpc" id="L53" title="1 of 2 branches missed.">                  } else if (command == StompCommand.SEND) {</span>
+<span class="fc" id="L54">                        String chatId = extractChatId(accessor.getDestination());</span>
+<span class="fc" id="L55">                        JwtUser jwtUser = ((SocketAuthentication) accessor.getUser()).jwtUser();</span>
+<span class="fc" id="L56">                        liveService.send(chatId, jwtUser.getId(), jwtUser.getClaims().avatar());</span>
+<span class="fc" id="L57">                        return null;</span>
+                  }
+            }
+<span class="fc" id="L60">            return message;</span>
+      }
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.11.202310140853</span></div></body></html>

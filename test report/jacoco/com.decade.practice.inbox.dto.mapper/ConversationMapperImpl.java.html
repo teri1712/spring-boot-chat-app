@@ -1,0 +1,82 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>ConversationMapperImpl.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">chat-app-server</a> &gt; <a href="index.source.html" class="el_package">com.decade.practice.inbox.dto.mapper</a> &gt; <span class="el_source">ConversationMapperImpl.java</span></div><h1>ConversationMapperImpl.java</h1><pre class="source lang-java linenums">package com.decade.practice.inbox.dto.mapper;
+
+import com.decade.practice.inbox.application.ports.out.PartnerLookUp;
+import com.decade.practice.inbox.domain.Conversation;
+import com.decade.practice.inbox.domain.ConversationId;
+import com.decade.practice.inbox.domain.ConversationInfo;
+import com.decade.practice.inbox.domain.HashValue;
+import com.decade.practice.inbox.dto.ConversationResponse;
+import com.decade.practice.inbox.dto.MessageStateResponse;
+import java.time.Instant;
+import java.util.List;
+import java.util.Map;
+import javax.annotation.processing.Generated;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Component;
+
+@Generated(
+    value = &quot;org.mapstruct.ap.MappingProcessor&quot;,
+    date = &quot;2026-03-25T16:47:05+0700&quot;,
+    comments = &quot;version: 1.5.5.Final, compiler: javac, environment: Java 21.0.10 (Ubuntu)&quot;
+)
+@Component
+<span class="fc" id="L23">public class ConversationMapperImpl implements ConversationMapper {</span>
+
+    @Autowired
+    private MessageMapper messageMapper;
+
+    @Override
+    public ConversationResponse map(Conversation conversation, PartnerLookUp partnerLookUp, Map&lt;String, ConversationInfo&gt; infoLookUp) {
+<span class="pc bpc" id="L30" title="1 of 2 branches missed.">        if ( conversation == null ) {</span>
+<span class="nc" id="L31">            return null;</span>
+        }
+
+<span class="fc" id="L34">        String identifier = null;</span>
+<span class="fc" id="L35">        Long revisionNumber = null;</span>
+<span class="fc" id="L36">        List&lt;MessageStateResponse&gt; recents = null;</span>
+<span class="fc" id="L37">        Instant modifiedAt = null;</span>
+
+<span class="fc" id="L39">        identifier = conversationConversationIdChatId( conversation );</span>
+<span class="fc" id="L40">        revisionNumber = conversationHashValue( conversation );</span>
+<span class="fc" id="L41">        recents = messageMapper.map( conversation.getRecents(), partnerLookUp );</span>
+<span class="fc" id="L42">        modifiedAt = conversation.getModifiedAt();</span>
+
+<span class="fc" id="L44">        String roomName = infoLookUp.get(conversation.getConversationId().chatId()).name();</span>
+<span class="fc" id="L45">        String roomAvatar = infoLookUp.get(conversation.getConversationId().chatId()).avatar();</span>
+
+<span class="fc" id="L47">        ConversationResponse conversationResponse = new ConversationResponse( identifier, roomName, roomAvatar, revisionNumber, recents, modifiedAt );</span>
+
+<span class="fc" id="L49">        return conversationResponse;</span>
+    }
+
+    private String conversationConversationIdChatId(Conversation conversation) {
+<span class="pc bpc" id="L53" title="1 of 2 branches missed.">        if ( conversation == null ) {</span>
+<span class="nc" id="L54">            return null;</span>
+        }
+<span class="fc" id="L56">        ConversationId conversationId = conversation.getConversationId();</span>
+<span class="pc bpc" id="L57" title="1 of 2 branches missed.">        if ( conversationId == null ) {</span>
+<span class="nc" id="L58">            return null;</span>
+        }
+<span class="fc" id="L60">        String chatId = conversationId.chatId();</span>
+<span class="pc bpc" id="L61" title="1 of 2 branches missed.">        if ( chatId == null ) {</span>
+<span class="nc" id="L62">            return null;</span>
+        }
+<span class="fc" id="L64">        return chatId;</span>
+    }
+
+    private Long conversationHashValue(Conversation conversation) {
+<span class="pc bpc" id="L68" title="1 of 2 branches missed.">        if ( conversation == null ) {</span>
+<span class="nc" id="L69">            return null;</span>
+        }
+<span class="fc" id="L71">        HashValue hash = conversation.getHash();</span>
+<span class="pc bpc" id="L72" title="1 of 2 branches missed.">        if ( hash == null ) {</span>
+<span class="nc" id="L73">            return null;</span>
+        }
+<span class="fc" id="L75">        Long value = hash.value();</span>
+<span class="pc bpc" id="L76" title="1 of 2 branches missed.">        if ( value == null ) {</span>
+<span class="nc" id="L77">            return null;</span>
+        }
+<span class="fc" id="L79">        return value;</span>
+    }
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.11.202310140853</span></div></body></html>
