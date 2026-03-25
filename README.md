@@ -8,7 +8,7 @@ profiles, authenticate, searching and participate in live chat rooms.
 https://angular-chat-application-psi.vercel.app (Unavailable now due to budget constraints)
 
 ## Demo
-A initial version of the application is available here:
+A initial version of the application demo is available here:
 
 * Web: [https://youtu.be/xm_pWF36_Uo](https://youtu.be/xm_pWF36_Uo)
 * Android: [https://youtu.be/E1SQVj2nTtw](https://youtu.be/E1SQVj2nTtw)
@@ -42,45 +42,69 @@ From the repository root:
 
 ```bash
 cd "source code/practice"
-docker-compose -f docker-compose.deploy.yml up -d --build
+docker compose -f docker-compose.dev.yml -f docker-compose.deploy.yml up -d
 ```
 
 or development deployable services with:
 
 ```bash
 cd "source code/practice"
-docker-compose -f docker-compose.dev.yml up -d --build
+docker-compose -f docker-compose.dev.yml up -d
 
 mvn spring-boot:run
 ```
 
 ## Refer to the frontend repository for detailed Angular setup and configuration.
 
-## Reports
+# Performance Test Report
 
-### Performance Report
+- Detailed reports are available in: `performance otimization report`
+- Detailed performance setting up are available ta `source code/practice/perf`
 
-This section compares the performance of the application with and without event caching. The benchmarks were conducted using JMeter.
+## Cache Performance Test
 
-#### No Cache
-| Label | # Samples | Average (ms) | Min (ms) | Max (ms) | Throughput |
-|-------|-----------|--------------|----------|----------|------------|
-| my messages | 5000 | 59 | 9 | 244 | 174.3/sec |
-| chat messages | 5000 | 58 | 9 | 269 | 175.4/sec |
-| **TOTAL** | **10000** | **59** | **9** | **269** | **348.4/sec** |
+### Test Setup
+- **Scenarios**: 2 server pools compared
+  - Pool 1: Cache disabled (2 servers)
+  - Pool 2: Cache enabled (2 servers)
+- **Load Profile**: 
+  - 0-30s: Ramp up to 20 concurrent users
+  - 30s-90s: Maintain 50 concurrent users
+  - 90s-120s: Ramp down to 0
+- **Total Requests**: 29,388
 
-#### With Cache (Redis)
-| Label | # Samples | Average (ms) | Min (ms) | Max (ms) | Throughput |
-|-------|-----------|--------------|----------|----------|------------|
-| my messages | 5000 | 4 | 2 | 227 | 241.6/sec |
-| chat messages | 5000 | 4 | 2 | 48 | 244.2/sec |
-| **TOTAL** | **10000** | **4** | **2** | **227** | **483.1/sec** |
+### Results
+| Metric | Value |
+|--------|-------|
+| Min Response Time | 4.52 ms |
+| Max Response Time | 1,168.95 ms |
+| Avg Response Time | **106.34 ms** |
+| Success Rate | **99.99%** |
+| Failed Requests | 0 |
 
-*Note: Enabling cache reduced average latency by approximately 93%. Detailed CSV reports can be found in the `perf_report` folder.*
+---
+
+## Fanout Performance Test (WebSocket Messaging)
+
+### Test Setup
+- **Scenarios**: Publisher-Subscriber messaging pattern
+  - **Subscribers**: 500 concurrent WebSocket connections (constant) to receive fanout
+  - **Publishers**: 30 messages/sec (constant arrival rate)
+  - **Test Duration**: 2 minutes per scenario
+- **Infrastructure**: 5 server instances for load distribution
+- **Total Requests**: 618 REST API calls
+
+### Results
+| Metric | Value |
+|--------|-------|
+| Avg Response Time | **20,922.68 ms** |
+| WebSocket Connections | **500 concurrent** |
+| Message Delivery Rate | **30 messages/sec** |
+
 
 ### Test Report
 
 The project maintains high code quality with a comprehensive test suite. We have achieved **over 80% test coverage**.
 
-- Detailed JaCoCo coverage reports are available in: `test_report/site/jacoco`
-- To view the report, open `test_report/site/jacoco/index.html` in your browser.
+- Detailed JaCoCo coverage reports are available in: `test report/jacoco`
+- To view the report, open `test report/jacoco/index.html` in your browser.

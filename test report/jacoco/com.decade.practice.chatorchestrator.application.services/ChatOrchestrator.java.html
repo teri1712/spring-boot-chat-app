@@ -1,0 +1,68 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>ChatOrchestrator.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">chat-app-server</a> &gt; <a href="index.source.html" class="el_package">com.decade.practice.chatorchestrator.application.services</a> &gt; <span class="el_source">ChatOrchestrator.java</span></div><h1>ChatOrchestrator.java</h1><pre class="source lang-java linenums">package com.decade.practice.chatorchestrator.application.services;
+
+import com.decade.practice.chatorchestrator.application.ports.in.ChatService;
+import com.decade.practice.chatorchestrator.application.ports.in.CreateGroupChatCommand;
+import com.decade.practice.chatorchestrator.dto.ChatResponse;
+import com.decade.practice.chatorchestrator.dto.DirectChatResponse;
+import com.decade.practice.chatorchestrator.dto.mappers.ChatMapper;
+import com.decade.practice.chatsettings.api.SettingApi;
+import com.decade.practice.chatsettings.api.SettingsInfo;
+import com.decade.practice.engagement.api.ChatPolicyInfo;
+import com.decade.practice.engagement.api.DirectInfo;
+import com.decade.practice.engagement.api.DirectMappingApi;
+import com.decade.practice.engagement.api.EngagementApi;
+import com.decade.practice.inbox.apis.ConversationApi;
+import jakarta.validation.ConstraintViolationException;
+import lombok.RequiredArgsConstructor;
+import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
+
+import java.util.*;
+
+@Service
+<span class="fc" id="L23">@RequiredArgsConstructor</span>
+@Transactional
+// TODO: SAGA
+public class ChatOrchestrator implements ChatService {
+
+      private final EngagementApi engagementApi;
+      private final DirectMappingApi directMappingApi;
+      private final SettingApi settingApi;
+      private final ConversationApi conversationApi;
+      private final ChatMapper chatMapper;
+
+      @Override
+      public ChatResponse createGroup(CreateGroupChatCommand command) {
+<span class="fc" id="L36">            Set&lt;UUID&gt; participants = new HashSet&lt;&gt;(command.partnerIds());</span>
+<span class="fc" id="L37">            participants.add(command.callerId());</span>
+<span class="pc bpc" id="L38" title="1 of 2 branches missed.">            if (participants.size() == 2) {</span>
+<span class="nc" id="L39">                  throw new ConstraintViolationException(&quot;Exactly two participants should be provided for a direct chat. Use the direct chat endpoint instead.&quot;, new HashSet&lt;&gt;());</span>
+            }
+<span class="fc" id="L41">            ChatPolicyInfo policyInfo = engagementApi.createGroup(command.callerId(), participants);</span>
+<span class="fc" id="L42">            String chatId = policyInfo.identifier();</span>
+<span class="fc" id="L43">            SettingsInfo settingsInfo = settingApi.create(chatId, command.roomName());</span>
+<span class="fc" id="L44">            conversationApi.create(chatId, command.callerId(), policyInfo.creators(), command.roomName());</span>
+<span class="fc" id="L45">            return chatMapper.map(policyInfo, settingsInfo);</span>
+      }
+
+      @Override
+      public DirectChatResponse getDirect(UUID callerId, UUID partnerId) {
+<span class="fc" id="L50">            return Optional.ofNullable(directMappingApi.findDirectMapping(callerId, partnerId))</span>
+<span class="fc" id="L51">                      .map(mapping -&gt; new DirectChatResponse(mapping, false))</span>
+<span class="fc" id="L52">                      .orElseGet(() -&gt; {</span>
+<span class="fc" id="L53">                            DirectInfo direct = engagementApi.createDirect(callerId, partnerId);</span>
+<span class="fc" id="L54">                            ChatPolicyInfo policy = direct.policy();</span>
+<span class="fc" id="L55">                            settingApi.create(policy.identifier(), null);</span>
+<span class="fc" id="L56">                            conversationApi.create(policy.identifier(), callerId, new HashSet&lt;&gt;(List.of(callerId, partnerId)), null);</span>
+<span class="fc" id="L57">                            return new DirectChatResponse(direct.mapping(), true);</span>
+                      });
+      }
+
+      @Override
+      public ChatResponse find(String chatId, UUID userId) {
+<span class="fc" id="L63">            ChatPolicyInfo policyInfo = engagementApi.find(chatId, userId).orElseThrow();</span>
+<span class="fc" id="L64">            SettingsInfo settingsInfo = settingApi.find(Set.of(chatId)).get(chatId);</span>
+<span class="fc" id="L65">            return chatMapper.map(policyInfo, settingsInfo);</span>
+      }
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.11.202310140853</span></div></body></html>

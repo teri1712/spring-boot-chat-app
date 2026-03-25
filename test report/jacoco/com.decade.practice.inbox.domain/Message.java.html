@@ -1,0 +1,139 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>Message.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">chat-app-server</a> &gt; <a href="index.source.html" class="el_package">com.decade.practice.inbox.domain</a> &gt; <span class="el_source">Message.java</span></div><h1>Message.java</h1><pre class="source lang-java linenums">package com.decade.practice.inbox.domain;
+
+import com.decade.practice.inbox.domain.events.MessageCreated;
+import com.decade.practice.inbox.domain.events.MessageUpdated;
+import jakarta.persistence.*;
+import jakarta.validation.constraints.NotNull;
+import lombok.AccessLevel;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
+import org.springframework.data.domain.AbstractAggregateRoot;
+
+import java.time.Instant;
+import java.util.HashMap;
+import java.util.Map;
+import java.util.UUID;
+
+<span class="fc" id="L18">@Slf4j</span>
+@Entity
+@Getter
+
+@Inheritance(strategy = InheritanceType.SINGLE_TABLE)
+@DiscriminatorColumn(name = &quot;message_type&quot;)
+public abstract class Message extends AbstractAggregateRoot&lt;Message&gt; {
+
+      @Id
+      @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = &quot;message_sequence&quot;)
+      @SequenceGenerator(name = &quot;message_sequence&quot;, sequenceName = &quot;message_seq&quot;, initialValue = 1000)
+<span class="fc" id="L29">      private Long sequenceId;</span>
+
+<span class="fc" id="L31">      private UUID postingId;</span>
+
+      @Column(updatable = false, nullable = false)
+<span class="fc" id="L34">      private UUID senderId;</span>
+
+      @Column(name = &quot;message_type&quot;, insertable = false, updatable = false)
+<span class="fc" id="L37">      private String messageType;</span>
+
+      @Column(nullable = false, updatable = false)
+      @NotNull
+<span class="fc" id="L41">      private String chatId;</span>
+
+      @Column(nullable = false, updatable = false)
+<span class="fc" id="L44">      private Instant createdAt;</span>
+
+<span class="nc" id="L46">      private Instant updatedAt;</span>
+
+
+      @OneToMany(cascade = CascadeType.ALL, orphanRemoval = true, fetch = FetchType.EAGER, mappedBy = &quot;message&quot;)
+      @MapKey(name = &quot;senderId&quot;)
+<span class="fc" id="L51">      @Getter(AccessLevel.PACKAGE)</span>
+      private Map&lt;UUID, SeenPointer&gt; seenPointers;
+
+      public void deleteSeen(UUID by) {
+<span class="fc" id="L55">            getSeenPointers().remove(by);</span>
+<span class="fc" id="L56">            this.onUpdated();</span>
+<span class="fc" id="L57">      }</span>
+
+
+      public Map&lt;UUID, SeenPointer&gt; getAllSeenPointers() {
+<span class="fc" id="L61">            return Map.copyOf(seenPointers);</span>
+      }
+
+      public void addSeen(UUID senderId, Instant at) {
+<span class="fc" id="L65">            getSeenPointers().put(senderId, new SeenPointer(chatId, senderId, at, this));</span>
+<span class="fc" id="L66">            this.onUpdated();</span>
+<span class="fc" id="L67">      }</span>
+
+<span class="fc" id="L69">      protected Message() {</span>
+<span class="fc" id="L70">      }</span>
+
+<span class="fc" id="L72">      protected Message(UUID postingId, UUID senderId, String chatId, Instant createdAt, String messageType) {</span>
+<span class="fc" id="L73">            this.postingId = postingId;</span>
+<span class="fc" id="L74">            this.senderId = senderId;</span>
+<span class="fc" id="L75">            this.chatId = chatId;</span>
+<span class="fc" id="L76">            this.createdAt = createdAt;</span>
+<span class="fc" id="L77">            this.messageType = messageType;</span>
+<span class="fc" id="L78">            this.updatedAt = createdAt;</span>
+<span class="fc" id="L79">            this.seenPointers = new HashMap&lt;&gt;();</span>
+<span class="fc" id="L80">            this.createdAt = Instant.now();</span>
+<span class="fc" id="L81">            this.updatedAt = Instant.now();</span>
+<span class="fc" id="L82">      }</span>
+
+      @PrePersist
+      protected void onPersisted() {
+<span class="fc" id="L86">            registerEvent(new MessageCreated(sequenceId, postingId, senderId, chatId, createdAt, messageType, getState()));</span>
+<span class="fc" id="L87">      }</span>
+
+      private void onUpdated() {
+<span class="fc" id="L90">            updatedAt = Instant.now();</span>
+<span class="fc" id="L91">            registerEvent(new MessageUpdated(sequenceId, postingId, chatId, senderId, updatedAt, getState()));</span>
+<span class="fc" id="L92">      }</span>
+
+      public abstract MessageState getState();
+
+      @Entity
+      @Getter
+<span class="fc" id="L98">      @NoArgsConstructor</span>
+      @Table(name = &quot;seen_pointer&quot;)
+      public static class SeenPointer {
+
+            @Id
+            @GeneratedValue(strategy = GenerationType.SEQUENCE)
+<span class="nc" id="L104">            private Long id;</span>
+
+            @Column(name = &quot;sender_id&quot;, nullable = false)
+<span class="nc" id="L107">            private UUID senderId;</span>
+
+<span class="nc" id="L109">            private String chatId;</span>
+
+            @Temporal(TemporalType.TIMESTAMP)
+<span class="nc" id="L112">            private Instant at;</span>
+
+<span class="fc" id="L114">            private SeenPointer(String chatId, UUID senderId, Instant at, Message message) {</span>
+<span class="fc" id="L115">                  this.chatId = chatId;</span>
+<span class="fc" id="L116">                  this.senderId = senderId;</span>
+<span class="fc" id="L117">                  this.at = at;</span>
+<span class="fc" id="L118">                  this.message = message;</span>
+<span class="fc" id="L119">            }</span>
+
+            @ManyToOne
+            @JoinColumn(name = &quot;message_id&quot;)
+<span class="nc" id="L123">            private Message message;</span>
+
+//
+//            @PrePersist
+//            void onPersisted() {
+//                  log.info(&quot;Seen pointer created: {}&quot;, this);
+//                  message.onUpdated();
+//            }
+//
+//            @PreRemove
+//            void onUpdated() {
+//                  log.info(&quot;Seen pointer updated: {}&quot;, this);
+//                  message.onUpdated();
+//            }
+      }
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.11.202310140853</span></div></body></html>

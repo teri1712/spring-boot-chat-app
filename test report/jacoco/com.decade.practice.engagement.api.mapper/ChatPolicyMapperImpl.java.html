@@ -1,0 +1,58 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>ChatPolicyMapperImpl.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">chat-app-server</a> &gt; <a href="index.source.html" class="el_package">com.decade.practice.engagement.api.mapper</a> &gt; <span class="el_source">ChatPolicyMapperImpl.java</span></div><h1>ChatPolicyMapperImpl.java</h1><pre class="source lang-java linenums">package com.decade.practice.engagement.api.mapper;
+
+import com.decade.practice.engagement.api.ChatPolicyInfo;
+import com.decade.practice.engagement.domain.Chat;
+import com.decade.practice.engagement.domain.ChatCreators;
+import java.util.LinkedHashSet;
+import java.util.Set;
+import java.util.UUID;
+import javax.annotation.processing.Generated;
+import org.springframework.stereotype.Component;
+
+@Generated(
+    value = &quot;org.mapstruct.ap.MappingProcessor&quot;,
+    date = &quot;2026-03-25T16:47:05+0700&quot;,
+    comments = &quot;version: 1.5.5.Final, compiler: javac, environment: Java 21.0.10 (Ubuntu)&quot;
+)
+@Component
+<span class="fc" id="L18">public class ChatPolicyMapperImpl implements ChatPolicyMapper {</span>
+
+    @Override
+    public ChatPolicyInfo map(Chat policy) {
+<span class="pc bpc" id="L22" title="1 of 2 branches missed.">        if ( policy == null ) {</span>
+<span class="nc" id="L23">            return null;</span>
+        }
+
+<span class="fc" id="L26">        String identifier = null;</span>
+<span class="fc" id="L27">        Set&lt;UUID&gt; creators = null;</span>
+<span class="fc" id="L28">        Integer maxParticipants = null;</span>
+
+<span class="fc" id="L30">        identifier = policy.getChatId();</span>
+<span class="fc" id="L31">        Set&lt;UUID&gt; members = policyCreatorsMembers( policy );</span>
+<span class="fc" id="L32">        Set&lt;UUID&gt; set = members;</span>
+<span class="pc bpc" id="L33" title="1 of 2 branches missed.">        if ( set != null ) {</span>
+<span class="fc" id="L34">            creators = new LinkedHashSet&lt;UUID&gt;( set );</span>
+        }
+<span class="fc" id="L36">        maxParticipants = policy.getMaxParticipants();</span>
+
+<span class="fc" id="L38">        ChatPolicyInfo chatPolicyInfo = new ChatPolicyInfo( identifier, maxParticipants, creators );</span>
+
+<span class="fc" id="L40">        return chatPolicyInfo;</span>
+    }
+
+    private Set&lt;UUID&gt; policyCreatorsMembers(Chat chat) {
+<span class="pc bpc" id="L44" title="1 of 2 branches missed.">        if ( chat == null ) {</span>
+<span class="nc" id="L45">            return null;</span>
+        }
+<span class="fc" id="L47">        ChatCreators creators = chat.getCreators();</span>
+<span class="pc bpc" id="L48" title="1 of 2 branches missed.">        if ( creators == null ) {</span>
+<span class="nc" id="L49">            return null;</span>
+        }
+<span class="fc" id="L51">        Set&lt;UUID&gt; members = creators.getMembers();</span>
+<span class="pc bpc" id="L52" title="1 of 2 branches missed.">        if ( members == null ) {</span>
+<span class="nc" id="L53">            return null;</span>
+        }
+<span class="fc" id="L55">        return members;</span>
+    }
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.11.202310140853</span></div></body></html>

@@ -1,0 +1,86 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>CacheableUserApi.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">chat-app-server</a> &gt; <a href="index.source.html" class="el_package">com.decade.practice.users.application.services</a> &gt; <span class="el_source">CacheableUserApi.java</span></div><h1>CacheableUserApi.java</h1><pre class="source lang-java linenums">package com.decade.practice.users.application.services;
+
+import com.decade.practice.users.api.UserApi;
+import com.decade.practice.users.api.UserInfo;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
+import org.springframework.context.annotation.Primary;
+import org.springframework.context.annotation.Profile;
+import org.springframework.dao.DataAccessException;
+import org.springframework.data.redis.connection.RedisConnection;
+import org.springframework.data.redis.core.RedisCallback;
+import org.springframework.data.redis.core.StringRedisTemplate;
+import org.springframework.lang.Nullable;
+import org.springframework.stereotype.Component;
+
+import java.time.Duration;
+import java.util.*;
+
+<span class="fc" id="L20">@Slf4j</span>
+@Primary
+@Profile(&quot;redis-cache&quot;)
+@Component
+<span class="fc" id="L24">@RequiredArgsConstructor</span>
+public class CacheableUserApi implements UserApi {
+
+      private static final String USER_INFO_KEY_PREFIX = &quot;user_info:&quot;;
+<span class="fc" id="L28">      private static final Duration TTL = Duration.ofMinutes(5);</span>
+
+      private final UserApiImpl userApi;
+      private final StringRedisTemplate redisTemplate;
+      private final ObjectMapper objectMapper;
+
+      private static String makeUserKey(UUID userId) {
+<span class="fc" id="L35">            return USER_INFO_KEY_PREFIX + userId.toString();</span>
+      }
+
+      @Override
+      public Map&lt;UUID, UserInfo&gt; getUserInfo(Set&lt;UUID&gt; ids) {
+
+<span class="fc" id="L41">            List&lt;UUID&gt; idList = ids.stream().toList();</span>
+<span class="fc" id="L42">            List&lt;String&gt; idStrings = idList.stream().map(CacheableUserApi::makeUserKey).toList();</span>
+<span class="fc" id="L43">            List&lt;String&gt; userStrings = redisTemplate.opsForValue().multiGet(idStrings);</span>
+<span class="fc" id="L44">            Set&lt;UUID&gt; missingIds = new HashSet&lt;&gt;();</span>
+<span class="fc" id="L45">            Set&lt;String&gt; invalidKeys = new HashSet&lt;&gt;();</span>
+<span class="fc" id="L46">            Map&lt;UUID, UserInfo&gt; result = new HashMap&lt;&gt;();</span>
+
+<span class="fc bfc" id="L48" title="All 2 branches covered.">            for (int index = 0; index &lt; idList.size(); index++) {</span>
+<span class="fc" id="L49">                  String userString = userStrings.get(index);</span>
+<span class="fc bfc" id="L50" title="All 2 branches covered.">                  if (userString != null) {</span>
+                        try {
+<span class="fc" id="L52">                              UserInfo userInfo = objectMapper.readValue(userString, UserInfo.class);</span>
+<span class="fc" id="L53">                              result.put(userInfo.id(), userInfo);</span>
+<span class="fc" id="L54">                              continue;</span>
+<span class="nc" id="L55">                        } catch (Exception e) {</span>
+<span class="nc" id="L56">                              log.warn(&quot;Failed to deserialize cached user info, treating as cache miss&quot;, e);</span>
+<span class="nc" id="L57">                              invalidKeys.add(makeUserKey(idList.get(index)));</span>
+                        }
+                  }
+<span class="fc" id="L60">                  missingIds.add(idList.get(index));</span>
+            }
+
+<span class="fc bfc" id="L63" title="All 2 branches covered.">            if (!missingIds.isEmpty()) {</span>
+<span class="fc" id="L64">                  Map&lt;UUID, UserInfo&gt; missingUsers = userApi.getUserInfo(missingIds);</span>
+<span class="fc" id="L65">                  result.putAll(missingUsers);</span>
+
+<span class="fc" id="L67">                  redisTemplate.executePipelined(new RedisCallback&lt;Object&gt;() {</span>
+                        @Nullable
+                        @Override
+                        public Object doInRedis(RedisConnection connection) throws DataAccessException {
+<span class="fc" id="L71">                              missingUsers.forEach((id, userInfo) -&gt; {</span>
+                                    try {
+<span class="fc" id="L73">                                          String userString = objectMapper.writeValueAsString(userInfo);</span>
+<span class="fc" id="L74">                                          connection.stringCommands().setEx(makeUserKey(id).getBytes(), TTL.toSeconds(), userString.getBytes());</span>
+<span class="nc" id="L75">                                    } catch (Exception e) {</span>
+<span class="nc" id="L76">                                          log.warn(&quot;Failed to cache user info for &quot; + id, e);</span>
+<span class="fc" id="L77">                                    }</span>
+<span class="fc" id="L78">                              });</span>
+<span class="fc" id="L79">                              return null;</span>
+                        }
+                  });
+            }
+<span class="fc" id="L83">            return result;</span>
+      }
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.11.202310140853</span></div></body></html>

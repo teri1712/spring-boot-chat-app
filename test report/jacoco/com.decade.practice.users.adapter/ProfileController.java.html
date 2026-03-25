@@ -1,0 +1,49 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>ProfileController.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">chat-app-server</a> &gt; <a href="index.source.html" class="el_package">com.decade.practice.users.adapter</a> &gt; <span class="el_source">ProfileController.java</span></div><h1>ProfileController.java</h1><pre class="source lang-java linenums">package com.decade.practice.users.adapter;
+
+import com.decade.practice.users.adapter.validation.StrongPassword;
+import com.decade.practice.users.application.ports.in.ProfileService;
+import com.decade.practice.users.dto.AccountResponse;
+import com.decade.practice.users.dto.ProfileRequest;
+import com.decade.practice.users.dto.ProfileResponse;
+import jakarta.persistence.OptimisticLockException;
+import jakarta.validation.Valid;
+import lombok.AllArgsConstructor;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
+import org.springframework.validation.annotation.Validated;
+import org.springframework.web.bind.annotation.*;
+
+import java.security.Principal;
+import java.util.UUID;
+
+<span class="fc" id="L18">@AllArgsConstructor</span>
+@RestController
+@Validated
+@RequestMapping(&quot;/profiles/me&quot;)
+public class ProfileController {
+
+      private final ProfileService profileService;
+
+      @GetMapping
+      public ProfileResponse get(Principal principal) {
+<span class="fc" id="L28">            return profileService.findByUsername(principal.getName());</span>
+      }
+
+      @PatchMapping
+      public ProfileResponse changeProfile(
+                @RequestBody @Valid ProfileRequest profile,
+                @AuthenticationPrincipal(expression = &quot;id&quot;) UUID id
+      ) throws OptimisticLockException {
+<span class="fc" id="L36">            return profileService.changeProfile(id, profile);</span>
+      }
+
+      // TODO: Adjust client
+      @PostMapping(&quot;/password&quot;)
+      public AccountResponse changePassword(
+                @AuthenticationPrincipal(expression = &quot;id&quot;) UUID id,
+                @RequestParam(value = &quot;password&quot;, required = false) String password,
+                @StrongPassword @RequestParam(&quot;new_password&quot;) String newPassword
+      ) {
+<span class="fc" id="L46">            return profileService.changePassword(id, newPassword, password);</span>
+      }
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.11.202310140853</span></div></body></html>

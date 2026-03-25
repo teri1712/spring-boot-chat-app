@@ -1,0 +1,58 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>HashValue.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">chat-app-server</a> &gt; <a href="index.source.html" class="el_package">com.decade.practice.inbox.domain</a> &gt; <span class="el_source">HashValue.java</span></div><h1>HashValue.java</h1><pre class="source lang-java linenums">package com.decade.practice.inbox.domain;
+
+import jakarta.persistence.Column;
+import jakarta.persistence.Embeddable;
+
+@Embeddable
+public record HashValue(
+
+          @Column(name = &quot;hash_value&quot;)
+          Long value) {
+
+<span class="fc" id="L12">      public HashValue {</span>
+<span class="fc bfc" id="L13" title="All 2 branches covered.">            if (value &gt;= mod) {</span>
+<span class="fc" id="L14">                  value %= mod;</span>
+            }
+<span class="fc" id="L16">      }</span>
+
+<span class="fc" id="L18">      private static final Long p = 31L, mod = 998_244_353L;</span>
+<span class="fc" id="L19">      public static final HashValue ONE = new HashValue(1L);</span>
+
+      HashValue shift() {
+<span class="fc" id="L22">            return new HashValue((value * p) % mod);</span>
+      }
+
+      HashValue plus(HashValue other) {
+<span class="fc" id="L26">            long newValue = value + other.value();</span>
+<span class="fc bfc" id="L27" title="All 2 branches covered.">            if (newValue &gt;= mod) newValue -= mod;</span>
+<span class="fc" id="L28">            return new HashValue(newValue);</span>
+      }
+
+      HashValue minus(HashValue other) {
+<span class="fc" id="L32">            long newValue = value - other.value();</span>
+<span class="fc bfc" id="L33" title="All 2 branches covered.">            if (newValue &lt; 0) newValue += mod;</span>
+<span class="fc" id="L34">            return new HashValue(newValue);</span>
+      }
+
+      HashValue times(HashValue other) {
+<span class="fc" id="L38">            long newValue = (value * other.value()) % mod;</span>
+<span class="fc" id="L39">            return new HashValue(newValue);</span>
+      }
+
+      public HashValue shift(long exp) {
+<span class="fc" id="L43">            long pow = 1;</span>
+<span class="fc" id="L44">            long base = p;</span>
+<span class="fc" id="L45">            base %= mod;</span>
+
+<span class="fc bfc" id="L47" title="All 2 branches covered.">            while (exp &gt; 0) {</span>
+<span class="pc bpc" id="L48" title="1 of 2 branches missed.">                  if ((exp &amp; 1) == 1) {</span>
+<span class="fc" id="L49">                        pow = (pow * base) % mod;</span>
+                  }
+<span class="fc" id="L51">                  base = (base * base) % mod;</span>
+<span class="fc" id="L52">                  exp &gt;&gt;= 1;</span>
+            }
+
+<span class="fc" id="L55">            return new HashValue((value * pow) % mod);</span>
+      }
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.11.202310140853</span></div></body></html>

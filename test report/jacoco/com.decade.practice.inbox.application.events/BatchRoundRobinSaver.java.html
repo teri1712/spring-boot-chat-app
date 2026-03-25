@@ -1,0 +1,118 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>BatchRoundRobinSaver.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">chat-app-server</a> &gt; <a href="index.source.html" class="el_package">com.decade.practice.inbox.application.events</a> &gt; <span class="el_source">BatchRoundRobinSaver.java</span></div><h1>BatchRoundRobinSaver.java</h1><pre class="source lang-java linenums">package com.decade.practice.inbox.application.events;
+
+import com.decade.practice.inbox.application.ports.out.*;
+import com.decade.practice.inbox.application.ports.out.projection.ConversationView;
+import com.decade.practice.inbox.domain.Conversation;
+import com.decade.practice.inbox.domain.InboxLog;
+import com.decade.practice.inbox.domain.LogAction;
+import com.decade.practice.inbox.domain.Room;
+import com.decade.practice.inbox.domain.events.MessageCreated;
+import com.decade.practice.inbox.domain.events.MessageUpdated;
+import com.decade.practice.inbox.domain.services.ConversationInfoService;
+import com.decade.practice.inbox.dto.mapper.InboxLogMapper;
+import lombok.RequiredArgsConstructor;
+import org.springframework.modulith.events.ApplicationModuleListener;
+import org.springframework.transaction.support.TransactionSynchronization;
+import org.springframework.transaction.support.TransactionSynchronizationManager;
+
+import java.util.HashSet;
+import java.util.List;
+import java.util.Set;
+import java.util.UUID;
+
+<span class="fc" id="L23">@RequiredArgsConstructor</span>
+public abstract class BatchRoundRobinSaver {
+
+      private final Integer lowerBound;
+      private final Integer upperBound;
+      private final LogRepository logs;
+      private final ConversationRepository conversations;
+      private final LookUpRegistry lookUpRegistry;
+
+      private final ConversationInfoService conversationInfoService;
+      private final DeliveryService deliveryService;
+      private final InboxLogMapper inboxLogMapper;
+
+      @ApplicationModuleListener
+      public void on(MessageCreated message) {
+<span class="fc" id="L38">            Set&lt;UUID&gt; allNeedUsers = new HashSet&lt;&gt;(message.currentState().getAllPartners().toList());</span>
+<span class="fc" id="L39">            List&lt;ConversationView&gt; convos = conversations.findByChatIdBetweenRoundRobin(message.chatId(), lowerBound, upperBound);</span>
+
+
+<span class="fc" id="L42">            convos.forEach(conversationView -&gt; {</span>
+<span class="fc" id="L43">                  Room room = conversationView.room();</span>
+<span class="fc" id="L44">                  allNeedUsers.addAll(room.getRepresentatives());</span>
+<span class="fc" id="L45">                  allNeedUsers.add(room.getCreator());</span>
+<span class="fc" id="L46">            });</span>
+<span class="fc" id="L47">            PartnerLookUp lookUp = lookUpRegistry.registerLookUp(allNeedUsers);</span>
+
+<span class="fc" id="L49">            convos.forEach(conversationView -&gt; {</span>
+<span class="fc" id="L50">                  Conversation conversation = conversationView.conversation();</span>
+<span class="fc" id="L51">                  Room room = conversationView.room();</span>
+<span class="fc" id="L52">                  UUID ownerId = conversation.getConversationId().ownerId();</span>
+<span class="fc" id="L53">                  InboxLog log = new InboxLog(LogAction.ADDITION,</span>
+<span class="fc" id="L54">                            message.chatId(),</span>
+<span class="fc" id="L55">                            message.senderId(),</span>
+                            ownerId,
+<span class="fc" id="L57">                            conversation.getId(),</span>
+<span class="fc" id="L58">                            message.id(),</span>
+<span class="fc" id="L59">                            message.currentState());</span>
+<span class="fc" id="L60">                  logs.save(log);</span>
+<span class="fc" id="L61">                  conversation.addRecent(message.currentState());</span>
+
+<span class="fc" id="L63">                  conversations.save(conversation);</span>
+
+<span class="fc" id="L65">                  TransactionSynchronizationManager.registerSynchronization(new TransactionSynchronization() {</span>
+                        @Override
+                        public void afterCommit() {
+<span class="fc" id="L68">                              send(log, room, conversation, lookUp);</span>
+<span class="fc" id="L69">                        }</span>
+                  });
+<span class="fc" id="L71">            });</span>
+
+<span class="fc" id="L73">      }</span>
+
+      @ApplicationModuleListener
+      public void on(MessageUpdated message) {
+<span class="fc" id="L77">            Set&lt;UUID&gt; allNeedUsers = new HashSet&lt;&gt;(message.currentState().getAllPartners().toList());</span>
+<span class="fc" id="L78">            List&lt;ConversationView&gt; convos = conversations.findByChatIdBetweenRoundRobin(message.chatId(), lowerBound, upperBound);</span>
+
+<span class="fc" id="L80">            convos.forEach(conversationView -&gt; {</span>
+<span class="fc" id="L81">                  Room room = conversationView.room();</span>
+<span class="fc" id="L82">                  allNeedUsers.addAll(room.getRepresentatives());</span>
+<span class="fc" id="L83">                  allNeedUsers.add(room.getCreator());</span>
+<span class="fc" id="L84">            });</span>
+<span class="fc" id="L85">            PartnerLookUp lookUp = lookUpRegistry.registerLookUp(allNeedUsers);</span>
+
+<span class="fc" id="L87">            convos.forEach(conversationView -&gt; {</span>
+<span class="fc" id="L88">                  Conversation conversation = conversationView.conversation();</span>
+<span class="fc" id="L89">                  Room room = conversationView.room();</span>
+<span class="fc" id="L90">                  UUID ownerId = conversation.getConversationId().ownerId();</span>
+<span class="fc" id="L91">                  InboxLog log = new InboxLog(LogAction.UPDATE,</span>
+<span class="fc" id="L92">                            message.chatId(),</span>
+<span class="fc" id="L93">                            message.senderId(),</span>
+                            ownerId,
+<span class="fc" id="L95">                            conversation.getId(),</span>
+<span class="fc" id="L96">                            message.id(),</span>
+<span class="fc" id="L97">                            message.currentState());</span>
+<span class="fc" id="L98">                  logs.save(log);</span>
+<span class="fc" id="L99">                  conversation.updateRecent(message.currentState());</span>
+<span class="fc" id="L100">                  conversations.save(conversation);</span>
+
+<span class="fc" id="L102">                  TransactionSynchronizationManager.registerSynchronization(new TransactionSynchronization() {</span>
+                        @Override
+                        public void afterCommit() {
+<span class="fc" id="L105">                              send(log, room, conversation, lookUp);</span>
+<span class="fc" id="L106">                        }</span>
+                  });
+<span class="fc" id="L108">            });</span>
+<span class="fc" id="L109">      }</span>
+
+
+      public void send(InboxLog inboxLog, Room room, Conversation conversation, PartnerLookUp lookUp) {
+<span class="fc" id="L113">            UUID ownerId = inboxLog.getOwnerId();</span>
+<span class="fc" id="L114">            deliveryService.send(inboxLogMapper.map(inboxLog, lookUp, conversation, conversationInfoService.getInfo(ownerId, room, lookUp)));</span>
+<span class="fc" id="L115">      }</span>
+
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.11.202310140853</span></div></body></html>

@@ -59,31 +59,31 @@ services:
     entrypoint: [ "sh", "-c", "cd /es && sh ./init.sh" ]
     networks:
       - backend
-  kibana:
-    image: docker.elastic.co/kibana/kibana:8.12.2
-    ports:
-      - "5601:5601"
-    depends_on:
-      - elasticsearch
-    environment:
-      ELASTICSEARCH_HOSTS: http://elasticsearch:9200
-    cpus: 0.5
-    mem_limit: 500m
-    networks:
-      - backend
-
-  filebeat:
-    image: docker.elastic.co/beats/filebeat:8.11.0
-    user: root
-    volumes:
-      - ../filebeat/filebeat.yml:/usr/share/filebeat/filebeat.yml
-      - ./logs:/logs
-    depends_on:
-      - elasticsearch
-    cpus: 0.3
-    mem_limit: 300m
-    networks:
-      - backend
+#  kibana:
+#    image: docker.elastic.co/kibana/kibana:8.12.2
+#    ports:
+#      - "5601:5601"
+#    depends_on:
+#      - elasticsearch
+#    environment:
+#      ELASTICSEARCH_HOSTS: http://elasticsearch:9200
+#    cpus: 0.5
+#    mem_limit: 500m
+#    networks:
+#      - backend
+#
+#  filebeat:
+#    image: docker.elastic.co/beats/filebeat:8.11.0
+#    user: root
+#    volumes:
+#      - ../filebeat/filebeat.yml:/usr/share/filebeat/filebeat.yml
+#      - ./logs:/logs
+#    depends_on:
+#      - elasticsearch
+#    cpus: 0.3
+#    mem_limit: 300m
+#    networks:
+#      - backend
 
 networks:
   backend:
