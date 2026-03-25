@@ -45,15 +45,6 @@ cd "source code/practice"
 docker compose -f docker-compose.dev.yml -f docker-compose.deploy.yml up -d
 ```
 
-or development deployable services with:
-
-```bash
-cd "source code/practice"
-docker-compose -f docker-compose.dev.yml up -d
-
-mvn spring-boot:run
-```
-
 ## Refer to the frontend repository for detailed Angular setup and configuration.
 
 # Performance Test Report
@@ -73,14 +64,33 @@ mvn spring-boot:run
   - 90s-120s: Ramp down to 0
 - **Total Requests**: 29,388
 
+
+
 ### Results
-| Metric | Value |
-|--------|-------|
-| Min Response Time | 4.52 ms |
-| Max Response Time | 1,168.95 ms |
+
+| Metric            | Value         |
+| ----------------- | ------------- |
+| Min Response Time | 4.52 ms       |
+| Max Response Time | 1,168.95 ms   |
 | Avg Response Time | **106.34 ms** |
-| Success Rate | **99.99%** |
-| Failed Requests | 0 |
+| Success Rate      | **99.99%**    |
+| Failed Requests   | 0             |
+
+---
+
+### Cache Performance Comparison
+
+| Scenario       | Avg Response Time |
+| -------------- | ----------------- |
+| Cache Disabled | **141.17 ms**     |
+| Cache Enabled  | **71.48 ms**      |
+
+---
+
+### Performance Impact
+
+* Enabling cache reduced average response time by **~49.4%**
+* Achieved nearly **2× faster response times** with caching enabled
 
 ---
 
@@ -97,16 +107,15 @@ mvn spring-boot:run
 ### Results
 | Metric | Value |
 |--------|-------|
-| Avg Response Time | **20,922.68 ms** |
 | WebSocket Connections | **500 concurrent** |
-| Message Delivery Rate | **30 messages/sec** |
+| Message Delivery Rate | **5280 messages/minutes** |
 
 ---
 
 
-### Test Report
+# Test Report
 
-The project maintains high code quality with a comprehensive test suite. We have achieved **over 80% test coverage**.
+The project maintains high code quality with a comprehensive test suite. We have achieved **over 88% test coverage**.
 
 - Detailed JaCoCo coverage reports are available in: `test report/jacoco`
 - To view the report, open `test report/jacoco/index.html` in your browser.
