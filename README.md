@@ -58,7 +58,7 @@ mvn spring-boot:run
 
 # Performance Test Report
 
-- Detailed reports are available in: `performance otimization report`
+- Detailed reports are available in: `performance otimization report`, use compression tools to unzip the files please
 - Detailed performance setting up are available ta `source code/practice/perf`
 
 ## Cache Performance Test
@@ -100,6 +100,8 @@ mvn spring-boot:run
 | Avg Response Time | **20,922.68 ms** |
 | WebSocket Connections | **500 concurrent** |
 | Message Delivery Rate | **30 messages/sec** |
+
+---
 
 
 ### Test Report
