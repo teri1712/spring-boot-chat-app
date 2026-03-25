@@ -90,8 +90,7 @@ class ProfileControllerTest extends BaseTestClass {
       @WithUserDetails("alice")
       void givenAliceExists_whenAliceChangesToWeakPassword_thenReturnsBadRequest() throws Exception {
             mockMvc.perform(post("/profiles/me/password")
-                                .param("password", "Password123!")
-                                .param("new_password", "weak"))
+                                .param("password", "Password123!").param("new_password", "weak"))
                       .andExpect(status().isBadRequest());
       }
 }
