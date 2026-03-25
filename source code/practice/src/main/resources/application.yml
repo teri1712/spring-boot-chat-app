@@ -5,7 +5,7 @@ spring:
     oauth2:
       resourceserver:
         jwt:
-          issuer-uri: https://profiles.google.com
+          issuer-uri: https://accounts.google.com
   application:
     name: chat-app
   datasource:

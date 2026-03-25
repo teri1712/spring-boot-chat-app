@@ -12,8 +12,6 @@ import org.springframework.test.context.event.ApplicationEvents;
 import org.springframework.test.context.jdbc.Sql;
 import org.springframework.test.web.servlet.MockMvc;
 
-import java.util.Date;
-
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
@@ -50,7 +48,6 @@ class ProfileControllerTest extends BaseTestClass {
       void givenAliceExists_whenAliceChangesProfileName_thenNameIsUpdated() throws Exception {
             ProfileRequest request = new ProfileRequest();
             request.setName("Alice in Wonderland");
-            request.setDob(new Date());
             request.setGender(2.0f);
 
             mockMvc.perform(patch("/profiles/me")
@@ -58,6 +55,21 @@ class ProfileControllerTest extends BaseTestClass {
                                 .content(objectMapper.writeValueAsString(request)))
                       .andExpect(status().isOk())
                       .andExpect(jsonPath("$.name").value("Alice in Wonderland"));
+      }
+
+
+      @Test
+      @Sql(scripts = {"/sql/clean.sql", "/sql/seed_users.sql"})
+      @WithUserDetails("alice")
+      void givenAliceExists_whenAliceChangesAvatar_thenAvatarIsUpdated() throws Exception {
+            ProfileRequest request = new ProfileRequest();
+            request.setAvatar("Alice's avatar URL");
+
+            mockMvc.perform(patch("/profiles/me")
+                                .contentType(MediaType.APPLICATION_JSON)
+                                .content(objectMapper.writeValueAsString(request)))
+                      .andExpect(status().isOk())
+                      .andExpect(jsonPath("$.avatar").value("Alice's avatar URL"));
       }
 
       @Test

@@ -1,6 +1,6 @@
 package com.decade.practice.users.application.ports.in;
 
-import com.decade.practice.users.dto.AccessToken;
+import com.decade.practice.users.dto.AccountResponse;
 import com.decade.practice.users.dto.ProfileRequest;
 import com.decade.practice.users.dto.ProfileResponse;
 import com.decade.practice.users.dto.SignUpRequest;
@@ -17,7 +17,7 @@ public interface ProfileService {
 
       ProfileResponse changeProfile(UUID id, ProfileRequest profileRequest);
 
-      AccessToken changePassword(UUID id, String newPassword, String password) throws AccessDeniedException;
+      AccountResponse changePassword(UUID id, String newPassword, String password) throws AccessDeniedException;
 
       ProfileResponse findById(UUID id);
 

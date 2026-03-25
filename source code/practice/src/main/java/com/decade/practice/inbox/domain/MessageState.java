@@ -1,5 +1,6 @@
 package com.decade.practice.inbox.domain;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonSubTypes;
 import com.fasterxml.jackson.annotation.JsonTypeInfo;
 import lombok.Getter;
@@ -41,6 +42,7 @@ public abstract class MessageState {
       private Set<UUID> seenByIds;
 
 
+      @JsonIgnore
       public Stream<UUID> getAllPartners() {
             return Stream.concat(seenByIds.stream(), Stream.of(senderId));
       }

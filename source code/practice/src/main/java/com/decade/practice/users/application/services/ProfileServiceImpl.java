@@ -8,10 +8,7 @@ import com.decade.practice.users.domain.DefaultAvatar;
 import com.decade.practice.users.domain.User;
 import com.decade.practice.users.domain.UserFactory;
 import com.decade.practice.users.domain.UserPasswordPolicy;
-import com.decade.practice.users.dto.AccessToken;
-import com.decade.practice.users.dto.ProfileRequest;
-import com.decade.practice.users.dto.ProfileResponse;
-import com.decade.practice.users.dto.SignUpRequest;
+import com.decade.practice.users.dto.*;
 import com.decade.practice.users.dto.mapper.UserMapper;
 import com.decade.practice.web.security.UserClaims;
 import jakarta.persistence.OptimisticLockException;
@@ -84,7 +81,7 @@ public class ProfileServiceImpl implements ProfileService {
 
 
       @Override
-      public AccessToken changePassword(UUID id, String newPassword, String password) throws AccessDeniedException, OptimisticLockException {
+      public AccountResponse changePassword(UUID id, String newPassword, String password) throws AccessDeniedException, OptimisticLockException {
             User user = users.findById(id).orElseThrow();
 
             passwordPolicy.change(user, password, newPassword);
@@ -92,12 +89,16 @@ public class ProfileServiceImpl implements ProfileService {
             users.save(user);
             tokens.evict(user.getUsername());
 
-            UserClaims userClaims = new UserClaims(
+            UserClaims claims = new UserClaims(
                       user.getId(),
                       user.getUsername(),
                       user.getName(),
                       user.getAvatar());
-            return tokenGenerator.generate(userClaims);
+            AccessToken credential = tokenGenerator.generate(claims);
+            tokens.add(user.getUsername(), credential.refreshToken());
+            
+            ProfileResponse profileResponse = userMapper.map(user);
+            return new AccountResponse(profileResponse, credential);
       }
 
       @Override

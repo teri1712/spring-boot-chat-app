@@ -23,7 +23,6 @@ import org.springframework.security.core.context.SecurityContext;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.oauth2.jwt.Jwt;
 import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
@@ -44,7 +43,7 @@ public class TokenController {
       private final TokenSessionService tokenSessionService;
 
       // TODO: Adjust client
-      @PutMapping("/oauth2")
+      @PostMapping("/oauth2")
       public void exchange(
                 @AuthenticationPrincipal Jwt jwt,
                 HttpServletRequest request,
@@ -53,7 +52,7 @@ public class TokenController {
             String username = jwt.getSubject();
 
             var claims = jwt.getClaims();
-            String name = claims.get("customName").toString();
+            String name = claims.get("name").toString();
             String picture = claims.get("picture").toString();
 
             SignUpRequest signUpRequest = new SignUpRequest();

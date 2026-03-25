@@ -60,6 +60,7 @@ public class TokenSessionServiceImpl implements TokenSessionService {
                       user.getName(),
                       user.getAvatar());
             AccessToken credential = tokenGenerator.generate(claims);
+            tokenStore.add(username, credential.refreshToken());
             return new AccountResponse(profileResponse, credential);
       }
 }
