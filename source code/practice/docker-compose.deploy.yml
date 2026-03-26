@@ -114,3 +114,8 @@ services:
 networks:
   backend:
     external: true
+
+
+
+volumes:
+  grafana-data:
