@@ -1,4 +1,4 @@
-## Spring Boot Chat Application
+## Chat Application following Hexagonal and Modulith architectures
 
 A real-time chat application built with Spring Boot for the backend and Angular for the frontend. Users can manage
 profiles, authenticate, searching and participate in live chat rooms.
