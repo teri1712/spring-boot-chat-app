@@ -30,32 +30,6 @@ services:
       retries: 20
       start_period: 5s
 
-  prometheus:
-    image: prom/prometheus
-    ports:
-      - "9090:9090"
-    volumes:
-      - ./prometheus/prometheus.yml:/etc/prometheus/prometheus.yml
-    cpus: 0.5
-    cpu_count: 3
-    mem_limit: 500m
-    networks:
-      - backend
-
-  grafana:
-    image: grafana/grafana
-    ports:
-      - "3000:3000"
-    volumes:
-      - grafana-data:/var/lib/grafana
-    depends_on:
-      - prometheus
-    cpu_count: 3
-    cpus: 0.3
-    mem_limit: 300m
-    networks:
-      - backend
-
   elasticsearch:
     image: docker.elastic.co/elasticsearch/elasticsearch:8.12.2
     environment:
