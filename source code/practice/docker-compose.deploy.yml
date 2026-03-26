@@ -30,7 +30,7 @@ services:
       start_period: 30s
       interval: 10s
       timeout: 30s
-      retries: 5
+      retries: 10
   backend2:
     image: teri1712/chat-app
     environment: *backend-env
@@ -50,7 +50,7 @@ services:
       interval: 10s
       start_period: 30s
       timeout: 30s
-      retries: 5
+      retries: 10
 
 
   es-init:
