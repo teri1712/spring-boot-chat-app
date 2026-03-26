@@ -37,6 +37,7 @@ services:
     volumes:
       - ./prometheus/prometheus.yml:/etc/prometheus/prometheus.yml
     cpus: 0.5
+    cpu_count: 3
     mem_limit: 500m
     networks:
       - backend
@@ -49,6 +50,7 @@ services:
       - grafana-data:/var/lib/grafana
     depends_on:
       - prometheus
+    cpu_count: 3
     cpus: 0.3
     mem_limit: 300m
     networks:
@@ -82,8 +84,9 @@ services:
       - elasticsearch
     environment:
       ELASTICSEARCH_HOSTS: http://elasticsearch:9200
-    cpus: 0.5
-    mem_limit: 500m
+    cpus: 0.3
+    mem_limit: 300m
+    cpu_count: 3
     networks:
       - backend
 
@@ -97,6 +100,7 @@ services:
       - elasticsearch
     cpus: 0.3
     mem_limit: 300m
+    cpu_count: 3
     networks:
       - backend
 
@@ -112,6 +116,7 @@ services:
       - /var/run/docker.sock:/var/run/docker.sock
       - ./s3/init:/etc/localstack/init/ready.d
     cpus: 0.5
+    cpu_count: 3
     mem_limit: 500m
     networks:
       - backend

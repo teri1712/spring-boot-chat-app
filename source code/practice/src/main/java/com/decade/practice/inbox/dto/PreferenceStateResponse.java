@@ -9,9 +9,5 @@ import lombok.extern.jackson.Jacksonized;
 
 @Jacksonized
 public class PreferenceStateResponse extends MessageStateResponse {
-      private final Integer iconId;
-      private final String roomName;
-      private final String roomAvatar;
-      private final String theme;
 
 }

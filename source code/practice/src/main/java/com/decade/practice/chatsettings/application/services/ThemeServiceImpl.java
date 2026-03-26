@@ -18,6 +18,6 @@ public class ThemeServiceImpl implements ThemeService {
 
       @Override
       public List<ThemeResponse> findAll() {
-            return themes.findAll().stream().map(mapper::themeToResponse).collect(Collectors.toList());
+            return themes.findAll().stream().map(mapper::map).collect(Collectors.toList());
       }
 }

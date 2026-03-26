@@ -17,5 +17,7 @@ public class Theme {
       // TODO: Fix client
       private String background;
 
+      private String name;
+
 
 }
