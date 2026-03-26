@@ -1,11 +1,10 @@
 name: Spring Boot Chat Application CI with Maven
 
 on:
+    pull_request:
+        branches: [ master ]
     push:
         branches-ignore: [ master ]
-    pull_request:
-        branches-ignore: [ master ]
-
 jobs:
     clean-and-test:
         runs-on: ubuntu-latest
@@ -22,4 +21,11 @@ jobs:
                     cache: 'maven'
             -   name: Build and test with Maven
                 working-directory: "./source code/practice"
-                run: mvn -B clean test
+                run: mvn -B clean surefire-report:report
+
+            -   name: Report jacoco coverage
+                uses: codecov/codecov-action@v3
+                with:
+                    files: ./source code/practice/target/site/jacoco/jacoco.xml
+                    token: ${{ secrets.CODECOV_TOKEN }}
+                    fail_ci_if_error: true

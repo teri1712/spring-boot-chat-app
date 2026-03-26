@@ -22,7 +22,11 @@ jobs:
                     cache: 'maven'
             -   name: Build and test with Maven
                 working-directory: "./source code/practice"
-                run: mvn -B clean test
+                run: mvn -B clean surefire-report:report
+            -   name: Report jacoco coverage
+                uses: codecov/codecov-action@v3
+                with:
+                    files: ./source code/practice/target/site/jacoco/jacoco.xml
     containerize-and-push:
        needs: clean-and-test
        runs-on: ubuntu-latest
