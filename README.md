@@ -99,7 +99,7 @@ docker compose -f docker-compose.dev.yml -f docker-compose.deploy.yml up -d
 ### Test Setup
 - **Scenarios**: Publisher-Subscriber messaging pattern
   - **Subscribers**: 500 concurrent WebSocket connections (constant) to receive fanout
-  - **Publishers**: 30 messages/sec (constant arrival rate)
+  - **Publishers**: 30 messages/sec (constant arrival rate), with actual success rate at 3 messages/sec due to database concurrent large fanout batch insertions and system constraints as bottleneck.
   - **Test Duration**: 2 minutes per scenario
 - **Infrastructure**: 5 server instances for load distribution
 - **Total Requests**: 618 REST API calls
@@ -117,5 +117,4 @@ docker compose -f docker-compose.dev.yml -f docker-compose.deploy.yml up -d
 
 The project maintains high code quality with a comprehensive test suite. We have achieved **over 88% test coverage**.
 
-- Detailed JaCoCo coverage reports are available in: `test report/jacoco`
-- To view the report, open `test report/jacoco/index.html` in your browser.
+- Detailed JaCoCo coverage reports are available in: `https://codecov.io/gh/teri1712/spring-boot-chat-app`
