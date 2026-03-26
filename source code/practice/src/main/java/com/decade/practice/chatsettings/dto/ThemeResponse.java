@@ -1,4 +1,4 @@
 package com.decade.practice.chatsettings.dto;
 
-public record ThemeResponse(Integer id, String background) {
+public record ThemeResponse(Integer id, String background, String themeName) {
 }

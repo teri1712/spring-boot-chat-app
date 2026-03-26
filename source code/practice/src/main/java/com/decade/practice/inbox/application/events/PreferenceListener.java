@@ -34,10 +34,6 @@ public class PreferenceListener {
                       UUID.randomUUID(),
                       event.getMakerId(),
                       event.getChatId(),
-                      event.getCreatedAt(),
-                      event.getIconId(),
-                      event.getCustomAvatar(),
-                      event.getCustomName(),
-                      event.getTheme()));
+                      event.getCreatedAt()));
       }
 }

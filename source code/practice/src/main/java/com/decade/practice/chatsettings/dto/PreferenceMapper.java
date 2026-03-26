@@ -13,7 +13,8 @@ import org.mapstruct.ReportingPolicy;
 @Mapper(unmappedTargetPolicy = ReportingPolicy.ERROR, componentModel = MappingConstants.ComponentModel.SPRING)
 public interface PreferenceMapper {
 
-      @Mapping(source = "preference.theme.background", target = "theme")
+      @Mapping(source = "preference.theme.background", target = "themeBackground")
+      @Mapping(source = "preference.theme.name", target = "themeName")
       PreferenceInfo map(Preference preference);
 
       PreferenceMessage map(PreferenceChanged preference);

@@ -14,7 +14,8 @@ public class PreferenceChanged {
       private final Integer iconId;
       private final String customName;
       private final String customAvatar;
-      private final String theme;
+      private final String themeBackground;
+      private final String themeName;
 
       private final UUID makerId;
       private final String chatId;
