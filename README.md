@@ -42,7 +42,7 @@ From the repository root:
 
 ```bash
 cd "source code/practice"
-docker compose -f docker-compose.dev.yml -f docker-compose.deploy.yml up -d
+docker compose -f docker-compose.dev.yml -f docker-compose.infra.yml up -d
 ```
 
 ## Refer to the frontend repository for detailed Angular setup and configuration.

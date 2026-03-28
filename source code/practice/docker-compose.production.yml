@@ -2,14 +2,15 @@ services:
   backend1:
     image: teri1712/chat-app
     environment: &backend-env
-      LOGGING_LEVEL_ROOT: WARN
-      SPRING_PROFILES_ACTIVE: redis-cache, dev
-      SPRING_DATASOURCE_USERNAME: root
-      SPRING_DATASOURCE_PASSWORD: root
+      FRONTEND_HOST_ADDRESS: http://${SERVER_IP}:4200
+      AWS_S3_ENDPOINT: http://${SERVER_IP}:4566
+      SPRING_PROFILES_ACTIVE: redis-cache, prod
+      SPRING_DATASOURCE_USERNAME: ${POSTGRES_USER}
+      SPRING_DATASOURCE_PASSWORD: ${POSTGRES_PASSWORD}
       SPRING_DATASOURCE_HIKARI_MAXIMUM_POOL_SIZE: 10
       SPRING_DATASOURCE_HIKARI_MINIMUM_IDLE: 5
-      ACTUATOR_USER_NAME: admin
-      ACTUATOR_USER_PASSWORD: admin
+      ACTUATOR_USER_NAME: ${ADMIN_USER}
+      ACTUATOR_USER_PASSWORD: ${ADMIN_PASSWORD}
       ACTUATOR_USER_ROLES: OPS
       SPRING_DATA_REDIS_HOST: redis
       SPRING_DATASOURCE_URL: jdbc:postgresql://postgres:5432/chatapp
@@ -66,7 +67,7 @@ services:
     networks:
       - backend
   client:
-    image: teri1712/chat-app-client
+    image: teri1712/chat-app-client-production
     ports:
       - "4200:80"
     networks:
@@ -114,8 +115,6 @@ services:
 networks:
   backend:
     external: true
-
-
 
 volumes:
   grafana-data:

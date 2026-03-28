@@ -33,7 +33,6 @@ jacoco/
 .env.*
 **/*.md
 # ===== Docker files =====
-docker-compose.deploy.yml
 docker-compose.*.yml
 
 # ===== Misc =====
