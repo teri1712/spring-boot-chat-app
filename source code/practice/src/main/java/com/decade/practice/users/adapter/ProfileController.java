@@ -36,7 +36,6 @@ public class ProfileController {
             return profileService.changeProfile(id, profile);
       }
 
-      // TODO: Adjust client
       @PostMapping("/password")
       public AccountResponse changePassword(
                 @AuthenticationPrincipal(expression = "id") UUID id,

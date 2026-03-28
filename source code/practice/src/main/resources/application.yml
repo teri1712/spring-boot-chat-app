@@ -118,7 +118,6 @@ management:
 
 aws:
   s3:
-    endpoint: http://localhost:4566
     region: ap-southeast-1
     bucket: decade-bucket
     access:
