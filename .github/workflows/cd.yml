@@ -26,8 +26,8 @@ jobs:
             -   name: Push image
                 run: docker push ${{ secrets.DOCKERHUB_USERNAME }}/chat-app
 
-    deploy-azure:
-         needs: containerize-and-push
+    google-cloud-azure:
+         needs: build-artifacts
          runs-on: ubuntu-latest
          steps:
              -   name: Checkout repository
