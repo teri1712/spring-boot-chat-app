@@ -7,5 +7,5 @@ scrape_configs:
     static_configs:
       - targets: [ "backend1:8081", "backend2:8081" ]
     basic_auth:
-      username: ${ADMIN_USER:-admin}
-      password: ${ADMIN_PASSWORD:-admin}
+      username: ${ADMIN_USER}
+      password: ${ADMIN_PASSWORD}
