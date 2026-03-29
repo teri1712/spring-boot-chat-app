@@ -33,7 +33,7 @@ services:
       start_period: 30s
       interval: 10s
       timeout: 30s
-      retries: 10
+      retries: 20
   backend2:
     image: teri1712/chat-app:${IMAGE_TAG:-latest}
     environment: *backend-env
@@ -53,7 +53,7 @@ services:
       interval: 10s
       start_period: 30s
       timeout: 30s
-      retries: 10
+      retries: 20
 
 
   es-init:
@@ -103,7 +103,7 @@ services:
       - prometheus
     cpu_count: 3
     cpus: 0.3
-    mem_limit: 300m
+    mem_limit: 1g
     networks:
       - backend
 
