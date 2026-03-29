@@ -3,7 +3,7 @@ name: Spring Boot Chat Application CI with Maven
 on:
     push:
         branches: 
-          - 'master*'
+          - 'master'
 
 jobs:
     build-artifacts:
