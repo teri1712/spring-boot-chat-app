@@ -25,6 +25,8 @@ services:
       - "8001:8001"
     networks:
       - backend
+    volumes:
+        - redis-data:/data
     healthcheck:
       test: [ "CMD", "redis-cli", "ping" ]
       interval: 5s
@@ -60,21 +62,22 @@ services:
     ports:
       - "5601:5601"
     depends_on:
-      - elasticsearch
+      elasticsearch:
+        condition: service_healthy
     environment:
       ELASTICSEARCH_HOSTS: http://elasticsearch:9200
     cpus: 0.3
-    mem_limit: 300m
+    mem_limit: 1g
     cpu_count: 3
     networks:
       - backend
 
   filebeat:
-    image: docker.elastic.co/beats/filebeat:8.11.0
     user: root
+    build: ./filebeat
     volumes:
-      - ./filebeat/filebeat.yml:/usr/share/filebeat/filebeat.yml
       - ./logs:/logs
+      - filebeat-data:/usr/share/filebeat/data
     depends_on:
       - elasticsearch
     cpus: 0.3
@@ -84,14 +87,14 @@ services:
       - backend
 
   s3:
-    image: localstack/localstack:latest
+    image: localstack/localstack:2.3
     ports:
       - "4566:4566"
     environment:
       SERVICES: s3
       AWS_DEFAULT_REGION: ap-southeast-1
     volumes:
-      - ./s3/localstack:/var/lib/localstack
+      - s3-data:/var/lib/localstack
       - /var/run/docker.sock:/var/run/docker.sock
       - ./s3/init:/etc/localstack/init/ready.d
     cpus: 0.5
@@ -135,3 +138,6 @@ networks:
 volumes:
   postrgres-data:
   elasticsearch-data:
+  filebeat-data:
+  redis-data:
+  s3-data:

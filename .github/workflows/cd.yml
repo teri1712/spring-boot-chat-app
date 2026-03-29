@@ -3,7 +3,7 @@ name: CD - Spring Boot Chat App
 on:
     push:
         branches:
-            - master
+            - master*
 
 jobs:
     build-artifacts:
@@ -57,13 +57,12 @@ jobs:
                   key: ${{ secrets.GOOGLE_CLOUD_SSH_KEY }}
                   script_stop: true
                   script: |
-                      set -euo pipefail
-                      
                       cd ~/app/spring-boot-chat-app/source\ code/practice
                       
-                      git fetch origin master
-                      git checkout master
-                      git reset --hard origin/master
+                      git reset --hard HEAD
+                      git fetch                    
+                      git checkout ${{ github.ref_name }}
+                      git pull origin ${{ github.ref_name }}
                       
                       cd ./prometheus
                       envsubst < prometheus.yml.template > prometheus.yml
@@ -74,6 +73,8 @@ jobs:
                       docker pull teri1712/chat-app:latest
                       
                       docker compose -f docker-compose.infra.yml -f docker-compose.production.yml pull
+                      docker compose -f docker-compose.infra.yml -f docker-compose.production.yml build filebeat
                       docker compose -f docker-compose.infra.yml -f docker-compose.production.yml up -d --remove-orphans
-                      
+                      docker compose -f docker-compose.infra.yml -f docker-compose.production.yml exec server nginx -s reload
+                   
                       docker image prune -f
