@@ -42,6 +42,7 @@ From the repository root:
 
 ```bash
 cd "source code/practice"
+docker network create backend
 docker compose -f docker-compose.dev.yml -f docker-compose.infra.yml up -d
 ```
 

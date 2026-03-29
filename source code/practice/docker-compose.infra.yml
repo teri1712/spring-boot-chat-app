@@ -130,7 +130,7 @@ services:
 
 networks:
   backend:
-    name: backend
+    external: true
 
 volumes:
   postrgres-data:
