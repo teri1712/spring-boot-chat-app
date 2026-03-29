@@ -3,7 +3,7 @@ name: CD - Spring Boot Chat App
 on:
     push:
         branches:
-            - master
+            - master*
 
 jobs:
     build-artifacts:
