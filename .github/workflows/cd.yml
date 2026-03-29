@@ -41,11 +41,14 @@ jobs:
                      key: ${{ secrets.GOOGLE_CLOUD_SSH_KEY }}
                      script: |
                          cd ~/app/spring-boot-chat-app
+                         docker compose -f docker-compose.production.yml down || true
+                         
                          git reset --hard HEAD
-                         git pull origin master
+                         git fetch
+                         git checkout ${{ github.ref_name }}
+                         git pull origin ${{ github.ref_name }}
                          cd ./prometheus
                          envsubst < prometheus.yml.template > prometheus.yml
                          cd ..
-                         docker compose -f docker-compose.production.yml down || true
                          docker compose -f docker-compose.production.yml pull
                          docker compose -f docker-compose.infra.yml -f docker-compose.production.yml up -d
