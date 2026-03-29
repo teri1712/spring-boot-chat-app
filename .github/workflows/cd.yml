@@ -75,5 +75,6 @@ jobs:
                       docker compose -f docker-compose.infra.yml -f docker-compose.production.yml pull
                       docker compose -f docker-compose.infra.yml -f docker-compose.production.yml build filebeat
                       docker compose -f docker-compose.infra.yml -f docker-compose.production.yml up -d --remove-orphans
+                      docker compose -f docker-compose.infra.yml -f docker-compose.production.yml exec server nginx -s reload
                    
                       docker image prune -f
