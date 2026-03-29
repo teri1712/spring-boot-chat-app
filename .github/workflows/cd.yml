@@ -54,5 +54,4 @@ jobs:
                          
                          cd ..
                          docker compose -f docker-compose.production.yml pull
-                         
-                         docker compose -f docker-compose.infra.yml -f docker-compose.production.yml up -d
+                         docker compose -f docker-compose.production.yml up -d
