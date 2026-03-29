@@ -57,13 +57,12 @@ jobs:
                   key: ${{ secrets.GOOGLE_CLOUD_SSH_KEY }}
                   script_stop: true
                   script: |
-                      set -euo pipefail
-                      
                       cd ~/app/spring-boot-chat-app/source\ code/practice
                       
-                      git fetch origin master
-                      git checkout master
-                      git reset --hard origin/master
+                      git reset --hard HEAD
+                      git fetch                    
+                      git checkout ${{ github.ref_name }}
+                      git pull origin ${{ github.ref_name }}
                       
                       cd ./prometheus
                       envsubst < prometheus.yml.template > prometheus.yml
