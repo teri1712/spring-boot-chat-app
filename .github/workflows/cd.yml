@@ -53,6 +53,5 @@ jobs:
                          envsubst < prometheus.yml.template > prometheus.yml
                          
                          cd ..
-                         docker pull teri1712/chat-app-client-production:latest
                          docker pull teri1712/chat-app:latest
                          docker compose -f docker-compose.infra.yml -f docker-compose.production.yml up -d

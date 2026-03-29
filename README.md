@@ -4,9 +4,7 @@ A real-time chat application built with Spring Boot for the backend and Angular 
 profiles, authenticate, searching and participate in live chat rooms.
 
 ## Live web app
-
-https://angular-chat-application-psi.vercel.app (Unavailable now due to budget constraints)
-
+http://34.143.199.46:4200/
 ## Demo
 A initial version of the application demo is available here:
 
@@ -46,7 +44,7 @@ docker network create backend
 docker compose -f docker-compose.dev.yml -f docker-compose.infra.yml up -d
 ```
 
-## Refer to the frontend repository for detailed Angular setup and configuration.
+Visit http://localhost:4200/ to access the application.
 
 # Performance Test Report
 
@@ -116,6 +114,6 @@ docker compose -f docker-compose.dev.yml -f docker-compose.infra.yml up -d
 
 # Test Report
 
-The project maintains high code quality with a comprehensive test suite. We have achieved **over 88% test coverage**.
+The project maintains high code quality with a comprehensive test suite. We have achieved **over 85% test coverage**.
 
-- Detailed JaCoCo coverage reports are available in: `https://codecov.io/gh/teri1712/spring-boot-chat-app`
+- Detailed JaCoCo coverage reports are available in: https://codecov.io/gh/teri1712/spring-boot-chat-app
