@@ -74,6 +74,7 @@ jobs:
                       docker pull teri1712/chat-app:latest
                       
                       docker compose -f docker-compose.infra.yml -f docker-compose.production.yml pull
+                      docker compose -f docker-compose.infra.yml -f docker-compose.production.yml build filebeat
                       docker compose -f docker-compose.infra.yml -f docker-compose.production.yml up -d --remove-orphans
-                      
+                   
                       docker image prune -f
