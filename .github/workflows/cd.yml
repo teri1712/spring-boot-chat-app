@@ -41,7 +41,7 @@ jobs:
                      key: ${{ secrets.GOOGLE_CLOUD_SSH_KEY }}
                      script: |
                          cd ~/app/spring-boot-chat-app/source\ code/practice
-                         docker compose -f docker-compose.production.yml down || true
+                         docker compose -f docker-compose.infra.yml -f docker-compose.production.yml down || true
                          
                          git reset --hard HEAD
                          git fetch
@@ -54,4 +54,4 @@ jobs:
                          
                          cd ..
                          docker compose -f docker-compose.production.yml pull
-                         docker compose -f docker-compose.production.yml up -d
+                         docker compose -f docker-compose.infra.yml -f docker-compose.production.yml up -d
