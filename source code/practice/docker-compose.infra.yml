@@ -73,6 +73,7 @@ services:
       - backend
 
   filebeat:
+    user: root
     build: ./filebeat
     volumes:
       - ./logs:/logs
