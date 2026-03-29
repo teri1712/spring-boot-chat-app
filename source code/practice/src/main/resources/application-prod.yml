@@ -1,0 +1,14 @@
+
+#server:
+#  forward-headers-strategy: framework
+#  servlet:
+#    session:
+#      cookie:
+#        secure: true
+#        same-site: None
+
+logging:
+  level:
+    root: INFO
+    org.springframework: WARN
+    com.decade: INFO

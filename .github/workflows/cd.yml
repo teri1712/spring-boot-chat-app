@@ -1,0 +1,57 @@
+name: Spring Boot Chat Application CI with Maven
+
+on:
+    push:
+        branches: 
+          - 'master'
+
+jobs:
+    build-artifacts:
+        runs-on: ubuntu-latest
+
+        steps:
+            -   name: Checkout repository
+                uses: actions/checkout@v4
+
+            -   name: Login to DockerHub
+                uses: docker/login-action@v3
+                with:
+                    username: ${{ secrets.DOCKERHUB_USERNAME }}
+                    password: ${{ secrets.DOCKERHUB_TOKEN }}
+
+            -   name: Build image
+                working-directory: "./source code/practice"
+                run: docker build -t ${{ secrets.DOCKERHUB_USERNAME }}/chat-app .
+
+            -   name: Push image
+                run: docker push ${{ secrets.DOCKERHUB_USERNAME }}/chat-app
+
+    google-cloud-deployment:
+         needs: build-artifacts
+         runs-on: ubuntu-latest
+         steps:
+             -   name: Checkout repository
+                 uses: actions/checkout@v4
+
+             -   name: Deploy to VM
+                 uses: appleboy/ssh-action@master
+                 with:
+                     host: ${{ secrets.GOOGLE_CLOUD_HOST }}
+                     username: ${{ secrets.GOOGLE_CLOUD_USER }}
+                     key: ${{ secrets.GOOGLE_CLOUD_SSH_KEY }}
+                     script: |
+                         cd ~/app/spring-boot-chat-app/source\ code/practice
+                         docker compose -f docker-compose.infra.yml -f docker-compose.production.yml down || true
+                         
+                         git reset --hard HEAD
+                         git fetch
+                         
+                         git checkout ${{ github.ref_name }}
+                         git pull origin ${{ github.ref_name }}
+                         
+                         cd ./prometheus
+                         envsubst < prometheus.yml.template > prometheus.yml
+                         
+                         cd ..
+                         docker pull teri1712/chat-app:latest
+                         docker compose -f docker-compose.infra.yml -f docker-compose.production.yml up -d

@@ -1,3 +1,8 @@
 logging:
   level:
     root: DEBUG
+
+
+aws:
+  s3:
+    endpoint: http://localhost:4566
