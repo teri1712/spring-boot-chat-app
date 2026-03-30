@@ -4,7 +4,7 @@ A real-time chat application built with Spring Boot for the backend and Angular 
 profiles, authenticate, searching and participate in live chat rooms.
 
 ## Live web app
-http://34.143.199.46:4200/
+http://decade.ddnsfree.com:4200/
 ## Demo
 A initial version of the application demo is available here:
 
