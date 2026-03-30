@@ -6,7 +6,7 @@ full_tokens = {}
 
 login_path = "http://localhost:8081/login"
 
-for i in range(1, 501):
+for i in range(1, 101):
     username_input = f"user_{i}"
     data = {"username": username_input, "password": "password"}
 

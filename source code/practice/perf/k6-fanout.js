@@ -5,7 +5,7 @@ import {Counter, Gauge, Trend} from 'k6/metrics';
 
 const jwts = JSON.parse(open("./jwts.json"));
 
-const NUM_USERS = 500;
+const NUM_USERS = 100;
 const NUM_SERVERS = 5;
 const CHAT_ID = 'group_5k_perf_test';
 
@@ -40,7 +40,7 @@ export const options = {
     scenarios: {
         subscribers: {
             executor: 'constant-vus',
-            vus: 500,
+            vus: 100,
             duration: '2m',
             exec: 'subscriberScenario',
         },

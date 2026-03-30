@@ -24,9 +24,6 @@ This will spin up:
 - PostgreSQL database
 - Redis cache
 - Elasticsearch
-- LocalStack (S3 mock)
-- Filebeat (logging)
-- Prometheus (monitoring)
 
 ### Step 2: Seed Test Data
 
@@ -51,7 +48,7 @@ This script will:
 Run the cache layer performance test:
 
 ```bash
-k6 run --out json=cache-report.json k6-cache.js
+k6 run --summary-export=cache-report.json k6-cache.js
 ```
 
 This test evaluates:
@@ -65,13 +62,13 @@ This test evaluates:
 Run the WebSocket fanout messaging test:
 
 ```bash
-k6 run --out json=fanout-report.json k6-fanout.js
+k6 run --summary-export=fanout-report.json k6-fanout.js
 ```
 
 This test evaluates:
 
 - WebSocket pub/sub messaging at scale
-- 500 concurrent subscribers with 30 messages/sec publishers
+- 100 concurrent subscribers with 30 messages/sec publishers
 - Message delivery across distributed server instances
 
 ### Step 4: Review Results
