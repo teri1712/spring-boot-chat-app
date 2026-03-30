@@ -2,8 +2,8 @@ services:
   backend1:
     image: teri1712/chat-app:${IMAGE_TAG:-latest}
     environment: &backend-env
-      FRONTEND_HOST_ADDRESS: http://${SERVER_IP}:4200
-      AWS_S3_ENDPOINT: http://${SERVER_IP}:4566
+      FRONTEND_HOST_ADDRESS: http://decade.ddnsfree.com:4200
+      AWS_S3_ENDPOINT: http://decade.ddnsfree.com:4566
       SPRING_PROFILES_ACTIVE: redis-cache, prod
       SPRING_DATASOURCE_USERNAME: ${POSTGRES_USER}
       SPRING_DATASOURCE_PASSWORD: ${POSTGRES_PASSWORD}
