@@ -97,8 +97,8 @@ class RealtimeMessageTest extends BaseTestClass {
                             "ROLE_USER"
                   );
 
-                  String aliceToken = tokenService.encodeToken(alice, Duration.ofDays(5).toMillis());
-                  String bobToken = tokenService.encodeToken(bob, Duration.ofDays(5).toMillis());
+                  String aliceToken = tokenService.encodeToken(alice, Duration.ofDays(5));
+                  String bobToken = tokenService.encodeToken(bob, Duration.ofDays(5));
 
                   CompletableFuture<InboxLogResponse> aliceEvent = new CompletableFuture<>();
                   CompletableFuture<InboxLogResponse> bobEvent = new CompletableFuture<>();

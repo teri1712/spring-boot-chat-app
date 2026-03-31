@@ -4,6 +4,7 @@ import com.decade.practice.users.adapter.security.strategies.LoginSuccessStrateg
 import com.decade.practice.users.application.ports.in.ProfileService;
 import com.decade.practice.users.application.ports.in.TokenSessionService;
 import com.decade.practice.users.dto.AccessToken;
+import com.decade.practice.users.dto.AccountResponse;
 import com.decade.practice.users.dto.SignUpRequest;
 import com.decade.practice.users.utils.GenderUtils;
 import com.decade.practice.web.security.TokenUtils;
@@ -87,7 +88,7 @@ public class TokenController {
             response.getWriter().write(
                       new ObjectMapper()
                                 .enable(SerializationFeature.INDENT_OUTPUT)
-                                .writeValueAsString(new AccessToken(accessToken, refreshToken))
+                                .writeValueAsString(new AccountResponse(null, new AccessToken(accessToken, refreshToken)))
             );
             response.getWriter().flush();
       }

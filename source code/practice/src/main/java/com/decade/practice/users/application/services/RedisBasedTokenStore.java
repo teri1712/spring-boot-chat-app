@@ -18,7 +18,7 @@ public class RedisBasedTokenStore implements TokenStore {
       private static final String TOKEN_KEY_SPACE = "JWT_TOKENS";
 
       private final StringRedisTemplate redisTemplate;
-
+            
       private static String generateKey(String username) {
             return TOKEN_KEY_SPACE + ":" + username;
       }
@@ -36,6 +36,11 @@ public class RedisBasedTokenStore implements TokenStore {
                         return null;
                   }
             });
+      }
+
+      @Override
+      public Long size(String username) {
+            return redisTemplate.opsForSet().size(generateKey(username));
       }
 
       @Override

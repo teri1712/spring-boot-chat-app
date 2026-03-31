@@ -53,7 +53,7 @@ class SecurityFilterTest extends BaseTestClass {
                                 "alice",
                                 "alice",
                                 "luffy.jpg");
-            String token = tokenService.encodeToken(claims, Duration.ofDays(5).toMillis());
+            String token = tokenService.encodeToken(claims, Duration.ofDays(5));
 
             // When & Then
             mockMvc.perform(get("/profiles/me")

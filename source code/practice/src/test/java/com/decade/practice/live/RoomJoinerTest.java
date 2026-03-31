@@ -85,8 +85,8 @@ class RoomJoinerTest extends BaseTestClass {
 
                   String chatId = new DirectChatFactory().make(new ChatCreators(alice.id(), Set.of(bob.id())));
 
-                  String aliceToken = tokenService.encodeToken(alice, Duration.ofDays(5).toMillis());
-                  String bobToken = tokenService.encodeToken(bob, Duration.ofDays(5).toMillis());
+                  String aliceToken = tokenService.encodeToken(alice, Duration.ofDays(5));
+                  String bobToken = tokenService.encodeToken(bob, Duration.ofDays(5));
 
                   CompletableFuture<TypeMessage> aliceEvent = new CompletableFuture<>();
                   CompletableFuture<TypeMessage> bobEvent = new CompletableFuture<>();
