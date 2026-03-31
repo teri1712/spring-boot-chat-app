@@ -10,5 +10,7 @@ public interface TokenStore {
 
       void add(String username, String... refreshTokens);
 
+      Long size(String username);
+
 
 }

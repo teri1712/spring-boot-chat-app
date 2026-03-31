@@ -42,7 +42,7 @@ public class TokenSessionServiceImpl implements TokenSessionService {
       @Override
       public String refresh(String refreshToken) throws AccessDeniedException {
             UserClaims claims = validate(refreshToken);
-            return tokenGenerator.generateRefreshToken(claims);
+            return tokenGenerator.generate(claims).accessToken();
       }
 
       @Override

@@ -8,16 +8,18 @@ import io.jsonwebtoken.JwtException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
 
+import java.time.Duration;
+
 @Component
 @RequiredArgsConstructor
 public class TokenGeneratorImpl implements TokenGenerator {
-      private static final long ONE_WEEK = 7L * 24 * 60 * 60 * 1000L;
-      private static final long FIFTEEN_MINUTES = 15 * 60 * 1000L;
+      private static final Duration ONE_WEEK = Duration.ofDays(7);
+      private static final Duration FIVE_MINUTES = Duration.ofMinutes(5);
       private final TokenService tokenService;
 
       @Override
       public AccessToken generate(UserClaims userClaims) {
-            String accessToken = tokenService.encodeToken(userClaims, FIFTEEN_MINUTES);
+            String accessToken = tokenService.encodeToken(userClaims, FIVE_MINUTES);
             String refreshToken = generateRefreshToken(userClaims);
             return new AccessToken(accessToken, refreshToken);
       }

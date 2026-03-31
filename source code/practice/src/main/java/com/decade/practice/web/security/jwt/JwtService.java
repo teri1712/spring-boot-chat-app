@@ -5,13 +5,16 @@ import com.decade.practice.web.security.UserClaims;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import io.jsonwebtoken.*;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 
+import java.time.Duration;
 import java.util.Base64;
 import java.util.Date;
 import java.util.Map;
 
+@Slf4j
 @Component
 public class JwtService implements TokenService {
 
@@ -34,12 +37,12 @@ public class JwtService implements TokenService {
       @Override
       public UserClaims decodeToken(String token) throws ExpiredJwtException, UnsupportedJwtException,
                 MalformedJwtException, SignatureException, IllegalArgumentException {
-            Claims claims = parse(token).getBody();
-            return objectMapper.convertValue(claims, UserClaims.class);
+            Jws<Claims> jwt = parse(token);
+            return objectMapper.convertValue(jwt.getBody(), UserClaims.class);
       }
 
       @Override
-      public String encodeToken(UserClaims user, Long duration) {
+      public String encodeToken(UserClaims user, Duration duration) {
             Map<String, Object> claims = objectMapper.convertValue(
                       user,
                       new TypeReference<Map<String, Object>>() {
@@ -49,9 +52,9 @@ public class JwtService implements TokenService {
             return Jwts.builder()
                       .setHeaderParam("typ", "JWT")
                       .setHeaderParam("alg", "HS256")
-                      .setIssuedAt(at)
-                      .setExpiration(new Date(at.getTime() + duration))
                       .setClaims(claims)
+                      .setIssuedAt(at)
+                      .setExpiration(new Date(at.getTime() + duration.toMillis()))
                       .signWith(SignatureAlgorithm.HS256, key)
                       .compact();
       }
