@@ -14,7 +14,7 @@ import java.time.Duration;
 @RequiredArgsConstructor
 public class TokenGeneratorImpl implements TokenGenerator {
       private static final Duration ONE_WEEK = Duration.ofDays(7);
-      private static final Duration FIVE_MINUTES = Duration.ofSeconds(2);
+      private static final Duration FIVE_MINUTES = Duration.ofMinutes(5);
       private final TokenService tokenService;
 
       @Override
