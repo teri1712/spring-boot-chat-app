@@ -6,9 +6,10 @@ import com.decade.practice.users.application.ports.in.ProfileService;
 import com.decade.practice.users.application.ports.in.TokenSessionService;
 import com.decade.practice.users.application.ports.out.TokenStore;
 import com.decade.practice.users.dto.AccountResponse;
-import com.decade.practice.web.security.TokenService;
+import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.test.context.jdbc.Sql;
 
 import java.util.UUID;
@@ -16,19 +17,24 @@ import java.util.UUID;
 import static org.assertj.core.api.Assertions.assertThat;
 
 @Sql(scripts = {"/sql/clean.sql", "/sql/seed_users.sql"}, executionPhase = Sql.ExecutionPhase.AFTER_TEST_METHOD)
-class TokenTest extends BaseTestClass {
+class TokenSessionTest extends BaseTestClass {
 
       @Autowired
       private TokenStore tokenStore;
-
-      @Autowired
-      private TokenService tokenService;
 
       @Autowired
       private TokenSessionService tokenSessionService;
 
       @Autowired
       private ProfileService profileService;
+
+      @Autowired
+      private RedisTemplate<?, ?> redisTemplate;
+
+      @AfterEach
+      public void tearDown() {
+            redisTemplate.getConnectionFactory().getConnection().flushDb();
+      }
 
       @Test
       @Sql(scripts = {"/sql/clean.sql", "/sql/seed_users.sql"})
@@ -45,11 +51,13 @@ class TokenTest extends BaseTestClass {
 
       }
 
+
       @Test
       @Sql(scripts = {"/sql/clean.sql", "/sql/seed_users.sql"})
       void given1ActiveSessionsOfAlice_whenLoginIn_thenTwoSessionsAreActive() {
             // given
             tokenStore.add("alice", "token1");
+            assertThat(tokenStore.size("alice")).isEqualTo(1);
 
             String token2 = tokenSessionService.login("alice").getAccessToken().refreshToken();
 
