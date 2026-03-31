@@ -61,7 +61,7 @@ Visit http://localhost:4200/ to access the application.
   - 0-30s: Ramp up to 20 concurrent users
   - 30s-90s: Maintain 50 concurrent users
   - 90s-120s: Ramp down to 0
-- **Total Requests**: 29,388
+- **Total Requests**: 34,772
 
 
 
@@ -69,10 +69,10 @@ Visit http://localhost:4200/ to access the application.
 
 | Metric            | Value         |
 | ----------------- | ------------- |
-| Min Response Time | 4.52 ms       |
-| Max Response Time | 1,168.95 ms   |
-| Avg Response Time | **106.34 ms** |
-| Success Rate      | **99.99%**    |
+| Min Response Time | 4.25 ms       |
+| Max Response Time | 1,520.00 ms   |
+| Avg Response Time | **89.94 ms**  |
+| Success Rate      | **99.20%**    |
 | Failed Requests   | 0             |
 
 ---
@@ -81,15 +81,15 @@ Visit http://localhost:4200/ to access the application.
 
 | Scenario       | Avg Response Time |
 | -------------- | ----------------- |
-| Cache Disabled | **141.17 ms**     |
-| Cache Enabled  | **71.48 ms**      |
+| Cache Disabled | **128.83 ms**     |
+| Cache Enabled  | **51.06 ms**      |
 
 ---
 
 ### Performance Impact
 
-* Enabling cache reduced average response time by **~49.4%**
-* Achieved nearly **2× faster response times** with caching enabled
+* Enabling cache reduced average response time by **~60.4%**
+* Achieved **~2.52× faster response times** with caching enabled
 
 ---
 
@@ -97,17 +97,17 @@ Visit http://localhost:4200/ to access the application.
 
 ### Test Setup
 - **Scenarios**: Publisher-Subscriber messaging pattern
-  - **Subscribers**: 500 concurrent WebSocket connections (constant) to receive fanout
-  - **Publishers**: 30 messages/sec (constant arrival rate), with actual success rate at 3 messages/sec due to database concurrent large fanout batch insertions and system constraints as bottleneck.
+  - **Subscribers**: 100 concurrent WebSocket connections (constant) to receive fanout
+  - **Publishers**: 30 messages/sec (constant arrival rate), with actual success rate at ~5.5 messages/sec due to database concurrent large fanout batch insertions and system constraints as bottleneck.
   - **Test Duration**: 2 minutes per scenario
 - **Infrastructure**: 5 server instances for load distribution
-- **Total Requests**: 618 REST API calls
+- **Total Requests**: 791 REST API calls
 
 ### Results
 | Metric | Value |
 |--------|-------|
-| WebSocket Connections | **500 concurrent** |
-| Message Delivery Rate | **5280 messages/minutes** |
+| WebSocket Connections | **100 concurrent** |
+| Message Delivery Rate | **~11,137 messages/minute** |
 
 ---
 
