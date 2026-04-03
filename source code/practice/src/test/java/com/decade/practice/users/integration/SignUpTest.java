@@ -11,7 +11,7 @@ import org.springframework.test.context.event.ApplicationEvents;
 import org.springframework.test.context.jdbc.Sql;
 import org.springframework.test.web.servlet.MockMvc;
 
-import java.util.Date;
+import java.time.Instant;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
@@ -40,7 +40,7 @@ class SignUpTest extends BaseTestClass {
             request.setPassword("StrongPass123!");
             request.setName("New User");
             request.setGender(1.0f);
-            request.setDob(new Date(System.currentTimeMillis() - 1000000000L));
+            request.setDob(Instant.now());
 
             mockMvc.perform(post("/users")
                                 .contentType(MediaType.APPLICATION_JSON)
