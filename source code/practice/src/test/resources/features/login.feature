@@ -1,6 +1,6 @@
 # Created by decade at 4/2/26
 Feature: Login
-  # Enter feature description here
+  As a user, I want to login and stay with my login session so that i can use the app and play with company documents
 
   Scenario: Login Successfully
     Given user exist with username "teri1712" and password "vcl123456"

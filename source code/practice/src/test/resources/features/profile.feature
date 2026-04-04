@@ -1,4 +1,5 @@
 Feature: Profile management
+  As a user, i want to update my profile and password so that i can protect my account.
 
   Scenario: Change password with correct submitted password
     Given user exist with username "teri1712" and password "12345678"
