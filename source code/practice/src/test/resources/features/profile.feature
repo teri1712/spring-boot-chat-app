@@ -7,7 +7,7 @@ Feature: Profile management
     When changing password to "123456789" with submitted password "12345678"
     Then password is changed successfully to "123456789"
     And invalidate current session
-    And grant new valid session
+    And grant a new valid session
 
 
   Scenario: Change profile partially

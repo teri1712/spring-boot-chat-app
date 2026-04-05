@@ -9,6 +9,7 @@ import org.springframework.data.redis.core.StringRedisTemplate;
 import org.springframework.lang.Nullable;
 import org.springframework.stereotype.Service;
 
+import java.util.Set;
 import java.util.concurrent.TimeUnit;
 
 @Service
@@ -18,7 +19,7 @@ public class RedisBasedTokenStore implements TokenStore {
       private static final String TOKEN_KEY_SPACE = "JWT_TOKENS";
 
       private final StringRedisTemplate redisTemplate;
-            
+
       private static String generateKey(String username) {
             return TOKEN_KEY_SPACE + ":" + username;
       }
@@ -41,6 +42,11 @@ public class RedisBasedTokenStore implements TokenStore {
       @Override
       public Long size(String username) {
             return redisTemplate.opsForSet().size(generateKey(username));
+      }
+
+      @Override
+      public Set<String> get(String username) {
+            return redisTemplate.opsForSet().members(generateKey(username));
       }
 
       @Override

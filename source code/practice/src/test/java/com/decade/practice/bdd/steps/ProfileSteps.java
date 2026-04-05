@@ -29,7 +29,7 @@ public class ProfileSteps {
 
 
       @When("changing password to {string} with submitted password {string}")
-      public void changePasswordSuccess(String newPassword, String submittedPassword) {
+      public void changePassword(String newPassword, String submittedPassword) {
             Response response = RestAssured.given().contentType(ContentType.URLENC)
                       .headers("Authorization", "Bearer " + authContext.accessToken.accessToken())
                       .formParam("password", submittedPassword)
@@ -55,19 +55,20 @@ public class ProfileSteps {
             RestAssured.given()
                       .contentType(ContentType.URLENC)
                       .formParam("refresh_token", authContext.accessToken.refreshToken())
-                      .post("/refresh")
+                      .post("/tokens/refresh")
                       .then()
                       .statusCode(401);
       }
 
-      @Then("grant new valid session")
+      @Then("grant a new valid session")
       public void newSession() {
+            assertThat(profileContext.accessToken).isNotNull();
             RestAssured.given()
                       .contentType(ContentType.URLENC)
-                      .formParam("refresh_token", authContext.accessToken.refreshToken())
-                      .post("/refresh")
+                      .formParam("refresh_token", profileContext.accessToken.refreshToken())
+                      .post("/tokens/refresh")
                       .then()
-                      .statusCode(401);
+                      .statusCode(200);
       }
 
       @When("the user update his name to {string} and his gender to {double}")
