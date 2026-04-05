@@ -77,4 +77,4 @@ jobs:
                       docker compose -f docker-compose.infra.yml -f docker-compose.production.yml up -d --remove-orphans
                       docker compose -f docker-compose.infra.yml -f docker-compose.production.yml exec server nginx -s reload
                    
-                      docker image prune -f
+                      docker image prune -a

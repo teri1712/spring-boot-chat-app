@@ -19,7 +19,7 @@ import org.springframework.security.access.AccessDeniedException;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.util.Date;
+import java.time.Instant;
 import java.util.Optional;
 import java.util.UUID;
 
@@ -55,7 +55,7 @@ public class ProfileServiceImpl implements ProfileService {
             String password = signUpRequest.getPassword();
             String name = signUpRequest.getName();
             Float gender = signUpRequest.getGender();
-            Date dob = signUpRequest.getDob();
+            Instant dob = signUpRequest.getDob();
             String avatar = Optional.ofNullable(signUpRequest.getAvatar())
                       .orElse(DefaultAvatar.URL);
             User user = userFactory.createUser(id, username, password, name, avatar, dob, gender);
@@ -96,7 +96,7 @@ public class ProfileServiceImpl implements ProfileService {
                       user.getAvatar());
             AccessToken credential = tokenGenerator.generate(claims);
             tokens.add(user.getUsername(), credential.refreshToken());
-            
+
             ProfileResponse profileResponse = userMapper.map(user);
             return new AccountResponse(profileResponse, credential);
       }

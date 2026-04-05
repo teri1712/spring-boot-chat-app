@@ -51,7 +51,7 @@ class UserInfoCacheTest extends BaseTestClass {
                                   UUID.randomUUID().toString(),
                                   "vcl",
                                   "vcl",
-                                  new Date(),
+                                  Instant.now(),
                                   1f
                         );
                   }

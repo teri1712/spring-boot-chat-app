@@ -1,6 +1,6 @@
 package com.decade.practice.users.domain.events;
 
-import java.util.Date;
+import java.time.Instant;
 import java.util.UUID;
 
 public record UserCreated(
@@ -8,7 +8,7 @@ public record UserCreated(
           String username,
           String name,
           String gender,
-          Date dob,
+          Instant dob,
           String avatar
 ) {
 }

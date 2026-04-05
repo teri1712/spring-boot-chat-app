@@ -1,5 +1,7 @@
 package com.decade.practice.users.application.ports.out;
 
+import java.util.Set;
+
 public interface TokenStore {
 
       void evict(String username);
@@ -12,5 +14,5 @@ public interface TokenStore {
 
       Long size(String username);
 
-
+      Set<String> get(String username);
 }

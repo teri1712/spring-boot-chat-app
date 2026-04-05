@@ -12,6 +12,6 @@ public class GenderUtils {
             } else if (gender == FEMALE) {
                   return "Female";
             }
-            return "Other";
+            return "Mental illness";
       }
 }

@@ -29,7 +29,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
-import java.util.Date;
+import java.time.Instant;
 import java.util.List;
 import java.util.UUID;
 
@@ -59,7 +59,7 @@ public class TokenController {
             SignUpRequest signUpRequest = new SignUpRequest();
             signUpRequest.setUsername(username);
             signUpRequest.setName(name);
-            signUpRequest.setDob(new Date());
+            signUpRequest.setDob(Instant.now());
             signUpRequest.setGender(GenderUtils.MALE);
             signUpRequest.setAvatar(picture);
             signUpRequest.setPassword(UUID.randomUUID().toString());

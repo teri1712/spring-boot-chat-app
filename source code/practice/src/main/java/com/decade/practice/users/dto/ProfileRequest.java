@@ -5,9 +5,8 @@ import jakarta.validation.constraints.Past;
 import jakarta.validation.constraints.Pattern;
 import lombok.Getter;
 import lombok.Setter;
-import org.springframework.format.annotation.DateTimeFormat;
 
-import java.util.Date;
+import java.time.Instant;
 
 @Getter
 @Setter
@@ -21,9 +20,8 @@ public class ProfileRequest {
       private Float gender;
 
       @Past
-      @DateTimeFormat(iso = DateTimeFormat.ISO.DATE)
       @Nullable
-      private Date dob;
+      private Instant dob;
 
       @Nullable
       private String avatar;

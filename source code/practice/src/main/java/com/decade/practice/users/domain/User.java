@@ -8,7 +8,7 @@ import jakarta.validation.constraints.NotNull;
 import lombok.Getter;
 import org.springframework.data.domain.AbstractAggregateRoot;
 
-import java.util.Date;
+import java.time.Instant;
 import java.util.UUID;
 
 @Getter
@@ -24,8 +24,7 @@ public class User extends AbstractAggregateRoot<User> {
 
       private String name;
 
-      @Temporal(value = TemporalType.TIMESTAMP)
-      private Date dob;
+      private Instant dob;
 
       @Column(updatable = false)
       private String role = "ROLE_USER";
@@ -59,14 +58,14 @@ public class User extends AbstractAggregateRoot<User> {
             this.name = name;
       }
 
-      public void changeDob(@NotNull Date dob) {
+      public void changeDob(@NotNull Instant dob) {
             this.dob = dob;
       }
 
       protected User() {
       }
 
-      public User(UUID id, String username, String password, String name, String avatar, Date dob, Float gender) {
+      public User(UUID id, String username, String password, String name, String avatar, Instant dob, Float gender) {
             this.id = id;
             this.username = username;
             this.password = password;
