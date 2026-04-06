@@ -13,7 +13,6 @@ import java.time.Duration;
 import java.util.UUID;
 
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 @Sql(scripts = "/sql/clean.sql", executionPhase = Sql.ExecutionPhase.AFTER_TEST_METHOD)
@@ -40,7 +39,7 @@ class SecurityFilterTest extends BaseTestClass {
             // /users is public for registration (POST), but GET might also be public or have different rules.
             // Let's check /medias/** or /users/** (registration)
             // Actually SecurityConfiguration says .requestMatchers("/users/**").permitAll()
-            mockMvc.perform(post("/files/upload").param("filename", "alice"))
+            mockMvc.perform(get("/swagger-ui/index.html"))
                       .andExpect(status().isOk());
       }
 
