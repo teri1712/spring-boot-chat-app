@@ -1,13 +1,12 @@
 package com.decade.practice.bdd.context;
 
+import com.decade.practice.resources.files.api.FileIntegrity;
 import io.cucumber.spring.ScenarioScope;
 import org.springframework.stereotype.Component;
 
 @Component
 @ScenarioScope
-public class SignUpContext {
-      public int status;
-      public String errorMessage;
-      public String username;
-      public String password;
+public class UploadContext {
+      public int finishStatus;
+      public FileIntegrity integrity;
 }

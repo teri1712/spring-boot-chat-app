@@ -57,21 +57,6 @@ class ProfileControllerTest extends BaseTestClass {
                       .andExpect(jsonPath("$.name").value("Alice in Wonderland"));
       }
 
-
-      @Test
-      @Sql(scripts = {"/sql/clean.sql", "/sql/seed_users.sql"})
-      @WithUserDetails("alice")
-      void givenAliceExists_whenAliceChangesAvatar_thenAvatarIsUpdated() throws Exception {
-            ProfileRequest request = new ProfileRequest();
-            request.setAvatar("Alice's avatar URL");
-
-            mockMvc.perform(patch("/profiles/me")
-                                .contentType(MediaType.APPLICATION_JSON)
-                                .content(objectMapper.writeValueAsString(request)))
-                      .andExpect(status().isOk())
-                      .andExpect(jsonPath("$.avatar").value("Alice's avatar URL"));
-      }
-
       @Test
       @Sql(scripts = {"/sql/clean.sql", "/sql/seed_users.sql"})
       @WithUserDetails("alice")

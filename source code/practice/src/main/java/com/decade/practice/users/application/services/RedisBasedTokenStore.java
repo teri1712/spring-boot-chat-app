@@ -2,6 +2,7 @@ package com.decade.practice.users.application.services;
 
 import com.decade.practice.users.application.ports.out.TokenStore;
 import lombok.AllArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.dao.DataAccessException;
 import org.springframework.data.redis.core.RedisOperations;
 import org.springframework.data.redis.core.SessionCallback;
@@ -12,6 +13,7 @@ import org.springframework.stereotype.Service;
 import java.util.Set;
 import java.util.concurrent.TimeUnit;
 
+@Slf4j
 @Service
 @AllArgsConstructor
 public class RedisBasedTokenStore implements TokenStore {
@@ -32,8 +34,10 @@ public class RedisBasedTokenStore implements TokenStore {
                   @Override
                   public <K, V> Object execute(RedisOperations<K, V> operations) throws DataAccessException {
                         StringRedisTemplate template = (StringRedisTemplate) operations;
+                        template.multi();
                         template.opsForSet().add(key, refreshTokens);
                         template.expire(key, ONE_MONTH, TimeUnit.MILLISECONDS);
+                        template.exec();
                         return null;
                   }
             });
@@ -64,7 +68,12 @@ public class RedisBasedTokenStore implements TokenStore {
       @Override
       public boolean has(String username, String refreshToken) {
             String key = generateKey(username);
-            return Boolean.TRUE.equals(redisTemplate.opsForSet().isMember(key, refreshToken));
+            Boolean result = redisTemplate.opsForSet().isMember(key, refreshToken);
+            if (result == null) {
+                  return false;
+            }
+            log.trace("Token validation result1: {}", result);
+            return result;
       }
 
 

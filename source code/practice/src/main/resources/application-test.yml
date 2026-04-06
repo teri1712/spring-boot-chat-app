@@ -4,9 +4,15 @@ server:
 
 logging:
   level:
-    root: INFO
+    root: DEBUG
     com.decade.practice: TRACE
     org.springframework: DEBUG
+    org:
+      springframework:
+        security:
+          web:
+            authentication:
+              www: TRACE
 
 
 outbox:

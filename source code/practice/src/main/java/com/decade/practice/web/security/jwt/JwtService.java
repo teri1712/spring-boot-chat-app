@@ -13,6 +13,7 @@ import java.time.Duration;
 import java.util.Base64;
 import java.util.Date;
 import java.util.Map;
+import java.util.UUID;
 
 @Slf4j
 @Component
@@ -53,6 +54,7 @@ public class JwtService implements TokenService {
                       .setHeaderParam("typ", "JWT")
                       .setHeaderParam("alg", "HS256")
                       .setClaims(claims)
+                      .setId(UUID.randomUUID().toString()) // fuck
                       .setIssuedAt(at)
                       .setExpiration(new Date(at.getTime() + duration.toMillis()))
                       .signWith(SignatureAlgorithm.HS256, key)

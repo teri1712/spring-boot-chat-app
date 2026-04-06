@@ -2,20 +2,24 @@ package com.decade.practice.bdd.steps;
 
 
 import com.decade.practice.bdd.context.SignUpContext;
-import com.decade.practice.users.dto.ProfileResponse;
 import io.cucumber.java.Before;
+import io.cucumber.java.en.And;
 import io.cucumber.java.en.Then;
 import io.cucumber.java.en.When;
 import io.restassured.RestAssured;
+import io.restassured.http.ContentType;
 import io.restassured.response.Response;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.core.env.Environment;
 
+import java.io.IOException;
 import java.time.Instant;
 import java.util.Map;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
+@Slf4j
 @RequiredArgsConstructor
 public class SignupSteps {
 
@@ -39,16 +43,69 @@ public class SignupSteps {
                                           "password", password))
                       .post("/users");
             signUpContext.status = response.statusCode();
+            signUpContext.username = username;
+            signUpContext.password = password;
             if (response.statusCode() != 201) {
                   signUpContext.errorMessage = response.jsonPath().getString("detail");
-            } else {
-                  signUpContext.profile = response.jsonPath().getObject(".", ProfileResponse.class);
             }
-
       }
 
       @Then("fails with error {string}")
       public void failsWithError(String error) {
             assertThat(signUpContext.errorMessage).isEqualTo(error);
+      }
+
+
+      @And("user set his avatar {string}")
+      public void whenUpload(String fileName) throws IOException {
+
+
+            Response response = RestAssured.given()
+                      .auth().preemptive().basic(signUpContext.username, signUpContext.password)
+                      .queryParam("filename", fileName)
+                      .post("/files/upload")
+                      .then().statusCode(200)
+                      .extract().response();
+
+            String uploadUrl = response.jsonPath().getString("presignedUploadUrl");
+            String fileKey = response.jsonPath().getString("fileKey");
+
+            response = RestAssured.given()
+                      .urlEncodingEnabled(false)
+                      .contentType(ContentType.BINARY)
+                      .body(getClass().getResourceAsStream("/samples/" + fileName))
+                      .put(uploadUrl)
+                      .andReturn();
+            String eTag = response.header("ETag");
+
+
+            RestAssured.given()
+                      .auth().preemptive().basic(signUpContext.username, signUpContext.password)
+                      .contentType(ContentType.JSON)
+                      .body("""
+                                {
+                                    "avatar" : {
+                                                "eTag": "%s",
+                                                "fileKey": "%s"
+                                              }
+                                }
+                                """.formatted(eTag.replace("\"", "\\\""), fileKey))
+                      .patch("/profiles/me")
+                      .andReturn();
+      }
+
+      @Then("his profile is created successfully with the name {string} and avatar {string}")
+      public void hisProfileIsCreatedSuccessfully(String name, String avatar) {
+            assertThat(signUpContext.status).isEqualTo(201);
+            Response response = RestAssured.given().auth().preemptive()
+                      .basic(signUpContext.username, signUpContext.password)
+                      .get("/profiles/me")
+                      .then()
+                      .statusCode(200)
+                      .extract().response();
+            String savedName = response.jsonPath().getString("name");
+            String savedAvatar = response.jsonPath().getString("avatar");
+            assertThat(savedName).isEqualTo(name);
+            assertThat(savedAvatar).contains(avatar);
       }
 }

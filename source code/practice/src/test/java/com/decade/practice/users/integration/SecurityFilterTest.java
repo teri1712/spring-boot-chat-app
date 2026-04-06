@@ -40,7 +40,7 @@ class SecurityFilterTest extends BaseTestClass {
             // /users is public for registration (POST), but GET might also be public or have different rules.
             // Let's check /medias/** or /users/** (registration)
             // Actually SecurityConfiguration says .requestMatchers("/users/**").permitAll()
-            mockMvc.perform(post("/files/upload-urls").param("filename", "alice"))
+            mockMvc.perform(post("/files/upload").param("filename", "alice"))
                       .andExpect(status().isOk());
       }
 

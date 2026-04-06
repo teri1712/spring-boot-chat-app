@@ -1,7 +1,7 @@
 package com.decade.practice.resources;
 
 import com.decade.practice.BaseTestClass;
-import com.decade.practice.resources.s3.S3PresignedResponse;
+import com.decade.practice.resources.files.dto.S3PresignedResponse;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
@@ -36,7 +36,7 @@ class S3PresignedTest extends BaseTestClass {
       void givenValidFilename_whenRequestPresignedUrlToUpload_thenReturnPresignedDetail() throws Exception {
 
 
-            mockMvc.perform(post("/files/upload-urls")
+            mockMvc.perform(post("/files/upload")
                                 .queryParam("filename", "teri.txt"))
                       .andExpect(status().isOk())
                       .andExpect(jsonPath("$.filename").value("teri.txt"));
@@ -48,35 +48,41 @@ class S3PresignedTest extends BaseTestClass {
       void givenUploadedFile_whenSubmitImageEvent_thenReturnSuccess() throws Exception {
 
 
-            MvcResult result = mockMvc.perform(post("/files/upload-urls")
+            MvcResult result = mockMvc.perform(post("/files/upload")
                                 .queryParam("filename", "teri.txt"))
                       .andExpect(status().isOk())
                       .andReturn();
 
             S3PresignedResponse response = objectMapper.readValue(result.getResponse().getContentAsString(), S3PresignedResponse.class);
 
-            Assertions.assertDoesNotThrow(() -> {
+            String eTag = Assertions.assertDoesNotThrow(() -> {
                   RestClient restClient = RestClient.builder()
                             .build();
 
 
-                  restClient.put()
+                  return restClient.put()
                             .uri(URI.create(response.getPresignedUploadUrl()))
                             .contentType(MediaType.APPLICATION_OCTET_STREAM)
                             .body("NAB Innovation Center Vietnam")
-                            .retrieve().toBodilessEntity();
+                            .retrieve()
+                            .toBodilessEntity()
+                            .getHeaders().getETag();
             });
 
             String chatIdentifier = "11111111-1111-1111-1111-111111111111+22222222-2222-2222-2222-222222222222";
             String eventJson = """
                       {
-                          "uri": "%s",
+                      
+                          "file" : {
+                                      "eTag": "%s",
+                                      "fileKey": "%s"
+                                    },
                           "width": 200,
                           "height": 200,
                           "filename": "teri.txt",
                           "format": "jpg"
                       }
-                      """.formatted(response.getDownloadUrl());
+                      """.formatted(eTag.replace("\"", "\\\""), response.getFileKey());
 
             mockMvc.perform(put("/chats/{chatIdentifier}/images/{postingId}", chatIdentifier, UUID.randomUUID())
                                 .contentType(MediaType.APPLICATION_JSON)

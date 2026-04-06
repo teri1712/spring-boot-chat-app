@@ -146,6 +146,7 @@ public class SecurityConfiguration extends GlobalAuthenticationConfigurerAdapter
                       )
                       .cors(Customizer.withDefaults())
                       .csrf(AbstractHttpConfigurer::disable)
+                      .httpBasic(Customizer.withDefaults())
                       .formLogin(login ->
                                 login.successHandler(successStrategy)
                                           .failureHandler(failedStrategy)

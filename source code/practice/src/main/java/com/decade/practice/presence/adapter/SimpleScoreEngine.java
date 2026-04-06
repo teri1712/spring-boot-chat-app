@@ -63,12 +63,14 @@ public class SimpleScoreEngine implements ScoreEngine {
                   public <K, V> Object execute(RedisOperations<K, V> operations) throws DataAccessException {
 
                         RedisOperations<String, Object> ops = (RedisOperations<String, Object>) operations;
+                        operations.multi();
 
                         ops.opsForZSet().addIfAbsent(key, value, computeRecency(timestamp));
                         ops.opsForZSet().incrementScore(key, value, bonus);
                         ops.opsForZSet().removeRange(key, 0, -capacity);
                         ops.opsForValue().set(determineTimestampKey(collection, value), Instant.now().getEpochSecond());
 
+                        operations.exec();
                         return null;
                   }
             });

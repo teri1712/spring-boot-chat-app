@@ -2,7 +2,6 @@ package com.decade.practice.users.adapter;
 
 import com.decade.practice.users.adapter.validation.StrongPassword;
 import com.decade.practice.users.application.ports.in.ProfileService;
-import com.decade.practice.users.dto.AccountResponse;
 import com.decade.practice.users.dto.ProfileRequest;
 import com.decade.practice.users.dto.ProfileResponse;
 import jakarta.persistence.OptimisticLockException;
@@ -37,7 +36,7 @@ public class ProfileController {
       }
 
       @PostMapping("/password")
-      public AccountResponse changePassword(
+      public ProfileResponse changePassword(
                 @AuthenticationPrincipal(expression = "id") UUID id,
                 @RequestParam(value = "password", required = false) String password,
                 @StrongPassword @RequestParam("new_password") String newPassword

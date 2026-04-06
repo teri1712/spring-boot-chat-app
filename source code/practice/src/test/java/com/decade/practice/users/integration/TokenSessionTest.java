@@ -5,16 +5,17 @@ import com.decade.practice.BaseTestClass;
 import com.decade.practice.users.application.ports.in.ProfileService;
 import com.decade.practice.users.application.ports.in.TokenSessionService;
 import com.decade.practice.users.application.ports.out.TokenStore;
-import com.decade.practice.users.dto.AccountResponse;
+import com.decade.practice.users.dto.AccessToken;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.redis.core.RedisTemplate;
+import org.springframework.security.access.AccessDeniedException;
 import org.springframework.test.context.jdbc.Sql;
 
 import java.util.UUID;
 
-import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.*;
 
 @Sql(scripts = {"/sql/clean.sql", "/sql/seed_users.sql"}, executionPhase = Sql.ExecutionPhase.AFTER_TEST_METHOD)
 class TokenSessionTest extends BaseTestClass {
@@ -67,20 +68,22 @@ class TokenSessionTest extends BaseTestClass {
 
       }
 
+
       @Test
       @Sql(scripts = {"/sql/clean.sql", "/sql/seed_users.sql"})
-      void given2ActiveSessionsOfAlice_whenFirstSessionChangingPassword_thenTwoSessionsBecomesInvalidated() {
-            // given
-            tokenStore.add("alice", "token1");
-            tokenStore.add("alice", "token2");
+      void givenAnActiveSessionOfAlice_whenFirstSessionChangingPassword_thenSessionBecomesInvalidated() {
 
-            AccountResponse account = profileService.changePassword(UUID.fromString("11111111-1111-1111-1111-111111111111"), "new_password", "Password123!");
+            AccessToken theSession = tokenSessionService.login("alice").getAccessToken();
             assertThat(tokenStore.size("alice")).isOne();
 
-            assertThat(tokenStore.has("alice", "token1")).isFalse();
-            assertThat(tokenStore.has("alice", "token2")).isFalse();
+            profileService.changePassword(UUID.fromString("11111111-1111-1111-1111-111111111111"), "new_password", "Password123!");
+            assertThat(tokenStore.size("alice")).isZero();
 
-            assertThat(tokenStore.has("alice", account.getAccessToken().refreshToken())).isTrue();
+            AccessToken theNewSession = tokenSessionService.login("alice").getAccessToken();
+            assertThatCode(() -> tokenSessionService.refresh(theNewSession.refreshToken()))
+                      .doesNotThrowAnyException();
+            assertThatThrownBy(() -> tokenSessionService.refresh(theSession.refreshToken()))
+                      .isInstanceOf(AccessDeniedException.class);
       }
 
 }
