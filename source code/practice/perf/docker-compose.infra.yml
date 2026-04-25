@@ -49,16 +49,6 @@ services:
       timeout: 5s
       retries: 10
       start_period: 30s
-  es-init:
-    image: curlimages/curl
-    depends_on:
-      elasticsearch:
-        condition: service_healthy
-    volumes:
-      - ../es:/es
-    entrypoint: [ "sh", "-c", "cd /es && sh ./init.sh" ]
-    networks:
-      - backend
 
 networks:
   backend:

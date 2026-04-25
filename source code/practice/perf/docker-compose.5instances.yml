@@ -29,8 +29,6 @@ services:
         condition: service_healthy
       redis:
         condition: service_healthy
-      es-init:
-        condition: service_completed_successfully
     healthcheck:
       test: [ "CMD-SHELL", "curl -f http://localhost:8081/actuator/health/readiness -u admin:admin || exit 1" ]
       interval: 10s
@@ -108,8 +106,6 @@ services:
         condition: service_healthy
       redis:
         condition: service_healthy
-      es-init:
-        condition: service_completed_successfully
     healthcheck:
       test: [ "CMD-SHELL", "curl -f http://localhost:8081/actuator/health/readiness -u admin:admin || exit 1" ]
       interval: 10s
@@ -133,8 +129,6 @@ services:
         condition: service_healthy
       redis:
         condition: service_healthy
-      es-init:
-        condition: service_completed_successfully
     healthcheck:
       test: [ "CMD-SHELL", "curl -f http://localhost:8081/actuator/health/readiness -u admin:admin || exit 1" ]
       interval: 10s

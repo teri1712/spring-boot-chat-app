@@ -11,11 +11,10 @@ import java.time.Instant;
 @NoArgsConstructor
 public class MatchingMessageResponse {
 
-      private String chatId;
+    private String chatId;
 
-      private Long sequenceNumber;
-      private String roomName;
-      private String content;
+    private Long sequenceNumber;
+    private String content;
 
-      private Instant createdAt;
+    private Instant createdAt;
 }
