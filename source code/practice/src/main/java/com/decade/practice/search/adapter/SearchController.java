@@ -19,15 +19,16 @@ public class SearchController {
 
     private final SearchService searchService;
 
-    @GetMapping("/users")
+    @GetMapping("/people")
+    // TODO: Fix client endpoint
     public List<PeopleResponse> findUsers(
         @RequestParam String query
     ) {
         return searchService.searchUsers(query);
     }
 
-
-    @GetMapping("/chats/{chatId}/history")
+    @GetMapping("/chat-histories/{chatId}")
+    // TODO: Fix client endpoint
     public List<MessageResponse> findMessages(
         @AuthenticationPrincipal(expression = "id") UUID userId,
         @PathVariable String chatId,

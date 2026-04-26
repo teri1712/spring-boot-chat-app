@@ -14,7 +14,7 @@ public interface PeopleRepository extends CrudRepository<Person, Long> {
 
     @Query(value = """
         select *  from people
-        where search_vector @@ websearch_to_tsquery('english', name)
+        where search_vector @@ websearch_to_tsquery('english', :name)
         limit 20
         """)
     List<Person> findPeople(String name);

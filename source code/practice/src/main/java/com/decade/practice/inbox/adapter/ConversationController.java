@@ -16,14 +16,14 @@ import java.util.UUID;
 @AllArgsConstructor
 public class ConversationController {
 
-      private final ConversationService conversationService;
+    private final ConversationService conversationService;
 
-      // TODO: Adjust client and test
-      @GetMapping("/me/conversations")
-      public List<ConversationResponse> list(
-                @AuthenticationPrincipal(expression = "id") UUID userId,
-                @RequestParam Optional<Long> anchorRevisionNumber
-      ) throws Throwable {
-            return conversationService.list(userId, anchorRevisionNumber);
-      }
+    // TODO: Adjust client endpoint
+    @GetMapping("/conversations")
+    public List<ConversationResponse> list(
+        @AuthenticationPrincipal(expression = "id") UUID userId,
+        @RequestParam Optional<Long> anchorRevisionNumber
+    ) throws Throwable {
+        return conversationService.list(userId, anchorRevisionNumber);
+    }
 }

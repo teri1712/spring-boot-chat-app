@@ -1,8 +1,8 @@
 package com.decade.practice.inbox.integration;
 
-import com.decade.practice.BaseTestClass;
-import com.decade.practice.TestBeans;
 import com.decade.practice.inbox.dto.MessageStateResponse;
+import com.decade.practice.integration.BaseTestClass;
+import com.decade.practice.integration.TestBeans;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.junit.jupiter.api.Test;
@@ -22,63 +22,63 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 @Sql(scripts = "/sql/clean.sql", executionPhase = Sql.ExecutionPhase.AFTER_TEST_METHOD)
 class MessageListingTest extends BaseTestClass {
 
-      @Autowired
-      private MockMvc mockMvc;
+    @Autowired
+    private MockMvc mockMvc;
 
-      @Autowired
-      private TestBeans.PrivateChatSender chatSender;
+    @Autowired
+    private TestBeans.PrivateChatSender chatSender;
 
-      @Autowired
-      private ObjectMapper objectMapper;
+    @Autowired
+    private ObjectMapper objectMapper;
 
-      @Test
-      @Sql(scripts = {"/sql/clean.sql", "/sql/seed_users.sql"})
-      @WithUserDetails("alice")
-      void givenChatHasLogs_whenAliceListsLogsForChat_thenReturnsLogsOrderedBySequenceIdDesc() throws Exception {
-            // Given
+    @Test
+    @Sql(scripts = {"/sql/clean.sql", "/sql/seed_users.sql"})
+    @WithUserDetails("alice")
+    void givenChatHasLogs_whenAliceListsLogsForChat_thenReturnsLogsOrderedBySequenceIdDesc() throws Exception {
+        // Given
 
-            mockMvc.perform(put("/direct-chats/{partnerId}", "22222222-2222-2222-2222-222222222222")
-                      )
-                      .andExpect(status().isCreated());
+        mockMvc.perform(put("/direct-chats/{partnerId}", "22222222-2222-2222-2222-222222222222")
+            )
+            .andExpect(status().isCreated());
 
-            UUID aliceId = UUID.fromString("11111111-1111-1111-1111-111111111111");
-            UUID bobId = UUID.fromString("22222222-2222-2222-2222-222222222222");
-            UUID charlieId = UUID.fromString("33333333-3333-3333-3333-333333333333");
+        UUID aliceId = UUID.fromString("11111111-1111-1111-1111-111111111111");
+        UUID bobId = UUID.fromString("22222222-2222-2222-2222-222222222222");
+        UUID charlieId = UUID.fromString("33333333-3333-3333-3333-333333333333");
 
-            String aliceBobChat = aliceId + "+" + bobId;
-            String aliceCharlieChat = aliceId + "+" + charlieId;
+        String aliceBobChat = aliceId + "+" + bobId;
+        String aliceCharlieChat = aliceId + "+" + charlieId;
 
-            chatSender.sendPrivateText("meo meo", bobId, aliceId);
-            chatSender.sendPrivateText("dcm", charlieId, aliceId);
-            chatSender.sendPrivateText("vcl", aliceId, bobId);
-            chatSender.sendPrivateText("dcm", bobId, aliceId);
-            chatSender.sendPrivateText("dcm", bobId, aliceId);
-
-
-            // When & Then
-            String bodyString = mockMvc.perform(get("/chats/{chatId}/messages", aliceBobChat)
-                                .param("anchorSequenceNumber", String.valueOf(Long.MAX_VALUE)))
-                      .andExpect(status().isOk())
-                      .andExpect(jsonPath("$.length()").value(4))
-                      .andExpect(jsonPath("$[0].content").value("dcm"))
-                      .andExpect(jsonPath("$[1].content").value("dcm"))
-                      .andExpect(jsonPath("$[2].content").value("vcl"))
-                      .andExpect(jsonPath("$[3].content").value("meo meo"))
-                      .andReturn().getResponse().getContentAsString();
-
-            List<MessageStateResponse> messages = objectMapper.readValue(bodyString, new TypeReference<>() {
-            });
+        chatSender.emitText("meomeo", bobId, aliceId);
+        chatSender.emitText("dcm", charlieId, aliceId);
+        chatSender.emitText("vcl", aliceId, bobId);
+        chatSender.emitText("dcm", bobId, aliceId);
+        chatSender.emitText("dcm", bobId, aliceId);
 
 
-            mockMvc.perform(get("/chats/{chatId}/messages", aliceBobChat)
-                                .param("anchorSequenceNumber", messages.get(1).getSequenceNumber().toString()))
-                      .andExpect(status().isOk())
-                      .andExpect(jsonPath("$.length()").value(3))
-                      .andExpect(jsonPath("$[0].content").value("dcm"))
-                      .andExpect(jsonPath("$[1].content").value("vcl"))
-                      .andExpect(jsonPath("$[2].content").value("meo meo"))
+        // When & Then
+        String bodyString = mockMvc.perform(get("/chats/{chatId}/messages", aliceBobChat)
+                .param("anchorSequenceNumber", String.valueOf(Long.MAX_VALUE)))
+            .andExpect(status().isOk())
+            .andExpect(jsonPath("$.length()").value(4))
+            .andExpect(jsonPath("$[0].content").value("dcm"))
+            .andExpect(jsonPath("$[1].content").value("dcm"))
+            .andExpect(jsonPath("$[2].content").value("vcl"))
+            .andExpect(jsonPath("$[3].content").value("meomeo"))
+            .andReturn().getResponse().getContentAsString();
 
-            ;
-      }
+        List<MessageStateResponse> messages = objectMapper.readValue(bodyString, new TypeReference<>() {
+        });
+
+
+        mockMvc.perform(get("/chats/{chatId}/messages", aliceBobChat)
+                .param("anchorSequenceNumber", messages.get(1).getSequenceNumber().toString()))
+            .andExpect(status().isOk())
+            .andExpect(jsonPath("$.length()").value(3))
+            .andExpect(jsonPath("$[0].content").value("dcm"))
+            .andExpect(jsonPath("$[1].content").value("vcl"))
+            .andExpect(jsonPath("$[2].content").value("meomeo"))
+
+        ;
+    }
 
 }

@@ -1,6 +1,6 @@
 package com.decade.practice.resources;
 
-import com.decade.practice.BaseTestClass;
+import com.decade.practice.integration.BaseTestClass;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.test.context.support.WithUserDetails;
@@ -22,8 +22,8 @@ class ThemeControllerTest extends BaseTestClass {
     @WithUserDetails("alice")
     void givenThemesExist_whenRequestThemes_thenReturnsAllThemes() throws Exception {
         mockMvc.perform(get("/themes"))
-                .andExpect(status().isOk())
-                .andExpect(jsonPath("$.length()").value(3));
+            .andExpect(status().isOk())
+            .andExpect(jsonPath("$.length()").value(3));
     }
 
 }

@@ -1,5 +1,6 @@
 package com.decade.practice.users.application.services;
 
+import com.decade.practice.shared.security.UserClaims;
 import com.decade.practice.users.application.ports.in.ProfileService;
 import com.decade.practice.users.application.ports.out.TokenGenerator;
 import com.decade.practice.users.application.ports.out.TokenStore;
@@ -12,7 +13,6 @@ import com.decade.practice.users.domain.events.ProfileChanged;
 import com.decade.practice.users.dto.*;
 import com.decade.practice.users.dto.mapper.UserMapper;
 import com.decade.practice.users.utils.GenderUtils;
-import com.decade.practice.web.security.UserClaims;
 import jakarta.persistence.OptimisticLockException;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;

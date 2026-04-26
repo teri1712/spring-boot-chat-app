@@ -1,5 +1,6 @@
 package com.decade.practice.users.adapter;
 
+import com.decade.practice.shared.security.TokenUtils;
 import com.decade.practice.users.adapter.security.strategies.LoginSuccessStrategy;
 import com.decade.practice.users.application.ports.in.ProfileService;
 import com.decade.practice.users.application.ports.in.TokenSessionService;
@@ -7,7 +8,6 @@ import com.decade.practice.users.dto.AccessToken;
 import com.decade.practice.users.dto.AccountResponse;
 import com.decade.practice.users.dto.SignUpRequest;
 import com.decade.practice.users.utils.GenderUtils;
-import com.decade.practice.web.security.TokenUtils;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.SerializationFeature;
 import jakarta.servlet.http.HttpServletRequest;
@@ -39,57 +39,57 @@ import java.util.UUID;
 @RequestMapping("/tokens")
 public class TokenController {
 
-      private final ProfileService profileService;
-      private final LoginSuccessStrategy loginSuccessStrategy;
-      private final TokenSessionService tokenSessionService;
+    private final ProfileService profileService;
+    private final LoginSuccessStrategy loginSuccessStrategy;
+    private final TokenSessionService tokenSessionService;
 
-      // TODO: Adjust client
-      @PostMapping("/oauth2")
-      public void exchange(
-                @AuthenticationPrincipal Jwt jwt,
-                HttpServletRequest request,
-                HttpServletResponse response
-      ) throws Exception {
-            String username = jwt.getSubject();
+    // TODO: Adjust client
+    @PostMapping("/oauth2")
+    public void exchange(
+        @AuthenticationPrincipal Jwt jwt,
+        HttpServletRequest request,
+        HttpServletResponse response
+    ) throws Exception {
+        String username = jwt.getSubject();
 
-            var claims = jwt.getClaims();
-            String name = claims.get("name").toString();
-            String picture = claims.get("picture").toString();
+        var claims = jwt.getClaims();
+        String name = claims.get("name").toString();
+        String picture = claims.get("picture").toString();
 
-            SignUpRequest signUpRequest = new SignUpRequest();
-            signUpRequest.setUsername(username);
-            signUpRequest.setName(name);
-            signUpRequest.setDob(Instant.now());
-            signUpRequest.setGender(GenderUtils.MALE);
-            signUpRequest.setAvatar(picture);
-            signUpRequest.setPassword(UUID.randomUUID().toString());
-            try {
-                  profileService.createIfNotExists(signUpRequest, false);
-            } catch (DataIntegrityViolationException ignored) {
-                  log.debug("Oauth2 user already exists");
-            }
-            UsernamePasswordAuthenticationToken authenticationToken = UsernamePasswordAuthenticationToken.authenticated(username, null, List.of(new SimpleGrantedAuthority("ROLE_USER")));
-            SecurityContext securityContext = SecurityContextHolder.createEmptyContext();
-            securityContext.setAuthentication(authenticationToken);
-            SecurityContextHolder.getContextHolderStrategy().setContext(securityContext);
-            loginSuccessStrategy.onAuthenticationSuccess(request, response, authenticationToken);
-      }
+        SignUpRequest signUpRequest = new SignUpRequest();
+        signUpRequest.setUsername(username);
+        signUpRequest.setName(name);
+        signUpRequest.setDob(Instant.now());
+        signUpRequest.setGender(GenderUtils.MALE);
+        signUpRequest.setAvatar(picture);
+        signUpRequest.setPassword(UUID.randomUUID().toString());
+        try {
+            profileService.createIfNotExists(signUpRequest, false);
+        } catch (DataIntegrityViolationException ignored) {
+            log.debug("Oauth2 user already exists");
+        }
+        UsernamePasswordAuthenticationToken authenticationToken = UsernamePasswordAuthenticationToken.authenticated(username, null, List.of(new SimpleGrantedAuthority("ROLE_USER")));
+        SecurityContext securityContext = SecurityContextHolder.createEmptyContext();
+        securityContext.setAuthentication(authenticationToken);
+        SecurityContextHolder.getContextHolderStrategy().setContext(securityContext);
+        loginSuccessStrategy.onAuthenticationSuccess(request, response, authenticationToken);
+    }
 
-      @PostMapping("/refresh")
-      public void refresh(HttpServletRequest request, HttpServletResponse response) throws IOException {
-            String refreshToken = TokenUtils.extractRefreshToken(request);
-            if (refreshToken == null) {
-                  throw new AccessDeniedException("No refresh token provided in the request");
-            }
+    @PostMapping("/refresh")
+    public void refresh(HttpServletRequest request, HttpServletResponse response) throws IOException {
+        String refreshToken = TokenUtils.extractRefreshToken(request);
+        if (refreshToken == null) {
+            throw new AccessDeniedException("No refresh token provided in the request");
+        }
 
-            String accessToken = tokenSessionService.refresh(refreshToken);
-            response.setContentType(MediaType.APPLICATION_JSON_VALUE);
-            response.setCharacterEncoding(StandardCharsets.UTF_8.name());
-            response.getWriter().write(
-                      new ObjectMapper()
-                                .enable(SerializationFeature.INDENT_OUTPUT)
-                                .writeValueAsString(new AccountResponse(null, new AccessToken(accessToken, refreshToken)))
-            );
-            response.getWriter().flush();
-      }
+        String accessToken = tokenSessionService.refresh(refreshToken);
+        response.setContentType(MediaType.APPLICATION_JSON_VALUE);
+        response.setCharacterEncoding(StandardCharsets.UTF_8.name());
+        response.getWriter().write(
+            new ObjectMapper()
+                .enable(SerializationFeature.INDENT_OUTPUT)
+                .writeValueAsString(new AccountResponse(null, new AccessToken(accessToken, refreshToken)))
+        );
+        response.getWriter().flush();
+    }
 }

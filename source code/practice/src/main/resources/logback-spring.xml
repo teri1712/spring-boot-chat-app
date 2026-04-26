@@ -1,11 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <configuration>
-
-    <!-- App customName -->
-    <property name="APP_NAME" value="chat-app"/>
-    <property name="LOG_PATH" value="./logs"/>
-
-    <!-- Console appender (for local + Docker) -->
+    <include resource="org/springframework/boot/logging/logback/defaults.xml"/>
+    <springProperty scope="context" name="APP_NAME" source="spring.application.name" defaultValue="nexa"/>
 
     <appender name="CONSOLE" class="ch.qos.logback.core.ConsoleAppender">
         <encoder>
@@ -16,23 +12,24 @@
     </appender>
 
 
-    <!--    &lt;!&ndash; File appender (for Filebeat) &ndash;&gt;-->
-    <!--    <appender name="FILE" class="ch.qos.logback.core.rolling.RollingFileAppender">-->
-    <!--        <file>${LOG_PATH}/${APP_NAME}.log</file>-->
-
-    <!--        <rollingPolicy class="ch.qos.logback.core.rolling.TimeBasedRollingPolicy">-->
-    <!--            <fileNamePattern>${LOG_PATH}/${APP_NAME}.%d{yyyy-MM-dd}.log</fileNamePattern>-->
-    <!--            <maxHistory>7</maxHistory>-->
-    <!--        </rollingPolicy>-->
-
-    <!--        <encoder class="net.logstash.logback.encoder.LogstashEncoder">-->
-    <!--        </encoder>-->
-    <!--    </appender>-->
+    <appender name="LOKI" class="com.github.loki4j.logback.Loki4jAppender">
+        <http>
+            <url>http://localhost:3100/loki/api/v1/push</url>
+        </http>
+        <format>
+            <label>
+                <pattern>app=${APP_NAME},host=${HOSTNAME}</pattern>
+            </label>
+            <message>
+                <pattern>traceId=%X{traceId} spanId=%X{spanId} %d{HH:mm:ss} %-5level %logger{36} - %msg%n</pattern>
+            </message>
+        </format>
+    </appender>
 
     <!-- Root logger -->
-    <root level="INFO">
+    <root>
         <appender-ref ref="CONSOLE"/>
-        <!--        <appender-ref ref="FILE"/>-->
+        <appender-ref ref="LOKI"/>
     </root>
 
 </configuration>

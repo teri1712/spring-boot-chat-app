@@ -1,6 +1,6 @@
 package com.decade.practice.users.integration;
 
-import com.decade.practice.BaseTestClass;
+import com.decade.practice.integration.BaseTestClass;
 import com.decade.practice.users.domain.events.UserPasswordChanged;
 import com.decade.practice.users.dto.ProfileRequest;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -20,77 +20,77 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 @Sql(scripts = "/sql/clean.sql", executionPhase = Sql.ExecutionPhase.AFTER_TEST_METHOD)
 class ProfileControllerTest extends BaseTestClass {
 
-      @Autowired
-      private MockMvc mockMvc;
+    @Autowired
+    private MockMvc mockMvc;
 
-      @Autowired
-      private ObjectMapper objectMapper;
-
-
-      @Autowired
-      private ApplicationEvents events;
+    @Autowired
+    private ObjectMapper objectMapper;
 
 
-      @Test
-      @Sql(scripts = {"/sql/clean.sql", "/sql/seed_users.sql"})
-      @WithUserDetails("alice")
-      void givenAliceExists_whenAliceRequestsAccount_thenReturnsAliceProfile() throws Exception {
-            mockMvc.perform(get("/profiles/me")
-                                .accept(MediaType.APPLICATION_JSON))
-                      .andExpect(status().isOk())
-                      .andExpect(jsonPath("$.username").value("alice"))
-                      .andExpect(jsonPath("$.name").value("Alice Liddell"));
-      }
-
-      @Test
-      @Sql(scripts = {"/sql/clean.sql", "/sql/seed_users.sql"})
-      @WithUserDetails("alice")
-      void givenAliceExists_whenAliceChangesProfileName_thenNameIsUpdated() throws Exception {
-            ProfileRequest request = new ProfileRequest();
-            request.setName("Alice in Wonderland");
-            request.setGender(2.0f);
-
-            mockMvc.perform(patch("/profiles/me")
-                                .contentType(MediaType.APPLICATION_JSON)
-                                .content(objectMapper.writeValueAsString(request)))
-                      .andExpect(status().isOk())
-                      .andExpect(jsonPath("$.name").value("Alice in Wonderland"));
-      }
+    @Autowired
+    private ApplicationEvents events;
 
 
-      @Test
-      @Sql(scripts = {"/sql/clean.sql", "/sql/seed_users.sql"})
-      @WithUserDetails("alice")
-      void givenAliceExists_whenAliceChangesAvatar_thenAvatarIsUpdated() throws Exception {
-            ProfileRequest request = new ProfileRequest();
-            request.setAvatar("Alice's avatar URL");
+    @Test
+    @Sql(scripts = {"/sql/clean.sql", "/sql/seed_users.sql"})
+    @WithUserDetails("alice")
+    void givenAliceExists_whenAliceRequestsAccount_thenReturnsAliceProfile() throws Exception {
+        mockMvc.perform(get("/profiles/me")
+                .accept(MediaType.APPLICATION_JSON))
+            .andExpect(status().isOk())
+            .andExpect(jsonPath("$.username").value("alice"))
+            .andExpect(jsonPath("$.name").value("Alice Liddell"));
+    }
 
-            mockMvc.perform(patch("/profiles/me")
-                                .contentType(MediaType.APPLICATION_JSON)
-                                .content(objectMapper.writeValueAsString(request)))
-                      .andExpect(status().isOk())
-                      .andExpect(jsonPath("$.avatar").value("Alice's avatar URL"));
-      }
+    @Test
+    @Sql(scripts = {"/sql/clean.sql", "/sql/seed_users.sql"})
+    @WithUserDetails("alice")
+    void givenAliceExists_whenAliceChangesProfileName_thenNameIsUpdated() throws Exception {
+        ProfileRequest request = new ProfileRequest();
+        request.setName("Alice in Wonderland");
+        request.setGender(2.0f);
 
-      @Test
-      @Sql(scripts = {"/sql/clean.sql", "/sql/seed_users.sql"})
-      @WithUserDetails("alice")
-      void givenAliceExists_whenAliceChangesToStrongPassword_thenSucceeds() throws Exception {
-            mockMvc.perform(post("/profiles/me/password")
-                                .param("password", "Password123!") // alice's seed password
-                                .param("new_password", "NewStrongPass123!"))
-                      .andExpect(status().isOk());
+        mockMvc.perform(patch("/profiles/me")
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(objectMapper.writeValueAsString(request)))
+            .andExpect(status().isOk())
+            .andExpect(jsonPath("$.name").value("Alice in Wonderland"));
+    }
 
 
-            assertThat(events.stream(UserPasswordChanged.class)).hasSize(1);
-      }
+    @Test
+    @Sql(scripts = {"/sql/clean.sql", "/sql/seed_users.sql"})
+    @WithUserDetails("alice")
+    void givenAliceExists_whenAliceChangesAvatar_thenAvatarIsUpdated() throws Exception {
+        ProfileRequest request = new ProfileRequest();
+        request.setAvatar("Alice's avatar URL");
 
-      @Test
-      @Sql(scripts = {"/sql/clean.sql", "/sql/seed_users.sql"})
-      @WithUserDetails("alice")
-      void givenAliceExists_whenAliceChangesToWeakPassword_thenReturnsBadRequest() throws Exception {
-            mockMvc.perform(post("/profiles/me/password")
-                                .param("password", "Password123!").param("new_password", "weak"))
-                      .andExpect(status().isBadRequest());
-      }
+        mockMvc.perform(patch("/profiles/me")
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(objectMapper.writeValueAsString(request)))
+            .andExpect(status().isOk())
+            .andExpect(jsonPath("$.avatar").value("Alice's avatar URL"));
+    }
+
+    @Test
+    @Sql(scripts = {"/sql/clean.sql", "/sql/seed_users.sql"})
+    @WithUserDetails("alice")
+    void givenAliceExists_whenAliceChangesToStrongPassword_thenSucceeds() throws Exception {
+        mockMvc.perform(post("/profiles/me/password")
+                .param("password", "Password123!") // alice's seed password
+                .param("new_password", "NewStrongPass123!"))
+            .andExpect(status().isOk());
+
+
+        assertThat(events.stream(UserPasswordChanged.class)).hasSize(1);
+    }
+
+    @Test
+    @Sql(scripts = {"/sql/clean.sql", "/sql/seed_users.sql"})
+    @WithUserDetails("alice")
+    void givenAliceExists_whenAliceChangesToWeakPassword_thenReturnsBadRequest() throws Exception {
+        mockMvc.perform(post("/profiles/me/password")
+                .param("password", "Password123!").param("new_password", "weak"))
+            .andExpect(status().isBadRequest());
+    }
 }

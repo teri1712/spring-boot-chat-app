@@ -1,7 +1,7 @@
 package com.decade.practice.users.integration;
 
 
-import com.decade.practice.BaseTestClass;
+import com.decade.practice.integration.BaseTestClass;
 import com.decade.practice.users.application.ports.in.ProfileService;
 import com.decade.practice.users.application.ports.in.TokenSessionService;
 import com.decade.practice.users.application.ports.out.TokenStore;
@@ -19,68 +19,68 @@ import static org.assertj.core.api.Assertions.assertThat;
 @Sql(scripts = {"/sql/clean.sql", "/sql/seed_users.sql"}, executionPhase = Sql.ExecutionPhase.AFTER_TEST_METHOD)
 class TokenSessionTest extends BaseTestClass {
 
-      @Autowired
-      private TokenStore tokenStore;
+    @Autowired
+    private TokenStore tokenStore;
 
-      @Autowired
-      private TokenSessionService tokenSessionService;
+    @Autowired
+    private TokenSessionService tokenSessionService;
 
-      @Autowired
-      private ProfileService profileService;
+    @Autowired
+    private ProfileService profileService;
 
-      @Autowired
-      private RedisTemplate<?, ?> redisTemplate;
+    @Autowired
+    private RedisTemplate<?, ?> redisTemplate;
 
-      @AfterEach
-      public void tearDown() {
-            redisTemplate.getConnectionFactory().getConnection().flushDb();
-      }
+    @AfterEach
+    public void tearDown() {
+        redisTemplate.getConnectionFactory().getConnection().flushDb();
+    }
 
-      @Test
-      @Sql(scripts = {"/sql/clean.sql", "/sql/seed_users.sql"})
-      void given2ActiveSessionsOfAlice_whenLogOutTheFirstOne_thenOnlyTheSecondRemainsActive() {
-            // given
-            tokenStore.add("alice", "token1");
-            tokenStore.add("alice", "token2");
+    @Test
+    @Sql(scripts = {"/sql/clean.sql", "/sql/seed_users.sql"})
+    void given2ActiveSessionsOfAlice_whenLogOutTheFirstOne_thenOnlyTheSecondRemainsActive() {
+        // given
+        tokenStore.add("alice", "token1");
+        tokenStore.add("alice", "token2");
 
-            tokenSessionService.logout("alice", "token1");
+        tokenSessionService.logout("alice", "token1");
 
-            assertThat(tokenStore.has("alice", "token2")).isTrue();
-            assertThat(tokenStore.has("alice", "token1")).isFalse();
-            assertThat(tokenStore.size("alice")).isEqualTo(1);
+        assertThat(tokenStore.has("alice", "token2")).isTrue();
+        assertThat(tokenStore.has("alice", "token1")).isFalse();
+        assertThat(tokenStore.size("alice")).isEqualTo(1);
 
-      }
+    }
 
 
-      @Test
-      @Sql(scripts = {"/sql/clean.sql", "/sql/seed_users.sql"})
-      void given1ActiveSessionsOfAlice_whenLoginIn_thenTwoSessionsAreActive() {
-            // given
-            tokenStore.add("alice", "token1");
-            assertThat(tokenStore.size("alice")).isEqualTo(1);
+    @Test
+    @Sql(scripts = {"/sql/clean.sql", "/sql/seed_users.sql"})
+    void given1ActiveSessionsOfAlice_whenLoginIn_thenTwoSessionsAreActive() {
+        // given
+        tokenStore.add("alice", "token1");
+        assertThat(tokenStore.size("alice")).isEqualTo(1);
 
-            String token2 = tokenSessionService.login("alice").getAccessToken().refreshToken();
+        String token2 = tokenSessionService.login("alice").getAccessToken().refreshToken();
 
-            assertThat(tokenStore.has("alice", "token1")).isTrue();
-            assertThat(tokenStore.has("alice", token2)).isTrue();
-            assertThat(tokenStore.size("alice")).isEqualTo(2);
+        assertThat(tokenStore.has("alice", "token1")).isTrue();
+        assertThat(tokenStore.has("alice", token2)).isTrue();
+        assertThat(tokenStore.size("alice")).isEqualTo(2);
 
-      }
+    }
 
-      @Test
-      @Sql(scripts = {"/sql/clean.sql", "/sql/seed_users.sql"})
-      void given2ActiveSessionsOfAlice_whenFirstSessionChangingPassword_thenTwoSessionsBecomesInvalidated() {
-            // given
-            tokenStore.add("alice", "token1");
-            tokenStore.add("alice", "token2");
+    @Test
+    @Sql(scripts = {"/sql/clean.sql", "/sql/seed_users.sql"})
+    void given2ActiveSessionsOfAlice_whenFirstSessionChangingPassword_thenTwoSessionsBecomesInvalidated() {
+        // given
+        tokenStore.add("alice", "token1");
+        tokenStore.add("alice", "token2");
 
-            AccountResponse account = profileService.changePassword(UUID.fromString("11111111-1111-1111-1111-111111111111"), "new_password", "Password123!");
-            assertThat(tokenStore.size("alice")).isOne();
+        AccountResponse account = profileService.changePassword(UUID.fromString("11111111-1111-1111-1111-111111111111"), "new_password", "Password123!");
+        assertThat(tokenStore.size("alice")).isOne();
 
-            assertThat(tokenStore.has("alice", "token1")).isFalse();
-            assertThat(tokenStore.has("alice", "token2")).isFalse();
+        assertThat(tokenStore.has("alice", "token1")).isFalse();
+        assertThat(tokenStore.has("alice", "token2")).isFalse();
 
-            assertThat(tokenStore.has("alice", account.getAccessToken().refreshToken())).isTrue();
-      }
+        assertThat(tokenStore.has("alice", account.getAccessToken().refreshToken())).isTrue();
+    }
 
 }

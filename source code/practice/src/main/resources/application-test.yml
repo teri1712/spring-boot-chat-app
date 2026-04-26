@@ -1,12 +1,8 @@
-server:
-  cache:
-    events: false
+spring:
+  docker:
+    compose:
+      enabled: false
 
-logging:
-  level:
-    root: INFO
-
-
-outbox:
-  scheduling:
-    enabled: false
+#logging:
+#  level:
+#    root: DEBUG

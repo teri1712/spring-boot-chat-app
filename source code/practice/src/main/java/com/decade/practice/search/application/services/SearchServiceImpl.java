@@ -1,7 +1,7 @@
 package com.decade.practice.search.application.services;
 
 import com.decade.practice.engagement.api.ReadPolicy;
-import com.decade.practice.search.application.ports.out.HistoryRepository;
+import com.decade.practice.search.application.ports.out.MessageHistoryRepository;
 import com.decade.practice.search.application.ports.out.PeopleRepository;
 import com.decade.practice.search.application.queries.SearchService;
 import com.decade.practice.search.dto.MessageResponse;
@@ -18,7 +18,7 @@ import java.util.UUID;
 @AllArgsConstructor
 public class SearchServiceImpl implements SearchService {
 
-    private final HistoryRepository messages;
+    private final MessageHistoryRepository messages;
     private final PeopleRepository people;
 
     @Override

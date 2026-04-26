@@ -23,72 +23,73 @@ import java.util.UUID;
 @Slf4j
 @RestController
 @AllArgsConstructor
+// TODO: Adjust client to new endpoints
 public class PostingController {
 
-      private final ChatEventService chatEventService;
-      private final CommandMappers commandMappers;
-      private final TextPlacement textPlacement;
-      private final ImagePlacement imagePlacement;
-      private final IconPlacement iconPlacement;
-      private final FilePlacement filePlacement;
-      private final SeenPlacement seenPlacement;
+    private final ChatEventService chatEventService;
+    private final CommandMappers commandMappers;
+    private final TextPlacement textPlacement;
+    private final ImagePlacement imagePlacement;
+    private final IconPlacement iconPlacement;
+    private final FilePlacement filePlacement;
+    private final SeenPlacement seenPlacement;
 
-      @ExceptionHandler(MessageAlreadySentException.class)
-      public PostingResponse handle(MessageAlreadySentException e) {
-            UUID idempotentKey = e.getIdempotentId();
-            log.debug("Concurrent insert encountered for receipt: {}", idempotentKey, e);
-            return chatEventService.find(idempotentKey);
-      }
+    @ExceptionHandler(MessageAlreadySentException.class)
+    public PostingResponse handle(MessageAlreadySentException e) {
+        UUID idempotentKey = e.getIdempotentId();
+        log.debug("Concurrent insert encountered for receipt: {}", idempotentKey, e);
+        return chatEventService.find(idempotentKey);
+    }
 
 
-      @PutMapping(path = "/chats/{chatId}/texts/{postingId}", consumes = {MediaType.APPLICATION_JSON_VALUE})
-      @ResponseStatus(HttpStatus.ACCEPTED)
-      public PostingResponse createText(
-                @AuthenticationPrincipal(expression = "id") UUID senderId,
-                @PathVariable UUID postingId,
-                @PathVariable String chatId,
-                @RequestBody @Valid TextRequest body) {
-            return textPlacement.place(commandMappers.toText(body, postingId, senderId, chatId));
-      }
+    @PutMapping(path = "/chats/{chatId}/texts/{postingId}", consumes = {MediaType.APPLICATION_JSON_VALUE})
+    @ResponseStatus(HttpStatus.ACCEPTED)
+    public PostingResponse createText(
+        @AuthenticationPrincipal(expression = "id") UUID senderId,
+        @PathVariable UUID postingId,
+        @PathVariable String chatId,
+        @RequestBody @Valid TextRequest body) {
+        return textPlacement.place(commandMappers.toText(body, postingId, senderId, chatId));
+    }
 
-      @PutMapping(path = "/chats/{chatId}/images/{postingId}", consumes = {MediaType.APPLICATION_JSON_VALUE})
-      @ResponseStatus(HttpStatus.ACCEPTED)
-      public PostingResponse createImage(
-                @PathVariable String chatId,
-                @AuthenticationPrincipal(expression = "id") UUID senderId,
-                @PathVariable UUID postingId,
-                @RequestBody @Valid ImageRequest body) {
-            return imagePlacement.place(commandMappers.toImage(body, postingId, senderId, chatId));
-      }
+    @PutMapping(path = "/chats/{chatId}/images/{postingId}", consumes = {MediaType.APPLICATION_JSON_VALUE})
+    @ResponseStatus(HttpStatus.ACCEPTED)
+    public PostingResponse createImage(
+        @PathVariable String chatId,
+        @AuthenticationPrincipal(expression = "id") UUID senderId,
+        @PathVariable UUID postingId,
+        @RequestBody @Valid ImageRequest body) {
+        return imagePlacement.place(commandMappers.toImage(body, postingId, senderId, chatId));
+    }
 
-      @PutMapping(path = "/chats/{chatId}/icons/{postingId}", consumes = {MediaType.APPLICATION_JSON_VALUE})
-      @ResponseStatus(HttpStatus.ACCEPTED)
-      public PostingResponse createIcon(
-                @PathVariable String chatId,
-                @AuthenticationPrincipal(expression = "id") UUID senderId,
-                @PathVariable UUID postingId,
-                @RequestBody @Valid IconRequest body) {
-            return iconPlacement.place(commandMappers.toIcon(body, postingId, senderId, chatId));
+    @PutMapping(path = "/chats/{chatId}/icons/{postingId}", consumes = {MediaType.APPLICATION_JSON_VALUE})
+    @ResponseStatus(HttpStatus.ACCEPTED)
+    public PostingResponse createIcon(
+        @PathVariable String chatId,
+        @AuthenticationPrincipal(expression = "id") UUID senderId,
+        @PathVariable UUID postingId,
+        @RequestBody @Valid IconRequest body) {
+        return iconPlacement.place(commandMappers.toIcon(body, postingId, senderId, chatId));
 
-      }
+    }
 
-      @PutMapping(path = "/chats/{chatId}/files/{postingId}", consumes = {MediaType.APPLICATION_JSON_VALUE})
-      @ResponseStatus(HttpStatus.ACCEPTED)
-      public PostingResponse createFile(
-                @PathVariable String chatId,
-                @AuthenticationPrincipal(expression = "id") UUID senderId,
-                @PathVariable UUID postingId,
-                @RequestBody @Valid FileRequest body) {
-            return filePlacement.place(commandMappers.toFile(body, postingId, senderId, chatId));
-      }
+    @PutMapping(path = "/chats/{chatId}/files/{postingId}", consumes = {MediaType.APPLICATION_JSON_VALUE})
+    @ResponseStatus(HttpStatus.ACCEPTED)
+    public PostingResponse createFile(
+        @PathVariable String chatId,
+        @AuthenticationPrincipal(expression = "id") UUID senderId,
+        @PathVariable UUID postingId,
+        @RequestBody @Valid FileRequest body) {
+        return filePlacement.place(commandMappers.toFile(body, postingId, senderId, chatId));
+    }
 
-      @PutMapping(path = "/chats/{chatId}/seens/{postingId}", consumes = {MediaType.APPLICATION_JSON_VALUE})
-      @ResponseStatus(HttpStatus.ACCEPTED)
-      public PostingResponse createSeen(
-                @PathVariable String chatId,
-                @AuthenticationPrincipal(expression = "id") UUID senderId,
-                @PathVariable UUID postingId,
-                @RequestBody @Valid SeenRequest body) {
-            return seenPlacement.place(commandMappers.toSeen(body, postingId, senderId, chatId));
-      }
+    @PutMapping(path = "/chats/{chatId}/seens/{postingId}", consumes = {MediaType.APPLICATION_JSON_VALUE})
+    @ResponseStatus(HttpStatus.ACCEPTED)
+    public PostingResponse createSeen(
+        @PathVariable String chatId,
+        @AuthenticationPrincipal(expression = "id") UUID senderId,
+        @PathVariable UUID postingId,
+        @RequestBody @Valid SeenRequest body) {
+        return seenPlacement.place(commandMappers.toSeen(body, postingId, senderId, chatId));
+    }
 }
