@@ -12,11 +12,11 @@ import org.springframework.stereotype.Service;
 public class FileListener {
 
 
-      private final MessageRepository messages;
+    private final MessageRepository messages;
 
-      @ApplicationModuleListener
-      public void on(FileRoomEventCreated eventPlaced) {
-            messages.save(new File(eventPlaced.getChatEventId(), eventPlaced.getSenderId(), eventPlaced.getChatId(), eventPlaced.getCreatedAt(), eventPlaced.getFilename(), eventPlaced.getSize(), eventPlaced.getUri()));
-      }
+    @ApplicationModuleListener(id = "file_listener")
+    public void on(FileRoomEventCreated eventPlaced) {
+        messages.save(new File(eventPlaced.getChatEventId(), eventPlaced.getSenderId(), eventPlaced.getChatId(), eventPlaced.getCreatedAt(), eventPlaced.getFilename(), eventPlaced.getSize(), eventPlaced.getUri()));
+    }
 
 }

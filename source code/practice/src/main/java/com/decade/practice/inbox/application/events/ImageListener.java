@@ -12,14 +12,14 @@ import org.springframework.stereotype.Service;
 @AllArgsConstructor
 public class ImageListener {
 
-      private final MessageRepository messages;
+    private final MessageRepository messages;
 
-      @ApplicationModuleListener
-      public void on(ImageRoomEventCreated eventPlaced) {
-            messages.save(new Image(eventPlaced.getChatEventId(), eventPlaced.getSenderId(), eventPlaced.getChatId(), eventPlaced.getCreatedAt(),
-                      new ImageSpec(eventPlaced.getUri(), eventPlaced.getFilename(), eventPlaced.getWidth(), eventPlaced.getHeight(), eventPlaced.getFormat())
-            ));
-      }
+    @ApplicationModuleListener(id = "image_listener")
+    public void on(ImageRoomEventCreated eventPlaced) {
+        messages.save(new Image(eventPlaced.getChatEventId(), eventPlaced.getSenderId(), eventPlaced.getChatId(), eventPlaced.getCreatedAt(),
+            new ImageSpec(eventPlaced.getUri(), eventPlaced.getFilename(), eventPlaced.getWidth(), eventPlaced.getHeight(), eventPlaced.getFormat())
+        ));
+    }
 
 
 }

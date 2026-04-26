@@ -46,17 +46,12 @@ spring:
       # ssl:
       #   enabled: true
       #   bundle: general
-    elasticsearch:
-      repositories:
-        enabled: true
   mvc:
     problemdetails:
       enabled: true
   flyway:
     clean-disabled: false
     enabled: true
-  elasticsearch:
-    uris: http://localhost:9200
 
   kafka:
     bootstrap-servers: localhost:9092

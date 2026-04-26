@@ -1,7 +1,7 @@
 CREATE EXTENSION IF NOT EXISTS btree_gin;
 create table message_history
 (
-    id              uuid primary key,
+    id              bigserial primary key,
     content         text not null,
     sequence_number bigint,
     chat_id         varchar(255),
@@ -25,7 +25,8 @@ execute function tsvector_update_trigger('search_vector', 'pg_catalog.english', 
 
 create table people
 (
-    id            uuid primary key,
+    id            bigserial primary key,
+    user_id       uuid,
     username      varchar(255),
     name          varchar(255),
     gender        varchar(255),
@@ -55,5 +56,6 @@ create trigger people_search_vector_update_trigger
 execute function people_vector_trigger();
 
 
-
 create index people_search_vector_idx on people using gin (search_vector);
+
+create index people_user_id_idx on people using hash (user_id);

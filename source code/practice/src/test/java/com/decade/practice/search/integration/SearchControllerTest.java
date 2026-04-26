@@ -3,9 +3,9 @@ package com.decade.practice.search.integration;
 import com.decade.practice.BaseTestClass;
 import com.decade.practice.TestBeans;
 import com.decade.practice.chatorchestrator.application.ports.in.ChatService;
-import com.decade.practice.search.application.ports.out.MessageDocumentRepository;
-import com.decade.practice.search.application.ports.out.UserDocumentRepository;
-import com.decade.practice.search.domain.UserDocument;
+import com.decade.practice.search.application.ports.out.HistoryRepository;
+import com.decade.practice.search.application.ports.out.PeopleRepository;
+import com.decade.practice.search.domain.Person;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -25,85 +25,85 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 @Sql(scripts = {"/sql/clean.sql"}, executionPhase = Sql.ExecutionPhase.AFTER_TEST_METHOD)
 class SearchControllerTest extends BaseTestClass {
 
-      @Autowired
-      private MockMvc mockMvc;
+    @Autowired
+    private MockMvc mockMvc;
 
-      @Autowired
-      private UserDocumentRepository userDocumentRepository;
+    @Autowired
+    private PeopleRepository peopleRepository;
 
-      @Autowired
-      private MessageDocumentRepository messageDocumentRepository;
+    @Autowired
+    private HistoryRepository historyRepository;
 
-      @Autowired
-      private ChatService chatService;
+    @Autowired
+    private ChatService chatService;
 
-      @Autowired
-      private TestBeans.PrivateChatSender sender;
+    @Autowired
+    private TestBeans.PrivateChatSender sender;
 
-      @BeforeEach
-      void setUp() {
-            messageDocumentRepository.deleteAll();
-            userDocumentRepository.deleteAll();
-      }
+    @BeforeEach
+    void setUp() {
+        historyRepository.deleteAll();
+        peopleRepository.deleteAll();
+    }
 
-      @Test
-      @WithUserDetails("alice")
-      void givenUsersExist_whenFindUsers_shouldReturnUserList() throws Exception {
-            UUID userId = UUID.randomUUID();
-            UserDocument user = new UserDocument(userId, "searchable_user", "Searchable Name", "Male", "vcl.jpg");
-            userDocumentRepository.save(user);
+    @Test
+    @WithUserDetails("alice")
+    void givenUsersExist_whenFindUsers_shouldReturnUserList() throws Exception {
+        UUID userId = UUID.randomUUID();
+        Person user = new Person(null, userId, "searchable_user", "Searchable Name", "Male", "vcl.jpg");
+        peopleRepository.save(user);
 
-            mockMvc.perform(get("/users")
-                                .param("query", "searchable")
-                                .contentType(MediaType.APPLICATION_JSON))
-                      .andExpect(status().isOk())
-                      .andExpect(jsonPath("$[0].name").value("Searchable Name"));
-      }
+        mockMvc.perform(get("/users")
+                .param("query", "searchable")
+                .contentType(MediaType.APPLICATION_JSON))
+            .andExpect(status().isOk())
+            .andExpect(jsonPath("$[0].name").value("Searchable Name"));
+    }
 
-      @Test
-      @WithUserDetails("charlie")
-      void givenUnParticipatedUser_whenFindMessages_thenReturnsUnauthorized() throws Exception {
+    @Test
+    @WithUserDetails("charlie")
+    void givenUnParticipatedUser_whenFindMessages_thenReturnsUnauthorized() throws Exception {
 
-            UUID aliceId = UUID.fromString("11111111-1111-1111-1111-111111111111");
-            UUID bobId = UUID.fromString("22222222-2222-2222-2222-222222222222");
+        UUID aliceId = UUID.fromString("11111111-1111-1111-1111-111111111111");
+        UUID bobId = UUID.fromString("22222222-2222-2222-2222-222222222222");
 
-            chatService.getDirect(aliceId, bobId);
+        chatService.getDirect(aliceId, bobId);
 
-            mockMvc.perform(get("/chats/{chatId}/history", aliceId + "+" + bobId)
+        mockMvc.perform(get("/chats/{chatId}/history", aliceId + "+" + bobId)
 
-                                .param("query", "hello").contentType(MediaType.APPLICATION_JSON))
-                      .andExpect(status().isForbidden());
-      }
+                .param("query", "hello").contentType(MediaType.APPLICATION_JSON))
+            .andExpect(status().isForbidden());
+    }
 
-      @Test
-      @WithUserDetails("alice")
-      void givenAuthenticatedUser_whenFindMessages_thenReturnsMessageHistory() throws Exception {
+    @Test
+    @WithUserDetails("alice")
+    void givenAuthenticatedUser_whenFindMessages_thenReturnsMessageHistory() throws Exception {
 
-            UUID aliceId = UUID.fromString("11111111-1111-1111-1111-111111111111");
-            UUID bobId = UUID.fromString("22222222-2222-2222-2222-222222222222");
+        UUID aliceId = UUID.fromString("11111111-1111-1111-1111-111111111111");
+        UUID bobId = UUID.fromString("22222222-2222-2222-2222-222222222222");
 
-            chatService.getDirect(aliceId, bobId);
-            sender.sendPrivateText("unique currentState content", bobId, aliceId);
+        chatService.getDirect(aliceId, bobId);
+        sender.sendPrivateText("unique currentState content", bobId, aliceId);
 
-            Assertions.assertEquals(1, messageDocumentRepository.count());
-            Assertions.assertEquals("unique currentState content", messageDocumentRepository.findAll().iterator().next().getContent());
+        Assertions.assertEquals(1, historyRepository.count());
+        Assertions.assertEquals("unique currentState content", historyRepository.findAll().iterator().next().content());
 
 
-            mockMvc.perform(get("/chats/{chatId}/history", aliceId + "+" + bobId)
-                                .queryParam("query", "unique")
-                                .contentType(MediaType.APPLICATION_JSON))
-                      .andExpect(status().isOk())
-                      .andExpect(jsonPath("$.length()").value(1))
-                      .andExpect(jsonPath("$[0].content").value("unique currentState content"));
-      }
+        mockMvc.perform(get("/chats/{chatId}/history", aliceId + "+" + bobId)
+                .queryParam("query", "unique")
+                .contentType(MediaType.APPLICATION_JSON))
+            .andExpect(status().isOk())
+            .andExpect(jsonPath("$.length()").value(1))
+            .andExpect(jsonPath("$[0].content").value("unique currentState content"));
+    }
 
-      @Test
-      @WithUserDetails("alice")
-      void givenEmptyQuery_whenFindUsers_thenReturnsEmptyList() throws Exception {
-            mockMvc.perform(get("/users")
-                                .param("query", "")
-                                .contentType(MediaType.APPLICATION_JSON))
-                      .andExpect(status().isOk())
-                      .andExpect(jsonPath("$.length()").value(0));
-      }
+    @Test
+    @WithUserDetails("alice")
+    void givenEmptyQuery_whenFindUsers_thenReturnsEmptyList() throws Exception {
+        mockMvc.perform(get("/users")
+                .param("query", "")
+                .contentType(MediaType.APPLICATION_JSON))
+            .andExpect(status().isOk())
+            .andExpect(jsonPath("$.length()").value(0));
+    }
 }

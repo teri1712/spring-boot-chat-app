@@ -16,23 +16,23 @@
     </appender>
 
 
-    <!-- File appender (for Filebeat) -->
-    <appender name="FILE" class="ch.qos.logback.core.rolling.RollingFileAppender">
-        <file>${LOG_PATH}/${APP_NAME}.log</file>
+    <!--    &lt;!&ndash; File appender (for Filebeat) &ndash;&gt;-->
+    <!--    <appender name="FILE" class="ch.qos.logback.core.rolling.RollingFileAppender">-->
+    <!--        <file>${LOG_PATH}/${APP_NAME}.log</file>-->
 
-        <rollingPolicy class="ch.qos.logback.core.rolling.TimeBasedRollingPolicy">
-            <fileNamePattern>${LOG_PATH}/${APP_NAME}.%d{yyyy-MM-dd}.log</fileNamePattern>
-            <maxHistory>7</maxHistory>
-        </rollingPolicy>
+    <!--        <rollingPolicy class="ch.qos.logback.core.rolling.TimeBasedRollingPolicy">-->
+    <!--            <fileNamePattern>${LOG_PATH}/${APP_NAME}.%d{yyyy-MM-dd}.log</fileNamePattern>-->
+    <!--            <maxHistory>7</maxHistory>-->
+    <!--        </rollingPolicy>-->
 
-        <encoder class="net.logstash.logback.encoder.LogstashEncoder">
-        </encoder>
-    </appender>
+    <!--        <encoder class="net.logstash.logback.encoder.LogstashEncoder">-->
+    <!--        </encoder>-->
+    <!--    </appender>-->
 
     <!-- Root logger -->
     <root level="INFO">
         <appender-ref ref="CONSOLE"/>
-        <appender-ref ref="FILE"/>
+        <!--        <appender-ref ref="FILE"/>-->
     </root>
 
 </configuration>

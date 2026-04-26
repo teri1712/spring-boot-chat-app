@@ -5,12 +5,11 @@ import org.springframework.data.relational.core.mapping.Column;
 import org.springframework.data.relational.core.mapping.Table;
 
 import java.time.Instant;
-import java.util.UUID;
 
 @Table(name = "message_history")
-public record MessageDocument(
+public record History(
     @Id
-    UUID id,
+    Long id,
     String content,
     @Column("sequence_number")
     Long sequenceNumber,

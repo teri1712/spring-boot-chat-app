@@ -20,42 +20,42 @@ import java.util.UUID;
 @TestConfiguration
 public class TestBeans {
 
-      @Bean
-      TaskExecutor taskExecutor() {
-            return new SyncTaskExecutor();
-      }
+    @Bean
+    TaskExecutor taskExecutor() {
+        return new SyncTaskExecutor();
+    }
 
-      @TestComponent
-      @AllArgsConstructor
-      public static class PrivateChatSender {
+    @TestComponent
+    @AllArgsConstructor
+    public static class PrivateChatSender {
 
-            private final TransactionalApplicationEventPublisher applicationEventPublisher;
+        private final TransactionalApplicationEventPublisher applicationEventPublisher;
 
-            public void sendPrivateText(String message, UUID senderId, UUID recipientId) {
-                  String chatId = new DirectChatFactory().make(new ChatCreators(senderId, Set.of(recipientId)));
+        public void sendPrivateText(String message, UUID senderId, UUID recipientId) {
+            String chatId = new DirectChatFactory().make(new ChatCreators(senderId, Set.of(recipientId)));
 
-                  applicationEventPublisher.publishEvent(TextRoomEventCreated.builder()
-                            .senderId(senderId)
-                            .chatId(chatId)
-                            .chatEventId(UUID.randomUUID())
-                            .createdAt(Instant.now())
-                            .content(message)
-                            .build()
-                  );
-            }
+            applicationEventPublisher.publishEvent(TextRoomEventCreated.builder()
+                .senderId(senderId)
+                .chatId(chatId)
+                .chatEventId(UUID.randomUUID())
+                .createdAt(Instant.now())
+                .content(message)
+                .build()
+            );
+        }
 
-      }
+    }
 
-      @AllArgsConstructor
-      @TestComponent
-      public static class TransactionalApplicationEventPublisher {
+    @AllArgsConstructor
+    @TestComponent
+    public static class TransactionalApplicationEventPublisher {
 
-            private final ApplicationEventPublisher applicationEventPublisher;
+        private final ApplicationEventPublisher applicationEventPublisher;
 
-            @Transactional(propagation = Propagation.REQUIRES_NEW)
-            public void publishEvent(Object event) {
-                  applicationEventPublisher.publishEvent(event);
-            }
+        @Transactional(propagation = Propagation.REQUIRES_NEW)
+        public void publishEvent(Object event) {
+            applicationEventPublisher.publishEvent(event);
+        }
 
-      }
+    }
 }

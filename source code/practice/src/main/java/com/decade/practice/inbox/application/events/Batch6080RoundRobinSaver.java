@@ -4,13 +4,28 @@ import com.decade.practice.inbox.application.ports.out.ConversationRepository;
 import com.decade.practice.inbox.application.ports.out.DeliveryService;
 import com.decade.practice.inbox.application.ports.out.LogRepository;
 import com.decade.practice.inbox.application.ports.out.LookUpRegistry;
+import com.decade.practice.inbox.domain.events.MessageCreated;
+import com.decade.practice.inbox.domain.events.MessageUpdated;
 import com.decade.practice.inbox.domain.services.ConversationInfoService;
 import com.decade.practice.inbox.dto.mapper.InboxLogMapper;
+import org.springframework.modulith.events.ApplicationModuleListener;
 import org.springframework.stereotype.Service;
 
 @Service
 public class Batch6080RoundRobinSaver extends BatchRoundRobinSaver {
-      public Batch6080RoundRobinSaver(LogRepository logs, ConversationRepository conversations, LookUpRegistry lookUpRegistry, ConversationInfoService conversationInfoService, DeliveryService deliveryService, InboxLogMapper inboxLogMapper) {
-            super(60, 80, logs, conversations, lookUpRegistry, conversationInfoService, deliveryService, inboxLogMapper);
-      }
+    public Batch6080RoundRobinSaver(LogRepository logs, ConversationRepository conversations, LookUpRegistry lookUpRegistry, ConversationInfoService conversationInfoService, DeliveryService deliveryService, InboxLogMapper inboxLogMapper) {
+        super(60, 80, logs, conversations, lookUpRegistry, conversationInfoService, deliveryService, inboxLogMapper);
+    }
+
+    @Override
+    @ApplicationModuleListener(id = "batch_60_insert")
+    protected void on(MessageCreated message) {
+        super.on(message);
+    }
+
+    @Override
+    @ApplicationModuleListener(id = "batch_60_update")
+    protected void on(MessageUpdated message) {
+        super.on(message);
+    }
 }

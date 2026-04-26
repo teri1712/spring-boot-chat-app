@@ -17,37 +17,37 @@ import java.util.function.Consumer;
 @AllArgsConstructor
 public class SeenListener {
 
-      private final MessageRepository messages;
+    private final MessageRepository messages;
 
-      @ApplicationModuleListener
-      public void on(SeenRoomEventCreated event) {
-            String chatId = event.getChatId();
-            UUID senderId = event.getSenderId();
-            Optional<Message> latestSeen = messages.findByLastSeen(chatId, senderId);
-            Optional<Message> latestMessage = messages.findFirstByChatIdOrderBySequenceIdDesc(chatId);
+    @ApplicationModuleListener(id = "seen_listener")
+    public void on(SeenRoomEventCreated event) {
+        String chatId = event.getChatId();
+        UUID senderId = event.getSenderId();
+        Optional<Message> latestSeen = messages.findByLastSeen(chatId, senderId);
+        Optional<Message> latestMessage = messages.findFirstByChatIdOrderBySequenceIdDesc(chatId);
 
-            if (latestSeen.equals(latestMessage)) {
-                  return;
+        if (latestSeen.equals(latestMessage)) {
+            return;
+        }
+
+        latestSeen.ifPresent(new Consumer<Message>() {
+
+            @Override
+            public void accept(Message message) {
+                message.deleteSeen(senderId);
+                log.debug("Removing seen pointer for user {} in chat {} for message {}", senderId, chatId, message.getSequenceId());
+                messages.save(message);
             }
+        });
 
-            latestSeen.ifPresent(new Consumer<Message>() {
-
-                  @Override
-                  public void accept(Message message) {
-                        message.deleteSeen(senderId);
-                        log.debug("Removing seen pointer for user {} in chat {} for message {}", senderId, chatId, message.getSequenceId());
-                        messages.save(message);
-                  }
-            });
-
-            latestMessage.ifPresent(new Consumer<Message>() {
-                  @Override
-                  public void accept(Message message) {
-                        message.addSeen(senderId, event.getAt());
-                        log.debug("Adding seen pointer for user {} in chat {} for message {}", senderId, chatId, message.getSequenceId());
-                        messages.save(message);
-                  }
-            });
-      }
+        latestMessage.ifPresent(new Consumer<Message>() {
+            @Override
+            public void accept(Message message) {
+                message.addSeen(senderId, event.getAt());
+                log.debug("Adding seen pointer for user {} in chat {} for message {}", senderId, chatId, message.getSequenceId());
+                messages.save(message);
+            }
+        });
+    }
 
 }

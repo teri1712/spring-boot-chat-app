@@ -18,22 +18,22 @@ import java.util.UUID;
 public class PreferenceListener {
 
 
-      private final MessageRepository messages;
-      private final RoomRepository rooms;
+    private final MessageRepository messages;
+    private final RoomRepository rooms;
 
 
-      @ApplicationModuleListener
-      public void on(PreferenceChanged event) {
+    @ApplicationModuleListener(id = "preference_listener")
+    public void on(PreferenceChanged event) {
 
-            Room room = rooms.findByChatId(event.getChatId()).orElseThrow();
-            room.update(event.getCustomName(), event.getCustomAvatar());
-            room.refreshLastActivity();
-            rooms.save(room);
+        Room room = rooms.findByChatId(event.getChatId()).orElseThrow();
+        room.update(event.getCustomName(), event.getCustomAvatar());
+        room.refreshLastActivity();
+        rooms.save(room);
 
-            messages.save(new Preference(
-                      UUID.randomUUID(),
-                      event.getMakerId(),
-                      event.getChatId(),
-                      event.getCreatedAt()));
-      }
+        messages.save(new Preference(
+            UUID.randomUUID(),
+            event.getMakerId(),
+            event.getChatId(),
+            event.getCreatedAt()));
+    }
 }

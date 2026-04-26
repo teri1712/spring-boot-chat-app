@@ -1,8 +1,8 @@
 package com.decade.practice.search.adapter;
 
 import com.decade.practice.search.application.queries.SearchService;
-import com.decade.practice.search.dto.MatchingMessageResponse;
-import com.decade.practice.search.dto.MatchingUserResponse;
+import com.decade.practice.search.dto.MessageResponse;
+import com.decade.practice.search.dto.PeopleResponse;
 import lombok.AllArgsConstructor;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -17,23 +17,23 @@ import java.util.UUID;
 @AllArgsConstructor
 public class SearchController {
 
-      private final SearchService searchService;
+    private final SearchService searchService;
 
-      @GetMapping("/users")
-      public List<MatchingUserResponse> findUsers(
-                @RequestParam String query
-      ) {
-            return searchService.searchUsers(query);
-      }
+    @GetMapping("/users")
+    public List<PeopleResponse> findUsers(
+        @RequestParam String query
+    ) {
+        return searchService.searchUsers(query);
+    }
 
 
-      @GetMapping("/chats/{chatId}/history")
-      public List<MatchingMessageResponse> findMessages(
-                @AuthenticationPrincipal(expression = "id") UUID userId,
-                @PathVariable String chatId,
-                @RequestParam String query
-      ) {
-            return searchService.searchMessages(chatId, userId, query);
-      }
+    @GetMapping("/chats/{chatId}/history")
+    public List<MessageResponse> findMessages(
+        @AuthenticationPrincipal(expression = "id") UUID userId,
+        @PathVariable String chatId,
+        @RequestParam String query
+    ) {
+        return searchService.searchMessages(chatId, userId, query);
+    }
 
 }

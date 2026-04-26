@@ -5,8 +5,6 @@ server:
 logging:
   level:
     root: INFO
-    com.decade.practice: TRACE
-    org.springframework: DEBUG
 
 
 outbox:

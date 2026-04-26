@@ -15,17 +15,17 @@ import java.util.UUID;
 @Slf4j
 public class HelloGroupListener {
 
-      private final MessageRepository messages;
+    private final MessageRepository messages;
 
-      @ApplicationModuleListener
-      public void on(RoomCreated event) {
-            if (event.representatives().size() > 2) {
-                  HelloGroup message = new HelloGroup(
-                            UUID.randomUUID(),
-                            event.creator(),
-                            event.chatId(),
-                            event.at());
-                  messages.save(message);
-            }
-      }
+    @ApplicationModuleListener(id = "group_listener")
+    public void on(RoomCreated event) {
+        if (event.representatives().size() > 2) {
+            HelloGroup message = new HelloGroup(
+                UUID.randomUUID(),
+                event.creator(),
+                event.chatId(),
+                event.at());
+            messages.save(message);
+        }
+    }
 }

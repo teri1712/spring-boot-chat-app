@@ -9,7 +9,7 @@ import java.time.Instant;
 @Builder
 @AllArgsConstructor
 @NoArgsConstructor
-public class MatchingMessageResponse {
+public class MessageResponse {
 
     private String chatId;
 
