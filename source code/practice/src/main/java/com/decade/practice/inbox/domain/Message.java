@@ -23,104 +23,107 @@ import java.util.UUID;
 @DiscriminatorColumn(name = "message_type")
 public abstract class Message extends AbstractAggregateRoot<Message> {
 
-      @Id
-      @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "message_sequence")
-      @SequenceGenerator(name = "message_sequence", sequenceName = "message_seq", initialValue = 1000)
-      private Long sequenceId;
+    @Id
+    @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "message_sequence")
+    @SequenceGenerator(name = "message_sequence", sequenceName = "message_seq", initialValue = 1000)
+    private Long sequenceId;
 
-      private UUID postingId;
+    private UUID postingId;
 
-      @Column(updatable = false, nullable = false)
-      private UUID senderId;
+    @Column(updatable = false, nullable = false)
+    private UUID senderId;
 
-      @Column(name = "message_type", insertable = false, updatable = false)
-      private String messageType;
+    @Column(name = "message_type", insertable = false, updatable = false)
+    private String messageType;
 
-      @Column(nullable = false, updatable = false)
-      @NotNull
-      private String chatId;
+    @Column(nullable = false, updatable = false)
+    @NotNull
+    private String chatId;
 
-      @Column(nullable = false, updatable = false)
-      private Instant createdAt;
+    // TODO: remove chatid
+    private Long roomId;
 
-      private Instant updatedAt;
+    @Column(nullable = false, updatable = false)
+    private Instant createdAt;
 
-
-      @OneToMany(cascade = CascadeType.ALL, orphanRemoval = true, fetch = FetchType.EAGER, mappedBy = "message")
-      @MapKey(name = "senderId")
-      @Getter(AccessLevel.PACKAGE)
-      private Map<UUID, SeenPointer> seenPointers;
-
-      public void deleteSeen(UUID by) {
-            getSeenPointers().remove(by);
-            this.onUpdated();
-      }
+    private Instant updatedAt;
 
 
-      public Map<UUID, SeenPointer> getAllSeenPointers() {
-            return Map.copyOf(seenPointers);
-      }
+    @OneToMany(cascade = CascadeType.ALL, orphanRemoval = true, fetch = FetchType.EAGER, mappedBy = "message")
+    @MapKey(name = "senderId")
+    @Getter(AccessLevel.PACKAGE)
+    private Map<UUID, SeenPointer> seenPointers;
 
-      public void addSeen(UUID senderId, Instant at) {
-            getSeenPointers().put(senderId, new SeenPointer(chatId, senderId, at, this));
-            this.onUpdated();
-      }
+    public void deleteSeen(UUID by) {
+        getSeenPointers().remove(by);
+        this.onUpdated();
+    }
 
-      protected Message() {
-      }
 
-      protected Message(UUID postingId, UUID senderId, String chatId, Instant createdAt, String messageType) {
-            this.postingId = postingId;
-            this.senderId = senderId;
+    public Map<UUID, SeenPointer> getAllSeenPointers() {
+        return Map.copyOf(seenPointers);
+    }
+
+    public void addSeen(UUID senderId, Instant at) {
+        getSeenPointers().put(senderId, new SeenPointer(chatId, senderId, at, this));
+        this.onUpdated();
+    }
+
+    protected Message() {
+    }
+
+    protected Message(UUID postingId, UUID senderId, String chatId, Instant createdAt, String messageType) {
+        this.postingId = postingId;
+        this.senderId = senderId;
+        this.chatId = chatId;
+        this.createdAt = createdAt;
+        this.messageType = messageType;
+        this.updatedAt = createdAt;
+        this.seenPointers = new HashMap<>();
+        this.createdAt = Instant.now();
+        this.updatedAt = Instant.now();
+    }
+
+    @PrePersist
+    protected void onPersisted() {
+        registerEvent(new MessageCreated(sequenceId, roomId, postingId, senderId, chatId, createdAt, messageType, getState()));
+    }
+
+    private void onUpdated() {
+        updatedAt = Instant.now();
+        registerEvent(new MessageUpdated(sequenceId, roomId, postingId, chatId, senderId, updatedAt, getState()));
+    }
+
+    public abstract MessageState getState();
+
+    @Entity
+    @Getter
+    @NoArgsConstructor
+    @Table(name = "seen_pointer")
+    public static class SeenPointer {
+
+        @Id
+        @GeneratedValue(strategy = GenerationType.SEQUENCE)
+        private Long id;
+
+        @Column(name = "sender_id", nullable = false)
+        private UUID senderId;
+
+        private String chatId;
+
+        @Temporal(TemporalType.TIMESTAMP)
+        private Instant at;
+
+        private SeenPointer(String chatId, UUID senderId, Instant at, Message message) {
             this.chatId = chatId;
-            this.createdAt = createdAt;
-            this.messageType = messageType;
-            this.updatedAt = createdAt;
-            this.seenPointers = new HashMap<>();
-            this.createdAt = Instant.now();
-            this.updatedAt = Instant.now();
-      }
+            this.senderId = senderId;
+            this.at = at;
+            this.message = message;
+        }
 
-      @PrePersist
-      protected void onPersisted() {
-            registerEvent(new MessageCreated(sequenceId, postingId, senderId, chatId, createdAt, messageType, getState()));
-      }
-
-      private void onUpdated() {
-            updatedAt = Instant.now();
-            registerEvent(new MessageUpdated(sequenceId, postingId, chatId, senderId, updatedAt, getState()));
-      }
-
-      public abstract MessageState getState();
-
-      @Entity
-      @Getter
-      @NoArgsConstructor
-      @Table(name = "seen_pointer")
-      public static class SeenPointer {
-
-            @Id
-            @GeneratedValue(strategy = GenerationType.SEQUENCE)
-            private Long id;
-
-            @Column(name = "sender_id", nullable = false)
-            private UUID senderId;
-
-            private String chatId;
-
-            @Temporal(TemporalType.TIMESTAMP)
-            private Instant at;
-
-            private SeenPointer(String chatId, UUID senderId, Instant at, Message message) {
-                  this.chatId = chatId;
-                  this.senderId = senderId;
-                  this.at = at;
-                  this.message = message;
-            }
-
-            @ManyToOne
-            @JoinColumn(name = "message_id")
-            private Message message;
+        @ManyToOne
+        @JoinColumn(name = "message_id")
+        private Message message;
 
 //
 //            @PrePersist
@@ -134,5 +137,5 @@ public abstract class Message extends AbstractAggregateRoot<Message> {
 //                  log.info("Seen pointer updated: {}", this);
 //                  message.onUpdated();
 //            }
-      }
+    }
 }
