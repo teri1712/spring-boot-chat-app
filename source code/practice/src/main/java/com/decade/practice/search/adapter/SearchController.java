@@ -28,7 +28,6 @@ public class SearchController {
     }
 
     @GetMapping("/chat-histories/{chatId}")
-    // TODO: Fix client endpoint
     public List<MessageResponse> findMessages(
         @AuthenticationPrincipal(expression = "id") UUID userId,
         @PathVariable String chatId,

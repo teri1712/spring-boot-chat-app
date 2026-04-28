@@ -1,5 +1,6 @@
 package com.decade.practice.users.infra;
 
+import com.decade.practice.shared.security.jwt.JwtService;
 import com.decade.practice.shared.security.jwt.JwtTokenFilter;
 import com.decade.practice.users.adapter.security.strategies.EntryPointStrategy;
 import com.decade.practice.users.adapter.security.strategies.LoginFailedStrategy;
@@ -87,7 +88,7 @@ public class UserSecurity extends GlobalAuthenticationConfigurerAdapter {
         LoginSuccessStrategy successStrategy,
         LoginFailedStrategy failedStrategy,
         LogoutStrategy logoutHandler,
-        JwtTokenFilter jwtAuthenticationFilter
+        JwtService jwtService
     ) throws Exception {
         http
             .securityMatcher("/tokens/**", "/users/**", "/login", "/logout", "/profiles/**", "/v3/api-docs/**", "/swagger-ui/**", "/swagger-ui.html")
@@ -112,7 +113,7 @@ public class UserSecurity extends GlobalAuthenticationConfigurerAdapter {
                     .addLogoutHandler(logoutHandler)
                     .permitAll()
             )
-            .addFilterAfter(jwtAuthenticationFilter, UsernamePasswordAuthenticationFilter.class)
+            .addFilterAfter(new JwtTokenFilter(jwtService), UsernamePasswordAuthenticationFilter.class)
             .authorizeHttpRequests(authorize ->
                 authorize
                     .requestMatchers(HttpMethod.POST, "/users").permitAll()

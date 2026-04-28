@@ -1,5 +1,6 @@
 package com.decade.practice.inbox.infras;
 
+import com.decade.practice.shared.security.jwt.JwtService;
 import com.decade.practice.shared.security.jwt.JwtTokenFilter;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -9,7 +10,6 @@ import org.springframework.security.config.annotation.method.configuration.Enabl
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configurers.AbstractHttpConfigurer;
 import org.springframework.security.config.http.SessionCreationPolicy;
-import org.springframework.security.oauth2.server.resource.web.HeaderBearerTokenResolver;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.HttpStatusEntryPoint;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
@@ -22,7 +22,7 @@ public class InboxSecurity {
     @Bean
     public SecurityFilterChain inboxChain(
         HttpSecurity http,
-        JwtTokenFilter jwtAuthenticationFilter
+        JwtService jwtService
     ) throws Exception {
         http
             .securityMatcher("**/logs", "**/logs", "/conversations/**")
@@ -36,14 +36,10 @@ public class InboxSecurity {
                 exceptionHandling.accessDeniedPage(null)
                     .authenticationEntryPoint(new HttpStatusEntryPoint(HttpStatus.UNAUTHORIZED))
             )
-            .addFilterAfter(jwtAuthenticationFilter, UsernamePasswordAuthenticationFilter.class)
+            .addFilterAfter(new JwtTokenFilter(jwtService), UsernamePasswordAuthenticationFilter.class)
             .authorizeHttpRequests(authorize ->
                 authorize.anyRequest().authenticated()
             )
-            .oauth2ResourceServer(oauth2 -> {
-                oauth2.bearerTokenResolver(new HeaderBearerTokenResolver("Oauth2-Token"));
-                oauth2.jwt(Customizer.withDefaults());
-            })
             .sessionManagement(session ->
                 session
                     .sessionCreationPolicy(SessionCreationPolicy.STATELESS)
