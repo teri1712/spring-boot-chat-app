@@ -20,7 +20,7 @@ import org.springframework.security.web.context.RequestAttributeSecurityContextR
 public class SettingSecurity {
 
     @Bean
-    public SecurityFilterChain inboxChain(
+    public SecurityFilterChain settingChain(
         HttpSecurity http,
         JwtService jwtService
     ) throws Exception {
