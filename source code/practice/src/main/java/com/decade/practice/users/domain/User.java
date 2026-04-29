@@ -16,70 +16,70 @@ import java.util.UUID;
 @Table(name = "user_member")
 public class User extends AbstractAggregateRoot<User> {
 
-      @Column(unique = true, nullable = false, updatable = false)
-      private String username;
+    @Column(unique = true, nullable = false, updatable = false)
+    private String username;
 
-      @Column(nullable = false)
-      private String password;
+    @Column(nullable = false)
+    private String password;
 
-      private String name;
+    private String name;
 
-      private Instant dob;
+    private Instant dob;
 
-      @Column(updatable = false)
-      private String role = "ROLE_USER";
+    @Column(updatable = false)
+    private String role = "ROLE_USER";
 
-      @Id
-      private UUID id;
+    @Id
+    private UUID id;
 
-      private String avatar;
+    private String avatar;
 
-      @Version
-      private Integer version;
+    @Version
+    private Integer version;
 
-      @Column(nullable = false)
-      private Float gender;
+    @Column(nullable = false)
+    private Float gender;
 
-      public void changeGender(@NotNull Float gender) {
-            this.gender = gender;
-      }
+    public void changeGender(@NotNull Float gender) {
+        this.gender = gender;
+    }
 
-      public void changeAvatar(@NotNull String avatar) {
-            this.avatar = avatar;
-      }
+    public void changeAvatar(@NotNull String avatar) {
+        this.avatar = avatar;
+    }
 
-      void changePassword(@NotNull String password) {
-            this.password = password;
+    void changePassword(@NotNull String password) {
+        this.password = password;
 
-            registerEvent(new UserPasswordChanged(username));
-      }
+        registerEvent(new UserPasswordChanged(username));
+    }
 
-      public void changeName(@NotNull String name) {
-            this.name = name;
-      }
+    public void changeName(@NotNull String name) {
+        this.name = name;
+    }
 
-      public void changeDob(@NotNull Instant dob) {
-            this.dob = dob;
-      }
+    public void changeDob(@NotNull Instant dob) {
+        this.dob = dob;
+    }
 
-      protected User() {
-      }
+    protected User() {
+    }
 
-      public User(UUID id, String username, String password, String name, String avatar, Instant dob, Float gender) {
-            this.id = id;
-            this.username = username;
-            this.password = password;
-            this.name = name;
-            this.avatar = avatar;
-            this.dob = dob;
-            this.gender = gender;
+    public User(UUID id, String username, String password, String name, String avatar, Instant dob, Float gender) {
+        this.id = id;
+        this.username = username;
+        this.password = password;
+        this.name = name;
+        this.avatar = avatar;
+        this.dob = dob;
+        this.gender = gender;
 
-      }
+    }
 
-      @PrePersist
-      void onCreated() {
-            registerEvent(new UserCreated(id, username, name, GenderUtils.inspect(gender), dob, avatar));
-      }
+    @PrePersist
+    void onCreated() {
+        registerEvent(new UserCreated(id, username, name, GenderUtils.inspect(gender), dob, avatar));
+    }
 
 }
 

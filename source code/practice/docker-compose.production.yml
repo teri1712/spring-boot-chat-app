@@ -14,16 +14,11 @@ services:
       ACTUATOR_USER_ROLES: OPS
       SPRING_DATA_REDIS_HOST: redis
       SPRING_DATASOURCE_URL: jdbc:postgresql://postgres:5432/chatapp
-      SPRING_ELASTICSEARCH_URIS: http://elasticsearch:9200
-      SPRING_DATA_ELASTICSEARCH_URIS: http://elasticsearch:9200
-      SPRING_KAFKA_BOOTSTRAP_SERVERS: kafka:9092
     depends_on:
       postgres:
         condition: service_healthy
       redis:
         condition: service_healthy
-      es-init:
-        condition: service_completed_successfully
     volumes:
       - ./logs:/logs
     networks:
@@ -42,8 +37,6 @@ services:
         condition: service_healthy
       redis:
         condition: service_healthy
-      es-init:
-        condition: service_completed_successfully
     volumes:
       - ./logs:/logs
     networks:
@@ -54,18 +47,6 @@ services:
       start_period: 30s
       timeout: 30s
       retries: 20
-
-
-  es-init:
-    image: curlimages/curl
-    depends_on:
-      elasticsearch:
-        condition: service_healthy
-    volumes:
-      - ./es:/es
-    entrypoint: [ "sh", "-c", "cd /es && sh ./init.sh" ]
-    networks:
-      - backend
 
   server:
     image: nginx:latest

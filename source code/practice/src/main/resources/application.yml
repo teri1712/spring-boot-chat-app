@@ -46,17 +46,12 @@ spring:
       # ssl:
       #   enabled: true
       #   bundle: general
-    elasticsearch:
-      repositories:
-        enabled: true
   mvc:
     problemdetails:
       enabled: true
   flyway:
     clean-disabled: false
     enabled: true
-  elasticsearch:
-    uris: http://localhost:9200
 
   kafka:
     bootstrap-servers: localhost:9092
@@ -103,18 +98,28 @@ frontend:
 jwt:
   secret: vcl-vcl-vcl-vcl-vcl-vcl-vcl-vcl-vcl-vcl
 
+
 management:
   server:
     port: 8081
   endpoints:
     web:
       exposure:
-        include: health,env,bean,info,prometheus
+        include: health,env,bean,info,prometheus,modulith
   endpoint:
     health:
       probes:
         enabled: true
       show-details: ALWAYS
+  metrics:
+    tags:
+      application: ${spring.application.name}
+  tracing:
+    sampling:
+      probability: 1.0
+  otlp:
+    tracing:
+      endpoint: http://localhost:4318/v1/traces
 
 aws:
   s3:

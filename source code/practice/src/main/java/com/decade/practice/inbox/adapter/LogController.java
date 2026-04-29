@@ -14,26 +14,26 @@ import java.util.UUID;
 @RestController
 @RequestMapping
 @AllArgsConstructor
-// TODO: refactor client
 public class LogController {
 
-      private final LogService logService;
+    private final LogService logService;
 
-      @GetMapping("/chats/{chatId}/logs")
-      public List<InboxLogResponse> listLog(
-                @AuthenticationPrincipal(expression = "id") UUID userId,
-                @PathVariable @Validated String chatId,
-                @RequestParam Long anchorSequenceNumber
-      ) throws EntityNotFoundException {
-            return logService.findByChatAndSequenceGreaterThanEqual(chatId, userId, anchorSequenceNumber);
-      }
+    // TODO: Adjust client to new endpoint
+    @GetMapping("/chats/{chatId}/logs")
+    public List<InboxLogResponse> listLog(
+        @AuthenticationPrincipal(expression = "id") UUID userId,
+        @PathVariable @Validated String chatId,
+        @RequestParam Long anchorSequenceNumber
+    ) throws EntityNotFoundException {
+        return logService.findByChatAndSequenceGreaterThanEqual(chatId, userId, anchorSequenceNumber);
+    }
 
-      // TODO: Adjust client to last currentState
-      @GetMapping("/users/me/logs")
-      public List<InboxLogResponse> listLog(
-                @AuthenticationPrincipal(expression = "id") UUID userId,
-                @RequestParam Long anchorSequenceNumber
-      ) throws EntityNotFoundException {
-            return logService.findBySequenceGreaterThanEqual(userId, anchorSequenceNumber);
-      }
+    // TODO: Adjust client to last currentState
+    @GetMapping("/users/me/logs")
+    public List<InboxLogResponse> listLog(
+        @AuthenticationPrincipal(expression = "id") UUID userId,
+        @RequestParam Long anchorSequenceNumber
+    ) throws EntityNotFoundException {
+        return logService.findBySequenceGreaterThanEqual(userId, anchorSequenceNumber);
+    }
 }

@@ -1,7 +1,12 @@
 logging:
   level:
-    root: DEBUG
+    root: INFO
 
+spring:
+  docker:
+    compose:
+      enabled: true
+      lifecycle-management: start_only
 
 aws:
   s3:

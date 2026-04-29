@@ -11,11 +11,11 @@ import org.springframework.stereotype.Service;
 @AllArgsConstructor
 public class TextListener {
 
-      private final MessageRepository messages;
+    private final MessageRepository messages;
 
-      @ApplicationModuleListener
-      public void on(TextRoomEventCreated event) {
-            messages.save(new Text(event.getChatEventId(), event.getSenderId(), event.getChatId(), event.getCreatedAt(), event.getContent()));
-      }
+    @ApplicationModuleListener(id = "text_listener")
+    public void on(TextRoomEventCreated event) {
+        messages.save(new Text(event.getChatEventId(), event.getSenderId(), event.getChatId(), event.getCreatedAt(), event.getContent()));
+    }
 
 }

@@ -16,41 +16,41 @@ import java.util.UUID;
 @RequiredArgsConstructor
 public class EnthusiasmManagement {
 
-      private final ScoreEngine scoreEngine;
+    private final ScoreEngine scoreEngine;
 
-      @ApplicationModuleListener
-      public void on(RoomEventCreated event) {
-            UUID userId = event.getSenderId();
-            String chatId = event.getChatId();
+    @ApplicationModuleListener(id = "enthus_room_event")
+    public void on(RoomEventCreated event) {
+        UUID userId = event.getSenderId();
+        String chatId = event.getChatId();
 
-            scoreEngine.incScore(chatId, userId.toString());
+        scoreEngine.incScore(chatId, userId.toString());
 
-      }
+    }
 
-      @ApplicationModuleListener
-      public void on(RoomCreated event) {
-            String chatId = event.chatId();
+    @ApplicationModuleListener(id = "enthus_room_created")
+    public void on(RoomCreated event) {
+        String chatId = event.chatId();
 
-            event.representatives().forEach(participant ->
-                      scoreEngine.incScore(chatId, participant.toString()));
-      }
+        event.representatives().forEach(participant ->
+            scoreEngine.incScore(chatId, participant.toString()));
+    }
 
-      @ApplicationModuleListener
-      public void on(JoinerTyped event) {
-            String chatId = event.chatId();
-            String userId = event.userId().toString();
-            scoreEngine.incScore(chatId, userId);
-      }
+    @ApplicationModuleListener(id = "enthus_user_typed")
+    public void on(JoinerTyped event) {
+        String chatId = event.chatId();
+        String userId = event.userId().toString();
+        scoreEngine.incScore(chatId, userId);
+    }
 
-      @ApplicationModuleListener
-      public void on(JoinerJoined event) {
-            String chatId = event.chatId();
-            String userId = event.userId().toString();
-            scoreEngine.incScore(chatId, userId);
-      }
+    @ApplicationModuleListener(id = "enthus_user_joined")
+    public void on(JoinerJoined event) {
+        String chatId = event.chatId();
+        String userId = event.userId().toString();
+        scoreEngine.incScore(chatId, userId);
+    }
 
-      @ApplicationModuleListener
-      public void on(StalkEvent event) {
-            scoreEngine.incScore(event.senderId().toString(), event.receiverId().toString());
-      }
+    @ApplicationModuleListener(id = "enthus_user_stalked")
+    public void on(StalkEvent event) {
+        scoreEngine.incScore(event.senderId().toString(), event.receiverId().toString());
+    }
 }

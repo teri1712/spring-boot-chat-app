@@ -13,11 +13,11 @@ import java.time.Instant;
 @RequiredArgsConstructor
 public class PresenceManagement {
 
-      private final PresenceRepository presences;
+    private final PresenceRepository presences;
 
-      @ApplicationModuleListener
-      public void on(ConnectionInteracted event) {
-            Presence presence = new Presence(event.userId(), Instant.now());
-            presences.save(presence);
-      }
+    @ApplicationModuleListener(id = "presence_user_connected")
+    public void on(ConnectionInteracted event) {
+        Presence presence = new Presence(event.userId(), Instant.now());
+        presences.save(presence);
+    }
 }

@@ -11,10 +11,10 @@ import org.springframework.stereotype.Service;
 @AllArgsConstructor
 public class IconListener {
 
-      private final MessageRepository messages;
+    private final MessageRepository messages;
 
-      @ApplicationModuleListener
-      public void on(IconRoomEventCreated eventPlaced) {
-            messages.save(new Icon(eventPlaced.getChatEventId(), eventPlaced.getSenderId(), eventPlaced.getChatId(), eventPlaced.getCreatedAt(), eventPlaced.getIconId()));
-      }
+    @ApplicationModuleListener(id = "icon_listener")
+    public void on(IconRoomEventCreated eventPlaced) {
+        messages.save(new Icon(eventPlaced.getChatEventId(), eventPlaced.getSenderId(), eventPlaced.getChatId(), eventPlaced.getCreatedAt(), eventPlaced.getIconId()));
+    }
 }

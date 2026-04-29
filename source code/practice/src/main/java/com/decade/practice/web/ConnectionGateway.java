@@ -1,6 +1,6 @@
 package com.decade.practice.web;
 
-import com.decade.practice.web.security.jwt.JwtUserAuthentication;
+import com.decade.practice.shared.security.jwt.JwtUserAuthentication;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.AllArgsConstructor;
@@ -29,53 +29,53 @@ import java.util.UUID;
 @AllArgsConstructor
 public class ConnectionGateway implements ChannelInterceptor, WebMvcConfigurer, HandshakeInterceptor {
 
-      private final ConnectionInteractionService interactionService;
+    private final ConnectionInteractionService interactionService;
 
-      @Override
-      public void addInterceptors(InterceptorRegistry registry) {
-            registry.addInterceptor(new HandlerInterceptor() {
-                  @Override
-                  public boolean preHandle(HttpServletRequest request, HttpServletResponse response, Object handler) throws Exception {
-                        String ip = request.getRemoteAddr();
-                        String userAgent = request.getHeader("User-Agent");
+    @Override
+    public void addInterceptors(InterceptorRegistry registry) {
+        registry.addInterceptor(new HandlerInterceptor() {
+            @Override
+            public boolean preHandle(HttpServletRequest request, HttpServletResponse response, Object handler) throws Exception {
+                String ip = request.getRemoteAddr();
+                String userAgent = request.getHeader("User-Agent");
 
-                        if (request.getUserPrincipal() != null && request.getUserPrincipal() instanceof JwtUserAuthentication authentication) {
-                              UUID userId = authentication.getPrincipal().getClaims().id();
-                              interactionService.publish(userId, ip, userAgent);
-                        }
-                        return true;
-                  }
-            });
-      }
-
-      @Override
-      public Message<?> preSend(Message<?> message, MessageChannel channel) {
-            var principal = SimpMessageHeaderAccessor.getUser(message.getHeaders());
-
-            SimpMessageHeaderAccessor accessor =
-                      MessageHeaderAccessor.getAccessor(message, SimpMessageHeaderAccessor.class);
-            Map<String, Object> attrs = accessor.getSessionAttributes();
-
-            String ip = attrs == null ? null : (String) attrs.get("ip");
-            String userAgent = attrs == null ? null : (String) attrs.get("userAgent");
-            if (principal instanceof JwtUserAuthentication authentication && attrs != null) {
-                  UUID userId = authentication.getPrincipal().getClaims().id();
-                  interactionService.publish(userId, ip, userAgent);
+                if (request.getUserPrincipal() != null && request.getUserPrincipal() instanceof JwtUserAuthentication authentication) {
+                    UUID userId = authentication.getPrincipal().getClaims().id();
+                    interactionService.publish(userId, ip, userAgent);
+                }
+                return true;
             }
-            return message;
-      }
+        });
+    }
 
-      @Override
-      public boolean beforeHandshake(ServerHttpRequest request, ServerHttpResponse response, WebSocketHandler wsHandler, Map<String, Object> attributes) throws Exception {
-            String ip = request.getRemoteAddress().getAddress().getHostAddress();
-            String userAgent = request.getHeaders().getFirst("User-Agent");
-            attributes.put("ip", ip);
-            attributes.put("userAgent", userAgent);
-            return true;
-      }
+    @Override
+    public Message<?> preSend(Message<?> message, MessageChannel channel) {
+        var principal = SimpMessageHeaderAccessor.getUser(message.getHeaders());
 
-      @Override
-      public void afterHandshake(ServerHttpRequest request, ServerHttpResponse response, WebSocketHandler wsHandler, @Nullable Exception exception) {
+        SimpMessageHeaderAccessor accessor =
+            MessageHeaderAccessor.getAccessor(message, SimpMessageHeaderAccessor.class);
+        Map<String, Object> attrs = accessor.getSessionAttributes();
 
-      }
+        String ip = attrs == null ? null : (String) attrs.get("ip");
+        String userAgent = attrs == null ? null : (String) attrs.get("userAgent");
+        if (principal instanceof JwtUserAuthentication authentication && attrs != null) {
+            UUID userId = authentication.getPrincipal().getClaims().id();
+            interactionService.publish(userId, ip, userAgent);
+        }
+        return message;
+    }
+
+    @Override
+    public boolean beforeHandshake(ServerHttpRequest request, ServerHttpResponse response, WebSocketHandler wsHandler, Map<String, Object> attributes) throws Exception {
+        String ip = request.getRemoteAddress().getAddress().getHostAddress();
+        String userAgent = request.getHeaders().getFirst("User-Agent");
+        attributes.put("ip", ip);
+        attributes.put("userAgent", userAgent);
+        return true;
+    }
+
+    @Override
+    public void afterHandshake(ServerHttpRequest request, ServerHttpResponse response, WebSocketHandler wsHandler, @Nullable Exception exception) {
+
+    }
 }

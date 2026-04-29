@@ -15,7 +15,7 @@ This directory contains load testing scripts and infrastructure setup for the me
 Start the Docker containers with 5 server instances and all supporting services:
 
 ```bash
-docker compose -f docker-compose.infra.yml -f docker-compose.5instances.yml up -d
+docker compose -f compose.yaml -f docker-compose.5instances.yml up -d
 ```
 
 This will spin up:

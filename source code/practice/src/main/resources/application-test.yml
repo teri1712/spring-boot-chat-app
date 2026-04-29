@@ -1,14 +1,8 @@
-server:
-  cache:
-    events: false
+spring:
+  docker:
+    compose:
+      enabled: false
 
-logging:
-  level:
-    root: INFO
-    com.decade.practice: TRACE
-    org.springframework: DEBUG
-
-
-outbox:
-  scheduling:
-    enabled: false
+#logging:
+#  level:
+#    root: DEBUG
