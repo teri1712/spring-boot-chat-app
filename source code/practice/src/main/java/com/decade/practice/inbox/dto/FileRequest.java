@@ -1,5 +1,6 @@
 package com.decade.practice.inbox.dto;
 
+import com.decade.practice.resources.files.api.FileIntegrity;
 import jakarta.validation.constraints.NotNull;
 
 public record FileRequest(
@@ -8,9 +9,8 @@ public record FileRequest(
           String filename,
           @NotNull
           Integer size,
-          // TODO: Adjust client
           @NotNull
-          String uri
+          FileIntegrity file
 ) {
 
 
