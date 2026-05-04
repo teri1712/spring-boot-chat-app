@@ -1,4 +1,4 @@
-package com.decade.practice.chatorchestrator.infras;
+package com.decade.practice.presence.infra;
 
 import com.decade.practice.shared.security.jwt.JwtService;
 import com.decade.practice.shared.security.jwt.JwtTokenFilter;
@@ -17,15 +17,15 @@ import org.springframework.security.web.context.RequestAttributeSecurityContextR
 
 @EnableMethodSecurity
 @Configuration
-public class ChatSecurity {
+public class PresenceSecurity {
 
     @Bean
-    public SecurityFilterChain chatChain(
+    public SecurityFilterChain presenceChain(
         HttpSecurity http,
         JwtService jwtService
     ) throws Exception {
         http
-            .securityMatcher("/groups/**", "/direct-chats/**", "/chats/**")
+            .securityMatcher("/presences/**", "/buddy-presences/**")
             .requestCache(Customizer.withDefaults())
             .securityContext(context ->
                 context.securityContextRepository(new RequestAttributeSecurityContextRepository())

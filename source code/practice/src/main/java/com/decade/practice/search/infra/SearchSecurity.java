@@ -1,5 +1,6 @@
 package com.decade.practice.search.infra;
 
+import com.decade.practice.shared.security.jwt.JwtService;
 import com.decade.practice.shared.security.jwt.JwtTokenFilter;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -21,7 +22,7 @@ public class SearchSecurity {
     @Bean
     public SecurityFilterChain searchChain(
         HttpSecurity http,
-        JwtTokenFilter jwtAuthenticationFilter
+        JwtService jwtService
     ) throws Exception {
         http
             .securityMatcher("/people/**", "/chat-histories/**")
@@ -35,7 +36,7 @@ public class SearchSecurity {
                 exceptionHandling.accessDeniedPage(null)
                     .authenticationEntryPoint(new HttpStatusEntryPoint(HttpStatus.UNAUTHORIZED))
             )
-            .addFilterAfter(jwtAuthenticationFilter, UsernamePasswordAuthenticationFilter.class)
+            .addFilterAfter(new JwtTokenFilter(jwtService), UsernamePasswordAuthenticationFilter.class)
             .authorizeHttpRequests(authorize ->
                 authorize.anyRequest().authenticated()
             )
