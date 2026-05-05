@@ -3,7 +3,6 @@ package com.decade.practice.inbox.domain;
 import com.decade.practice.inbox.domain.events.MessageCreated;
 import com.decade.practice.inbox.domain.events.MessageUpdated;
 import jakarta.persistence.*;
-import jakarta.validation.constraints.NotNull;
 import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -37,11 +36,7 @@ public abstract class Message extends AbstractAggregateRoot<Message> {
     private String messageType;
 
     @Column(nullable = false, updatable = false)
-    @NotNull
     private String chatId;
-
-    // TODO: remove chatid
-    private Long roomId;
 
     @Column(nullable = false, updatable = false)
     private Instant createdAt;
@@ -86,12 +81,12 @@ public abstract class Message extends AbstractAggregateRoot<Message> {
 
     @PrePersist
     protected void onPersisted() {
-        registerEvent(new MessageCreated(sequenceId, roomId, postingId, senderId, chatId, createdAt, messageType, getState()));
+        registerEvent(new MessageCreated(sequenceId, chatId, postingId, senderId, createdAt, messageType, getState()));
     }
 
     private void onUpdated() {
         updatedAt = Instant.now();
-        registerEvent(new MessageUpdated(sequenceId, roomId, postingId, chatId, senderId, updatedAt, getState()));
+        registerEvent(new MessageUpdated(sequenceId, chatId, postingId, senderId, updatedAt, getState()));
     }
 
     public abstract MessageState getState();

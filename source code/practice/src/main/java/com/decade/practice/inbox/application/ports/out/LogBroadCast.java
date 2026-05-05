@@ -42,9 +42,8 @@ public class LogBroadCast {
         convos.forEach(conversationView -> {
             Conversation conversation = conversationView.conversation();
             Room room = conversationView.room();
-            UUID ownerId = conversation.getConversationId().ownerId();
+            UUID ownerId = conversation.getOwnerId();
             InboxLog log = new InboxLog(LogAction.ADDITION,
-                message.chatId(),
                 message.senderId(),
                 ownerId,
                 conversation.getId(),
@@ -77,9 +76,8 @@ public class LogBroadCast {
         convos.forEach(conversationView -> {
             Conversation conversation = conversationView.conversation();
             Room room = conversationView.room();
-            UUID ownerId = conversation.getConversationId().ownerId();
+            UUID ownerId = conversation.getOwnerId();
             InboxLog log = new InboxLog(LogAction.UPDATE,
-                message.chatId(),
                 message.senderId(),
                 ownerId,
                 conversation.getId(),

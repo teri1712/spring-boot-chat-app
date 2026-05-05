@@ -29,10 +29,10 @@ public class DeliveringManagement extends LogBroadCast {
     @EventListener
     @Transactional(propagation = Propagation.MANDATORY)
     void on(MessageCreated event) {
-        Long roomId = event.roomId();
-        Room room = rooms.findById(roomId).orElseThrow();
+        String chatId = event.chatId();
+        Room room = rooms.findByChatId(chatId).orElseThrow();
         if (room.getParticipantCount() < 20) {
-            broadcastInsert(event, conversations.findByRoomId(roomId));
+            broadcastInsert(event, conversations.findByChatId(chatId));
         } else if (room.getParticipantCount() <= 100) {
             for (int i = 0; i < room.getParticipantCount(); i += 20) {
                 publisher.publishEvent(new BatchInsertionEvent(i, i + 20, event));
@@ -44,11 +44,12 @@ public class DeliveringManagement extends LogBroadCast {
     @Transactional(propagation = Propagation.MANDATORY)
     void on(MessageUpdated event) {
 
-        Long roomId = event.roomId();
-        Room room = rooms.findById(roomId).orElseThrow();
+
+        String chatId = event.chatId();
+        Room room = rooms.findByChatId(chatId).orElseThrow();
 
         if (room.getParticipantCount() < 20) {
-            broadcastUpdate(event, conversations.findByRoomId(roomId));
+            broadcastUpdate(event, conversations.findByChatId(chatId));
         } else if (room.getParticipantCount() <= 100) {
             for (int i = 0; i < room.getParticipantCount(); i += 20) {
                 publisher.publishEvent(new BatchUpdateEvent(i, i + 20, event));

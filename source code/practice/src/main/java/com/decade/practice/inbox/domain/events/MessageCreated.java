@@ -7,10 +7,9 @@ import java.util.UUID;
 
 public record MessageCreated(
     Long id,
-    Long roomId,
+    String chatId,
     UUID postingId,
     UUID senderId,
-    String chatId,
     Instant createdAt,
     String messageType,
     MessageState currentState) {

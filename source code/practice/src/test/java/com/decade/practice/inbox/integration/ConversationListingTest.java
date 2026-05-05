@@ -1,7 +1,6 @@
 package com.decade.practice.inbox.integration;
 
 import com.decade.practice.inbox.application.ports.out.ConversationRepository;
-import com.decade.practice.inbox.domain.ConversationId;
 import com.decade.practice.inbox.domain.HashValue;
 import com.decade.practice.inbox.domain.events.InboxLogCreated;
 import com.decade.practice.inbox.domain.events.MessageCreated;
@@ -174,8 +173,8 @@ class ConversationListingTest extends BaseTestClass {
 
         // When & Then: Request with version 1 should fail
 
-        HashValue bobHash = conversations.findByConversationId(new ConversationId(aliceBobChat, aliceId)).orElseThrow().getHash();
-        HashValue charlieHash = conversations.findByConversationId(new ConversationId(aliceCharlieChat, aliceId)).orElseThrow().getHash();
+        HashValue bobHash = conversations.findByChatIdAndOwnerId(aliceBobChat, aliceId).orElseThrow().conversation().getHash();
+        HashValue charlieHash = conversations.findByChatIdAndOwnerId(aliceCharlieChat, aliceId).orElseThrow().conversation().getHash();
 
         mockMvc.perform(get("/conversations")
                 .queryParam("startAt", aliceBobChat)
