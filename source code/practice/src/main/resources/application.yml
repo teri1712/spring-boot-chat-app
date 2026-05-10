@@ -59,15 +59,13 @@ spring:
       concurrency: 4
     producer:
       key-serializer: org.apache.kafka.common.serialization.StringSerializer
-      value-serializer: org.apache.kafka.common.serialization.StringSerializer
+      value-serializer: org.springframework.kafka.support.serializer.JsonSerializer
 
     consumer:
-      group-id: decade
       auto-offset-reset: earliest
       key-deserializer: org.apache.kafka.common.serialization.StringDeserializer
-      value-deserializer: org.apache.kafka.common.serialization.StringDeserializer
-      properties:
-        spring.json.add.type.headers: false
+      value-deserializer: org.springframework.kafka.support.serializer.JsonDeserializer
+
   modulith:
     events:
       jdbc:
@@ -141,5 +139,4 @@ websocket:
     user: /user
     queue: /queue
     room: /room
-
 

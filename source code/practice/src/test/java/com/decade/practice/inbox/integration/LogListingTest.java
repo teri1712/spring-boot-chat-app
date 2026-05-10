@@ -1,7 +1,7 @@
 package com.decade.practice.inbox.integration;
 
 import com.decade.practice.chatorchestrator.application.ports.in.ChatService;
-import com.decade.practice.inbox.dto.InboxLogResponse;
+import com.decade.practice.inbox.dto.InboxLogWithPartnerDto;
 import com.decade.practice.integration.BaseTestClass;
 import com.decade.practice.integration.TestBeans;
 import com.fasterxml.jackson.core.type.TypeReference;
@@ -67,7 +67,7 @@ class LogListingTest extends BaseTestClass {
             .andExpect(jsonPath("$[1].messageState.content").value("vcl"))
             .andReturn().getResponse().getContentAsString();
 
-        List<InboxLogResponse> logs = objectMapper.readValue(bodyString, new TypeReference<>() {
+        List<InboxLogWithPartnerDto> logs = objectMapper.readValue(bodyString, new TypeReference<>() {
         });
 
 
@@ -109,7 +109,7 @@ class LogListingTest extends BaseTestClass {
             .andExpect(jsonPath("$[2].messageState.content").value("vcl"))
             .andReturn().getResponse().getContentAsString();
 
-        List<InboxLogResponse> logs = objectMapper.readValue(bodyString, new TypeReference<>() {
+        List<InboxLogWithPartnerDto> logs = objectMapper.readValue(bodyString, new TypeReference<>() {
         });
         mockMvc.perform(get("/users/me/logs")
                 .param("anchorSequenceNumber", logs.get(1).sequenceNumber().toString()))

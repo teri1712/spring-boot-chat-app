@@ -7,9 +7,11 @@ import com.decade.practice.inbox.domain.LogAction;
 import com.decade.practice.inbox.domain.Room;
 import com.decade.practice.inbox.domain.events.MessageCreated;
 import com.decade.practice.inbox.domain.events.MessageUpdated;
+import com.decade.practice.inbox.domain.messages.InboxLogMessage;
 import com.decade.practice.inbox.domain.services.ConversationInfoService;
-import com.decade.practice.inbox.dto.mapper.InboxLogMapper;
+import com.decade.practice.inbox.dto.mapper.MessageStateResponseMapper;
 import lombok.RequiredArgsConstructor;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.transaction.support.TransactionSynchronization;
 import org.springframework.transaction.support.TransactionSynchronizationManager;
 
@@ -25,33 +27,25 @@ public class LogBroadCast {
     protected final LookUpRegistry lookUpRegistry;
     protected final ConversationRepository conversations;
     protected final DeliveryService deliveryService;
-    protected final InboxLogMapper inboxLogMapper;
+    protected final MessageStateResponseMapper messageStateMapper;
     protected final ConversationInfoService conversationInfoService;
 
+    @Transactional
     protected void broadcastInsert(MessageCreated message, List<ConversationView> convos) {
         Set<UUID> allNeedUsers = new HashSet<>(message.currentState().getAllPartners().toList());
-
-
-        convos.forEach(conversationView -> {
-            Room room = conversationView.room();
-            allNeedUsers.addAll(room.getRepresentatives());
-            allNeedUsers.add(room.getCreator());
+        convos.forEach(cv -> {
+            allNeedUsers.addAll(cv.room().getRepresentatives());
+            allNeedUsers.add(cv.room().getCreator());
         });
         PartnerLookUp lookUp = lookUpRegistry.registerLookUp(allNeedUsers);
 
-        convos.forEach(conversationView -> {
-            Conversation conversation = conversationView.conversation();
-            Room room = conversationView.room();
+        convos.forEach(cv -> {
+            Conversation conversation = cv.conversation();
+            Room room = cv.room();
             UUID ownerId = conversation.getOwnerId();
-            InboxLog log = new InboxLog(LogAction.ADDITION,
-                message.senderId(),
-                ownerId,
-                conversation.getId(),
-                message.id(),
-                message.currentState());
+            InboxLog log = new InboxLog(LogAction.ADDITION, message.senderId(), ownerId, conversation.getId(), message.id(), message.currentState());
             logs.save(log);
             conversation.addRecent(message.currentState());
-
             conversations.save(conversation);
 
             TransactionSynchronizationManager.registerSynchronization(new TransactionSynchronization() {
@@ -63,26 +57,20 @@ public class LogBroadCast {
         });
     }
 
+    @Transactional
     protected void broadcastUpdate(MessageUpdated message, List<ConversationView> convos) {
         Set<UUID> allNeedUsers = new HashSet<>(message.currentState().getAllPartners().toList());
-
-        convos.forEach(conversationView -> {
-            Room room = conversationView.room();
-            allNeedUsers.addAll(room.getRepresentatives());
-            allNeedUsers.add(room.getCreator());
+        convos.forEach(cv -> {
+            allNeedUsers.addAll(cv.room().getRepresentatives());
+            allNeedUsers.add(cv.room().getCreator());
         });
         PartnerLookUp lookUp = lookUpRegistry.registerLookUp(allNeedUsers);
 
-        convos.forEach(conversationView -> {
-            Conversation conversation = conversationView.conversation();
-            Room room = conversationView.room();
+        convos.forEach(cv -> {
+            Conversation conversation = cv.conversation();
+            Room room = cv.room();
             UUID ownerId = conversation.getOwnerId();
-            InboxLog log = new InboxLog(LogAction.UPDATE,
-                message.senderId(),
-                ownerId,
-                conversation.getId(),
-                message.id(),
-                message.currentState());
+            InboxLog log = new InboxLog(LogAction.UPDATE, message.senderId(), ownerId, conversation.getId(), message.id(), message.currentState());
             logs.save(log);
             conversation.updateRecent(message.currentState());
             conversations.save(conversation);
@@ -98,6 +86,16 @@ public class LogBroadCast {
 
     private void send(InboxLog inboxLog, Room room, Conversation conversation, PartnerLookUp lookUp) {
         UUID ownerId = inboxLog.getOwnerId();
-        deliveryService.send(inboxLogMapper.map(inboxLog, lookUp, conversation, conversationInfoService.getInfo(ownerId, room, lookUp)));
+        var info = conversationInfoService.getInfo(ownerId, room);
+        deliveryService.send(new InboxLogMessage(
+            inboxLog.getSequenceId(),
+            room.getChatId(),
+            info,
+            conversation.getHash().value(),
+            inboxLog.getSenderId(),
+            ownerId,
+            inboxLog.getAction(),
+            messageStateMapper.toResponse(inboxLog.getMessageState())
+        ));
     }
 }

@@ -28,7 +28,7 @@ public class ConversationSteps {
         RestAssured.baseURI = "http://localhost";
     }
 
-    @Given("there alr is a conversation from {string} to  {string}")
+    @Given("there alr is a conversationView from {string} to  {string}")
     public void conversationBetweenUserAndExists(String user1, String user2) {
         loginSteps.alrLogin(user2, "password123");
         UUID partnerId = authContext.profile.id();

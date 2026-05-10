@@ -1,18 +1,18 @@
 package com.decade.practice.inbox.dto;
 
-import com.decade.practice.inbox.domain.ConversationInfo;
 import com.decade.practice.inbox.domain.LogAction;
 
 import java.util.UUID;
 
-public record InboxLogResponse(
+public record InboxLogMessageWithPartnerDto(
     Long sequenceNumber,
     String chatId,
-    ConversationInfo info,
+    String roomName,
+    String roomAvatar,
     Long revisionNumber,
-    UUID senderId,
+    PartnerResponse sender,
     UUID ownerId,
     LogAction action,
-    MessageStateResponse messageState
+    MessageStateWithPartnerDto messageState
 ) {
 }

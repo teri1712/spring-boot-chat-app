@@ -1,25 +1,20 @@
 package com.decade.practice.inbox.dto.mapper;
 
-import com.decade.practice.inbox.application.ports.out.PartnerLookUp;
-import com.decade.practice.inbox.domain.Conversation;
+import com.decade.practice.inbox.application.ports.out.projection.ConversationView;
 import com.decade.practice.inbox.domain.ConversationInfo;
 import com.decade.practice.inbox.dto.ConversationResponse;
-import org.mapstruct.*;
-
-import java.util.List;
-import java.util.Map;
+import org.mapstruct.Mapper;
+import org.mapstruct.Mapping;
+import org.mapstruct.MappingConstants;
+import org.mapstruct.ReportingPolicy;
 
 @Mapper(unmappedTargetPolicy = ReportingPolicy.ERROR, componentModel = MappingConstants.ComponentModel.SPRING, uses = {MessageMapper.class})
 public interface ConversationMapper {
 
-      @Mapping(source = "conversationId.chatId", target = "identifier")
-      @Mapping(source = "hash.value", target = "revisionNumber")
-      @Mapping(target = "roomName", expression = "java(infoLookUp.get(conversation.getConversationId().chatId()).name())")
-      @Mapping(target = "roomAvatar", expression = "java(infoLookUp.get(conversation.getConversationId().chatId()).avatar())")
-      ConversationResponse map(Conversation conversation, @Context PartnerLookUp partnerLookUp, @Context Map<String, ConversationInfo> infoLookUp);
-
-      default List<ConversationResponse> map(List<Conversation> conversation, @Context PartnerLookUp partnerLookUp, @Context Map<String, ConversationInfo> infoLookUp) {
-            return conversation.stream().map(history -> map(history, partnerLookUp, infoLookUp)).toList();
-      }
+    @Mapping(source = "c.room.chatId", target = "identifier")
+    @Mapping(source = "c.conversation.hash.value", target = "revisionNumber")
+    @Mapping(source = "c.conversation.recents", target = "recents")
+    @Mapping(source = "c.conversation.modifiedAt", target = "modifiedAt")
+    ConversationResponse map(ConversationView c, ConversationInfo info);
 
 }

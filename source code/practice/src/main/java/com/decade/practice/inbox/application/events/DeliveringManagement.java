@@ -7,7 +7,7 @@ import com.decade.practice.inbox.domain.events.BatchUpdateEvent;
 import com.decade.practice.inbox.domain.events.MessageCreated;
 import com.decade.practice.inbox.domain.events.MessageUpdated;
 import com.decade.practice.inbox.domain.services.ConversationInfoService;
-import com.decade.practice.inbox.dto.mapper.InboxLogMapper;
+import com.decade.practice.inbox.dto.mapper.MessageStateResponseMapper;
 import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.context.event.EventListener;
 import org.springframework.stereotype.Component;
@@ -19,12 +19,11 @@ public class DeliveringManagement extends LogBroadCast {
     private final RoomRepository rooms;
     private final ApplicationEventPublisher publisher;
 
-    public DeliveringManagement(LogRepository logs, LookUpRegistry lookUpRegistry, ConversationRepository conversations, DeliveryService deliveryService, InboxLogMapper inboxLogMapper, ConversationInfoService conversationInfoService, RoomRepository rooms, ApplicationEventPublisher publisher) {
-        super(logs, lookUpRegistry, conversations, deliveryService, inboxLogMapper, conversationInfoService);
+    public DeliveringManagement(LogRepository logs, LookUpRegistry lookUpRegistry, ConversationRepository conversations, DeliveryService deliveryService, MessageStateResponseMapper messageStateMapper, ConversationInfoService conversationInfoService, RoomRepository rooms, ApplicationEventPublisher publisher) {
+        super(logs, lookUpRegistry, conversations, deliveryService, messageStateMapper, conversationInfoService);
         this.rooms = rooms;
         this.publisher = publisher;
     }
-
 
     @EventListener
     @Transactional(propagation = Propagation.MANDATORY)
@@ -43,11 +42,8 @@ public class DeliveringManagement extends LogBroadCast {
     @EventListener
     @Transactional(propagation = Propagation.MANDATORY)
     void on(MessageUpdated event) {
-
-
         String chatId = event.chatId();
         Room room = rooms.findByChatId(chatId).orElseThrow();
-
         if (room.getParticipantCount() < 20) {
             broadcastUpdate(event, conversations.findByChatId(chatId));
         } else if (room.getParticipantCount() <= 100) {
