@@ -15,6 +15,6 @@ import org.mapstruct.*;
 public interface InboxLogMessageWithPartnerMapper {
     @Mapping(target = "roomName", expression = "java(info.getName(lookUp))")
     @Mapping(target = "roomAvatar", expression = "java(info.getAvatar(lookUp))")
-    @Mapping(target = "sender", source = "message.senderId")
+    @Mapping(target = "sender", expression = "java(lookUp.lookUp(message.getSenderId()))")
     InboxLogMessageWithPartnerDto map(InboxLogMessage message, ConversationInfo info, @Context PartnerLookUp lookUp);
 }
