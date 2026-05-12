@@ -18,10 +18,7 @@ import org.springframework.transaction.annotation.Isolation;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.time.Instant;
-import java.util.List;
-import java.util.Map;
-import java.util.Optional;
-import java.util.UUID;
+import java.util.*;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
@@ -32,38 +29,39 @@ import java.util.stream.Stream;
 @Transactional
 public class ConversationServiceImpl implements ConversationService {
 
-      private final ConversationListing conversationListing;
-      private final ConversationMapper conversationMapper;
-      private final LookUpRegistry lookUpRegistry;
-      private final ConversationInfoService conversationInfoService;
+    private final ConversationListing conversationListing;
+    private final ConversationMapper conversationMapper;
+    private final LookUpRegistry lookUpRegistry;
+    private final ConversationInfoService conversationInfoService;
 
 
-      @Override
-      @Transactional(isolation = Isolation.REPEATABLE_READ, readOnly = true)
-      public List<ConversationResponse> list(UUID userId, Optional<Long> anchorRevisionNumber) throws Throwable {
-            PageRequest pageRequest = PageRequest.of(0, 20, Sort.by(Sort.Direction.DESC, "modifiedAt"));
-            List<ConversationView> convoViewList;
-            if (anchorRevisionNumber.isEmpty()) {
-                  convoViewList = conversationListing.findByModifiedAtLessThan(userId, Instant.now().plusSeconds(60), pageRequest);
-            } else {
-                  convoViewList = conversationListing.findByAnchor(new HashValue(anchorRevisionNumber.get()), userId, pageRequest);
-            }
-            List<Conversation> convoList = convoViewList.stream().map(ConversationView::conversation).toList();
-            List<Room> roomList = convoViewList.stream().map(ConversationView::room).toList();
-            PartnerLookUp lookUp = lookUpRegistry.registerLookUp(Stream.concat(aggregateAllConvoUsers(convoList), aggregateAllRoomUsers(roomList)).collect(Collectors.toSet()));
-            Map<String, ConversationInfo> roomLookUp = conversationInfoService.getInfo(userId, roomList, lookUp);
-            return conversationMapper.map(convoList, lookUp, roomLookUp);
-      }
+    @Override
+    @Transactional(isolation = Isolation.REPEATABLE_READ, readOnly = true)
+    public List<ConversationResponse> list(UUID userId, Optional<Long> anchorRevisionNumber) throws Throwable {
+        PageRequest pageRequest = PageRequest.of(0, 20, Sort.by(Sort.Direction.DESC, "modifiedAt"));
+        List<ConversationView> convoViewList;
+        if (anchorRevisionNumber.isEmpty()) {
+            convoViewList = conversationListing.findByModifiedAtLessThan(userId, Instant.now().plusSeconds(60), pageRequest);
+        } else {
+            convoViewList = conversationListing.findByAnchor(new HashValue(anchorRevisionNumber.get()), userId, pageRequest);
+        }
+        List<Conversation> convoList = convoViewList.stream().map(ConversationView::conversation).toList();
+        List<Room> roomList = convoViewList.stream().map(ConversationView::room).toList();
+        Set<UUID> allUsers = Stream.concat(aggregateAllConvoUsers(convoList), aggregateAllRoomUsers(roomList)).collect(Collectors.toSet());
+        PartnerLookUp lookUp = lookUpRegistry.registerLookUp(allUsers);
+        Map<String, ConversationInfo> roomLookUp = conversationInfoService.getInfo(userId, roomList, lookUp);
+        return conversationMapper.map(convoList, lookUp, roomLookUp);
+    }
 
-      private static Stream<UUID> aggregateAllConvoUsers(List<Conversation> convoList) {
-            return convoList.stream()
-                      .flatMap((Function<Conversation, Stream<MessageState>>)
-                                conversation -> conversation.getRecents().stream())
-                      .flatMap((Function<MessageState, Stream<UUID>>) MessageState::getAllPartners);
-      }
+    private static Stream<UUID> aggregateAllConvoUsers(List<Conversation> convoList) {
+        return convoList.stream()
+            .flatMap((Function<Conversation, Stream<MessageState>>)
+                conversation -> conversation.getRecents().stream())
+            .flatMap((Function<MessageState, Stream<UUID>>) MessageState::getAllPartners);
+    }
 
-      private static Stream<UUID> aggregateAllRoomUsers(List<Room> roomList) {
-            return roomList.stream()
-                      .flatMap((Function<Room, Stream<UUID>>) room -> Stream.concat(room.getRepresentatives().stream(), Stream.of(room.getCreator())));
-      }
+    private static Stream<UUID> aggregateAllRoomUsers(List<Room> roomList) {
+        return roomList.stream()
+            .flatMap((Function<Room, Stream<UUID>>) room -> Stream.concat(room.getRepresentatives().stream(), Stream.of(room.getCreator())));
+    }
 }

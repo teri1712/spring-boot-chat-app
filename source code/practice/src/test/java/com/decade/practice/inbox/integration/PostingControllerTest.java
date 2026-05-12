@@ -273,7 +273,7 @@ class PostingControllerTest extends BaseTestClass {
             .andExpect(jsonPath("$[0].seenBy[0].id").value(alice));
 
 
-        mockMvc.perform(get("/me/conversations")
+        mockMvc.perform(get("/conversations")
                 .accept(MediaType.APPLICATION_JSON))
             .andExpect(status().isOk())
             .andExpect(jsonPath("$[0].identifier").value(chatIdentifier))
