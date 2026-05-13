@@ -27,50 +27,52 @@ import java.util.stream.Collectors;
 @Service
 public class SettingsServiceImpl implements SettingsService, SettingApi {
 
-      private final SettingRepository settings;
+    private final SettingRepository settings;
 
-      private final ThemeRepository themes;
-      private final SettingsMapper settingsMapper;
-
-
-      @Override
-      @WritePolicy
-      public void setPreference(String chatId, UUID userId, PreferenceRequest request) {
-            Setting setting = settings.findByIdentifier(chatId).orElseThrow();
-            Setting.PreferenceChain chain = setting.getPreferenceChain(userId);
-
-            if (request.iconId() != null)
-                  chain = chain.iconId(request.iconId());
-
-            if (request.themeId() != null)
-                  chain = chain.theme(themes.findById(request.themeId()).orElseThrow());
-
-            if (request.customName() != null)
-                  chain = chain.roomName(request.customName());
-
-            if (request.customAvatar() != null)
-                  chain = chain.roomAvatar(request.customAvatar());
-
-            chain.complete();
-            settings.save(setting);
-      }
+    private final ThemeRepository themes;
+    private final SettingsMapper settingsMapper;
 
 
-      @Override
-      public Map<String, SettingsInfo> find(Set<String> chatIds) {
-            return settings.findByIdentifierIn(chatIds).stream().map(settingsMapper::map)
-                      .collect(Collectors.toMap(
-                                SettingsInfo::id,
-                                Function.identity(),
-                                (existing, replacement) -> existing
-                      ));
-      }
+    @Override
+    @WritePolicy
+    public void setPreference(String chatId, UUID userId, PreferenceRequest request) {
+        Setting setting = settings.findByIdentifier(chatId).orElseThrow();
+        Setting.PreferenceChain chain = setting.getPreferenceChain(userId);
 
-      @Override
-      @Transactional(propagation = Propagation.MANDATORY)
-      public SettingsInfo create(String chatId, String roomName) {
-            Setting setting = new Setting(chatId, new Preference(1, roomName, null, null));
-            settings.save(setting);
-            return settingsMapper.map(settings.save(setting));
-      }
+        if (request.iconId() != null)
+            chain = chain.iconId(request.iconId());
+
+        if (request.themeId() != null)
+            chain = chain.theme(themes.findById(request.themeId()).orElseThrow());
+
+        if (request.customName() != null)
+            chain = chain.roomName(request.customName());
+
+        if (request.customAvatar() != null)
+            chain = chain.roomAvatar(request.customAvatar());
+
+        Preference preference = chain.complete();
+        setting.setPreference(userId, preference);
+        settings.save(setting);
+
+    }
+
+
+    @Override
+    public Map<String, SettingsInfo> find(Set<String> chatIds) {
+        return settings.findByIdentifierIn(chatIds).stream().map(settingsMapper::map)
+            .collect(Collectors.toMap(
+                SettingsInfo::id,
+                Function.identity(),
+                (existing, replacement) -> existing
+            ));
+    }
+
+    @Override
+    @Transactional(propagation = Propagation.MANDATORY)
+    public SettingsInfo create(String chatId, String roomName) {
+        Setting setting = new Setting(chatId, new Preference(1, roomName, null, null));
+        settings.save(setting);
+        return settingsMapper.map(settings.save(setting));
+    }
 }

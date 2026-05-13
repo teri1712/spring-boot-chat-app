@@ -1,8 +1,11 @@
 package com.decade.practice.bdd.users;
 
+import com.decade.practice.bdd.files.UploadContext;
+import com.decade.practice.bdd.files.UploadSteps;
 import com.decade.practice.users.dto.AccessToken;
 import com.decade.practice.users.dto.ProfileRequest;
 import io.cucumber.java.Before;
+import io.cucumber.java.en.And;
 import io.cucumber.java.en.Then;
 import io.cucumber.java.en.When;
 import io.restassured.RestAssured;
@@ -11,12 +14,14 @@ import io.restassured.response.Response;
 import lombok.RequiredArgsConstructor;
 import org.springframework.core.env.Environment;
 
+import static org.hamcrest.Matchers.contains;
 import static org.hamcrest.Matchers.equalTo;
 
 @RequiredArgsConstructor
 public class ProfileSteps {
     private final AuthContext authContext;
     private final ProfileContext profileContext;
+    private final UploadContext uploadContext;
     private final Environment environment;
 
     @Before
@@ -108,4 +113,43 @@ public class ProfileSteps {
         ;
     }
 
+    private final UploadSteps uploadSteps;
+    Response changeAvatarResponse;
+
+    @When("set as his avatar {string}")
+    public void changeHisAvatar(String filename) {
+        uploadSteps.userAlrUploadedTheFile(filename);
+
+        String eTag = uploadContext.integrity.eTag();
+        String fileKey = uploadContext.integrity.fileKey();
+        changeAvatarResponse = RestAssured.given().headers("Authorization", "Bearer " + authContext.accessToken.accessToken())
+            .contentType(ContentType.JSON)
+            .body("""
+                {
+                    "avatar" : {
+                                "eTag": "%s",
+                                "fileKey": "%s"
+                              }
+                }
+                """.formatted(eTag.replace("\"", "\\\""), fileKey))
+
+            .when()
+            .patch("/profiles/me");
+    }
+
+
+    @And("his profile avatar is reflected to the file {string}")
+    public void hisProfileAvatarIsReflectedToTheNewAvatar(String filename) {
+        changeAvatarResponse
+            .then()
+            .statusCode(200);
+
+        RestAssured.given()
+            .headers("Authorization", "Bearer " + authContext.accessToken.accessToken())
+            .when()
+            .get("/profiles/me")
+            .then()
+            .statusCode(200)
+            .body("avatar", contains(filename));
+    }
 }

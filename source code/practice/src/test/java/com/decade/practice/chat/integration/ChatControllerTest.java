@@ -1,6 +1,8 @@
 package com.decade.practice.chat.integration;
 
 import com.decade.practice.chatorchestrator.application.ports.in.ChatService;
+import com.decade.practice.chatsettings.application.ports.out.SettingRepository;
+import com.decade.practice.chatsettings.application.services.SettingsService;
 import com.decade.practice.chatsettings.domain.events.PreferenceChanged;
 import com.decade.practice.chatsettings.dto.PreferenceRequest;
 import com.decade.practice.inbox.domain.events.InboxLogCreated;
@@ -89,6 +91,12 @@ class ChatControllerTest extends BaseTestClass {
             .andExpect(status().isForbidden());
     }
 
+    @Autowired
+    SettingRepository settings;
+
+    @Autowired
+    SettingsService settingsService;
+
     @Test
     @Sql(scripts = {"/sql/clean.sql", "/sql/seed_users.sql", "/sql/seed_themes.sql"})
     @WithUserDetails("alice")
@@ -107,11 +115,11 @@ class ChatControllerTest extends BaseTestClass {
         mockMvc.perform(patch("/chats/{id}/preference", chatId)
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(objectMapper.writeValueAsString(preference)))
-            .andExpect(status().isAccepted());
+            .andExpect(status().isOk());
 
         assertThat(events.stream(PreferenceChanged.class)).hasSize(1);
-
         // Then
+
         mockMvc.perform(get("/chats/{id}", chatId))
             .andExpect(status().isOk())
             .andExpect(jsonPath("$.preference.customName").value("My pookie bob"))
