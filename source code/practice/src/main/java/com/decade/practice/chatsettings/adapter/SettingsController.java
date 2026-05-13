@@ -15,16 +15,16 @@ import java.util.UUID;
 public class
 SettingsController {
 
-      private final SettingsService settingsService;
+    private final SettingsService settingsService;
 
-      // TODO: Adjust client to patch
-      @PatchMapping("/chats/{identifier}/preference")
-      @ResponseStatus(HttpStatus.ACCEPTED)
-      public void setPreference(
-                @AuthenticationPrincipal(expression = "id") UUID userId,
-                @PathVariable String identifier,
-                @Valid @RequestBody PreferenceRequest request) {
+    // TODO: Adjust client to patch
+    @PatchMapping("/chats/{identifier}/preference")
+    @ResponseStatus(HttpStatus.OK)
+    public void setPreference(
+        @AuthenticationPrincipal(expression = "id") UUID userId,
+        @PathVariable String identifier,
+        @Valid @RequestBody PreferenceRequest request) {
 
-            settingsService.setPreference(identifier, userId, request);
-      }
+        settingsService.setPreference(identifier, userId, request);
+    }
 }
