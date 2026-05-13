@@ -8,6 +8,7 @@ import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.hibernate.Hibernate;
 import org.springframework.data.domain.AbstractAggregateRoot;
 
 import java.time.Instant;
@@ -52,7 +53,7 @@ public abstract class Message extends AbstractAggregateRoot<Message> {
     private Map<UUID, SeenPointer> seenPointers;
 
     public void deleteSeen(UUID by) {
-        seenPointers.remove(by);
+        getSeenPointers().remove(by);
         this.onUpdated();
     }
 
@@ -62,7 +63,7 @@ public abstract class Message extends AbstractAggregateRoot<Message> {
     }
 
     public void addSeen(UUID senderId, Instant at) {
-        seenPointers.put(senderId, new SeenPointer(chatId, senderId, at, this));
+        getSeenPointers().put(senderId, new SeenPointer(chatId, senderId, at, (Message) Hibernate.unproxy(this)));
         this.onUpdated();
     }
 
