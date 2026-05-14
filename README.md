@@ -3,7 +3,7 @@
 A real-time chat application built with Spring Boot for the backend and Angular for the frontend. Users can manage
 profiles, authenticate, searching and participate in live chat rooms.
 
-## Live web app
+## Live web app (Un available now due to budget constraint, please refer to setting up locally)
 http://decade.ddnsfree.com:4200/
 ## Demo
 A initial version of the application demo is available here:
