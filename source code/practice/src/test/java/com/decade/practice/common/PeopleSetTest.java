@@ -6,7 +6,7 @@ import org.springframework.boot.test.context.TestComponent;
 
 @TestComponent
 @RequiredArgsConstructor
-public class PeopleCleanUp implements DataCleanUp {
+public class PeopleSetTest implements TestDataSet {
     private final PeopleRepository people;
 
     @Override

@@ -11,6 +11,7 @@ import com.decade.practice.inbox.domain.messages.InboxLogMessage;
 import com.decade.practice.inbox.domain.services.ConversationInfoService;
 import com.decade.practice.inbox.dto.mapper.MessageStateResponseMapper;
 import lombok.RequiredArgsConstructor;
+import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.transaction.support.TransactionSynchronization;
 import org.springframework.transaction.support.TransactionSynchronizationManager;
@@ -21,17 +22,18 @@ import java.util.Set;
 import java.util.UUID;
 
 @RequiredArgsConstructor
-public class LogBroadCast {
+@Service
+public class LogBroadCaster {
 
-    protected final LogRepository logs;
-    protected final LookUpRegistry lookUpRegistry;
-    protected final ConversationRepository conversations;
-    protected final DeliveryService deliveryService;
-    protected final MessageStateResponseMapper messageStateMapper;
-    protected final ConversationInfoService conversationInfoService;
+    final LogRepository logs;
+    final LookUpRegistry lookUpRegistry;
+    final ConversationRepository conversations;
+    final DeliveryService deliveryService;
+    final MessageStateResponseMapper messageStateMapper;
+    final ConversationInfoService conversationInfoService;
 
     @Transactional
-    protected void broadcastInsert(MessageCreated message, List<ConversationView> convos) {
+    public void broadcastInsert(MessageCreated message, List<ConversationView> convos) {
         Set<UUID> allNeedUsers = new HashSet<>(message.currentState().getAllPartners().toList());
         convos.forEach(cv -> {
             allNeedUsers.addAll(cv.room().getRepresentatives());
@@ -58,7 +60,7 @@ public class LogBroadCast {
     }
 
     @Transactional
-    protected void broadcastUpdate(MessageUpdated message, List<ConversationView> convos) {
+    public void broadcastUpdate(MessageUpdated message, List<ConversationView> convos) {
         Set<UUID> allNeedUsers = new HashSet<>(message.currentState().getAllPartners().toList());
         convos.forEach(cv -> {
             allNeedUsers.addAll(cv.room().getRepresentatives());

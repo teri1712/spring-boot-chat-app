@@ -14,21 +14,22 @@ import java.util.UUID;
 public interface LogRepository extends JpaRepository<InboxLog, Long> {
 
 
-      @Query("select distinct new com.decade.practice.inbox.application.ports.out.projection.LogView(l,m, new com.decade.practice.inbox.application.ports.out.projection.ConversationView(c,r)) " +
-                "from InboxLog l " +
-                "join fetch Conversation c on l.chatId = c.conversationId.chatId and l.ownerId = c.conversationId.ownerId " +
-                "join fetch Room r on r.chatId = l.chatId " +
-                "join fetch Message m on l.messageId = m.sequenceId " +
-                "where l.sequenceId >= :sequenceId and l.ownerId = :ownerId and l.chatId = :chatId")
-      List<LogView> findByOwnerIdAndChatIdAndSequenceIdGreaterThanEqual(UUID ownerId, String chatId, Long sequenceId, Pageable pageable);
+    @Query("select distinct new com.decade.practice.inbox.application.ports.out.projection.LogView(l,m, new com.decade.practice.inbox.application.ports.out.projection.ConversationView(c,r)) " +
+        "from InboxLog l " +
+        "join fetch Conversation c on l.conversationId = c.id " +
+        "join fetch Room r on r.id = c.roomId " +
+        "join fetch Message m on l.messageId = m.sequenceId " +
+        "where l.sequenceId >= :sequenceId and l.ownerId = :ownerId and r.chatId = :chatId")
+    List<LogView> findByOwnerIdAndChatIdAndSequenceIdGreaterThanEqual(UUID ownerId, String chatId, Long sequenceId, Pageable pageable);
 
-      @Query("select distinct new com.decade.practice.inbox.application.ports.out.projection.LogView(l,m, new com.decade.practice.inbox.application.ports.out.projection.ConversationView(c,r)) " +
-                "from InboxLog l " +
-                "join fetch Conversation c on l.chatId = c.conversationId.chatId and l.ownerId = c.conversationId.ownerId " +
-                "join fetch Room r on r.chatId = l.chatId " +
-                "join fetch Message m on l.messageId = m.sequenceId " +
-                "where l.sequenceId >= :sequenceId and l.ownerId = :ownerId")
-      List<LogView> findByOwnerIdAndSequenceIdGreaterThanEqual(UUID ownerId, Long sequenceId, Pageable pageable);
+    @Query("select distinct new com.decade.practice.inbox.application.ports.out.projection.LogView(l,m, new com.decade.practice.inbox.application.ports.out.projection.ConversationView(c,r)) " +
+        "from InboxLog l " +
+        "join fetch Conversation c on l.conversationId = c.id " +
+        "join fetch Room r on r.id = c.roomId " +
+        "join fetch Message m on l.messageId = m.sequenceId " +
+        "where l.sequenceId >= :sequenceId and l.ownerId = :ownerId")
+    List<LogView> findByOwnerIdAndSequenceIdGreaterThanEqual(UUID ownerId, Long sequenceId, Pageable pageable);
 
+    List<InboxLog> findBySenderId(UUID senderId);
 
 }

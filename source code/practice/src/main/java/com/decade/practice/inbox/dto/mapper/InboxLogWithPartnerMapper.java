@@ -10,14 +10,13 @@ import java.util.List;
 @Mapper(
     unmappedTargetPolicy = ReportingPolicy.ERROR,
     componentModel = MappingConstants.ComponentModel.SPRING,
-    uses = {MessageStateWithPartnerMapper.class}
+    uses = {MessageStateWithPartnerMapper.class, PartnerMapper.class}
 )
 public interface InboxLogWithPartnerMapper {
 
     @Mapping(target = "sequenceNumber", source = "log.sequenceNumber")
-    @Mapping(target = "chatId", expression = "java(logView.conversationView().room().getChatId())")
-    @Mapping(target = "roomName", expression = "java(infoMap.get(logView.conversationView().room().getChatId()).getName(lookUp))")
-    @Mapping(target = "roomAvatar", expression = "java(infoMap.get(logView.conversationView().room().getChatId()).getAvatar(lookUp))")
+    @Mapping(target = "roomName", expression = "java(log.info().getName(lookUp))")
+    @Mapping(target = "roomAvatar", expression = "java(log.info().getAvatar(lookUp))")
     @Mapping(target = "revisionNumber", source = "log.revisionNumber")
     @Mapping(target = "sender", source = "log.senderId")
     @Mapping(target = "ownerId", source = "log.ownerId")

@@ -14,7 +14,7 @@ import io.restassured.response.Response;
 import lombok.RequiredArgsConstructor;
 import org.springframework.core.env.Environment;
 
-import static org.hamcrest.Matchers.contains;
+import static org.hamcrest.Matchers.containsString;
 import static org.hamcrest.Matchers.equalTo;
 
 @RequiredArgsConstructor
@@ -122,7 +122,8 @@ public class ProfileSteps {
 
         String eTag = uploadContext.integrity.eTag();
         String fileKey = uploadContext.integrity.fileKey();
-        changeAvatarResponse = RestAssured.given().headers("Authorization", "Bearer " + authContext.accessToken.accessToken())
+        changeAvatarResponse = RestAssured
+            .given().headers("Authorization", "Bearer " + authContext.accessToken.accessToken())
             .contentType(ContentType.JSON)
             .body("""
                 {
@@ -150,6 +151,6 @@ public class ProfileSteps {
             .get("/profiles/me")
             .then()
             .statusCode(200)
-            .body("avatar", contains(filename));
+            .body("avatar", containsString(filename));
     }
 }

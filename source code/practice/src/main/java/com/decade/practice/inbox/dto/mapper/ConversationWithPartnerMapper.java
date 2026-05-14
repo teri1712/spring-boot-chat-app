@@ -14,9 +14,8 @@ import java.util.List;
 )
 public interface ConversationWithPartnerMapper {
 
-    @Mapping(target = "identifier", expression = "java(convoView.room().getChatId())")
-    @Mapping(target = "roomName", expression = "java(info.getName(lookUp))")
-    @Mapping(target = "roomAvatar", expression = "java(info.getAvatar(lookUp))")
+    @Mapping(target = "roomName", expression = "java(convo.info().getName(lookUp))")
+    @Mapping(target = "roomAvatar", expression = "java(convo.info().getAvatar(lookUp))")
     ConversationWithPartnerDto toDto(ConversationResponse convo, @Context PartnerLookUp lookUp);
 
     default List<ConversationWithPartnerDto> toDtos(List<ConversationResponse> convos, @Context PartnerLookUp lookUp) {

@@ -3,7 +3,7 @@ package com.decade.practice.live;
 import com.decade.practice.chatorchestrator.application.ports.in.ChatService;
 import com.decade.practice.inbox.domain.events.InboxLogCreated;
 import com.decade.practice.inbox.domain.events.MessageCreated;
-import com.decade.practice.inbox.dto.InboxLogWithPartnerDto;
+import com.decade.practice.inbox.dto.InboxLogMessageWithPartnerDto;
 import com.decade.practice.inbox.dto.TextStateWithPartnerDto;
 import com.decade.practice.integration.BaseTestClass;
 import com.decade.practice.integration.TestBeans;
@@ -100,8 +100,8 @@ class RealtimeMessageTest extends BaseTestClass {
             String aliceToken = tokenService.encodeToken(alice, Duration.ofDays(5));
             String bobToken = tokenService.encodeToken(bob, Duration.ofDays(5));
 
-            CompletableFuture<InboxLogWithPartnerDto> aliceEvent = new CompletableFuture<>();
-            CompletableFuture<InboxLogWithPartnerDto> bobEvent = new CompletableFuture<>();
+            CompletableFuture<InboxLogMessageWithPartnerDto> aliceEvent = new CompletableFuture<>();
+            CompletableFuture<InboxLogMessageWithPartnerDto> bobEvent = new CompletableFuture<>();
 
             stompClient = new WebSocketStompClient(new StandardWebSocketClient());
             stompClient.setMessageConverter(converter);
@@ -140,24 +140,24 @@ class RealtimeMessageTest extends BaseTestClass {
             aliceSession.subscribe(userTopic + queueTopic, new StompFrameHandler() {
                 @Override
                 public Type getPayloadType(StompHeaders headers) {
-                    return InboxLogWithPartnerDto.class;
+                    return InboxLogMessageWithPartnerDto.class;
                 }
 
                 @Override
                 public void handleFrame(StompHeaders headers, Object payload) {
-                    aliceEvent.complete((InboxLogWithPartnerDto) payload);
+                    aliceEvent.complete((InboxLogMessageWithPartnerDto) payload);
                 }
             });
 
             bobSession.subscribe(userTopic + queueTopic, new StompFrameHandler() {
                 @Override
                 public Type getPayloadType(StompHeaders headers) {
-                    return InboxLogWithPartnerDto.class;
+                    return InboxLogMessageWithPartnerDto.class;
                 }
 
                 @Override
                 public void handleFrame(StompHeaders headers, Object payload) {
-                    bobEvent.complete((InboxLogWithPartnerDto) payload);
+                    bobEvent.complete((InboxLogMessageWithPartnerDto) payload);
                 }
             });
 

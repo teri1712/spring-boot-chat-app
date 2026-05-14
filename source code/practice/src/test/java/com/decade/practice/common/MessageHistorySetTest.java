@@ -6,7 +6,7 @@ import org.springframework.boot.test.context.TestComponent;
 
 @TestComponent
 @RequiredArgsConstructor
-public class MessageHistoryCleanUp implements DataCleanUp {
+public class MessageHistorySetTest implements TestDataSet {
     private final MessageHistoryRepository history;
 
     @Override

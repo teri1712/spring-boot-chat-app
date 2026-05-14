@@ -12,7 +12,7 @@ public abstract class ConversationInfo {
     private final Set<UUID> representatives;
 
     protected ConversationInfo(RoomInfo roomInfo, Set<UUID> representatives) {
-        this.roomInfo = roomInfo;
+        this.roomInfo = roomInfo == null ? new RoomInfo(null, null) : roomInfo;
         this.representatives = representatives;
     }
 

@@ -48,7 +48,8 @@ public class UploadSteps {
             .extract().response();
 
 
-        String uploadUrl = response.jsonPath().getString("presignedUploadUrl");
+        String uploadUrl = presignedResponse.jsonPath().getString("presignedUploadUrl");
+        log.debug("uploadUrl: {}", uploadUrl);
         response = RestAssured.given()
             .urlEncodingEnabled(false)
             .contentType(ContentType.BINARY)

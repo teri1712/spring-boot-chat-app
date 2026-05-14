@@ -6,7 +6,7 @@ import org.springframework.boot.test.context.TestComponent;
 
 @RequiredArgsConstructor
 @TestComponent
-public class UserCleanUp implements DataCleanUp {
+public class UserSetTest implements TestDataSet {
 
     private final UserRepository users;
 

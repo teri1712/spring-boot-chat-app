@@ -6,7 +6,7 @@ import org.springframework.data.redis.core.StringRedisTemplate;
 
 @RequiredArgsConstructor
 @TestComponent
-public class RedisCleanUp implements DataCleanUp {
+public class RedisSetTest implements TestDataSet {
     private final StringRedisTemplate redisTemplate;
 
     @Override

@@ -10,11 +10,11 @@ import org.mapstruct.*;
 @Mapper(
     unmappedTargetPolicy = ReportingPolicy.ERROR,
     componentModel = MappingConstants.ComponentModel.SPRING,
-    uses = {MessageMapper.class}
+    uses = {MessageStateWithPartnerMapper.class, PartnerMapper.class}
 )
 public interface InboxLogMessageWithPartnerMapper {
     @Mapping(target = "roomName", expression = "java(info.getName(lookUp))")
     @Mapping(target = "roomAvatar", expression = "java(info.getAvatar(lookUp))")
-    @Mapping(target = "sender", expression = "java(lookUp.lookUp(message.getSenderId()))")
+    @Mapping(target = "sender", source = "message.senderId")
     InboxLogMessageWithPartnerDto map(InboxLogMessage message, ConversationInfo info, @Context PartnerLookUp lookUp);
 }

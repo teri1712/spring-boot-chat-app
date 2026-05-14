@@ -50,7 +50,7 @@ public class ContainerConfigs {
     @ServiceConnection
     @Bean
     KafkaContainer kafkaContainer() {
-        return new KafkaContainer("confluentinc/cp-kafka:7.4.0");
+        return new KafkaContainer(DockerImageName.parse("apache/kafka:3.7.0"));
     }
 
 }

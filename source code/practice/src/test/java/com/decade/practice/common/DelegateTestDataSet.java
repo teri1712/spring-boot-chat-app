@@ -9,11 +9,16 @@ import java.util.List;
 @TestComponent
 @RequiredArgsConstructor
 @Primary
-public class DelegateDataCleanUp implements DataCleanUp {
-    private final List<DataCleanUp> cleanups;
+public class DelegateTestDataSet implements TestDataSet {
+    private final List<TestDataSet> cleanups;
 
     @Override
     public void clean() {
-        cleanups.forEach(DataCleanUp::clean);
+        cleanups.forEach(TestDataSet::clean);
+    }
+
+    @Override
+    public void setUp() {
+        cleanups.forEach(TestDataSet::setUp);
     }
 }

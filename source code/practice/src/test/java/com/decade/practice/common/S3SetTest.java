@@ -11,9 +11,16 @@ import software.amazon.awssdk.services.s3.model.DeleteBucketRequest;
 @Slf4j
 @RequiredArgsConstructor
 @TestComponent
-public class S3CleanUp implements DataCleanUp {
+public class S3SetTest implements TestDataSet {
     private final S3Client s3Client;
     private @Value("${aws.s3.bucket}") String bucket;
+
+    @Override
+    public void setUp() {
+        s3Client.createBucket(CreateBucketRequest.builder()
+            .bucket(bucket)
+            .build());
+    }
 
     @Override
     public void clean() {

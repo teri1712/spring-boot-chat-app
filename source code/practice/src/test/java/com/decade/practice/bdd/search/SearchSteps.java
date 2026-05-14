@@ -74,7 +74,7 @@ public class SearchSteps {
     }
 
 
-    @When("user find {string} in the conversationView")
+    @When("user find {string} in the conversation")
     public void userFindInTheConversation(String query) {
         searchResponse = RestAssured
             .given()
@@ -94,7 +94,7 @@ public class SearchSteps {
             .body("[0].content", equalTo(query));
     }
 
-    @And("no {string} messages in the conversationView")
+    @And("no {string} messages in the conversation")
     public void noMessagesInTheConversation(String message) {
     }
 
@@ -106,7 +106,7 @@ public class SearchSteps {
             .body("size()", equalTo(0));
     }
 
-    @When("user {string} search message of that conversationView")
+    @When("user {string} search message of that conversation")
     public void userSearchMessageOfThatConversation(String user) {
         loginSteps.alrLogin(user, "password123");
 

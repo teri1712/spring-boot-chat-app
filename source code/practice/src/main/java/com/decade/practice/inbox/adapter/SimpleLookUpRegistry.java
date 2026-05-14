@@ -7,8 +7,6 @@ import com.decade.practice.users.api.UserApi;
 import com.decade.practice.users.api.UserInfo;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
-import org.springframework.transaction.annotation.Propagation;
-import org.springframework.transaction.annotation.Transactional;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -17,9 +15,7 @@ import java.util.UUID;
 
 @Component
 @RequiredArgsConstructor
-@Transactional(propagation = Propagation.MANDATORY)
 public class SimpleLookUpRegistry implements LookUpRegistry {
-
 
     private final UserApi userApi;
 
