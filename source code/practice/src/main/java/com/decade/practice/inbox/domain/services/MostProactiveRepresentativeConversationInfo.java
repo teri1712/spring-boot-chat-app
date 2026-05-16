@@ -6,6 +6,7 @@ import com.decade.practice.inbox.domain.Partner;
 import com.decade.practice.inbox.domain.Room;
 
 import java.util.Iterator;
+import java.util.Optional;
 import java.util.Set;
 import java.util.UUID;
 
@@ -22,10 +23,10 @@ public class MostProactiveRepresentativeConversationInfo extends ConversationInf
         var representatives = getRepresentatives();
         Iterator<UUID> iterator = representatives.iterator();
         Partner first = partnerLookUp.lookUp(iterator.next());
-        StringBuilder roomName = new StringBuilder(first.name());
+        StringBuilder roomName = new StringBuilder(Optional.ofNullable(first.name()).orElse(""));
         if (representatives.size() > 1) {
             while (iterator.hasNext()) {
-                roomName.append(", ").append(partnerLookUp.lookUp(iterator.next()).name());
+                roomName.append(", ").append(Optional.ofNullable(partnerLookUp.lookUp(iterator.next())).map(Partner::name).orElse(""));
             }
             int remaining = room.getParticipantCount() - 1 - representatives.size();
             if (remaining > 0) {
@@ -38,6 +39,7 @@ public class MostProactiveRepresentativeConversationInfo extends ConversationInf
     @Override
     protected String deriveAvatar(PartnerLookUp partnerLookUp) {
         var representatives = getRepresentatives();
-        return partnerLookUp.lookUp(representatives.iterator().next()).avatar();
+        return Optional.ofNullable(partnerLookUp.lookUp(representatives.iterator().next())).
+            map(Partner::avatar).orElse("");
     }
 }

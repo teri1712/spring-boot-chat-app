@@ -1,94 +1,87 @@
 package com.decade.practice.inbox.integration;
 
-import com.decade.practice.chatorchestrator.application.ports.in.ChatService;
+import com.decade.practice.inbox.apis.ConversationApi;
 import com.decade.practice.inbox.domain.events.*;
-import com.decade.practice.integration.BaseTestClass;
 import com.decade.practice.resources.files.dto.S3PresignedResponse;
+import com.decade.practice.shared.security.jwt.WithJwtUser;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import lombok.RequiredArgsConstructor;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.MediaType;
-import org.springframework.security.test.context.support.WithUserDetails;
-import org.springframework.test.context.event.ApplicationEvents;
 import org.springframework.test.context.jdbc.Sql;
-import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.MvcResult;
 import org.springframework.web.client.RestClient;
 
 import java.net.URI;
+import java.util.Set;
 import java.util.UUID;
+import java.util.concurrent.TimeUnit;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.awaitility.Awaitility.await;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 @Sql(scripts = "/sql/clean.sql", executionPhase = Sql.ExecutionPhase.AFTER_TEST_METHOD)
-class PostingControllerTest extends BaseTestClass {
+@RequiredArgsConstructor
+@WithJwtUser(
+    id = "11111111-1111-1111-1111-111111111111",
+    name = "alice",
+    username = "alice"
+)
+class PostingControllerTest extends BaseInboxTestClass {
 
-    @Autowired
-    private MockMvc mockMvc;
-
-    @Autowired
-    private ApplicationEvents events;
-
-    @Autowired
-    private ObjectMapper objectMapper;
-
-    @Autowired
-    private ChatService chatService;
-
+    final ObjectMapper objectMapper;
+    final ConversationApi conversationApi;
 
     @Test
-    @Sql(scripts = {"/sql/clean.sql", "/sql/seed_users.sql"})
-    @WithUserDetails("alice")
     void givenValidTextEvent_whenAliceSendsToBob_thenStatusCreated() throws Exception {
         // Given
-        // Create chat first
-        mockMvc.perform(put("/direct-chats/{partnerId}", "22222222-2222-2222-2222-222222222222")
-            )
-            .andExpect(status().isCreated());
-
-        String chatIdentifier = "11111111-1111-1111-1111-111111111111+22222222-2222-2222-2222-222222222222";
-        String eventJson = """
-            {
-                "content": "Hello Bob"
-            }
-            """;
+        conversationApi.create(aliceBobChat, aliceId, Set.of(aliceId, bobId), null);
 
         // When & Then
-        String idempotentKey = UUID.randomUUID().toString();
-        mockMvc.perform(put("/chats/{chatIdentifier}/texts/{postingId}", chatIdentifier, idempotentKey)
+        UUID idempotentKey = UUID.randomUUID();
+        mockMvc.perform(put("/chats/{chatIdentifier}/texts/{postingId}", aliceBobChat, idempotentKey)
                 .contentType(MediaType.APPLICATION_JSON)
-                .content(eventJson))
+                .content(
+                    """
+                        {
+                            "content": "Hello Bob"
+                        }
+                        """
+                ))
             .andExpect(status().isAccepted())
-            .andExpect(jsonPath("$.postingId").value(idempotentKey));
-
-
-        assertThat(events.stream(TextRoomEventCreated.class)).hasSize(1);
-
-        assertThat(events.stream(MessageCreated.class)).hasSize(1);
-        assertThat(events.stream(InboxLogCreated.class)).hasSize(2);
+            .andExpect(jsonPath("$.postingId").value(idempotentKey.toString()));
+        await()
+            .atMost(2, TimeUnit.SECONDS)
+            .untilAsserted(() -> {
+                assertThat(events.stream(TextRoomEventCreated.class))
+                    .hasSize(1);
+                assertThat(events.stream(MessageCreated.class))
+                    .hasSize(1);
+                assertThat(events.stream(InboxLogCreated.class))
+                    .hasSize(2);
+            });
 
 
         // Idempotent check
-        mockMvc.perform(put("/chats/{chatIdentifier}/texts/{postingId}", chatIdentifier, idempotentKey)
+        mockMvc.perform(put("/chats/{chatIdentifier}/texts/{postingId}", aliceBobChat, idempotentKey)
                 .contentType(MediaType.APPLICATION_JSON)
-                .content(eventJson))
+                .content("""
+                    {
+                        "content": "Hello Bob"
+                    }
+                    """))
             .andExpect(status().isOk())
-            .andExpect(jsonPath("$.postingId").value(idempotentKey));
+            .andExpect(jsonPath("$.postingId").value(idempotentKey.toString()));
 
     }
 
     @Test
-    @Sql(scripts = {"/sql/clean.sql", "/sql/seed_users.sql"})
-    @WithUserDetails("alice")
     void givenValidImageEvent_whenAliceSendsToBob_thenStatusCreated() throws Exception {
-
-        mockMvc.perform(put("/direct-chats/{partnerId}", "22222222-2222-2222-2222-222222222222")
-            )
-            .andExpect(status().isCreated());
+        conversationApi.create(aliceBobChat, aliceId, Set.of(aliceId, bobId), null);
 
         MvcResult result = mockMvc.perform(post("/files/upload")
                 .queryParam("filename", "teri.txt"))
@@ -111,115 +104,90 @@ class PostingControllerTest extends BaseTestClass {
                 .getHeaders().getETag();
         });
 
-        String chatIdentifier = "11111111-1111-1111-1111-111111111111+22222222-2222-2222-2222-222222222222";
-        String eventJson = """
-            {
-                "file" : {
-                            "eTag": "%s",
-                            "fileKey": "%s"
-                          },
-                "width": 200,
-                "height": 200,
-                "filename": "teri.txt",
-                "format": "jpg"
-            }
-            """.formatted(eTag.replace("\"", "\\\""), response.getFileKey());
 
-        mockMvc.perform(put("/chats/{chatIdentifier}/images/{postingId}", chatIdentifier, UUID.randomUUID())
+        mockMvc.perform(put("/chats/{chatIdentifier}/images/{postingId}", aliceBobChat, UUID.randomUUID())
                 .contentType(MediaType.APPLICATION_JSON)
-                .content(eventJson))
+                .content("""
+                    {
+                        "file" : {
+                                    "eTag": "%s",
+                                    "fileKey": "%s"
+                                  },
+                        "width": 200,
+                        "height": 200,
+                        "filename": "teri.txt",
+                        "format": "jpg"
+                    }
+                    """.formatted(eTag.replace("\"", "\\\""), response.getFileKey())))
             .andExpect(status().isAccepted());
 
-        assertThat(events.stream(ImageRoomEventCreated.class)).hasSize(1);
 
-        assertThat(events.stream(MessageCreated.class)).hasSize(1);
-        assertThat(events.stream(InboxLogCreated.class)).hasSize(2);
+        await()
+            .atMost(2, TimeUnit.SECONDS)
+            .untilAsserted(() -> {
+                assertThat(events.stream(ImageRoomEventCreated.class))
+                    .hasSize(1);
+                assertThat(events.stream(MessageCreated.class))
+                    .hasSize(1);
+                assertThat(events.stream(InboxLogCreated.class))
+                    .hasSize(2);
+            });
+
     }
 
     @Test
-    @Sql(scripts = {"/sql/clean.sql", "/sql/seed_users.sql"})
-    @WithUserDetails("alice")
     void givenValidIconEvent_whenAliceSendsToBob_thenStatusCreated() throws Exception {
         // Given
+        conversationApi.create(aliceBobChat, aliceId, Set.of(aliceId, bobId), null);
 
-        mockMvc.perform(put("/direct-chats/{partnerId}", "22222222-2222-2222-2222-222222222222")
-            )
-            .andExpect(status().isCreated());
-
-        String chatIdentifier = "11111111-1111-1111-1111-111111111111+22222222-2222-2222-2222-222222222222";
-        String eventJson = """
-            {
-                "iconId": 5
-            }
-            """;
         // When & Then
-        mockMvc.perform(put("/chats/{chatIdentifier}/icons/{postingId}", chatIdentifier, UUID.randomUUID())
-                .contentType(MediaType.APPLICATION_JSON)
-                .content(eventJson))
-            .andExpect(status().isAccepted());
+        sendIcon(aliceBobChat, 5);
+        await()
+            .atMost(2, TimeUnit.SECONDS)
+            .untilAsserted(() -> {
+                assertThat(events.stream(IconRoomEventCreated.class))
+                    .hasSize(1);
+                assertThat(events.stream(MessageCreated.class))
+                    .hasSize(1);
+                assertThat(events.stream(InboxLogCreated.class))
+                    .hasSize(2);
+            });
 
-
-        assertThat(events.stream(IconRoomEventCreated.class)).hasSize(1);
-        assertThat(events.stream(MessageCreated.class)).hasSize(1);
-        assertThat(events.stream(InboxLogCreated.class)).hasSize(2);
     }
 
     @Test
-    @Sql(scripts = {"/sql/clean.sql", "/sql/seed_users.sql"})
-    @WithUserDetails("alice")
     void givenNewMessageFromBob_whenAliceSeenToBobAgain_thenSeenPointerMoved() throws Exception {
         // Given
+        conversationApi.create(aliceBobChat, aliceId, Set.of(aliceId, bobId), null);
 
-        mockMvc.perform(put("/direct-chats/{partnerId}", "22222222-2222-2222-2222-222222222222")
-            )
-            .andExpect(status().isCreated());
+        sendIcon(aliceBobChat, 5);
+        sendSeen(aliceBobChat);
 
-        String alice = "11111111-1111-1111-1111-111111111111";
-        String chatIdentifier = "11111111-1111-1111-1111-111111111111+22222222-2222-2222-2222-222222222222";
-        String iconJson = """
-            {
-                "iconId": 5
-            }
-            """;
-        mockMvc.perform(put("/chats/{chatIdentifier}/icons/{postingId}", chatIdentifier, UUID.randomUUID())
-                .contentType(MediaType.APPLICATION_JSON)
-                .content(iconJson))
-            .andExpect(status().isAccepted());
-
-        String eventJson = """
-            {
-                "at": "2016-01-24T10:15:30Z"
-            }
-            """;
-
-        mockMvc.perform(put("/chats/{chatIdentifier}/seens/{postingId}", chatIdentifier, UUID.randomUUID())
-                .contentType(MediaType.APPLICATION_JSON)
-                .content(eventJson))
-            .andExpect(status().isAccepted());
         // When
-
-        mockMvc.perform(put("/chats/{chatIdentifier}/icons/{postingId}", chatIdentifier, UUID.randomUUID())
-                .contentType(MediaType.APPLICATION_JSON)
-                .content(iconJson))
-            .andExpect(status().isAccepted());
-
-        mockMvc.perform(put("/chats/{chatIdentifier}/seens/{postingId}", chatIdentifier, UUID.randomUUID())
-                .contentType(MediaType.APPLICATION_JSON)
-                .content(eventJson))
-            .andExpect(status().isAccepted());
+        sendIcon(aliceBobChat, 5);
+        sendSeen(aliceBobChat);
 
         // Then
-        assertThat(events.stream(SeenRoomEventCreated.class)).hasSize(2);
-        assertThat(events.stream(MessageCreated.class)).hasSize(2);
-        assertThat(events.stream(MessageUpdated.class)).hasSize(3);
-        assertThat(events.stream(InboxLogCreated.class)).hasSize(10);
+        await()
+            .atMost(2, TimeUnit.SECONDS)
+            .untilAsserted(() -> {
+                assertThat(events.stream(SeenRoomEventCreated.class))
+                    .hasSize(2);
+                assertThat(events.stream(MessageCreated.class))
+                    .hasSize(2);
+                assertThat(events.stream(MessageUpdated.class))
+                    .hasSize(3);
+                assertThat(events.stream(InboxLogCreated.class))
+                    .hasSize(10);
+            });
 
-        mockMvc.perform(get("/chats/{chatIdentifier}/messages", chatIdentifier, UUID.randomUUID())
+
+        mockMvc.perform(get("/chats/{chatIdentifier}/messages", aliceBobChat)
                 .queryParam("anchorSequenceNumber", "1000000")
                 .contentType(MediaType.APPLICATION_JSON))
             .andExpect(status().isOk())
             .andExpect(jsonPath("$[0].seenBy.size()").value(1))
-            .andExpect(jsonPath("$[0].seenBy[0].id").value(alice))
+            .andExpect(jsonPath("$[0].seenBy[0].id").value(aliceId.toString()))
             .andExpect(jsonPath("$[1].seenBy.size()").value(0))
 
         ;
@@ -227,74 +195,49 @@ class PostingControllerTest extends BaseTestClass {
     }
 
     @Test
-    @Sql(scripts = {"/sql/clean.sql", "/sql/seed_users.sql"})
-    @WithUserDetails("alice")
     void givenExistingMessageFromBob_whenAliceSeenToBob_thenMessageUpdadedWithSeenPointer() throws Exception {
         // Given
+        conversationApi.create(aliceBobChat, aliceId, Set.of(aliceId, bobId), null);
 
-        mockMvc.perform(put("/direct-chats/{partnerId}", "22222222-2222-2222-2222-222222222222")
-            )
-            .andExpect(status().isCreated());
-
-        String alice = "11111111-1111-1111-1111-111111111111";
-        String chatIdentifier = "11111111-1111-1111-1111-111111111111+22222222-2222-2222-2222-222222222222";
-        String iconJson = """
-            {
-                "iconId": 5
-            }
-            """;
-        mockMvc.perform(put("/chats/{chatIdentifier}/icons/{postingId}", chatIdentifier, UUID.randomUUID())
-                .contentType(MediaType.APPLICATION_JSON)
-                .content(iconJson))
-            .andExpect(status().isAccepted());
+        sendIcon(aliceBobChat, 5);
 
         // When & Then
-        String eventJson = """
-            {
-                "at": "2016-01-24T10:15:30Z"
-            }
-            """;
+        sendSeen(aliceBobChat);
 
-        mockMvc.perform(put("/chats/{chatIdentifier}/seens/{postingId}", chatIdentifier, UUID.randomUUID())
-                .contentType(MediaType.APPLICATION_JSON)
-                .content(eventJson))
-            .andExpect(status().isAccepted());
+        await()
+            .atMost(2, TimeUnit.SECONDS)
+            .untilAsserted(() -> {
+                assertThat(events.stream(SeenRoomEventCreated.class))
+                    .hasSize(1);
+                assertThat(events.stream(MessageUpdated.class))
+                    .hasSize(1);
+                assertThat(events.stream(InboxLogCreated.class))
+                    .hasSize(4);
+            });
 
 
-        assertThat(events.stream(SeenRoomEventCreated.class)).hasSize(1);
-        assertThat(events.stream(MessageUpdated.class)).hasSize(1);
-        assertThat(events.stream(InboxLogCreated.class)).hasSize(4);
-
-        mockMvc.perform(get("/chats/{chatIdentifier}/messages", chatIdentifier, UUID.randomUUID())
+        mockMvc.perform(get("/chats/{chatIdentifier}/messages", aliceBobChat)
                 .queryParam("anchorSequenceNumber", "1000000")
                 .contentType(MediaType.APPLICATION_JSON))
             .andExpect(status().isOk())
             .andExpect(jsonPath("$[0].seenBy.size()").value(1))
-            .andExpect(jsonPath("$[0].seenBy[0].id").value(alice));
+            .andExpect(jsonPath("$[0].seenBy[0].id").value(aliceId.toString()));
 
 
         mockMvc.perform(get("/conversations")
                 .accept(MediaType.APPLICATION_JSON))
             .andExpect(status().isOk())
-            .andExpect(jsonPath("$[0].identifier").value(chatIdentifier))
+            .andExpect(jsonPath("$[0].identifier").value(aliceBobChat))
             .andExpect(jsonPath("$[0].recents.size()").value(1))
-            .andExpect(jsonPath("$[0].recents[0].seenBy[0].id").value(alice))
+            .andExpect(jsonPath("$[0].recents[0].seenBy[0].id").value(aliceId.toString()))
         ;
 
     }
 
     @Test
-    @Sql(scripts = {"/sql/clean.sql", "/sql/seed_users.sql"})
-    @WithUserDetails("alice")
     void givenValidFileEvent_whenAliceSendsToBob_thenStatusCreated() throws Exception {
         // Given
-
-        mockMvc.perform(put("/direct-chats/{partnerId}", "22222222-2222-2222-2222-222222222222")
-            )
-            .andExpect(status().isCreated());
-
-        String chatIdentifier = "11111111-1111-1111-1111-111111111111+22222222-2222-2222-2222-222222222222";
-
+        conversationApi.create(aliceBobChat, aliceId, Set.of(aliceId, bobId), null);
 
         MvcResult result = mockMvc.perform(post("/files/upload")
                 .queryParam("filename", "teri.txt"))
@@ -317,41 +260,43 @@ class PostingControllerTest extends BaseTestClass {
                 .getHeaders().getETag();
         });
 
-        String eventJson = """
-            {
-                "filename": "test.txt",
-                "size": 1024,
-                "file" : {
-                            "eTag": "%s",
-                            "fileKey": "%s"
-                          }
-            }
-            """.formatted(eTag.replace("\"", "\\\""), response.getFileKey());
         // When & Then
-        mockMvc.perform(put("/chats/{chatIdentifier}/files/{postingId}", chatIdentifier, UUID.randomUUID())
+        mockMvc.perform(put("/chats/{chatIdentifier}/files/{postingId}", aliceBobChat, UUID.randomUUID())
 
                 .contentType(MediaType.APPLICATION_JSON)
-                .content(eventJson))
+                .content("""
+                    {
+                        "filename": "test.txt",
+                        "size": 1024,
+                        "file" : {
+                                    "eTag": "%s",
+                                    "fileKey": "%s"
+                                  }
+                    }
+                    """.formatted(eTag.replace("\"", "\\\""), response.getFileKey())))
             .andExpect(status().isAccepted());
 
+        await()
+            .atMost(2, TimeUnit.SECONDS)
+            .untilAsserted(() -> {
+                assertThat(events.stream(FileRoomEventCreated.class))
+                    .hasSize(1);
+                assertThat(events.stream(MessageCreated.class))
+                    .hasSize(1);
+                assertThat(events.stream(InboxLogCreated.class))
+                    .hasSize(2);
+            });
 
-        assertThat(events.stream(FileRoomEventCreated.class)).hasSize(1);
-
-        assertThat(events.stream(MessageCreated.class)).hasSize(1);
-        assertThat(events.stream(InboxLogCreated.class)).hasSize(2);
     }
 
 
     @Test
-    @Sql(scripts = {"/sql/clean.sql", "/sql/seed_users.sql"})
-    @WithUserDetails("alice")
     void givenMalformedJson_whenCreateTextEvent_thenReturnsBadRequest() throws Exception {
         // Given
-        String chatIdentifier = "11111111-1111-1111-1111-111111111111+22222222-2222-2222-2222-222222222222";
         String malformedJson = "{ \"textEvent\": { ... } }";
 
         // When & Then
-        mockMvc.perform(put("/chats/{chatIdentifier}/texts/{postingId}", chatIdentifier, UUID.randomUUID())
+        mockMvc.perform(put("/chats/{chatIdentifier}/texts/{postingId}", aliceBobChat, UUID.randomUUID())
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(malformedJson))
             .andExpect(status().isBadRequest());

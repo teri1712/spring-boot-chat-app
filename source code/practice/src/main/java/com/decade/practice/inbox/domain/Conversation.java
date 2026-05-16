@@ -15,6 +15,7 @@ import java.util.UUID;
 @Getter
 public class Conversation extends AbstractAggregateRoot<Conversation> {
 
+    public static final Instant DORAEMON_BIRTHDAY = Instant.parse("2112-09-03T00:00:00Z");
     public static final int MAX_ROUND = 100;
 
     @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "conversation_seq_gen")
@@ -43,7 +44,7 @@ public class Conversation extends AbstractAggregateRoot<Conversation> {
     public Conversation(UUID ownerId, Long roomId, Integer participantIndex) {
         this.roomId = roomId;
         this.ownerId = ownerId;
-        this.modifiedAt = Instant.now();
+        this.modifiedAt = DORAEMON_BIRTHDAY;
         this.participantIndex = participantIndex;
         this.roundRobin = participantIndex % MAX_ROUND;
         this.recents = new ArrayList<>();
