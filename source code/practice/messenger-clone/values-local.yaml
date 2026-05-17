@@ -1,0 +1,9 @@
+postgresql:
+  primary:
+    persistence:
+      enabled: false
+    resources:
+      requests:
+        memory: 2Gi
+
+replicaCount: 3

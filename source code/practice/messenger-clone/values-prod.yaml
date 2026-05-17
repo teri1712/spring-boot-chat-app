@@ -1,0 +1,19 @@
+postgresql:
+  primary:
+    persistence:
+      enabled: true
+      size: 5Gi
+      storageClass: "premium-rwo"
+    resources:
+      requests:
+        cpu: "2"
+        memory: 4Gi
+
+
+# This section is for setting up autoscaling more information can be found here: https://kubernetes.io/docs/concepts/workloads/autoscaling/
+autoscaling:
+  enabled: true
+  minReplicas: 1
+  maxReplicas: 100
+  targetCPUUtilizationPercentage: 80
+  # targetMemoryUtilizationPercentage: 80
