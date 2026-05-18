@@ -31,14 +31,14 @@ public class LogServiceImpl implements LogService {
     @Override
     @ReadPolicy
     public List<InboxLogResponse> findByChatAndSequenceGreaterThanEqual(String chatId, UUID userId, Long anchorSequenceNumber) {
-        log.trace("Finding events for ownerId '{}' and chat '{}'", userId, chatId);
+        log.trace("Finding events for owner '{}' and chat '{}'", userId, chatId);
         List<LogView> logList = logs.findByOwnerIdAndChatIdAndSequenceIdGreaterThanEqual(userId, chatId, anchorSequenceNumber, LogUtils.SEQUENCE_ASC_PAGE);
         return map(userId, logList);
     }
 
     @Override
     public List<InboxLogResponse> findBySequenceGreaterThanEqual(UUID userId, Long anchorSequenceNumber) {
-        log.trace("Finding events for ownerId '{}'", userId);
+        log.trace("Finding events for owner '{}'", userId);
         List<LogView> logList = logs.findByOwnerIdAndSequenceIdGreaterThanEqual(userId, anchorSequenceNumber, LogUtils.SEQUENCE_ASC_PAGE);
         return logList.stream().map(new Function<LogView, InboxLogResponse>() {
             @Override

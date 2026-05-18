@@ -1,6 +1,6 @@
 package com.decade.practice.bdd.search;
 
-import com.decade.practice.bdd.chats.ConversationContext;
+import com.decade.practice.bdd.conversations.ConversationContext;
 import com.decade.practice.bdd.users.AuthContext;
 import com.decade.practice.bdd.users.LoginSteps;
 import io.cucumber.java.Before;
