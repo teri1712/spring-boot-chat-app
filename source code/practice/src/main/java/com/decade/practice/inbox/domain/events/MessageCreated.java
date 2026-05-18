@@ -6,11 +6,11 @@ import java.time.Instant;
 import java.util.UUID;
 
 public record MessageCreated(
-          Long id,
-          UUID postingId,
-          UUID senderId,
-          String chatId,
-          Instant createdAt,
-          String messageType,
-          MessageState currentState) {
+    Long id,
+    String chatId,
+    UUID postingId,
+    UUID senderId,
+    Instant createdAt,
+    String messageType,
+    MessageState currentState) {
 }

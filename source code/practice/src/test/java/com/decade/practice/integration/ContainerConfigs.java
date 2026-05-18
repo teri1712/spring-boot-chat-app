@@ -7,6 +7,7 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.test.context.DynamicPropertyRegistrar;
 import org.testcontainers.containers.PostgreSQLContainer;
 import org.testcontainers.containers.localstack.LocalStackContainer;
+import org.testcontainers.kafka.KafkaContainer;
 import org.testcontainers.utility.DockerImageName;
 
 import static org.testcontainers.containers.localstack.LocalStackContainer.Service.S3;
@@ -44,6 +45,12 @@ public class ContainerConfigs {
             registry.add("aws.s3.access.secret", localStack::getSecretKey);
             registry.add("aws.s3.region", localStack::getRegion);
         };
+    }
+
+    @ServiceConnection
+    @Bean
+    KafkaContainer kafkaContainer() {
+        return new KafkaContainer(DockerImageName.parse("apache/kafka:3.7.0"));
     }
 
 }

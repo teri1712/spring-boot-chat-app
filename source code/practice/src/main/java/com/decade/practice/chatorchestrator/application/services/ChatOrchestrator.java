@@ -25,43 +25,43 @@ import java.util.*;
 // TODO: SAGA
 public class ChatOrchestrator implements ChatService {
 
-      private final EngagementApi engagementApi;
-      private final DirectMappingApi directMappingApi;
-      private final SettingApi settingApi;
-      private final ConversationApi conversationApi;
-      private final ChatMapper chatMapper;
+    private final EngagementApi engagementApi;
+    private final DirectMappingApi directMappingApi;
+    private final SettingApi settingApi;
+    private final ConversationApi conversationApi;
+    private final ChatMapper chatMapper;
 
-      @Override
-      public ChatResponse createGroup(CreateGroupChatCommand command) {
-            Set<UUID> participants = new HashSet<>(command.partnerIds());
-            participants.add(command.callerId());
-            if (participants.size() == 2) {
-                  throw new ConstraintViolationException("Exactly two participants should be provided for a direct chat. Use the direct chat endpoint instead.", new HashSet<>());
-            }
-            ChatPolicyInfo policyInfo = engagementApi.createGroup(command.callerId(), participants);
-            String chatId = policyInfo.identifier();
-            SettingsInfo settingsInfo = settingApi.create(chatId, command.roomName());
-            conversationApi.create(chatId, command.callerId(), policyInfo.creators(), command.roomName());
-            return chatMapper.map(policyInfo, settingsInfo);
-      }
+    @Override
+    public ChatResponse createGroup(CreateGroupChatCommand command) {
+        Set<UUID> participants = new HashSet<>(command.partnerIds());
+        participants.add(command.callerId());
+        if (participants.size() == 2) {
+            throw new ConstraintViolationException("Exactly two participants should be provided for a direct chat. Use the direct chat endpoint instead.", new HashSet<>());
+        }
+        ChatPolicyInfo policyInfo = engagementApi.createGroup(command.callerId(), participants);
+        String chatId = policyInfo.identifier();
+        SettingsInfo settingsInfo = settingApi.create(chatId, command.roomName());
+        conversationApi.create(chatId, command.callerId(), policyInfo.creators(), command.roomName());
+        return chatMapper.map(policyInfo, settingsInfo);
+    }
 
-      @Override
-      public DirectChatResponse getDirect(UUID callerId, UUID partnerId) {
-            return Optional.ofNullable(directMappingApi.findDirectMapping(callerId, partnerId))
-                      .map(mapping -> new DirectChatResponse(mapping, false))
-                      .orElseGet(() -> {
-                            DirectInfo direct = engagementApi.createDirect(callerId, partnerId);
-                            ChatPolicyInfo policy = direct.policy();
-                            settingApi.create(policy.identifier(), null);
-                            conversationApi.create(policy.identifier(), callerId, new HashSet<>(List.of(callerId, partnerId)), null);
-                            return new DirectChatResponse(direct.mapping(), true);
-                      });
-      }
+    @Override
+    public DirectChatResponse getDirect(UUID callerId, UUID partnerId) {
+        return Optional.ofNullable(directMappingApi.findDirectMapping(callerId, partnerId))
+            .map(mapping -> new DirectChatResponse(mapping, false))
+            .orElseGet(() -> {
+                DirectInfo direct = engagementApi.createDirect(callerId, partnerId);
+                ChatPolicyInfo policy = direct.policy();
+                settingApi.create(policy.identifier(), null);
+                conversationApi.create(policy.identifier(), callerId, new HashSet<>(List.of(callerId, partnerId)), null);
+                return new DirectChatResponse(direct.mapping(), true);
+            });
+    }
 
-      @Override
-      public ChatResponse find(String chatId, UUID userId) {
-            ChatPolicyInfo policyInfo = engagementApi.find(chatId, userId).orElseThrow();
-            SettingsInfo settingsInfo = settingApi.find(Set.of(chatId)).get(chatId);
-            return chatMapper.map(policyInfo, settingsInfo);
-      }
+    @Override
+    public ChatResponse find(String chatId, UUID userId) {
+        ChatPolicyInfo policyInfo = engagementApi.find(chatId, userId).orElseThrow();
+        SettingsInfo settingsInfo = settingApi.find(Set.of(chatId)).get(chatId);
+        return chatMapper.map(policyInfo, settingsInfo);
+    }
 }

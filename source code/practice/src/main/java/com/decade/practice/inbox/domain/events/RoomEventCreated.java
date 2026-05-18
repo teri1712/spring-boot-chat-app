@@ -10,20 +10,20 @@ import java.util.UUID;
 
 @Getter
 @JsonTypeInfo(
-          use = JsonTypeInfo.Id.NAME,
-          include = JsonTypeInfo.As.PROPERTY,
-          property = "type"
+    use = JsonTypeInfo.Id.NAME,
+    include = JsonTypeInfo.As.PROPERTY,
+    property = "type"
 )
-//@Externalized("engagement.currentState.placed::#{#this.ownerId}")
+//@Externalized("engagement.currentState.placed::#{#this.owner}")
 @SuperBuilder
 
 @Jacksonized
 public class RoomEventCreated {
 
-      private final UUID senderId;
-      private final UUID chatEventId;
+    private final UUID senderId;
+    private final UUID chatEventId;
 
-      private final String chatId;
+    private final String chatId;
 
-      private final Instant createdAt;
+    private final Instant createdAt;
 }

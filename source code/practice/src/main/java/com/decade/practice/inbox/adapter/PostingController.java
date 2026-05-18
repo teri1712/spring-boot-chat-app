@@ -11,7 +11,7 @@ import com.decade.practice.inbox.dto.ImageRequest;
 import com.decade.practice.inbox.dto.PostingResponse;
 import com.decade.practice.inbox.dto.mapper.CommandMappers;
 import jakarta.validation.Valid;
-import lombok.AllArgsConstructor;
+import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
@@ -22,7 +22,7 @@ import java.util.UUID;
 
 @Slf4j
 @RestController
-@AllArgsConstructor
+@RequiredArgsConstructor
 public class PostingController {
 
       private final ChatEventService chatEventService;

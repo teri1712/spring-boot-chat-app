@@ -3,8 +3,8 @@ package com.decade.practice.live;
 import com.decade.practice.chatorchestrator.application.ports.in.ChatService;
 import com.decade.practice.inbox.domain.events.InboxLogCreated;
 import com.decade.practice.inbox.domain.events.MessageCreated;
-import com.decade.practice.inbox.dto.InboxLogResponse;
-import com.decade.practice.inbox.dto.TextStateResponse;
+import com.decade.practice.inbox.dto.InboxLogMessageWithPartnerDto;
+import com.decade.practice.inbox.dto.TextStateWithPartnerDto;
 import com.decade.practice.integration.BaseTestClass;
 import com.decade.practice.integration.TestBeans;
 import com.decade.practice.shared.security.TokenService;
@@ -100,8 +100,8 @@ class RealtimeMessageTest extends BaseTestClass {
             String aliceToken = tokenService.encodeToken(alice, Duration.ofDays(5));
             String bobToken = tokenService.encodeToken(bob, Duration.ofDays(5));
 
-            CompletableFuture<InboxLogResponse> aliceEvent = new CompletableFuture<>();
-            CompletableFuture<InboxLogResponse> bobEvent = new CompletableFuture<>();
+            CompletableFuture<InboxLogMessageWithPartnerDto> aliceEvent = new CompletableFuture<>();
+            CompletableFuture<InboxLogMessageWithPartnerDto> bobEvent = new CompletableFuture<>();
 
             stompClient = new WebSocketStompClient(new StandardWebSocketClient());
             stompClient.setMessageConverter(converter);
@@ -140,24 +140,24 @@ class RealtimeMessageTest extends BaseTestClass {
             aliceSession.subscribe(userTopic + queueTopic, new StompFrameHandler() {
                 @Override
                 public Type getPayloadType(StompHeaders headers) {
-                    return InboxLogResponse.class;
+                    return InboxLogMessageWithPartnerDto.class;
                 }
 
                 @Override
                 public void handleFrame(StompHeaders headers, Object payload) {
-                    aliceEvent.complete((InboxLogResponse) payload);
+                    aliceEvent.complete((InboxLogMessageWithPartnerDto) payload);
                 }
             });
 
             bobSession.subscribe(userTopic + queueTopic, new StompFrameHandler() {
                 @Override
                 public Type getPayloadType(StompHeaders headers) {
-                    return InboxLogResponse.class;
+                    return InboxLogMessageWithPartnerDto.class;
                 }
 
                 @Override
                 public void handleFrame(StompHeaders headers, Object payload) {
-                    bobEvent.complete((InboxLogResponse) payload);
+                    bobEvent.complete((InboxLogMessageWithPartnerDto) payload);
                 }
             });
 
@@ -168,12 +168,12 @@ class RealtimeMessageTest extends BaseTestClass {
             assertThat(events.stream(InboxLogCreated.class)).hasSize(2);
             Assertions.assertNotNull(aliceEvent.get(10, TimeUnit.SECONDS));
             Assertions.assertNotNull(bobEvent.get(10, TimeUnit.SECONDS));
-            Assertions.assertNotNull(((TextStateResponse) aliceEvent.get(2, TimeUnit.SECONDS).messageState()).getContent());
-            Assertions.assertNotNull(((TextStateResponse) bobEvent.get(2, TimeUnit.SECONDS).messageState()).getContent());
+            Assertions.assertNotNull(((TextStateWithPartnerDto) aliceEvent.get(2, TimeUnit.SECONDS).messageState()).getContent());
+            Assertions.assertNotNull(((TextStateWithPartnerDto) bobEvent.get(2, TimeUnit.SECONDS).messageState()).getContent());
             Assertions.assertEquals("TEXT", aliceEvent.get(2, TimeUnit.SECONDS).messageState().getMessageType());
             Assertions.assertEquals(aliceEvent.get(2, TimeUnit.SECONDS).messageState().getChatId(), bobEvent.get(2, TimeUnit.SECONDS).messageState().getChatId());
-            Assertions.assertEquals(((TextStateResponse) aliceEvent.get(2, TimeUnit.SECONDS).messageState()).getContent(), ((TextStateResponse) bobEvent.get(2, TimeUnit.SECONDS).messageState()).getContent());
-            Assertions.assertEquals("Hello Bob", ((TextStateResponse) aliceEvent.get(2, TimeUnit.SECONDS).messageState()).getContent());
+            Assertions.assertEquals(((TextStateWithPartnerDto) aliceEvent.get(2, TimeUnit.SECONDS).messageState()).getContent(), ((TextStateWithPartnerDto) bobEvent.get(2, TimeUnit.SECONDS).messageState()).getContent());
+            Assertions.assertEquals("Hello Bob", ((TextStateWithPartnerDto) aliceEvent.get(2, TimeUnit.SECONDS).messageState()).getContent());
             Assertions.assertEquals(alice.id(), aliceEvent.get(2, TimeUnit.SECONDS).messageState().getSender().id());
 
         } finally {

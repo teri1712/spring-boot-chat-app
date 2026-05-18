@@ -7,10 +7,10 @@ import java.util.UUID;
 
 public interface ChatService {
 
-      ChatResponse createGroup(CreateGroupChatCommand command);
+    ChatResponse createGroup(CreateGroupChatCommand command);
 
-      DirectChatResponse getDirect(UUID callerId, UUID partnerId);
+    DirectChatResponse getDirect(UUID callerId, UUID partnerId);
 
-      ChatResponse find(String chatId, UUID userId);
+    ChatResponse find(String chatId, UUID userId);
 
 }

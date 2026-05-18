@@ -1,5 +1,6 @@
 package com.decade.practice.users.application.services;
 
+import com.decade.practice.resources.files.api.DownloadPathGenerator;
 import com.decade.practice.shared.security.UserClaims;
 import com.decade.practice.users.application.ports.in.ProfileService;
 import com.decade.practice.users.application.ports.out.TokenGenerator;
@@ -32,14 +33,16 @@ import java.util.UUID;
 @RequiredArgsConstructor
 public class ProfileServiceImpl implements ProfileService {
 
-    private final UserFactory userFactory;
-    private final UserRepository users;
-    private final TokenStore tokens;
-    private final TokenGenerator tokenGenerator;
-    private final UserMapper userMapper;
+    final UserFactory userFactory;
+    final UserRepository users;
+    final TokenStore tokens;
+    final TokenGenerator tokenGenerator;
+    final UserMapper userMapper;
 
-    private final UserPasswordPolicy passwordPolicy;
-    private final ApplicationEventPublisher eventPublisher;
+    final UserPasswordPolicy passwordPolicy;
+    final ApplicationEventPublisher eventPublisher;
+
+    final DownloadPathGenerator pathGenerator;
 
 
     @Override
@@ -78,7 +81,7 @@ public class ProfileServiceImpl implements ProfileService {
         if (profileRequest.getGender() != null)
             user.changeGender(profileRequest.getGender());
         if (profileRequest.getAvatar() != null) {
-            user.changeAvatar(profileRequest.getAvatar());
+            user.changeAvatar(pathGenerator.generateDownload(profileRequest.getAvatar()));
         }
         eventPublisher.publishEvent(new ProfileChanged(user.getId(), user.getUsername(), user.getName(), GenderUtils.inspect(user.getGender()), user.getDob(), user.getAvatar()));
         return userMapper.map(user);

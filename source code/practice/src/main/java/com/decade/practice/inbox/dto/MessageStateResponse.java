@@ -15,28 +15,28 @@ import java.util.UUID;
 @Getter
 
 @JsonTypeInfo(
-          use = JsonTypeInfo.Id.NAME,
-          include = JsonTypeInfo.As.PROPERTY,
-          property = "type"
+    use = JsonTypeInfo.Id.NAME,
+    include = JsonTypeInfo.As.PROPERTY,
+    property = "type"
 )
 
 // fuck jackson
 @JsonSubTypes({
-          @JsonSubTypes.Type(value = TextStateResponse.class, name = "text"),
-          @JsonSubTypes.Type(value = IconStateResponse.class, name = "icon"),
-          @JsonSubTypes.Type(value = ImageStateResponse.class, name = "image"),
-          @JsonSubTypes.Type(value = FileStateResponse.class, name = "file"),
-          @JsonSubTypes.Type(value = PreferenceStateResponse.class, name = "preference"),
+    @JsonSubTypes.Type(value = TextStateResponse.class, name = "text"),
+    @JsonSubTypes.Type(value = IconStateResponse.class, name = "icon"),
+    @JsonSubTypes.Type(value = ImageStateResponse.class, name = "image"),
+    @JsonSubTypes.Type(value = FileStateResponse.class, name = "file"),
+    @JsonSubTypes.Type(value = PreferenceStateResponse.class, name = "preference"),
 })
 public class MessageStateResponse {
 
-      private Long sequenceNumber;
-      private UUID postingId;
-      private PartnerResponse sender;
-      private String messageType;
-      private String chatId;
-      private Instant createdAt;
-      private Instant updatedAt;
-      private Set<PartnerResponse> seenBy;
+    private Long sequenceNumber;
+    private UUID postingId;
+    private UUID senderId;
+    private String messageType;
+    private String chatId;
+    private Instant createdAt;
+    private Instant updatedAt;
+    private Set<UUID> seenByIds;
 
 }

@@ -3,12 +3,10 @@ package com.decade.practice.inbox.domain;
 import com.decade.practice.inbox.domain.events.MessageCreated;
 import com.decade.practice.inbox.domain.events.MessageUpdated;
 import jakarta.persistence.*;
-import jakarta.validation.constraints.NotNull;
 import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.hibernate.Hibernate;
 import org.springframework.data.domain.AbstractAggregateRoot;
 
 import java.time.Instant;
@@ -38,7 +36,6 @@ public abstract class Message extends AbstractAggregateRoot<Message> {
     private String messageType;
 
     @Column(nullable = false, updatable = false)
-    @NotNull
     private String chatId;
 
     @Column(nullable = false, updatable = false)
@@ -63,7 +60,7 @@ public abstract class Message extends AbstractAggregateRoot<Message> {
     }
 
     public void addSeen(UUID senderId, Instant at) {
-        getSeenPointers().put(senderId, new SeenPointer(chatId, senderId, at, (Message) Hibernate.unproxy(this)));
+        getSeenPointers().put(senderId, new SeenPointer(chatId, senderId, at, this));
         this.onUpdated();
     }
 
@@ -84,12 +81,12 @@ public abstract class Message extends AbstractAggregateRoot<Message> {
 
     @PrePersist
     protected void onPersisted() {
-        registerEvent(new MessageCreated(sequenceId, postingId, senderId, chatId, createdAt, messageType, getState()));
+        registerEvent(new MessageCreated(sequenceId, chatId, postingId, senderId, createdAt, messageType, getState()));
     }
 
     private void onUpdated() {
         updatedAt = Instant.now();
-        registerEvent(new MessageUpdated(sequenceId, postingId, chatId, senderId, updatedAt, getState()));
+        registerEvent(new MessageUpdated(sequenceId, chatId, postingId, senderId, updatedAt, getState()));
     }
 
     public abstract MessageState getState();

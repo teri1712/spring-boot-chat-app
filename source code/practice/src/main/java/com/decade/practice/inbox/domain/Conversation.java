@@ -15,83 +15,83 @@ import java.util.UUID;
 @Getter
 public class Conversation extends AbstractAggregateRoot<Conversation> {
 
-      public static final int MAX_ROUND = 100;
+    public static final Instant DORAEMON_BIRTHDAY = Instant.parse("2112-09-03T00:00:00Z");
+    public static final int MAX_ROUND = 100;
 
-      @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "conversation_seq_gen")
-      @SequenceGenerator(name = "conversation_seq_gen", sequenceName = "conversation_seq")
-      @Id
-      private Long id;
+    @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "conversation_seq_gen")
+    @SequenceGenerator(name = "conversation_seq_gen", sequenceName = "conversation_seq")
+    @Id
+    private Long id;
 
-      @Embedded
-      private ConversationId conversationId;
-      private Long roomId;
+    private UUID ownerId;
+    private Long roomId;
 
-      @JdbcTypeCode(SqlTypes.JSON)
-      @Column(columnDefinition = "jsonb")
-      private List<MessageState> recents;
+    @JdbcTypeCode(SqlTypes.JSON)
+    @Column(columnDefinition = "jsonb")
+    private List<MessageState> recents;
 
-      private Instant modifiedAt;
+    private Instant modifiedAt;
 
-      private Integer roundRobin;
-      private Integer participantIndex;
+    private Integer roundRobin;
+    private Integer participantIndex;
 
-      @Embedded
-      private HashValue hash;
+    @Embedded
+    private HashValue hash;
 
-      protected Conversation() {
-      }
+    protected Conversation() {
+    }
 
-      public Conversation(String chatId, UUID ownerId, Long roomId, Integer participantIndex) {
-            this.roomId = roomId;
-            this.conversationId = new ConversationId(chatId, ownerId);
-            this.modifiedAt = Instant.now();
-            this.participantIndex = participantIndex;
-            this.roundRobin = participantIndex % MAX_ROUND;
-            this.recents = new ArrayList<>();
-            this.hash = new HashValue((long) conversationId.hashCode());
-      }
+    public Conversation(UUID ownerId, Long roomId, Integer participantIndex) {
+        this.roomId = roomId;
+        this.ownerId = ownerId;
+        this.modifiedAt = DORAEMON_BIRTHDAY;
+        this.participantIndex = participantIndex;
+        this.roundRobin = participantIndex % MAX_ROUND;
+        this.recents = new ArrayList<>();
+        this.hash = new HashValue(roomId).plus(new HashValue((long) ownerId.hashCode()));
+    }
 
-      public void addRecent(MessageState messageState) {
-            this.recents.add(0, messageState);
-            this.modifiedAt = Instant.now();
-            this.hash = hash.shift().plus(computeHash(messageState));
-            if (this.recents.size() > 20) {
-                  pop();
+    public void addRecent(MessageState messageState) {
+        this.recents.add(0, messageState);
+        this.modifiedAt = Instant.now();
+        this.hash = hash.shift().plus(computeHash(messageState));
+        if (this.recents.size() > 20) {
+            pop();
+        }
+    }
+
+    private void pop() {
+        this.recents.remove(this.recents.size() - 1);
+    }
+
+    public void updateRecent(MessageState messageState) {
+        if (recents.isEmpty()) return;
+        Long sequenceId = messageState.getSequenceId();
+        int left = 0, right = recents.size();
+        while (left < right) {
+            int mid = (left + right) / 2;
+            MessageState midState = recents.get(mid);
+            if (midState.getSequenceId() > sequenceId) {
+                left = mid + 1;
+            } else {
+                right = mid;
             }
-      }
+        }
+        if (left < recents.size()) {
+            hash = hash.minus(HashValue.ONE
+                .shift(left)
+                .times(computeHash(recents.get(left))));
 
-      private void pop() {
-            this.recents.remove(this.recents.size() - 1);
-      }
+            hash = hash.plus(HashValue.ONE
+                .shift(left).times(computeHash(messageState)));
 
-      public void updateRecent(MessageState messageState) {
-            if (recents.isEmpty()) return;
-            Long sequenceId = messageState.getSequenceId();
-            int left = 0, right = recents.size();
-            while (left < right) {
-                  int mid = (left + right) / 2;
-                  MessageState midState = recents.get(mid);
-                  if (midState.getSequenceId() > sequenceId) {
-                        left = mid + 1;
-                  } else {
-                        right = mid;
-                  }
-            }
-            if (left < recents.size()) {
-                  hash = hash.minus(HashValue.ONE
-                            .shift(left)
-                            .times(computeHash(recents.get(left))));
+            recents.set(left, messageState);
+        }
+    }
 
-                  hash = hash.plus(HashValue.ONE
-                            .shift(left).times(computeHash(messageState)));
-
-                  recents.set(left, messageState);
-            }
-      }
-
-      private static HashValue computeHash(MessageState messageState) {
-            return new HashValue((long) messageState.getPostingId().hashCode());
-      }
+    private static HashValue computeHash(MessageState messageState) {
+        return new HashValue((long) messageState.getPostingId().hashCode());
+    }
 
 }
 

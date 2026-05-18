@@ -1,5 +1,6 @@
 package com.decade.practice.users.dto;
 
+import com.decade.practice.resources.files.api.FileIntegrity;
 import jakarta.annotation.Nullable;
 import jakarta.validation.constraints.Past;
 import jakarta.validation.constraints.Pattern;
@@ -12,17 +13,17 @@ import java.time.Instant;
 @Setter
 public class ProfileRequest {
 
-      @Pattern(regexp = "\\S.*")
-      @Nullable
-      private String name;
+    @Pattern(regexp = "\\S.*")
+    @Nullable
+    private String name;
 
-      @Nullable
-      private Float gender;
+    @Nullable
+    private Float gender;
 
-      @Past
-      @Nullable
-      private Instant dob;
+    @Past
+    @Nullable
+    private Instant dob;
 
-      @Nullable
-      private String avatar;
+    @Nullable
+    private FileIntegrity avatar;
 }

@@ -6,13 +6,12 @@ import com.decade.practice.inbox.domain.MessageState;
 import java.util.UUID;
 
 public record InboxLogCreated(
-          Long sequenceId,
-          String chatId,
-          Long conversationId,
-          Long messageId,
-          UUID senderId,
-          UUID ownerId,
-          LogAction action,
-          MessageState messageState
+    Long sequenceId,
+    Long conversationId,
+    Long messageId,
+    UUID senderId,
+    UUID ownerId,
+    LogAction action,
+    MessageState messageState
 ) {
 }
