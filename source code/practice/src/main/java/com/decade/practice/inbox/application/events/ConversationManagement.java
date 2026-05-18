@@ -29,9 +29,10 @@ public class ConversationManagement implements ConversationApi {
             .map(new Function<UUID, Conversation>() {
                 @Override
                 public Conversation apply(UUID participantId) {
+                    var participantIndex = room.getParticipantCount();
                     room.incParticipantCount();
                     room.addRepresentative(participantId);
-                    return new Conversation(participantId, room.getId(), room.getParticipantCount());
+                    return new Conversation(participantId, room.getId(), participantIndex);
                 }
             }).toList();
         conversations.saveAll(cL);

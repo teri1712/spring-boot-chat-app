@@ -34,7 +34,7 @@ public class KafkaBatchRoundRobinSaver extends BatchRoundRobinSaver {
 
     @Override
     @KafkaListener(topics = "batch-update-placed", groupId = "inbox", concurrency = "4")
-    @Observed(name = "batch-insertion-placed",
+    @Observed(name = "batch-update-placed",
         lowCardinalityKeyValues = {
             "batch-mode", "kafka"
         })

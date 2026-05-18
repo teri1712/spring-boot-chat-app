@@ -48,7 +48,7 @@ public class Conversation extends AbstractAggregateRoot<Conversation> {
         this.participantIndex = participantIndex;
         this.roundRobin = participantIndex % MAX_ROUND;
         this.recents = new ArrayList<>();
-        this.hash = new HashValue(roomId);
+        this.hash = new HashValue(roomId).plus(new HashValue((long) ownerId.hashCode()));
     }
 
     public void addRecent(MessageState messageState) {
