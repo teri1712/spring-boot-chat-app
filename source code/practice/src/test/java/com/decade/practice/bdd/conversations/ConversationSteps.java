@@ -1,4 +1,4 @@
-package com.decade.practice.bdd.chats;
+package com.decade.practice.bdd.conversations;
 
 import com.decade.practice.bdd.users.AuthContext;
 import com.decade.practice.bdd.users.LoginSteps;

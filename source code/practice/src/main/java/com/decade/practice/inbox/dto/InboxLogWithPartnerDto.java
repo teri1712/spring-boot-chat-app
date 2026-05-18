@@ -9,7 +9,7 @@ public record InboxLogWithPartnerDto(
     String roomAvatar,
     Long revisionNumber,
     PartnerResponse sender,
-    PartnerResponse ownerId,
+    PartnerResponse owner,
     LogAction action,
     MessageStateWithPartnerDto messageState
 ) {

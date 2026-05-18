@@ -293,7 +293,7 @@ class PostingControllerTest extends BaseInboxTestClass {
     @Test
     void givenMalformedJson_whenCreateTextEvent_thenReturnsBadRequest() throws Exception {
         // Given
-        String malformedJson = "{ \"textEvent\": { ... }}";
+        String malformedJson = "{ \"textEvent\": { ... } }";
 
         // When & Then
         mockMvc.perform(put("/chats/{chatIdentifier}/texts/{postingId}", aliceBobChat, UUID.randomUUID())

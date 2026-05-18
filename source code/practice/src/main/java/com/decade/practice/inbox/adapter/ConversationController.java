@@ -47,7 +47,8 @@ public class ConversationController {
     @GetMapping("/conversations")
     public List<ConversationWithPartnerDto> list(
         @AuthenticationPrincipal(expression = "id") UUID userId,
-        @Parameter(description = "revision number of the anchor chat") @RequestParam Optional<Long> anchorRevisionNumber
+        @Parameter(description = "revision number of the anchor chat")
+        @RequestParam Optional<Long> anchorRevisionNumber
     ) throws Throwable {
         var convos = conversationService.list(userId, anchorRevisionNumber);
         Set<UUID> allUsers = conversationUserAggregator.aggregate(convos).collect(Collectors.toSet());

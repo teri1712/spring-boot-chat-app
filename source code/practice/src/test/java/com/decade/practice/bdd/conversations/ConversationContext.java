@@ -1,4 +1,4 @@
-package com.decade.practice.bdd.chats;
+package com.decade.practice.bdd.conversations;
 
 import io.cucumber.spring.ScenarioScope;
 import org.springframework.stereotype.Component;
