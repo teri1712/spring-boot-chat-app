@@ -1,12 +1,11 @@
-version: '2.40.3'
-
 services:
   postgres:
     image: postgres:16
     environment:
       POSTGRES_DB: chatapp
-      POSTGRES_USER: ${POSTGRES_USER:-root}
-      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-root}
+      POSTGRES_USER: root
+      POSTGRES_PASSWORD: root
+
     ports:
       - "5432:5432"
     healthcheck:
@@ -16,11 +15,13 @@ services:
       retries: 5
     volumes:
       - postrgres-data:/var/lib/postgresql/data
+
   redis:
     image: redis/redis-stack:latest
     ports:
       - "6379:6379"
       - "8001:8001"
+    command: redis-server --requirepass redispassword
     volumes:
       - redis-data:/data
     healthcheck:
@@ -38,26 +39,37 @@ services:
     environment:
       KAFKA_NODE_ID: 1
       KAFKA_PROCESS_ROLES: broker,controller
-      KAFKA_LISTENERS: PLAINTEXT://0.0.0.0:9092,CONTROLLER://0.0.0.0:9093
-      KAFKA_ADVERTISED_LISTENERS: PLAINTEXT://localhost:9092
+      KAFKA_LISTENERS: SASL_PLAINTEXT://0.0.0.0:9092,CONTROLLER://0.0.0.0:9093
+      KAFKA_ADVERTISED_LISTENERS: SASL_PLAINTEXT://localhost:9092
       KAFKA_CONTROLLER_LISTENER_NAMES: CONTROLLER
-      KAFKA_LISTENER_SECURITY_PROTOCOL_MAP: CONTROLLER:PLAINTEXT,PLAINTEXT:PLAINTEXT
+      KAFKA_LISTENER_SECURITY_PROTOCOL_MAP: CONTROLLER:PLAINTEXT,SASL_PLAINTEXT:SASL_PLAINTEXT
       KAFKA_CONTROLLER_QUORUM_VOTERS: 1@kafka:9093
       KAFKA_OFFSETS_TOPIC_REPLICATION_FACTOR: 1
       KAFKA_TRANSACTION_STATE_LOG_REPLICATION_FACTOR: 1
       KAFKA_TRANSACTION_STATE_LOG_MIN_ISR: 1
       KAFKA_GROUP_INITIAL_REBALANCE_DELAY_MS: 0
       CLUSTER_ID: 'MkU3OEVBNTcwNTJENDM2Qk'
+      KAFKA_SASL_ENABLED_MECHANISMS: PLAIN
+      KAFKA_SASL_MECHANISM_INTER_BROKER_PROTOCOL: PLAIN
+      KAFKA_OPTS: "-Djava.security.auth.login.config=/etc/kafka/kafka_server_jaas.conf"
+    configs:
+      - source: kafka_server_jaas
+        target: /etc/kafka/kafka_server_jaas.conf
+      - source: kafka_client_properties
+        target: /etc/kafka/client.properties
     cpus: 2
     mem_limit: 2g
 
     healthcheck:
       test: [ "CMD", "/opt/kafka/bin/kafka-broker-api-versions.sh",
-              "--bootstrap-server", "localhost:9092" ]
+              "--bootstrap-server", "localhost:9092",
+              "--command-config", "/etc/kafka/client.properties" ]
       interval: 30s
       timeout: 10s
       retries: 5
       start_period: 60s
+    extra_hosts:
+      - "localhost:127.0.0.1"
   s3:
     image: localstack/localstack:2.3
     ports:
@@ -129,3 +141,21 @@ volumes:
   prometheus-data:
   grafana-data:
   tempo-data:
+
+configs:
+  kafka_server_jaas:
+    content: |
+      KafkaServer {
+          org.apache.kafka.common.security.plain.PlainLoginModule required
+          username="admin"
+          password="admin-password"
+          user_admin="admin-password"
+          user_user="user-password";
+      };
+  kafka_client_properties:
+    content: |
+      security.protocol=SASL_PLAINTEXT
+      sasl.mechanism=PLAIN
+      sasl.jaas.config=org.apache.kafka.common.security.plain.PlainLoginModule required \
+          username="admin" \
+          password="admin-password";

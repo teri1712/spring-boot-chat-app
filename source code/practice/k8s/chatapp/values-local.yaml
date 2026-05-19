@@ -1,0 +1,25 @@
+# LOCAL-ONLY Overrides for Kind
+replicaCount: 3
+
+env:
+  SPRING_PROFILES_ACTIVE: "prod"
+  DATABASE_USERNAME: "root"
+  KAFKA_PROPERTIES_USER: "user"
+  KAFKA_PROPERTIES_PASSWORD: "user-password"
+  JWT_SECRET: "vcl-vcl-vcl-vcl-vcl-vcl-vcl-vcl-vcl-vcl"
+  AWS_ACCESS_KEY_ID: "decade"
+  AWS_SECRET_ACCESS_KEY: "decade"
+
+
+# --- LOCAL INGRESS CONFIGURATION ---
+serviceMonitor:
+  enabled: true
+
+ingress:
+  enabled: true
+  className: nginx
+  hosts:
+    - host: localhost
+      paths:
+        - path: /
+          pathType: Prefix

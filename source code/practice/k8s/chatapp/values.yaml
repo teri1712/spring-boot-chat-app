@@ -1,0 +1,54 @@
+# Master Configuration for Messenger Clone
+replicaCount: 1
+
+image:
+  repository: teri1712/chat-app
+  pullPolicy: IfNotPresent
+  tag: "latest"
+
+service:
+  type: ClusterIP
+  port: 80
+
+serviceAccount:
+  # Specifies whether a service account should be created
+  create: true
+  # Automatically mount a ServiceAccount's API credentials?
+  automount: true
+  # Annotations to add to the service account
+  annotations: {}
+  # The name of the service account to use.
+  # If not set and create is true, a name is generated using the fullname template
+  name: ""
+
+serviceMonitor:
+  enabled: true
+
+env:
+  SPRING_PROFILES_ACTIVE: "prod"
+  DATABASE_URL: "jdbc:postgresql://infra-postgresql:5432/chatapp"
+  REDIS_HOST: "infra-redis-master"
+  KAFKA_BOOTSTRAP_SERVERS: "infra-kafka:9092"
+  KAFKA_SECURITY_PROTOCOL: "SASL_PLAINTEXT"
+  AWS_S3_REGION: "ap-southeast-1"
+  AWS_S3_BUCKET: "decade-bucket"
+  LOKI_URL: "http://loki-gateway.monitoring.svc.cluster.local/loki/api/v1/push"
+  OTLP_ENDPOINT: "http://tempo.monitoring.svc.cluster.local:4318/v1/traces"
+
+# --- PROBES (Health Checks) ---
+livenessProbe:
+  httpGet:
+    path: /actuator/health/liveness
+    port: 8081 # Management port
+  initialDelaySeconds: 60
+readinessProbe:
+  httpGet:
+    path: /actuator/health/readiness
+    port: 8081 # Management port
+  initialDelaySeconds: 60
+
+autoscaling:
+  enabled: false
+
+httpRoute:
+  enabled: false

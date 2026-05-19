@@ -1,0 +1,169 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: {{ include "chatapp.fullname" . }}
+  labels:
+    {{- include "chatapp.labels" . | nindent 4 }}
+spec:
+  {{- if not .Values.autoscaling.enabled }}
+  replicas: {{ .Values.replicaCount }}
+  {{- end }}
+  selector:
+    matchLabels:
+      {{- include "chatapp.selectorLabels" . | nindent 6 }}
+  template:
+    metadata:
+      {{- with .Values.podAnnotations }}
+      annotations:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      labels:
+        {{- include "chatapp.labels" . | nindent 8 }}
+        {{- with .Values.podLabels }}
+        {{- toYaml . | nindent 8 }}
+        {{- end }}
+    spec:
+      {{- with .Values.imagePullSecrets }}
+      imagePullSecrets:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      serviceAccountName: {{ include "chatapp.serviceAccountName" . }}
+      {{- with .Values.podSecurityContext }}
+      securityContext:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      containers:
+        - name: {{ .Chart.Name }}
+          {{- with .Values.securityContext }}
+          securityContext:
+            {{- toYaml . | nindent 12 }}
+          {{- end }}
+          image: "{{ .Values.image.repository }}:{{ .Values.image.tag | default .Chart.AppVersion }}"
+          imagePullPolicy: {{ .Values.image.pullPolicy }}
+          ports:
+            - name: http
+              containerPort: 8080
+              protocol: TCP
+          {{- with .Values.livenessProbe }}
+          livenessProbe:
+            {{- toYaml . | nindent 12 }}
+          {{- end }}
+          {{- with .Values.readinessProbe }}
+          readinessProbe:
+            {{- toYaml . | nindent 12 }}
+          {{- end }}
+          {{- with .Values.resources }}
+          resources:
+            {{- toYaml . | nindent 12 }}
+          {{- end }}
+          {{- with .Values.volumeMounts }}
+          volumeMounts:
+            {{- toYaml . | nindent 12 }}
+          {{- end }}
+          env:
+            - name: SPRING_PROFILES_ACTIVE
+              value: {{ .Values.env.SPRING_PROFILES_ACTIVE | quote }}
+            - name: SPRING_DATASOURCE_URL
+              value: {{ .Values.env.DATABASE_URL | quote }}
+            - name: SPRING_DATASOURCE_USERNAME
+              {{- if .Values.env.existingSecret }}
+              valueFrom:
+                secretKeyRef:
+                  name: {{ .Values.env.existingSecret }}
+                  key: database-username
+              {{- else }}
+              value: {{ .Values.env.DATABASE_USERNAME | quote }}
+              {{- end }}
+            - name: SPRING_DATASOURCE_PASSWORD
+              {{- if .Values.postgresql.auth.existingSecret }}
+              valueFrom:
+                secretKeyRef:
+                  name: {{ .Values.postgresql.auth.existingSecret }}
+                  key: {{ index .Values.postgresql.auth.secretKeys "userPasswordKey" }}
+              {{- else }}
+              value: {{ .Values.postgresql.auth.password | quote }}
+              {{- end }}
+            - name: SPRING_DATA_REDIS_HOST
+              value: {{ .Values.env.REDIS_HOST | quote }}
+            - name: SPRING_DATA_REDIS_PASSWORD
+              {{- if .Values.redis.auth.existingSecret }}
+              valueFrom:
+                secretKeyRef:
+                  name: {{ .Values.redis.auth.existingSecret }}
+                  key: {{ .Values.redis.auth.existingSecretPasswordKey }}
+              {{- else }}
+              value: {{ .Values.redis.auth.password | quote }}
+              {{- end }}
+            - name: SPRING_KAFKA_BOOTSTRAP_SERVERS
+              value: {{ .Values.env.KAFKA_BOOTSTRAP_SERVERS | quote }}
+            - name: SPRING_KAFKA_PROPERTIES_USER
+              {{- if .Values.env.existingSecret }}
+              valueFrom:
+                secretKeyRef:
+                  name: {{ .Values.env.existingSecret }}
+                  key: kafka-user
+              {{- else }}
+              value: {{ .Values.env.KAFKA_PROPERTIES_USER | quote }}
+              {{- end }}
+            - name: SPRING_KAFKA_PROPERTIES_PASSWORD
+              {{- if .Values.kafka.auth.existingSecret }}
+              valueFrom:
+                secretKeyRef:
+                  name: {{ .Values.kafka.auth.existingSecret }}
+                  key: kafka-password
+              {{- else }}
+              value: {{ .Values.env.KAFKA_PROPERTIES_PASSWORD | quote }}
+              {{- end }}
+            - name: KAFKA_SECURITY_PROTOCOL
+              value: {{ .Values.env.KAFKA_SECURITY_PROTOCOL | quote }}
+            - name: JWT_SECRET
+              {{- if .Values.env.existingSecret }}
+              valueFrom:
+                secretKeyRef:
+                  name: {{ .Values.env.existingSecret }}
+                  key: jwt-secret
+              {{- else }}
+              value: {{ .Values.env.JWT_SECRET | quote }}
+              {{- end }}
+            - name: AWS_S3_REGION
+              value: {{ .Values.env.AWS_S3_REGION | quote }}
+            - name: AWS_S3_BUCKET
+              value: {{ .Values.env.AWS_S3_BUCKET | quote }}
+            - name: AWS_ACCESS_KEY_ID
+              {{- if .Values.env.existingSecret }}
+              valueFrom:
+                secretKeyRef:
+                  name: {{ .Values.env.existingSecret }}
+                  key: aws-access-id
+              {{- else }}
+              value: {{ .Values.env.AWS_ACCESS_KEY_ID | quote }}
+              {{- end }}
+            - name: AWS_SECRET_ACCESS_KEY
+              {{- if .Values.env.existingSecret }}
+              valueFrom:
+                secretKeyRef:
+                  name: {{ .Values.env.existingSecret }}
+                  key: aws-secret-key
+              {{- else }}
+              value: {{ .Values.env.AWS_SECRET_ACCESS_KEY | quote }}
+              {{- end }}
+            - name: LOKI_URL
+              value: {{ .Values.env.LOKI_URL | quote }}
+            - name: OTLP_ENDPOINT
+              value: {{ .Values.env.OTLP_ENDPOINT | quote }}
+      {{- with .Values.volumes }}
+      volumes:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      {{- with .Values.nodeSelector }}
+      nodeSelector:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      {{- with .Values.affinity }}
+      affinity:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      {{- with .Values.tolerations }}
+      tolerations:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}

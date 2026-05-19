@@ -1,6 +1,6 @@
 # Performance Testing Guide
 
-This directory contains load testing scripts and infrastructure setup for the messenger-clone server.
+This directory contains load testing scripts and infrastructure setup for the chatapp server.
 
 ## Prerequisites
 
@@ -20,7 +20,7 @@ docker compose -f compose.yaml -f docker-compose.5instances.yml up -d
 
 This will spin up:
 
-- 5 messenger server instances (for load distribution)
+- 5 chatapp server instances (for load distribution)
 - PostgreSQL database
 - Redis cache
 - Elasticsearch

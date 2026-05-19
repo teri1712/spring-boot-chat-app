@@ -1,14 +1,29 @@
-
-#server:
-#  forward-headers-strategy: framework
-#  servlet:
-#    session:
-#      cookie:
-#        secure: true
-#        same-site: None
-
 logging:
   level:
     root: INFO
     org.springframework: WARN
     com.decade: INFO
+
+spring:
+  datasource:
+    url: ${SPRING_DATASOURCE_URL}
+    username: ${SPRING_DATASOURCE_USERNAME}
+    password: ${SPRING_DATASOURCE_PASSWORD}
+  data:
+    redis:
+      host: ${SPRING_DATA_REDIS_HOST}
+      password: ${SPRING_DATA_REDIS_PASSWORD}
+  kafka:
+    bootstrap-servers: ${SPRING_KAFKA_BOOTSTRAP_SERVERS}
+    properties:
+      security.protocol: ${KAFKA_SECURITY_PROTOCOL}
+      sasl.mechanism: PLAIN
+      sasl.jaas.config: org.apache.kafka.common.security.plain.PlainLoginModule required username="${SPRING_KAFKA_PROPERTIES_USER}" password="${SPRING_KAFKA_PROPERTIES_PASSWORD}";
+
+management:
+  otlp:
+    tracing:
+      endpoint: ${OTLP_ENDPOINT}
+
+loki:
+  url: ${LOKI_URL}

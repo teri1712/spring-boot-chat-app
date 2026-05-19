@@ -1,0 +1,20 @@
+kube-prometheus-stack:
+  prometheus:
+    prometheusSpec:
+      # Allows Prometheus to find ServiceMonitors in ANY namespace, not just its own.
+      serviceMonitorSelectorNilUsesHelmValues: false
+
+loki-stack:
+  loki:
+    persistence:
+      enabled: false
+
+tempo:
+  tempo:
+    persistence:
+      enabled: false
+    receivers:
+      otlp:
+        protocols:
+          http:
+            endpoint: "0.0.0.0:4318"

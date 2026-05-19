@@ -10,10 +10,7 @@ spring:
     name: chat-app
   datasource:
     type: com.zaxxer.hikari.HikariDataSource
-    url: jdbc:postgresql://localhost:5432/chatapp
     driver-class-name: org.postgresql.Driver
-    username: root
-    password: root
     hikari:
       maximum-pool-size: 15
       connection-timeout: 30000
@@ -37,15 +34,8 @@ spring:
         order_updates: true
   data:
     redis:
-      host: localhost
-      port: 6379
       timeout: 60000
       client-type: lettuce
-      # username: username
-      # password: password
-      # ssl:
-      #   enabled: true
-      #   bundle: general
   mvc:
     problemdetails:
       enabled: true
@@ -54,7 +44,6 @@ spring:
     enabled: true
 
   kafka:
-    bootstrap-servers: localhost:9092
     producer:
       key-serializer: org.apache.kafka.common.serialization.StringSerializer
       value-serializer: org.springframework.kafka.support.serializer.JsonSerializer
@@ -65,6 +54,7 @@ spring:
       value-deserializer: org.springframework.kafka.support.serializer.JsonDeserializer
       properties:
         spring.json.trusted.packages: "*"
+
 
   modulith:
     events:
@@ -93,9 +83,6 @@ frontend:
   host:
     address: http://localhost:4200
 
-jwt:
-  secret: vcl-vcl-vcl-vcl-vcl-vcl-vcl-vcl-vcl-vcl
-
 
 management:
   server:
@@ -112,12 +99,6 @@ management:
   metrics:
     tags:
       application: ${spring.application.name}
-  tracing:
-    sampling:
-      probability: 1.0
-  otlp:
-    tracing:
-      endpoint: http://localhost:4318/v1/traces
 
 aws:
   s3:

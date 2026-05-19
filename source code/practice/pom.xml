@@ -9,7 +9,7 @@
         <relativePath/> <!-- lookup parent from repository -->
     </parent>
     <groupId>com.decade</groupId>
-    <artifactId>demo</artifactId>
+    <artifactId>chat-app-server</artifactId>
     <version>0.0.1-SNAPSHOT</version>
     <name/>
     <description/>

@@ -1,0 +1,25 @@
+postgresql:
+  auth:
+    database: chatapp
+    username: root
+    password: ""
+  primary:
+    persistence:
+      enabled: true
+
+redis:
+  auth:
+    enabled: true
+    password: ""
+  master:
+    persistence:
+      enabled: true
+
+kafka:
+  auth:
+    clientProtocol: sasl_plaintext
+  persistence:
+    enabled: true
+  zookeeper:
+    persistence:
+      enabled: true

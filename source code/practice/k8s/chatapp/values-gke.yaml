@@ -1,0 +1,55 @@
+# PRODUCTION Overrides for GKE
+replicaCount: 3
+
+# --- SECURE AUTHENTICATION ---
+# Instead of hardcoding passwords, we tell the sub-charts to use our K8s Secret
+postgresql:
+  auth:
+    existingSecret: "chatapp-secrets"
+    secretKeys:
+      adminPasswordKey: "postgres-password"
+      userPasswordKey: "postgres-password"
+  primary:
+    persistence:
+      enabled: true
+      size: 10Gi
+      storageClass: "premium-rwo"
+
+redis:
+  auth:
+    enabled: true
+    existingSecret: "chatapp-secrets"
+    existingSecretPasswordKey: "redis-password" # Add this to your Secret command!
+  master:
+    persistence:
+      enabled: true
+
+kafka:
+  auth:
+    clientProtocol: sasl_plaintext # Enable security for production Kafka
+    interBrokerProtocol: sasl_plaintext
+    saslMechanism: plain
+    existingSecret: "chatapp-secrets"
+  persistence:
+    enabled: true
+
+# --- APPLICATION ENVIRONMENT ---
+env:
+  SPRING_PROFILES_ACTIVE: "prod"
+  existingSecret: "chatapp-secrets"
+
+# --- SCALING & INGRESS ---
+ingress:
+  enabled: true
+  annotations:
+    kubernetes.io/ingress.class: "gce"
+  hosts:
+    - host: api.chatapp.com
+      paths:
+        - path: /
+          pathType: Prefix
+
+autoscaling:
+  enabled: true
+  minReplicas: 3
+  maxReplicas: 10

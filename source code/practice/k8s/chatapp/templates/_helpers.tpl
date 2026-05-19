@@ -1,7 +1,7 @@
 {{/*
 Expand the name of the chart.
 */}}
-{{- define "messenger-clone.name" -}}
+{{- define "chatapp.name" -}}
 {{- default .Chart.Name .Values.nameOverride | trunc 63 | trimSuffix "-" }}
 {{- end }}
 
@@ -10,7 +10,7 @@ Create a default fully qualified app name.
 We truncate at 63 chars because some Kubernetes name fields are limited to this (by the DNS naming spec).
 If release name contains chart name it will be used as a full name.
 */}}
-{{- define "messenger-clone.fullname" -}}
+{{- define "chatapp.fullname" -}}
 {{- if .Values.fullnameOverride }}
 {{- .Values.fullnameOverride | trunc 63 | trimSuffix "-" }}
 {{- else }}
@@ -26,16 +26,16 @@ If release name contains chart name it will be used as a full name.
 {{/*
 Create chart name and version as used by the chart label.
 */}}
-{{- define "messenger-clone.chart" -}}
+{{- define "chatapp.chart" -}}
 {{- printf "%s-%s" .Chart.Name .Chart.Version | replace "+" "_" | trunc 63 | trimSuffix "-" }}
 {{- end }}
 
 {{/*
 Common labels
 */}}
-{{- define "messenger-clone.labels" -}}
-helm.sh/chart: {{ include "messenger-clone.chart" . }}
-{{ include "messenger-clone.selectorLabels" . }}
+{{- define "chatapp.labels" -}}
+helm.sh/chart: {{ include "chatapp.chart" . }}
+{{ include "chatapp.selectorLabels" . }}
 {{- if .Chart.AppVersion }}
 app.kubernetes.io/version: {{ .Chart.AppVersion | quote }}
 {{- end }}
@@ -45,17 +45,17 @@ app.kubernetes.io/managed-by: {{ .Release.Service }}
 {{/*
 Selector labels
 */}}
-{{- define "messenger-clone.selectorLabels" -}}
-app.kubernetes.io/name: {{ include "messenger-clone.name" . }}
+{{- define "chatapp.selectorLabels" -}}
+app.kubernetes.io/name: {{ include "chatapp.name" . }}
 app.kubernetes.io/instance: {{ .Release.Name }}
 {{- end }}
 
 {{/*
 Create the name of the service account to use
 */}}
-{{- define "messenger-clone.serviceAccountName" -}}
+{{- define "chatapp.serviceAccountName" -}}
 {{- if .Values.serviceAccount.create }}
-{{- default (include "messenger-clone.fullname" .) .Values.serviceAccount.name }}
+{{- default (include "chatapp.fullname" .) .Values.serviceAccount.name }}
 {{- else }}
 {{- default "default" .Values.serviceAccount.name }}
 {{- end }}

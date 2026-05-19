@@ -1,0 +1,26 @@
+postgresql:
+  auth:
+    password: "root"
+  primary:
+    persistence:
+      enabled: false
+
+redis:
+  auth:
+    password: "redispassword"
+  master:
+    persistence:
+      enabled: false
+
+kafka:
+  auth:
+    jaas:
+      clientUser: user
+      clientPassword: user-password
+      interBrokerUser: admin
+      interBrokerPassword: admin-password
+  persistence:
+    enabled: false
+  zookeeper:
+    persistence:
+      enabled: false
