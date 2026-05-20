@@ -50,5 +50,6 @@ public interface ConversationRepository extends JpaRepository<Conversation, Long
         """)
     Optional<ConversationView> findByChatIdAndOwnerId(String chatId, UUID ownerId);
 
+    List<Conversation> findByOwnerId(UUID ownerId);
 
 }

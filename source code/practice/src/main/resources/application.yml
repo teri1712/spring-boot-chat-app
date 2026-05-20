@@ -35,6 +35,7 @@ spring:
         format_sql: true
         highlight_sql: true
         order_updates: true
+    open-in-view: true
   data:
     redis:
       host: localhost
@@ -132,11 +133,10 @@ broker:
   topics:
     queue: queue
     room: room
-
+    setting: setting
 
 websocket:
   topics:
     user: /user
     queue: /queue
     room: /room
-

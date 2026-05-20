@@ -1,15 +1,14 @@
 package com.decade.practice.live;
 
-import com.decade.practice.chatorchestrator.application.ports.in.ChatService;
-import com.decade.practice.engagement.domain.ChatCreators;
-import com.decade.practice.engagement.domain.services.DirectChatFactory;
+import com.decade.practice.engagement.api.EngagementApi;
 import com.decade.practice.integration.BaseTestClass;
 import com.decade.practice.live.dto.TypeMessage;
 import com.decade.practice.shared.security.TokenService;
 import com.decade.practice.shared.security.UserClaims;
+import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.jetbrains.annotations.Nullable;
-import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.Timeout;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -18,6 +17,7 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.web.server.LocalServerPort;
 import org.springframework.messaging.converter.MessageConverter;
 import org.springframework.messaging.simp.stomp.*;
+import org.springframework.test.context.bean.override.mockito.MockitoSpyBean;
 import org.springframework.test.context.jdbc.Sql;
 import org.springframework.web.socket.WebSocketHttpHeaders;
 import org.springframework.web.socket.client.standard.StandardWebSocketClient;
@@ -25,34 +25,45 @@ import org.springframework.web.socket.messaging.WebSocketStompClient;
 
 import java.lang.reflect.Type;
 import java.time.Duration;
-import java.util.Set;
 import java.util.UUID;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.TimeUnit;
 
 import static com.decade.practice.shared.security.TokenUtils.BEARER;
 import static com.decade.practice.shared.security.TokenUtils.HEADER_NAME;
-import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.Mockito.when;
 
 @Slf4j
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
 @Sql(value = "/sql/clean.sql", executionPhase = Sql.ExecutionPhase.AFTER_TEST_METHOD)
+@RequiredArgsConstructor
 class RoomJoinerTest extends BaseTestClass {
 
     @LocalServerPort
-    private int port = 0;
-
-    @Autowired
-    private MessageConverter converter;
-
-    @Autowired
-    private TokenService tokenService;
+    int port = 0;
 
     @Value("${websocket.topics.room}")
-    private String roomTopic;
+    String roomTopic;
 
     @Autowired
-    private ChatService chatService;
+    final MessageConverter converter;
+
+    @Autowired
+    final TokenService tokenService;
+
+    @MockitoSpyBean
+    EngagementApi engagementApi;
+
+    @BeforeEach
+    void allowEngagement() {
+        when(engagementApi.canRead(any(), any()))
+            .thenReturn(true);
+
+        when(engagementApi.canWrite(any(), any()))
+            .thenReturn(true);
+    }
 
     @Test
     @Timeout(20)
@@ -66,11 +77,6 @@ class RoomJoinerTest extends BaseTestClass {
 
         try {
 
-            UUID aliceId = UUID.fromString("11111111-1111-1111-1111-111111111111");
-            UUID bobId = UUID.fromString("22222222-2222-2222-2222-222222222222");
-
-            chatService.getDirect(aliceId, bobId);
-
             UserClaims alice = new UserClaims(
                 UUID.fromString("11111111-1111-1111-1111-111111111111"),
                 "alice",
@@ -83,7 +89,7 @@ class RoomJoinerTest extends BaseTestClass {
                 "bob",
                 "vcl.jpg");
 
-            String chatId = new DirectChatFactory().make(new ChatCreators(alice.id(), Set.of(bob.id())));
+            String chatId = "12345678";
 
             String aliceToken = tokenService.encodeToken(alice, Duration.ofDays(5));
             String bobToken = tokenService.encodeToken(bob, Duration.ofDays(5));
@@ -93,7 +99,6 @@ class RoomJoinerTest extends BaseTestClass {
 
             stompClient = new WebSocketStompClient(new StandardWebSocketClient());
             stompClient.setMessageConverter(converter);
-
 
             StompHeaders aliceHeaders = new StompHeaders();
             aliceHeaders.add(HEADER_NAME, BEARER + aliceToken);
@@ -156,9 +161,10 @@ class RoomJoinerTest extends BaseTestClass {
             chatStompHeaders.setDestination(roomTopic + "/" + chatId);
             bobSession.send(chatStompHeaders, "Hello");
 
-            assertNotNull(aliceEvent.get(5, TimeUnit.SECONDS));
-            assertNotNull(bobEvent.get(5, TimeUnit.SECONDS));
-            Assertions.assertEquals(bobEvent.get(2, TimeUnit.SECONDS).from(), aliceEvent.get(2, TimeUnit.SECONDS).from());
+            TypeMessage aliceMessage = aliceEvent.get(5, TimeUnit.SECONDS);
+            TypeMessage bobMessage = bobEvent.get(5, TimeUnit.SECONDS);
+            assertThat(aliceMessage.from())
+                .isEqualTo(bobMessage.from());
 
 
         } finally {

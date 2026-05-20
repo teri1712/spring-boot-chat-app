@@ -2,17 +2,18 @@ package com.decade.practice.chatsettings.application.services;
 
 import com.decade.practice.chatsettings.api.SettingApi;
 import com.decade.practice.chatsettings.api.SettingsInfo;
+import com.decade.practice.chatsettings.application.ports.out.PreferenceNotifier;
 import com.decade.practice.chatsettings.application.ports.out.SettingRepository;
 import com.decade.practice.chatsettings.application.ports.out.ThemeRepository;
 import com.decade.practice.chatsettings.domain.Preference;
 import com.decade.practice.chatsettings.domain.Setting;
+import com.decade.practice.chatsettings.dto.PreferenceMapper;
 import com.decade.practice.chatsettings.dto.PreferenceRequest;
 import com.decade.practice.chatsettings.dto.SettingsMapper;
 import com.decade.practice.engagement.api.WritePolicy;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.Map;
@@ -27,11 +28,13 @@ import java.util.stream.Collectors;
 @Service
 public class SettingsServiceImpl implements SettingsService, SettingApi {
 
-    private final SettingRepository settings;
+    final SettingRepository settings;
 
-    private final ThemeRepository themes;
-    private final SettingsMapper settingsMapper;
+    final ThemeRepository themes;
+    final SettingsMapper settingsMapper;
 
+    final PreferenceMapper preferenceMapper;
+    final PreferenceNotifier notifier;
 
     @Override
     @WritePolicy
@@ -55,6 +58,7 @@ public class SettingsServiceImpl implements SettingsService, SettingApi {
         setting.setPreference(userId, preference);
         settings.save(setting);
 
+        notifier.notify(chatId, preferenceMapper.mapMessage(preference));
     }
 
 
@@ -69,7 +73,6 @@ public class SettingsServiceImpl implements SettingsService, SettingApi {
     }
 
     @Override
-    @Transactional(propagation = Propagation.MANDATORY)
     public SettingsInfo create(String chatId, String roomName) {
         Setting setting = new Setting(chatId, new Preference(1, roomName, null, null));
         settings.save(setting);

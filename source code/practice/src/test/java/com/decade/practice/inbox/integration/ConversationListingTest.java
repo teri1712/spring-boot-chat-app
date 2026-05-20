@@ -2,16 +2,17 @@ package com.decade.practice.inbox.integration;
 
 import com.decade.practice.inbox.apis.ConversationApi;
 import com.decade.practice.inbox.application.ports.out.ConversationRepository;
+import com.decade.practice.inbox.domain.Conversation;
 import com.decade.practice.inbox.domain.HashValue;
 import com.decade.practice.inbox.domain.events.InboxLogCreated;
 import com.decade.practice.shared.security.jwt.WithJwtUser;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.junit.jupiter.api.Test;
 import org.springframework.http.MediaType;
 import org.springframework.test.context.jdbc.Sql;
 
 import java.util.Set;
-import java.util.UUID;
 import java.util.concurrent.TimeUnit;
 
 import static org.assertj.core.api.Assertions.assertThat;
@@ -20,6 +21,7 @@ import static org.springframework.test.web.servlet.request.MockMvcRequestBuilder
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
+@Slf4j
 @Sql(scripts = "/sql/clean.sql", executionPhase = Sql.ExecutionPhase.AFTER_TEST_METHOD)
 @RequiredArgsConstructor
 @WithJwtUser(
@@ -159,6 +161,9 @@ class ConversationListingTest extends BaseInboxTestClass {
 
         HashValue bobHash = conversations.findByChatIdAndOwnerId(aliceBobChat, aliceId).orElseThrow().conversation().getHash();
         HashValue charlieHash = conversations.findByChatIdAndOwnerId(aliceCharlieChat, aliceId).orElseThrow().conversation().getHash();
+
+        log.debug("Bob modified at: {}", conversations.findByChatIdAndOwnerId(aliceBobChat, aliceId).orElseThrow().conversation().getModifiedAt());
+        log.debug("Alice conversation modified at: {}", conversations.findByOwnerId(aliceId).stream().map(Conversation::getModifiedAt).toList());
 
         mockMvc.perform(get("/conversations")
                 .queryParam("anchorRevisionNumber", bobHash.value().toString())

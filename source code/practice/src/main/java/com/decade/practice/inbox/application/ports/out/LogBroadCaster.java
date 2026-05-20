@@ -13,12 +13,8 @@ import com.decade.practice.inbox.dto.mapper.MessageStateResponseMapper;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import org.springframework.transaction.support.TransactionSynchronization;
-import org.springframework.transaction.support.TransactionSynchronizationManager;
 
-import java.util.HashSet;
 import java.util.List;
-import java.util.Set;
 import java.util.UUID;
 
 @RequiredArgsConstructor
@@ -26,7 +22,6 @@ import java.util.UUID;
 public class LogBroadCaster {
 
     final LogRepository logs;
-    final LookUpRegistry lookUpRegistry;
     final ConversationRepository conversations;
     final DeliveryService deliveryService;
     final MessageStateResponseMapper messageStateMapper;
@@ -34,40 +29,33 @@ public class LogBroadCaster {
 
     @Transactional
     public void broadcastInsert(MessageCreated message, List<ConversationView> convos) {
-        Set<UUID> allNeedUsers = new HashSet<>(message.currentState().getAllPartners().toList());
-        convos.forEach(cv -> {
-            allNeedUsers.addAll(cv.room().getRepresentatives());
-            allNeedUsers.add(cv.room().getCreator());
-        });
-        PartnerLookUp lookUp = lookUpRegistry.registerLookUp(allNeedUsers);
-
         convos.forEach(cv -> {
             Conversation conversation = cv.conversation();
             Room room = cv.room();
             UUID ownerId = conversation.getOwnerId();
             InboxLog log = new InboxLog(LogAction.ADDITION, message.senderId(), ownerId, conversation.getId(), message.id(), message.currentState());
             logs.save(log);
+
             conversation.addRecent(message.currentState());
             conversations.save(conversation);
 
-            TransactionSynchronizationManager.registerSynchronization(new TransactionSynchronization() {
-                @Override
-                public void afterCommit() {
-                    send(log, room, conversation, lookUp);
-                }
-            });
+            var info = conversationInfoService.getInfo(ownerId, room);
+            deliveryService.send(new InboxLogMessage(
+                log.getSequenceId(),
+                room.getChatId(),
+                info,
+                conversation.getHash().value(),
+                log.getSenderId(),
+                ownerId,
+                log.getAction(),
+                messageStateMapper.toResponse(log.getMessageState())
+            ));
+
         });
     }
 
     @Transactional
     public void broadcastUpdate(MessageUpdated message, List<ConversationView> convos) {
-        Set<UUID> allNeedUsers = new HashSet<>(message.currentState().getAllPartners().toList());
-        convos.forEach(cv -> {
-            allNeedUsers.addAll(cv.room().getRepresentatives());
-            allNeedUsers.add(cv.room().getCreator());
-        });
-        PartnerLookUp lookUp = lookUpRegistry.registerLookUp(allNeedUsers);
-
         convos.forEach(cv -> {
             Conversation conversation = cv.conversation();
             Room room = cv.room();
@@ -77,27 +65,19 @@ public class LogBroadCaster {
             conversation.updateRecent(message.currentState());
             conversations.save(conversation);
 
-            TransactionSynchronizationManager.registerSynchronization(new TransactionSynchronization() {
-                @Override
-                public void afterCommit() {
-                    send(log, room, conversation, lookUp);
-                }
-            });
+            var info = conversationInfoService.getInfo(ownerId, room);
+            deliveryService.send(new InboxLogMessage(
+                log.getSequenceId(),
+                room.getChatId(),
+                info,
+                conversation.getHash().value(),
+                log.getSenderId(),
+                ownerId,
+                log.getAction(),
+                messageStateMapper.toResponse(log.getMessageState())
+            ));
+
         });
     }
 
-    private void send(InboxLog inboxLog, Room room, Conversation conversation, PartnerLookUp lookUp) {
-        UUID ownerId = inboxLog.getOwnerId();
-        var info = conversationInfoService.getInfo(ownerId, room);
-        deliveryService.send(new InboxLogMessage(
-            inboxLog.getSequenceId(),
-            room.getChatId(),
-            info,
-            conversation.getHash().value(),
-            inboxLog.getSenderId(),
-            ownerId,
-            inboxLog.getAction(),
-            messageStateMapper.toResponse(inboxLog.getMessageState())
-        ));
-    }
 }

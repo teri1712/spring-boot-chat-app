@@ -6,18 +6,29 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.stereotype.Component;
+import org.springframework.transaction.support.TransactionSynchronization;
+import org.springframework.transaction.support.TransactionSynchronizationManager;
 
 @RequiredArgsConstructor
 @Component
 public class PreferenceNotifierImpl implements PreferenceNotifier {
 
-      private final RedisTemplate<String, Object> redisTemplate;
+    @Value("${broker.topics.setting}")
+    private String preferenceTopic;
 
-      @Value("${broker.topics.room}")
-      private String roomTopic;
+    private final RedisTemplate<String, Object> redisTemplate;
 
-      @Override
-      public void notify(String chatId, PreferenceMessage message) {
-            redisTemplate.convertAndSend(roomTopic + ":" + chatId, message);
-      }
+    @Override
+    public void notify(String chatId, PreferenceMessage message) {
+        if (TransactionSynchronizationManager.isActualTransactionActive()) {
+            TransactionSynchronizationManager.registerSynchronization(new TransactionSynchronization() {
+                @Override
+                public void afterCommit() {
+                    redisTemplate.convertAndSend(preferenceTopic + ":" + chatId, message);
+                }
+            });
+        } else {
+            redisTemplate.convertAndSend(preferenceTopic + ":" + chatId, message);
+        }
+    }
 }

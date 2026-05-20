@@ -13,7 +13,6 @@ import lombok.RequiredArgsConstructor;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.ValueSource;
 import org.springframework.modulith.test.Scenario;
-import org.springframework.test.context.jdbc.Sql;
 
 import java.time.Instant;
 import java.util.HashSet;
@@ -26,7 +25,6 @@ import java.util.function.Supplier;
 import static org.assertj.core.api.Assertions.assertThat;
 
 @RequiredArgsConstructor
-@Sql(scripts = "/sql/clean.sql", executionPhase = Sql.ExecutionPhase.AFTER_TEST_METHOD)
 class BatchHandlingTest extends BaseTestClass {
     final ConversationRepository conversations;
     final LogRepository logs;

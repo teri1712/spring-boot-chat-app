@@ -9,6 +9,8 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.stereotype.Component;
+import org.springframework.transaction.support.TransactionSynchronization;
+import org.springframework.transaction.support.TransactionSynchronizationManager;
 
 import java.util.Set;
 import java.util.UUID;
@@ -31,6 +33,15 @@ public class InboxLogDelivery implements DeliveryService {
     public void send(InboxLogMessage message) {
         Set<UUID> userIds = aggregator.aggregate(message).collect(Collectors.toSet());
         InboxLogMessageWithPartnerDto sentMessage = mapper.map(message, message.info(), lookUpRegistry.registerLookUp(userIds));
-        redisTemplate.convertAndSend(queueTopic + ":" + message.ownerId(), sentMessage);
+        if (TransactionSynchronizationManager.isActualTransactionActive()) {
+            TransactionSynchronizationManager.registerSynchronization(new TransactionSynchronization() {
+                @Override
+                public void afterCommit() {
+                    redisTemplate.convertAndSend(queueTopic + ":" + message.ownerId(), sentMessage);
+                }
+            });
+        } else {
+            redisTemplate.convertAndSend(queueTopic + ":" + message.ownerId(), sentMessage);
+        }
     }
 }
