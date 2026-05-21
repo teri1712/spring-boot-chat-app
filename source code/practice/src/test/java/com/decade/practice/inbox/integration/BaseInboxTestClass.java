@@ -12,6 +12,7 @@ import org.springframework.test.context.bean.override.mockito.MockitoSpyBean;
 import org.springframework.test.context.event.ApplicationEvents;
 import org.springframework.test.web.servlet.MockMvc;
 
+import java.util.Optional;
 import java.util.UUID;
 
 import static org.mockito.ArgumentMatchers.any;
@@ -43,6 +44,7 @@ public class BaseInboxTestClass extends BaseTestClass {
     LookUpRegistry lookUpRegistry;
 
     protected void sendText(String chatId, String content) throws Exception {
+        Thread.sleep(1);
         mockMvc.perform(
                 put("/chats/{id}/texts/{postingId}", chatId, UUID.randomUUID())
                     .contentType(MediaType.APPLICATION_JSON)
@@ -132,14 +134,14 @@ public class BaseInboxTestClass extends BaseTestClass {
         when(lookUpRegistry.registerLookUp(any()))
             .thenReturn(new PartnerLookUp() {
                 @Override
-                public Partner lookUp(UUID id) {
+                public Optional<Partner> lookUp(UUID id) {
                     if (id.equals(aliceId)) {
-                        return new Partner(id, "Alice Liddell", "alice.jpg");
+                        return Optional.of(new Partner(id, "Alice Liddell", "alice.jpg"));
                     }
                     if (id.equals(bobId)) {
-                        return new Partner(id, "Bob Builder", "bob.jpg");
+                        return Optional.of(new Partner(id, "Bob Builder", "bob.jpg"));
                     }
-                    return new Partner(id, "Charlie Brown", "charlie.jpg");
+                    return Optional.of(new Partner(id, "Charlie Brown", "charlie.jpg"));
                 }
             });
     }

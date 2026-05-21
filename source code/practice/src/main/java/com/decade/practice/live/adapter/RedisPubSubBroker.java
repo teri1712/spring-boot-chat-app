@@ -20,73 +20,73 @@ import java.util.concurrent.ConcurrentHashMap;
 @RequiredArgsConstructor
 public class RedisPubSubBroker implements RoomBroker, QueueService {
 
-      @Value("${broker.topics.queue}")
-      private String queueTopic;
+    @Value("${broker.topics.queue}")
+    private String queueTopic;
 
-      @Value("${broker.topics.room}")
-      private String roomTopic;
+    @Value("${broker.topics.room}")
+    private String roomTopic;
 
-      private final RedisMessageListenerContainer container;
-      private final ConcurrentHashMap<String, Long> topicCountMap = new ConcurrentHashMap<>();
-      private final RelayListener listener;
-      private final RedisTemplate<String, Object> redisTemplate;
+    private final RedisMessageListenerContainer container;
+    private final ConcurrentHashMap<String, Long> topicCountMap = new ConcurrentHashMap<>();
+    private final RelayListener listener;
+    private final RedisTemplate<String, Object> redisTemplate;
 
-      @Override
-      public void send(TypeMessage message) {
-            redisTemplate.convertAndSend(roomTopic + ":" + message.chatId(), message);
-      }
+    @Override
+    public void send(TypeMessage message) {
+        redisTemplate.convertAndSend(roomTopic + ":" + message.chatId(), message);
+    }
 
-      @Override
-      public void subRoom(String chatId) {
-            Topic topic = new PatternTopic(roomTopic + ":" + chatId);
-            topicCountMap.compute(topic.getTopic(), (s, aLong) -> {
-                  if (aLong == null) {
-                        container.addMessageListener(listener, topic);
-                        return 1L;
-                  }
-                  return aLong + 1;
-            });
-      }
+    @Override
+    public void subRoom(String chatId, UUID userId) {
+        Topic topic = new PatternTopic(roomTopic + ":" + chatId);
+        topicCountMap.compute(topic.getTopic(), (s, aLong) -> {
+            if (aLong == null) {
+                container.addMessageListener(listener, topic);
+                return 1L;
+            }
+            return aLong + 1;
+        });
+    }
 
-      @Override
-      public void unSubRoom(String chatId) {
-            Topic topic = new PatternTopic(roomTopic + ":" + chatId);
-            topicCountMap.compute(topic.getTopic(), (s, aLong) -> {
-                  if (aLong == null)
-                        aLong = 0L;
-                  aLong -= 1L;
-                  if (aLong <= 0) {
-                        container.removeMessageListener(listener, topic);
-                        return null;
-                  }
-                  return aLong;
-            });
-      }
+    @Override
+    public void unSubRoom(String chatId, UUID userId) {
+        Topic topic = new PatternTopic(roomTopic + ":" + chatId);
+        topicCountMap.compute(topic.getTopic(), (s, aLong) -> {
+            if (aLong == null)
+                aLong = 0L;
+            aLong -= 1L;
+            if (aLong <= 0) {
+                container.removeMessageListener(listener, topic);
+                return null;
+            }
+            return aLong;
+        });
+    }
 
-      @Override
-      public void subQueue(UUID userId) {
-            Topic topic = new PatternTopic(queueTopic + ":" + userId);
-            topicCountMap.compute(topic.getTopic(), (s, aLong) -> {
-                  if (aLong == null) {
-                        container.addMessageListener(listener, topic);
-                        return 1L;
-                  }
-                  return aLong + 1;
-            });
-      }
+    @Override
+    public void subQueue(UUID userId) {
+        Topic topic = new PatternTopic(queueTopic + ":" + userId);
+        topicCountMap.compute(topic.getTopic(), (s, aLong) -> {
+            if (aLong == null) {
+                container.addMessageListener(listener, topic);
+                return 1L;
+            }
+            return aLong + 1;
+        });
+    }
 
-      @Override
-      public void unSubQueue(UUID userId) {
-            Topic topic = new PatternTopic(queueTopic + ":" + userId);
-            topicCountMap.compute(topic.getTopic(), (s, aLong) -> {
-                  if (aLong == null)
-                        aLong = 0L;
-                  aLong -= 1L;
-                  if (aLong <= 0) {
-                        container.removeMessageListener(listener, topic);
-                        return null;
-                  }
-                  return aLong;
-            });
-      }
+    @Override
+    public void unSubQueue(UUID userId) {
+        Topic topic = new PatternTopic(queueTopic + ":" + userId);
+        topicCountMap.compute(topic.getTopic(), (s, aLong) -> {
+            if (aLong == null)
+                aLong = 0L;
+            aLong -= 1L;
+            if (aLong <= 0) {
+                container.removeMessageListener(listener, topic);
+                return null;
+            }
+            return aLong;
+        });
+    }
 }

@@ -8,10 +8,7 @@ import com.decade.practice.users.api.UserInfo;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
 
-import java.util.HashMap;
-import java.util.Map;
-import java.util.Set;
-import java.util.UUID;
+import java.util.*;
 
 @Component
 @RequiredArgsConstructor
@@ -35,8 +32,8 @@ public class SimpleLookUpRegistry implements LookUpRegistry {
         }
 
         @Override
-        public Partner lookUp(UUID id) {
-            return lookupDictionary.get(id);
+        public Optional<Partner> lookUp(UUID id) {
+            return Optional.ofNullable(lookupDictionary.get(id));
         }
 
     }

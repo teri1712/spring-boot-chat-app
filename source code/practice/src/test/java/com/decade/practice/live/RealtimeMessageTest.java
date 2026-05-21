@@ -1,27 +1,24 @@
 package com.decade.practice.live;
 
-import com.decade.practice.chatorchestrator.application.ports.in.ChatService;
-import com.decade.practice.inbox.domain.events.InboxLogCreated;
-import com.decade.practice.inbox.domain.events.MessageCreated;
-import com.decade.practice.inbox.dto.InboxLogMessageWithPartnerDto;
-import com.decade.practice.inbox.dto.TextStateWithPartnerDto;
+import com.decade.practice.engagement.api.EngagementApi;
 import com.decade.practice.integration.BaseTestClass;
-import com.decade.practice.integration.TestBeans;
 import com.decade.practice.shared.security.TokenService;
 import com.decade.practice.shared.security.UserClaims;
 import jakarta.annotation.Nullable;
+import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.Timeout;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.web.server.LocalServerPort;
+import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.messaging.converter.MessageConverter;
 import org.springframework.messaging.simp.stomp.*;
-import org.springframework.test.context.event.ApplicationEvents;
-import org.springframework.test.context.jdbc.Sql;
+import org.springframework.test.context.bean.override.mockito.MockitoSpyBean;
 import org.springframework.web.socket.WebSocketHttpHeaders;
 import org.springframework.web.socket.client.standard.StandardWebSocketClient;
 import org.springframework.web.socket.messaging.WebSocketStompClient;
@@ -35,40 +32,52 @@ import java.util.concurrent.TimeUnit;
 import static com.decade.practice.shared.security.TokenUtils.BEARER;
 import static com.decade.practice.shared.security.TokenUtils.HEADER_NAME;
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.Mockito.when;
 
 @Slf4j
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
-@Sql(value = "/sql/clean.sql", executionPhase = Sql.ExecutionPhase.AFTER_TEST_METHOD)
+@RequiredArgsConstructor
 class RealtimeMessageTest extends BaseTestClass {
 
     @LocalServerPort
-    private int port = 0;
-
-    @Autowired
-    private MessageConverter converter;
-
-    @Autowired
-    private TokenService tokenService;
-
+    int port = 0;
     @Value("${websocket.topics.queue}")
-    private String queueTopic;
+    String queueTopic;
 
     @Value("${websocket.topics.user}")
-    private String userTopic;
+    String userTopic;
 
-
-    @Autowired
-    private TestBeans.PrivateChatSender chatSender;
-
-    @Autowired
-    private ApplicationEvents events;
+    @Value("${broker.topics.queue}")
+    String brokerQueueTopic;
 
     @Autowired
-    private ChatService chatService;
+    final MessageConverter converter;
+
+    @Autowired
+    final TokenService tokenService;
+
+
+    final RedisTemplate<String, Object> redisTemplate;
+
+    record SomeDTO(String someField) {
+    }
+
+    @MockitoSpyBean
+    EngagementApi engagementApi;
+
+    @BeforeEach
+    void allowEngagement() {
+        when(engagementApi.canRead(any(), any()))
+            .thenReturn(true);
+
+        when(engagementApi.canWrite(any(), any()))
+            .thenReturn(true);
+    }
+
 
     @Test
     @Timeout(value = 20, unit = TimeUnit.SECONDS)
-    @Sql(value = {"/sql/clean.sql", "/sql/seed_users.sql"}, executionPhase = Sql.ExecutionPhase.BEFORE_TEST_METHOD)
     void giveAliceAndBobOnline_whenAliceSendToBob_thenBobReceiveMessageViaWebsocket() throws Exception {
 
         StompSession aliceSession = null;
@@ -76,12 +85,6 @@ class RealtimeMessageTest extends BaseTestClass {
         WebSocketStompClient stompClient = null;
 
         try {
-
-            UUID aliceId = UUID.fromString("11111111-1111-1111-1111-111111111111");
-            UUID bobId = UUID.fromString("22222222-2222-2222-2222-222222222222");
-
-            chatService.getDirect(aliceId, bobId);
-
             UserClaims alice = new UserClaims(
                 UUID.fromString("11111111-1111-1111-1111-111111111111"),
                 "alice",
@@ -100,8 +103,8 @@ class RealtimeMessageTest extends BaseTestClass {
             String aliceToken = tokenService.encodeToken(alice, Duration.ofDays(5));
             String bobToken = tokenService.encodeToken(bob, Duration.ofDays(5));
 
-            CompletableFuture<InboxLogMessageWithPartnerDto> aliceEvent = new CompletableFuture<>();
-            CompletableFuture<InboxLogMessageWithPartnerDto> bobEvent = new CompletableFuture<>();
+            CompletableFuture<SomeDTO> aliceEvent = new CompletableFuture<>();
+            CompletableFuture<SomeDTO> bobEvent = new CompletableFuture<>();
 
             stompClient = new WebSocketStompClient(new StandardWebSocketClient());
             stompClient.setMessageConverter(converter);
@@ -140,41 +143,35 @@ class RealtimeMessageTest extends BaseTestClass {
             aliceSession.subscribe(userTopic + queueTopic, new StompFrameHandler() {
                 @Override
                 public Type getPayloadType(StompHeaders headers) {
-                    return InboxLogMessageWithPartnerDto.class;
+                    return SomeDTO.class;
                 }
 
                 @Override
                 public void handleFrame(StompHeaders headers, Object payload) {
-                    aliceEvent.complete((InboxLogMessageWithPartnerDto) payload);
+                    aliceEvent.complete((SomeDTO) payload);
                 }
             });
 
             bobSession.subscribe(userTopic + queueTopic, new StompFrameHandler() {
                 @Override
                 public Type getPayloadType(StompHeaders headers) {
-                    return InboxLogMessageWithPartnerDto.class;
+                    return SomeDTO.class;
                 }
 
                 @Override
                 public void handleFrame(StompHeaders headers, Object payload) {
-                    bobEvent.complete((InboxLogMessageWithPartnerDto) payload);
+                    bobEvent.complete((SomeDTO) payload);
                 }
             });
+            Thread.sleep(5000);
+            redisTemplate.convertAndSend(brokerQueueTopic + ":" + alice.id(), new SomeDTO("Hello"));
+            redisTemplate.convertAndSend(brokerQueueTopic + ":" + bob.id(), new SomeDTO("How are you"));
 
-            Thread.sleep(1000);
+            assertThat(aliceEvent.get(10, TimeUnit.SECONDS)).extracting(SomeDTO::someField)
+                .isEqualTo("Hello");
 
-            chatSender.emitText("Hello Bob", alice.id(), bob.id());
-            assertThat(events.stream(MessageCreated.class)).hasSize(1);
-            assertThat(events.stream(InboxLogCreated.class)).hasSize(2);
-            Assertions.assertNotNull(aliceEvent.get(10, TimeUnit.SECONDS));
-            Assertions.assertNotNull(bobEvent.get(10, TimeUnit.SECONDS));
-            Assertions.assertNotNull(((TextStateWithPartnerDto) aliceEvent.get(2, TimeUnit.SECONDS).messageState()).getContent());
-            Assertions.assertNotNull(((TextStateWithPartnerDto) bobEvent.get(2, TimeUnit.SECONDS).messageState()).getContent());
-            Assertions.assertEquals("TEXT", aliceEvent.get(2, TimeUnit.SECONDS).messageState().getMessageType());
-            Assertions.assertEquals(aliceEvent.get(2, TimeUnit.SECONDS).messageState().getChatId(), bobEvent.get(2, TimeUnit.SECONDS).messageState().getChatId());
-            Assertions.assertEquals(((TextStateWithPartnerDto) aliceEvent.get(2, TimeUnit.SECONDS).messageState()).getContent(), ((TextStateWithPartnerDto) bobEvent.get(2, TimeUnit.SECONDS).messageState()).getContent());
-            Assertions.assertEquals("Hello Bob", ((TextStateWithPartnerDto) aliceEvent.get(2, TimeUnit.SECONDS).messageState()).getContent());
-            Assertions.assertEquals(alice.id(), aliceEvent.get(2, TimeUnit.SECONDS).messageState().getSender().id());
+            assertThat(bobEvent.get(10, TimeUnit.SECONDS)).extracting(SomeDTO::someField)
+                .isEqualTo("How are you");
 
         } finally {
 

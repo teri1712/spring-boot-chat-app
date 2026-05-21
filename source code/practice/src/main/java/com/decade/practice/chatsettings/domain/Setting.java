@@ -54,9 +54,8 @@ public class Setting extends AbstractAggregateRoot<Setting> {
     public PreferenceChain getPreferenceChain(UUID makerId) {
         return new PreferenceChain(makerId, preference.iconId(), preference.customName(), preference.customAvatar(), preference.theme());
     }
-
-
-    public class PreferenceChain {
+    
+    public static class PreferenceChain {
 
         private final UUID makerId;
         private final Integer iconId;
