@@ -14,7 +14,7 @@ import java.util.UUID;
 
 public interface ConversationRepository extends JpaRepository<Conversation, Long> {
 
-    Optional<Conversation> findFirstByHash(HashValue hash);
+    Optional<Conversation> findFirstByHashAndOwnerId(HashValue hash, UUID ownerId);
 
     @Query("""
             select new com.decade.practice.inbox.application.ports.out.projection.ConversationView(c, r)

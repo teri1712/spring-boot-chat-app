@@ -162,9 +162,6 @@ class ConversationListingTest extends BaseInboxTestClass {
         HashValue bobHash = conversations.findByChatIdAndOwnerId(aliceBobChat, aliceId).orElseThrow().conversation().getHash();
         HashValue charlieHash = conversations.findByChatIdAndOwnerId(aliceCharlieChat, aliceId).orElseThrow().conversation().getHash();
 
-        log.debug("Bob modified at: {}", conversations.findByChatIdAndOwnerId(aliceBobChat, aliceId).orElseThrow().conversation().getModifiedAt());
-        log.debug("Alice conversation modified at: {}", conversations.findByOwnerId(aliceId).stream().map(Conversation::getModifiedAt).toList());
-
         mockMvc.perform(get("/conversations")
                 .queryParam("anchorRevisionNumber", bobHash.value().toString())
                 .accept(MediaType.APPLICATION_JSON))

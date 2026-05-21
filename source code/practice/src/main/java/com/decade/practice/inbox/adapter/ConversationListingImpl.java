@@ -22,7 +22,7 @@ public class ConversationListingImpl implements ConversationListing {
 
     @Override
     public List<ConversationView> findByAnchor(HashValue anchorHash, UUID ownerId, Pageable pageable) throws Throwable {
-        Conversation anchor = conversations.findFirstByHash(anchorHash).orElseThrow();
+        Conversation anchor = conversations.findFirstByHashAndOwnerId(anchorHash, ownerId).orElseThrow();
         return conversations.findByOwnerIdAndModifiedAtLessThanOrderByModifiedAtDesc(ownerId, anchor.getModifiedAt(), pageable);
     }
 
