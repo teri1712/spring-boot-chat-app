@@ -1,6 +1,6 @@
 package com.decade.practice.live.adapter.interceptors;
 
-import com.decade.practice.live.application.ports.in.LiveService;
+import com.decade.practice.live.application.ports.in.RoomService;
 import com.decade.practice.live.infras.security.SocketAuthentication;
 import com.decade.practice.shared.security.jwt.JwtUser;
 import lombok.RequiredArgsConstructor;
@@ -18,9 +18,9 @@ import org.springframework.stereotype.Component;
 @Component
 @RequiredArgsConstructor
 @Order(0)
-public class LiveInterceptor implements ChannelInterceptor {
+public class RoomInterceptor implements ChannelInterceptor {
 
-    private final LiveService liveService;
+    private final RoomService roomService;
 
     @Value("${websocket.topics.room}")
     private String roomTopic;
@@ -45,15 +45,15 @@ public class LiveInterceptor implements ChannelInterceptor {
             if (command == StompCommand.SUBSCRIBE) {
                 String chatId = extractChatId(accessor.getDestination());
                 JwtUser jwtUser = ((SocketAuthentication) accessor.getUser()).jwtUser();
-                liveService.join(chatId, jwtUser.getId(), jwtUser.getClaims().avatar());
+                roomService.join(chatId, jwtUser.getId(), jwtUser.getClaims().avatar());
             } else if (command == StompCommand.UNSUBSCRIBE) {
                 String chatId = extractChatId(accessor.getDestination());
                 JwtUser jwtUser = ((SocketAuthentication) accessor.getUser()).jwtUser();
-                liveService.leave(chatId, jwtUser.getId(), jwtUser.getClaims().avatar());
+                roomService.leave(chatId, jwtUser.getId(), jwtUser.getClaims().avatar());
             } else if (command == StompCommand.SEND) {
                 String chatId = extractChatId(accessor.getDestination());
                 JwtUser jwtUser = ((SocketAuthentication) accessor.getUser()).jwtUser();
-                liveService.send(chatId, jwtUser.getId(), jwtUser.getClaims().avatar());
+                roomService.send(chatId, jwtUser.getId(), jwtUser.getClaims().avatar());
                 return null;
             }
         }

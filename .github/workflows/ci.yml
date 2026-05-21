@@ -2,7 +2,7 @@ name: Spring Boot Chat Application CI with Maven
 
 on:
     pull_request:
-        branches: [ master ]
+        branches: [ master, develop ]
 jobs:
     clean-and-test:
         runs-on: ubuntu-latest

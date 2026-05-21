@@ -9,14 +9,19 @@ import org.mapstruct.MappingConstants;
 import org.mapstruct.ReportingPolicy;
 
 import java.util.UUID;
+import java.util.function.Function;
 
 @Mapper(unmappedTargetPolicy = ReportingPolicy.ERROR, componentModel = MappingConstants.ComponentModel.SPRING)
 public interface PartnerMapper {
 
     default PartnerResponse toPartner(UUID id, @Context PartnerLookUp lookUp) {
         if (id == null) return null;
-        Partner partner = lookUp.lookUp(id);
-        return partner == null ? null : new PartnerResponse(partner.id(), partner.name(), partner.avatar());
+        return lookUp.lookUp(id).map(new Function<Partner, PartnerResponse>() {
+            @Override
+            public PartnerResponse apply(Partner partner) {
+                return new PartnerResponse(partner.id(), partner.name(), partner.avatar());
+            }
+        }).orElse(null);
     }
 
 }

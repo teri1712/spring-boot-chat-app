@@ -12,20 +12,20 @@ import org.springframework.stereotype.Service;
 @Service
 @AllArgsConstructor
 public class LiveManagement {
-      private final RoomBroker broker;
+    private final RoomBroker broker;
 
-      @EventListener
-      public void on(JoinerJoined joined) {
-            broker.subRoom(joined.chatId());
-      }
+    @EventListener
+    public void on(JoinerJoined joined) {
+        broker.subRoom(joined.chatId(), joined.userId());
+    }
 
-      @EventListener
-      public void on(JoinerTyped typeEvent) {
-            broker.send(new TypeMessage(typeEvent.userId(), typeEvent.avatar(), typeEvent.chatId(), typeEvent.at()));
-      }
+    @EventListener
+    public void on(JoinerTyped typeEvent) {
+        broker.send(new TypeMessage(typeEvent.userId(), typeEvent.avatar(), typeEvent.chatId(), typeEvent.at()));
+    }
 
-      @EventListener
-      public void on(JoinerLeaved leaved) {
-            broker.unSubRoom(leaved.chatId());
-      }
+    @EventListener
+    public void on(JoinerLeaved leaved) {
+        broker.unSubRoom(leaved.chatId(), leaved.userId());
+    }
 }

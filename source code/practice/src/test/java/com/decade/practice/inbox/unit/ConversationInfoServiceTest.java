@@ -11,6 +11,7 @@ import org.mockito.InjectMocks;
 import org.mockito.Mockito;
 import org.mockito.junit.jupiter.MockitoExtension;
 
+import java.util.Optional;
 import java.util.Set;
 import java.util.UUID;
 
@@ -29,7 +30,7 @@ class ConversationInfoServiceTest {
         Room room = new Room("123", me.id(), null, null, Set.of(me.id(), other.id()));
 
         PartnerLookUp lookUp = Mockito.mock(PartnerLookUp.class);
-        Mockito.when(lookUp.lookUp(other.id())).thenReturn(other);
+        Mockito.when(lookUp.lookUp(other.id())).thenReturn(Optional.of(other));
 
         ConversationInfo info = conversationInfoService.getInfo(me.id(), room);
 
@@ -45,8 +46,8 @@ class ConversationInfoServiceTest {
         Room room = new Room("123", me.id(), null, null, Set.of(other1.id(), other2.id(), me.id()));
 
         PartnerLookUp lookUp = Mockito.mock(PartnerLookUp.class);
-        Mockito.when(lookUp.lookUp(other1.id())).thenReturn(other1);
-        Mockito.when(lookUp.lookUp(other2.id())).thenReturn(other2);
+        Mockito.when(lookUp.lookUp(other1.id())).thenReturn(Optional.of(other1));
+        Mockito.when(lookUp.lookUp(other2.id())).thenReturn(Optional.of(other2));
 
         ConversationInfo info = conversationInfoService.getInfo(me.id(), room);
 

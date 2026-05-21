@@ -7,6 +7,7 @@ import org.hibernate.type.SqlTypes;
 import org.springframework.data.domain.AbstractAggregateRoot;
 
 import java.time.Instant;
+import java.time.temporal.ChronoUnit;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
@@ -48,12 +49,12 @@ public class Conversation extends AbstractAggregateRoot<Conversation> {
         this.participantIndex = participantIndex;
         this.roundRobin = participantIndex % MAX_ROUND;
         this.recents = new ArrayList<>();
-        this.hash = new HashValue(roomId).plus(new HashValue((long) ownerId.hashCode()));
+        this.hash = new HashValue(roomId).shift().plus(new HashValue((long) ownerId.hashCode()));
     }
 
     public void addRecent(MessageState messageState) {
         this.recents.add(0, messageState);
-        this.modifiedAt = Instant.now();
+        this.modifiedAt = Instant.now().truncatedTo(ChronoUnit.MICROS);
         this.hash = hash.shift().plus(computeHash(messageState));
         if (this.recents.size() > 20) {
             pop();
