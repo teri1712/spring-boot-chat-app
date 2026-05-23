@@ -20,28 +20,28 @@ import java.util.UUID;
 @Validated
 @RequestMapping("/profiles/me")
 public class ProfileController {
+      
+    private final ProfileService profileService;
 
-      private final ProfileService profileService;
+    @GetMapping
+    public ProfileResponse get(Principal principal) {
+        return profileService.findByUsername(principal.getName());
+    }
 
-      @GetMapping
-      public ProfileResponse get(Principal principal) {
-            return profileService.findByUsername(principal.getName());
-      }
+    @PatchMapping
+    public ProfileResponse changeProfile(
+        @RequestBody @Valid ProfileRequest profile,
+        @AuthenticationPrincipal(expression = "id") UUID id
+    ) throws OptimisticLockException {
+        return profileService.changeProfile(id, profile);
+    }
 
-      @PatchMapping
-      public ProfileResponse changeProfile(
-                @RequestBody @Valid ProfileRequest profile,
-                @AuthenticationPrincipal(expression = "id") UUID id
-      ) throws OptimisticLockException {
-            return profileService.changeProfile(id, profile);
-      }
-
-      @PostMapping("/password")
-      public AccountResponse changePassword(
-                @AuthenticationPrincipal(expression = "id") UUID id,
-                @RequestParam(value = "password", required = false) String password,
-                @StrongPassword @RequestParam("new_password") String newPassword
-      ) {
-            return profileService.changePassword(id, newPassword, password);
-      }
+    @PostMapping("/password")
+    public AccountResponse changePassword(
+        @AuthenticationPrincipal(expression = "id") UUID id,
+        @RequestParam(value = "password", required = false) String password,
+        @StrongPassword @RequestParam("new_password") String newPassword
+    ) {
+        return profileService.changePassword(id, newPassword, password);
+    }
 }

@@ -1,6 +1,6 @@
 spring:
   profiles:
-    active: dev
+    active: ${APP_PROFILES:dev}
   security:
     oauth2:
       resourceserver:

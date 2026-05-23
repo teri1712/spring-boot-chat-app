@@ -1,43 +1,56 @@
 # PRODUCTION Overrides for GKE
 replicaCount: 3
 
-# --- SECURE AUTHENTICATION ---
-# Instead of hardcoding passwords, we tell the sub-charts to use our K8s Secret
-postgresql:
-  auth:
-    existingSecret: "chatapp-secrets"
-    secretKeys:
-      adminPasswordKey: "postgres-password"
-      userPasswordKey: "postgres-password"
-  primary:
-    persistence:
-      enabled: true
-      size: 10Gi
-      storageClass: "premium-rwo"
+image:
+  repository: teri1712/chat-app
+  pullPolicy: IfNotPresent
+  tag: "1.0.0" # Always use an immutable version tag in production
 
-redis:
-  auth:
-    enabled: true
-    existingSecret: "chatapp-secrets"
-    existingSecretPasswordKey: "redis-password" # Add this to your Secret command!
-  master:
-    persistence:
-      enabled: true
+restartPolicy: Always
 
-kafka:
-  auth:
-    clientProtocol: sasl_plaintext # Enable security for production Kafka
-    interBrokerProtocol: sasl_plaintext
-    saslMechanism: plain
-    existingSecret: "chatapp-secrets"
-  persistence:
-    enabled: true
-
-# --- APPLICATION ENVIRONMENT ---
+# --- APPLICATION ENVIRONMENT (Framework Agnostic) ---
 env:
-  SPRING_PROFILES_ACTIVE: "prod"
-  existingSecret: "chatapp-secrets"
-
+  APP_PROFILES: "prod"
+  DB_USERNAME:
+    valueFrom:
+      secretKeyRef:
+        name: chatapp-secrets
+        key: database-username
+  DB_PASSWORD:
+    valueFrom:
+      secretKeyRef:
+        name: chatapp-secrets
+        key: postgres-password
+  REDIS_PASSWORD:
+    valueFrom:
+      secretKeyRef:
+        name: chatapp-secrets
+        key: redis-password
+  KAFKA_USER:
+    valueFrom:
+      secretKeyRef:
+        name: chatapp-secrets
+        key: kafka-user
+  KAFKA_PASSWORD:
+    valueFrom:
+      secretKeyRef:
+        name: chatapp-secrets
+        key: kafka-password
+  JWT_SECRET:
+    valueFrom:
+      secretKeyRef:
+        name: chatapp-secrets
+        key: jwt-secret
+  AWS_ACCESS_KEY_ID:
+    valueFrom:
+      secretKeyRef:
+        name: chatapp-secrets
+        key: aws-access-id
+  AWS_SECRET_ACCESS_KEY:
+    valueFrom:
+      secretKeyRef:
+        name: chatapp-secrets
+        key: aws-secret-key
 # --- SCALING & INGRESS ---
 ingress:
   enabled: true

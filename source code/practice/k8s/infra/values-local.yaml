@@ -3,14 +3,14 @@ postgresql:
     password: "root"
   primary:
     persistence:
-      enabled: false
+      enabled: true
 
 redis:
   auth:
     password: "redispassword"
   master:
     persistence:
-      enabled: false
+      enabled: true
 
 kafka:
   auth:
@@ -20,7 +20,4 @@ kafka:
       interBrokerUser: admin
       interBrokerPassword: admin-password
   persistence:
-    enabled: false
-  zookeeper:
-    persistence:
-      enabled: false
+    enabled: true

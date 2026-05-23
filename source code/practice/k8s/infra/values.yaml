@@ -16,10 +16,9 @@ redis:
       enabled: true
 
 kafka:
+  image:
+    repository: bitnamilegacy/kafka
   auth:
     clientProtocol: sasl_plaintext
   persistence:
     enabled: true
-  zookeeper:
-    persistence:
-      enabled: true

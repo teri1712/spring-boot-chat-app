@@ -1,0 +1,37 @@
+# PRODUCTION Overrides for GKE - Observability
+# Enables persistent storage for logs, metrics, and traces
+
+kube-prometheus-stack:
+  prometheus:
+    prometheusSpec:
+      serviceMonitorSelectorNilUsesHelmValues: false
+      storageSpec:
+        volumeClaimTemplate:
+          spec:
+            storageClassName: premium-rwo
+            accessModes: [ "ReadWriteOnce" ]
+            resources:
+              requests:
+                storage: 20Gi
+  grafana:
+    enabled: false
+
+grafana:
+  persistence:
+    enabled: true
+    storageClassName: premium-rwo
+    size: 5Gi
+
+loki:
+  singleBinary:
+    persistence:
+      enabled: true
+      storageClass: premium-rwo
+      size: 20Gi
+
+tempo:
+  tempo:
+    persistence:
+      enabled: true
+      storageClass: premium-rwo
+      size: 20Gi

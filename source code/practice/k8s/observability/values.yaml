@@ -1,20 +1,63 @@
+# Global configuration for Observability Stack
+
 kube-prometheus-stack:
   prometheus:
     prometheusSpec:
-      # Allows Prometheus to find ServiceMonitors in ANY namespace, not just its own.
+      # Allows Prometheus to find ServiceMonitors in ANY namespace
       serviceMonitorSelectorNilUsesHelmValues: false
+  grafana:
+    enabled: false # Using standalone grafana dependency
 
-loki-stack:
-  loki:
-    persistence:
+grafana:
+  enabled: true
+  persistence:
+    enabled: true
+  serviceMonitor:
+    enabled: true
+  additionalDataSources:
+    - name: Prometheus
+      type: prometheus
+      url: http://observability-kube-prometh-prometheus:9090
+      access: proxy
+      isDefault: true
+    - name: Loki
+      type: loki
+      url: http://observability-loki-gateway:80
+      access: proxy
+    - name: Tempo
+      type: tempo
+      url: http://observability-tempo:3200
+      access: proxy
+
+loki:
+  deploymentMode: SingleBinary
+  monitoring:
+    serviceMonitor:
+      enabled: true
+    selfMonitoring:
       enabled: false
+      grafanaAgent:
+        install: false
+  loki:
+    auth_enabled: false
+    commonConfig:
+      replication_factor: 1
+    storage:
+      type: 'filesystem'
+  singleBinary:
+    persistence:
+      enabled: true
 
 tempo:
   tempo:
     persistence:
-      enabled: false
+      enabled: true
     receivers:
       otlp:
         protocols:
           http:
             endpoint: "0.0.0.0:4318"
+          grpc:
+            endpoint: "0.0.0.0:4317"
+  serviceMonitor:
+    enabled: true

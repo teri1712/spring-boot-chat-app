@@ -1,0 +1,33 @@
+# LOCAL-ONLY Overrides for Kind - Observability
+# Disables persistence for local development
+
+kube-prometheus-stack:
+  prometheus:
+    prometheusSpec:
+      # Allows Prometheus to find ServiceMonitors in ANY namespace
+      serviceMonitorSelectorNilUsesHelmValues: false
+  grafana:
+    enabled: false
+
+grafana:
+  persistence:
+    enabled: true
+
+loki:
+  backend:
+    replicas: 0
+  read:
+    replicas: 0
+  write:
+    replicas: 0
+  singleBinary:
+    replicas: 1
+    persistence:
+      enabled: true
+  loki:
+    useTestSchema: true
+
+tempo:
+  tempo:
+    persistence:
+      enabled: true

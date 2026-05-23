@@ -7,11 +7,11 @@ appVersion: "1.0.0"
 
 dependencies:
   - name: postgresql
-    version: 15.5.21
+    version: 18.6.7
     repository: https://charts.bitnami.com/bitnami
   - name: redis
-    version: 19.6.1
+    version: 25.5.3
     repository: https://charts.bitnami.com/bitnami
   - name: kafka
-    version: 29.3.5
+    version: 32.4.3
     repository: https://charts.bitnami.com/bitnami

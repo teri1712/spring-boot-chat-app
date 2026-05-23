@@ -11,7 +11,7 @@ spec:
     matchLabels:
       {{- include "chatapp.selectorLabels" . | nindent 6 }}
   endpoints:
-    - port: http
+    - port: management
       path: /actuator/prometheus
       interval: 15s
 {{- end }}

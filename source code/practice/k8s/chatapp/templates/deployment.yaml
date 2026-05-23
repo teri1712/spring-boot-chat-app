@@ -23,6 +23,7 @@ spec:
         {{- toYaml . | nindent 8 }}
         {{- end }}
     spec:
+      restartPolicy: {{ .Values.restartPolicy | default "Always" }}
       {{- with .Values.imagePullSecrets }}
       imagePullSecrets:
         {{- toYaml . | nindent 8 }}
@@ -44,6 +45,9 @@ spec:
             - name: http
               containerPort: 8080
               protocol: TCP
+            - name: management
+              containerPort: 8081
+              protocol: TCP
           {{- with .Values.livenessProbe }}
           livenessProbe:
             {{- toYaml . | nindent 12 }}
@@ -61,96 +65,14 @@ spec:
             {{- toYaml . | nindent 12 }}
           {{- end }}
           env:
-            - name: SPRING_PROFILES_ACTIVE
-              value: {{ .Values.env.SPRING_PROFILES_ACTIVE | quote }}
-            - name: SPRING_DATASOURCE_URL
-              value: {{ .Values.env.DATABASE_URL | quote }}
-            - name: SPRING_DATASOURCE_USERNAME
-              {{- if .Values.env.existingSecret }}
-              valueFrom:
-                secretKeyRef:
-                  name: {{ .Values.env.existingSecret }}
-                  key: database-username
+            {{- range $name, $value := .Values.env }}
+            - name: {{ $name }}
+              {{- if kindIs "map" $value }}
+              {{- toYaml $value | nindent 14 }}
               {{- else }}
-              value: {{ .Values.env.DATABASE_USERNAME | quote }}
+              value: {{ $value | quote }}
               {{- end }}
-            - name: SPRING_DATASOURCE_PASSWORD
-              {{- if .Values.postgresql.auth.existingSecret }}
-              valueFrom:
-                secretKeyRef:
-                  name: {{ .Values.postgresql.auth.existingSecret }}
-                  key: {{ index .Values.postgresql.auth.secretKeys "userPasswordKey" }}
-              {{- else }}
-              value: {{ .Values.postgresql.auth.password | quote }}
-              {{- end }}
-            - name: SPRING_DATA_REDIS_HOST
-              value: {{ .Values.env.REDIS_HOST | quote }}
-            - name: SPRING_DATA_REDIS_PASSWORD
-              {{- if .Values.redis.auth.existingSecret }}
-              valueFrom:
-                secretKeyRef:
-                  name: {{ .Values.redis.auth.existingSecret }}
-                  key: {{ .Values.redis.auth.existingSecretPasswordKey }}
-              {{- else }}
-              value: {{ .Values.redis.auth.password | quote }}
-              {{- end }}
-            - name: SPRING_KAFKA_BOOTSTRAP_SERVERS
-              value: {{ .Values.env.KAFKA_BOOTSTRAP_SERVERS | quote }}
-            - name: SPRING_KAFKA_PROPERTIES_USER
-              {{- if .Values.env.existingSecret }}
-              valueFrom:
-                secretKeyRef:
-                  name: {{ .Values.env.existingSecret }}
-                  key: kafka-user
-              {{- else }}
-              value: {{ .Values.env.KAFKA_PROPERTIES_USER | quote }}
-              {{- end }}
-            - name: SPRING_KAFKA_PROPERTIES_PASSWORD
-              {{- if .Values.kafka.auth.existingSecret }}
-              valueFrom:
-                secretKeyRef:
-                  name: {{ .Values.kafka.auth.existingSecret }}
-                  key: kafka-password
-              {{- else }}
-              value: {{ .Values.env.KAFKA_PROPERTIES_PASSWORD | quote }}
-              {{- end }}
-            - name: KAFKA_SECURITY_PROTOCOL
-              value: {{ .Values.env.KAFKA_SECURITY_PROTOCOL | quote }}
-            - name: JWT_SECRET
-              {{- if .Values.env.existingSecret }}
-              valueFrom:
-                secretKeyRef:
-                  name: {{ .Values.env.existingSecret }}
-                  key: jwt-secret
-              {{- else }}
-              value: {{ .Values.env.JWT_SECRET | quote }}
-              {{- end }}
-            - name: AWS_S3_REGION
-              value: {{ .Values.env.AWS_S3_REGION | quote }}
-            - name: AWS_S3_BUCKET
-              value: {{ .Values.env.AWS_S3_BUCKET | quote }}
-            - name: AWS_ACCESS_KEY_ID
-              {{- if .Values.env.existingSecret }}
-              valueFrom:
-                secretKeyRef:
-                  name: {{ .Values.env.existingSecret }}
-                  key: aws-access-id
-              {{- else }}
-              value: {{ .Values.env.AWS_ACCESS_KEY_ID | quote }}
-              {{- end }}
-            - name: AWS_SECRET_ACCESS_KEY
-              {{- if .Values.env.existingSecret }}
-              valueFrom:
-                secretKeyRef:
-                  name: {{ .Values.env.existingSecret }}
-                  key: aws-secret-key
-              {{- else }}
-              value: {{ .Values.env.AWS_SECRET_ACCESS_KEY | quote }}
-              {{- end }}
-            - name: LOKI_URL
-              value: {{ .Values.env.LOKI_URL | quote }}
-            - name: OTLP_ENDPOINT
-              value: {{ .Values.env.OTLP_ENDPOINT | quote }}
+            {{- end }}
       {{- with .Values.volumes }}
       volumes:
         {{- toYaml . | nindent 8 }}

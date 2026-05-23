@@ -1,15 +1,26 @@
 # LOCAL-ONLY Overrides for Kind
-replicaCount: 3
+replicaCount: 1
+
+
+image:
+  repository: teri1712/chat-app
+  pullPolicy: IfNotPresent
+  tag: "local"
+
+restartPolicy: Always
 
 env:
-  SPRING_PROFILES_ACTIVE: "prod"
-  DATABASE_USERNAME: "root"
-  KAFKA_PROPERTIES_USER: "user"
-  KAFKA_PROPERTIES_PASSWORD: "user-password"
+  APP_PROFILES: "prod"
+  DB_USERNAME: "root"
+  DB_PASSWORD: "root"
+  REDIS_PASSWORD: "redispassword"
+  KAFKA_USER: "user"
+  KAFKA_PASSWORD: "user-password"
   JWT_SECRET: "vcl-vcl-vcl-vcl-vcl-vcl-vcl-vcl-vcl-vcl"
   AWS_ACCESS_KEY_ID: "decade"
   AWS_SECRET_ACCESS_KEY: "decade"
-
+  LOKI_URL: "http://observability-loki-gateway/loki/api/v1/push"
+  OTLP_ENDPOINT: "http://observability-tempo:4318/v1/traces"
 
 # --- LOCAL INGRESS CONFIGURATION ---
 serviceMonitor:
@@ -23,3 +34,4 @@ ingress:
       paths:
         - path: /
           pathType: Prefix
+

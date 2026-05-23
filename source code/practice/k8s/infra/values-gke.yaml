@@ -1,0 +1,36 @@
+# PRODUCTION Overrides for GKE - Infrastructure
+# This file configures the shared infra (DB, Redis, Kafka) for GKE
+
+postgresql:
+  auth:
+    existingSecret: "chatapp-secrets"
+    secretKeys:
+      adminPasswordKey: "postgres-password"
+      userPasswordKey: "postgres-password"
+  primary:
+    persistence:
+      enabled: true
+      size: 10Gi
+      storageClass: "premium-rwo"
+
+redis:
+  auth:
+    enabled: true
+    existingSecret: "chatapp-secrets"
+    existingSecretPasswordKey: "redis-password"
+  master:
+    persistence:
+      enabled: true
+      size: 8Gi
+      storageClass: "premium-rwo"
+
+kafka:
+  auth:
+    clientProtocol: sasl_plaintext
+    interBrokerProtocol: sasl_plaintext
+    saslMechanism: plain
+    existingSecret: "chatapp-secrets"
+  persistence:
+    enabled: true
+    size: 20Gi
+    storageClass: "premium-rwo"
