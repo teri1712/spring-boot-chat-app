@@ -7,14 +7,14 @@ spring:
         jwt:
           issuer-uri: https://accounts.google.com
   application:
-    name: chat-app
+    name: chatapp
   datasource:
     type: com.zaxxer.hikari.HikariDataSource
     driver-class-name: org.postgresql.Driver
     hikari:
       maximum-pool-size: 15
       connection-timeout: 30000
-      minimum-idle: 5
+      minimum-idle: 10
   jpa:
     database: POSTGRESQL
     show-sql: true
@@ -31,7 +31,9 @@ spring:
       hibernate:
         format_sql: true
         highlight_sql: true
+        order_inserts: true
         order_updates: true
+        jdbc.batch_size: 50
     open-in-view: true
   data:
     redis:
@@ -45,6 +47,8 @@ spring:
     enabled: true
 
   kafka:
+    listener:
+      concurrency: 4
     producer:
       key-serializer: org.apache.kafka.common.serialization.StringSerializer
       value-serializer: org.springframework.kafka.support.serializer.JsonSerializer
@@ -55,7 +59,6 @@ spring:
       value-deserializer: org.springframework.kafka.support.serializer.JsonDeserializer
       properties:
         spring.json.trusted.packages: "*"
-
 
   modulith:
     events:
@@ -79,19 +82,13 @@ server:
         same-site: Lax
   # ssl:
   #   bundle: general
-
-frontend:
-  host:
-    address: http://localhost:4200
-
-
 management:
   server:
     port: 8081
   endpoints:
     web:
       exposure:
-        include: health,env,bean,info,prometheus,modulith
+        include: health,env,beans,info,prometheus,modulith
   endpoint:
     health:
       probes:
@@ -100,6 +97,12 @@ management:
   metrics:
     tags:
       application: ${spring.application.name}
+  tracing:
+    sampling:
+      probability: 1.0
+frontend:
+  host:
+    address: http://localhost:4200
 
 aws:
   s3:
@@ -121,3 +124,7 @@ websocket:
     user: /user
     queue: /queue
     room: /room
+
+
+inbox:
+  batch-size: 100

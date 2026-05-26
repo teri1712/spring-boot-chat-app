@@ -5,7 +5,7 @@ metadata:
   name: {{ include "chatapp.fullname" . }}
   labels:
     {{- include "chatapp.labels" . | nindent 4 }}
-    release: obs # Should match the name of the kube-prometheus-stack release
+    release: {{ .Values.serviceMonitor.release | default "observability" }}
 spec:
   selector:
     matchLabels:

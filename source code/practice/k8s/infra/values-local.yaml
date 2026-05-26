@@ -1,23 +1,30 @@
+# LOCAL Scaling Down for Kind
 postgresql:
-  auth:
-    password: "root"
   primary:
     persistence:
-      enabled: true
+      size: 1Gi
 
 redis:
-  auth:
-    password: "redispassword"
   master:
     persistence:
-      enabled: true
+      size: 1Gi
+
 
 kafka:
-  auth:
-    jaas:
-      clientUser: user
-      clientPassword: user-password
-      interBrokerUser: admin
-      interBrokerPassword: admin-password
   persistence:
-    enabled: true
+    size: 2Gi
+  resources:
+    limits:
+      cpu: 2000m
+      memory: 2Gi
+    requests:
+      cpu: 1000m
+      memory: 512Mi
+  zookeeper:
+    resources:
+      limits:
+        cpu: 500m
+        memory: 512Mi
+      requests:
+        cpu: 200m
+        memory: 256Mi

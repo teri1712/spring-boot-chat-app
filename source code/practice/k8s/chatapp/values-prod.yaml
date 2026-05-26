@@ -1,0 +1,30 @@
+# GKE Production Profile - App
+replicaCount: 3
+
+image:
+  tag: "latest"
+
+resources:
+  limits:
+    cpu: 1000m
+    memory: 2Gi
+  requests:
+    cpu: 400m
+    memory: 1Gi
+
+ingress:
+  className: "gce"
+  annotations:
+    kubernetes.io/ingress.class: "gce"
+  hosts:
+    - host: ""
+      paths:
+        - path: /
+          pathType: Prefix
+
+autoscaling:
+  enabled: true
+  minReplicas: 3
+  maxReplicas: 10
+  targetCPUUtilizationPercentage: 70
+  targetMemoryUtilizationPercentage: 80

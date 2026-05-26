@@ -1,0 +1,50 @@
+# GKE Production Profile - Infrastructure
+postgresql:
+  primary:
+    persistence:
+      storageClass: "premium-rwo"
+      size: 10Gi
+    resources:
+      limits:
+        cpu: 1000m
+        memory: 2Gi
+      requests:
+        cpu: 500m
+        memory: 1Gi
+
+redis:
+  replica:
+    replicaCount: 1
+  master:
+    persistence:
+      storageClass: "premium-rwo"
+      size: 8Gi
+    resources:
+      limits:
+        cpu: 500m
+        memory: 512Mi
+      requests:
+        cpu: 250m
+        memory: 512Mi
+
+kafka:
+  controller:
+    replicaCount: 2
+  persistence:
+    storageClass: "premium-rwo"
+    size: 20Gi
+  resources:
+    limits:
+      cpu: 2000m
+      memory: 4Gi
+    requests:
+      cpu: 500m
+      memory: 2Gi
+  zookeeper:
+    resources:
+      limits:
+        cpu: 250m
+        memory: 512Mi
+      requests:
+        cpu: 250m
+        memory: 512Mi

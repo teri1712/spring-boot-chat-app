@@ -12,18 +12,18 @@ import java.util.List;
 
 @RequiredArgsConstructor
 @Transactional
-public class BatchRoundRobinSaver {
+public class BatchParticipantLogSaver {
 
     final LogBroadCaster broadcaster;
     final ConversationRepository conversations;
 
     public void on(BatchInsertionEvent event) {
-        List<ConversationView> convos = conversations.findByChatIdBetweenRoundRobin(event.insertion().chatId(), event.lower(), event.upper());
+        List<ConversationView> convos = conversations.findByChatIdBetweenParticipantIndex(event.insertion().chatId(), event.lower(), event.upper());
         broadcaster.broadcastInsert(event.insertion(), convos);
     }
 
     public void on(BatchUpdateEvent event) {
-        List<ConversationView> convos = conversations.findByChatIdBetweenRoundRobin(event.update().chatId(), event.lower(), event.upper());
+        List<ConversationView> convos = conversations.findByChatIdBetweenParticipantIndex(event.update().chatId(), event.lower(), event.upper());
         broadcaster.broadcastUpdate(event.update(), convos);
     }
 }

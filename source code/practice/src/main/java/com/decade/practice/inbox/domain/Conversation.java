@@ -17,7 +17,6 @@ import java.util.UUID;
 public class Conversation extends AbstractAggregateRoot<Conversation> {
 
     public static final Instant DORAEMON_BIRTHDAY = Instant.parse("2112-09-03T00:00:00Z");
-    public static final int MAX_ROUND = 100;
 
     @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "conversation_seq_gen")
     @SequenceGenerator(name = "conversation_seq_gen", sequenceName = "conversation_seq")
@@ -33,7 +32,6 @@ public class Conversation extends AbstractAggregateRoot<Conversation> {
 
     private Instant modifiedAt;
 
-    private Integer roundRobin;
     private Integer participantIndex;
 
     @Embedded
@@ -47,7 +45,6 @@ public class Conversation extends AbstractAggregateRoot<Conversation> {
         this.ownerId = ownerId;
         this.modifiedAt = DORAEMON_BIRTHDAY;
         this.participantIndex = participantIndex;
-        this.roundRobin = participantIndex % MAX_ROUND;
         this.recents = new ArrayList<>();
         this.hash = new HashValue(roomId).shift().plus(new HashValue((long) ownerId.hashCode()));
     }

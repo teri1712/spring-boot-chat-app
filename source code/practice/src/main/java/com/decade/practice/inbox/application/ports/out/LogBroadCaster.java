@@ -4,7 +4,6 @@ import com.decade.practice.inbox.application.ports.out.projection.ConversationVi
 import com.decade.practice.inbox.domain.Conversation;
 import com.decade.practice.inbox.domain.InboxLog;
 import com.decade.practice.inbox.domain.LogAction;
-import com.decade.practice.inbox.domain.Room;
 import com.decade.practice.inbox.domain.events.MessageCreated;
 import com.decade.practice.inbox.domain.events.MessageUpdated;
 import com.decade.practice.inbox.domain.messages.InboxLogMessage;
@@ -14,6 +13,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
 
@@ -29,55 +29,78 @@ public class LogBroadCaster {
 
     @Transactional
     public void broadcastInsert(MessageCreated message, List<ConversationView> convos) {
-        convos.forEach(cv -> {
+        List<InboxLog> logsToSave = new ArrayList<>(convos.size());
+        List<Conversation> convosToSave = new ArrayList<>(convos.size());
+
+        for (ConversationView cv : convos) {
             Conversation conversation = cv.conversation();
-            Room room = cv.room();
             UUID ownerId = conversation.getOwnerId();
+
             InboxLog log = new InboxLog(LogAction.ADDITION, message.senderId(), ownerId, conversation.getId(), message.id(), message.currentState());
-            logs.save(log);
+            logsToSave.add(log);
 
             conversation.addRecent(message.currentState());
-            conversations.save(conversation);
+            convosToSave.add(conversation);
+        }
 
-            var info = conversationInfoService.getInfo(ownerId, room);
+        logs.saveAll(logsToSave);
+        conversations.saveAll(convosToSave);
+
+        for (int i = 0; i < convos.size(); i++) {
+            ConversationView cv = convos.get(i);
+            InboxLog log = logsToSave.get(i);
+            Conversation conversation = convosToSave.get(i);
+
+            var info = conversationInfoService.getInfo(conversation.getOwnerId(), cv.room());
             deliveryService.send(new InboxLogMessage(
                 log.getSequenceId(),
-                room.getChatId(),
+                cv.room().getChatId(),
                 info,
                 conversation.getHash().value(),
                 log.getSenderId(),
-                ownerId,
+                conversation.getOwnerId(),
                 log.getAction(),
                 messageStateMapper.toResponse(log.getMessageState())
             ));
-
-        });
+        }
     }
 
     @Transactional
     public void broadcastUpdate(MessageUpdated message, List<ConversationView> convos) {
-        convos.forEach(cv -> {
-            Conversation conversation = cv.conversation();
-            Room room = cv.room();
-            UUID ownerId = conversation.getOwnerId();
-            InboxLog log = new InboxLog(LogAction.UPDATE, message.senderId(), ownerId, conversation.getId(), message.id(), message.currentState());
-            logs.save(log);
-            conversation.updateRecent(message.currentState());
-            conversations.save(conversation);
+        List<InboxLog> logsToSave = new ArrayList<>(convos.size());
+        List<Conversation> convosToSave = new ArrayList<>(convos.size());
 
-            var info = conversationInfoService.getInfo(ownerId, room);
+        for (ConversationView cv : convos) {
+            Conversation conversation = cv.conversation();
+            UUID ownerId = conversation.getOwnerId();
+
+            InboxLog log = new InboxLog(LogAction.UPDATE, message.senderId(), ownerId, conversation.getId(), message.id(), message.currentState());
+            logsToSave.add(log);
+
+            conversation.updateRecent(message.currentState());
+            convosToSave.add(conversation);
+        }
+
+        logs.saveAll(logsToSave);
+        conversations.saveAll(convosToSave);
+
+        for (int i = 0; i < convos.size(); i++) {
+            ConversationView cv = convos.get(i);
+            InboxLog log = logsToSave.get(i);
+            Conversation conversation = convosToSave.get(i);
+
+            var info = conversationInfoService.getInfo(conversation.getOwnerId(), cv.room());
             deliveryService.send(new InboxLogMessage(
                 log.getSequenceId(),
-                room.getChatId(),
+                cv.room().getChatId(),
                 info,
                 conversation.getHash().value(),
                 log.getSenderId(),
-                ownerId,
+                conversation.getOwnerId(),
                 log.getAction(),
                 messageStateMapper.toResponse(log.getMessageState())
             ));
-
-        });
+        }
     }
 
 }

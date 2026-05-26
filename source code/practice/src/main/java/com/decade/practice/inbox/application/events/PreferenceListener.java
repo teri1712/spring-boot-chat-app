@@ -7,7 +7,7 @@ import com.decade.practice.inbox.domain.Preference;
 import com.decade.practice.inbox.domain.Room;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.modulith.events.ApplicationModuleListener;
+import org.springframework.context.event.EventListener;
 import org.springframework.stereotype.Service;
 
 import java.util.UUID;
@@ -22,7 +22,7 @@ public class PreferenceListener {
     private final RoomRepository rooms;
 
 
-    @ApplicationModuleListener(id = "preference_listener")
+    @EventListener
     public void on(PreferenceChanged event) {
 
         Room room = rooms.findByChatId(event.getChatId()).orElseThrow();

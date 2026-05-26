@@ -14,14 +14,14 @@ import java.util.UUID;
 
 @Slf4j
 @RestController
-@RequestMapping("/user-infos")
+@RequestMapping("/infos")
 @AllArgsConstructor
-public class UseInfoController {
+public class UserInfoController {
 
-      private final UserApi userApi;
-      
-      @GetMapping
-      public Map<UUID, UserInfo> getUsersByIds(@Size(max = 50) @RequestParam("userId") Set<UUID> ids) {
-            return userApi.getUserInfo(ids);
-      }
+    private final UserApi userApi;
+
+    @GetMapping
+    public Map<UUID, UserInfo> getUsersByIds(@Size(max = 50) @RequestParam("userId") Set<UUID> ids) {
+        return userApi.getUserInfo(ids);
+    }
 }

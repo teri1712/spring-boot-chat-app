@@ -13,27 +13,15 @@ const userIds = Object.values(jwtData).map(jwt => {
     }
 }).filter(id => id !== null);
 
-// Custom metrics for tracking response times
-const cacheEnabledDuration = new Trend('cache_enabled_duration');
-const cacheDisabledDuration = new Trend('cache_disabled_duration');
+// Custom metric for tracking response times
+const requestDuration = new Trend('user_info_duration');
+
+// Get server host/port from environment variable (e.g. localhost:8080)
+const SERVER_URL = __ENV.SERVER_URL || 'localhost:8080';
 
 const config = {
-    // Pool 1: Cache disabled (2 servers)
-    cacheDisabledPool: [
-        'http://localhost:8081',
-        'http://localhost:8082',
-    ],
-    // Pool 2: Cache enabled (2 servers)
-    cacheEnabledPool: [
-        'http://localhost:8083',
-        'http://localhost:8084',
-    ],
     userIdsPerRequest: 10,
 };
-
-// Round-robin counters for each pool
-let cacheDisabledCounter = 0;
-let cacheEnabledCounter = 0;
 
 export const options = {
     stages: [
@@ -47,11 +35,6 @@ export const options = {
     },
 };
 
-function getServerFromPool(pool, counterKey) {
-    const serverUrl = pool[counterKey % pool.length];
-    return serverUrl;
-}
-
 // Helper function to get random user IDs
 function getRandomUserIds(count) {
     const selected = [];
@@ -61,43 +44,30 @@ function getRandomUserIds(count) {
     return selected;
 }
 
-function makeUserRequest(accessToken, pool, userIdList, cacheStatus, counterKey) {
-    const url = getServerFromPool(pool, counterKey);
-
+function makeUserRequest(accessToken, userIdList) {
     const params = {
         headers: {
             'Content-Type': 'application/json',
             'Authorization': `Bearer ${accessToken}`,
         },
-        tags: {name: `GetUsers_${cacheStatus}`},
+        tags: {name: 'GetUsers'},
     };
 
-    let queryString = '';
-    userIdList.forEach((userId, index) => {
-        queryString += `userId=${userId}`;
-        if (index < userIdList.length - 1) {
-            queryString += '&';
-        }
-    });
+    const queryString = userIdList.map(id => `userId=${id}`).join('&');
+    const fullUrl = `http://${SERVER_URL}/infos?${queryString}`;
 
-    const fullUrl = `${url}/user-infos?${queryString}`;
     const response = http.get(fullUrl, params);
 
-    const cacheLabel = cacheStatus === 'CacheEnabled' ? 'with cache' : 'without cache';
     check(response, {
-        [`status is 200 (${cacheLabel})`]: (r) => r.status === 200,
-        [`response time < 500ms (${cacheLabel})`]: (r) => r.timings.duration < 500,
+        'status is 200': (r) => r.status === 200,
+        'response time < 500ms': (r) => r.timings.duration < 500,
     });
-    const success = response.status === 200;
-    if (!success)
-        console.error(`Request to ${fullUrl} failed with status ${response.status} (${cacheLabel})`);
 
-    // Track metrics for each cache scenario
-    if (cacheStatus === 'CacheEnabled') {
-        cacheEnabledDuration.add(response.timings.duration);
-    } else {
-        cacheDisabledDuration.add(response.timings.duration);
+    if (response.status !== 200) {
+        console.error(`Request to ${fullUrl} failed with status ${response.status}`);
     }
+
+    requestDuration.add(response.timings.duration);
 
     return response;
 }
@@ -105,14 +75,8 @@ function makeUserRequest(accessToken, pool, userIdList, cacheStatus, counterKey)
 export default function () {
     const randomUserIds = getRandomUserIds(config.userIdsPerRequest);
 
-    group('Cache Disabled Pool', function () {
-        makeUserRequest(jwtData["user_1"].token, config.cacheDisabledPool, randomUserIds, 'CacheDisabled', cacheDisabledCounter++);
+    group('User Info Request', function () {
+        // Using user_1 as a standard requester
+        makeUserRequest(jwtData["user_1"].token, randomUserIds);
     });
-
-    group('Cache Enabled Pool', function () {
-        makeUserRequest(jwtData["user_1"].token, config.cacheEnabledPool, randomUserIds, 'CacheEnabled', cacheEnabledCounter++);
-    });
-
 }
-
-

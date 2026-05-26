@@ -1,0 +1,74 @@
+# GKE Production Profile - Observability
+# Economical settings to prioritize resources for App and Infra services
+
+kube-prometheus-stack:
+  prometheusOperator:
+    resources:
+      limits:
+        cpu: 250m
+        memory: 512Mi
+      requests:
+        cpu: 250m
+        memory: 512Mi
+  kubeStateMetrics:
+    resources:
+      limits:
+        cpu: 250m
+        memory: 512Mi
+      requests:
+        cpu: 250m
+        memory: 512Mi
+  prometheus:
+    prometheusSpec:
+      storageSpec:
+        volumeClaimTemplate:
+          spec:
+            storageClassName: "premium-rwo"
+            resources:
+              requests:
+                storage: 5Gi
+      resources:
+        limits:
+          cpu: 500m
+          memory: 2Gi
+        requests:
+          cpu: 250m
+          memory: 1Gi
+
+grafana:
+  persistence:
+    storageClassName: "premium-rwo"
+    size: 1Gi
+  resources:
+    limits:
+      cpu: 250m
+      memory: 512Mi
+    requests:
+      cpu: 250m
+      memory: 512Mi
+
+loki:
+  singleBinary:
+    persistence:
+      storageClass: "premium-rwo"
+      size: 5Gi
+    resources:
+      limits:
+        cpu: 500m
+        memory: 1Gi
+      requests:
+        cpu: 250m
+        memory: 512Mi
+
+tempo:
+  tempo:
+    persistence:
+      storageClass: "premium-rwo"
+      size: 5Gi
+    resources:
+      limits:
+        cpu: 500m
+        memory: 1Gi
+      requests:
+        cpu: 250m
+        memory: 512Mi

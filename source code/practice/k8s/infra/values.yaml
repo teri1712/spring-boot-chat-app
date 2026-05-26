@@ -1,24 +1,43 @@
+# Blueprint for Infrastructure Stack
 postgresql:
   auth:
-    database: chatapp
     username: root
-    password: ""
+    database: chatapp
+    existingSecret: "chatapp-secrets"
+    secretKeys:
+      adminPasswordKey: "postgres-password"
+      userPasswordKey: "postgres-password"
   primary:
     persistence:
       enabled: true
+      storageClass: ""
+      size: "" # Defined in profiles
+    resources: { } # Defined in profiles
 
 redis:
   auth:
     enabled: true
-    password: ""
+    existingSecret: "chatapp-secrets"
+    existingSecretPasswordKey: "redis-password"
   master:
     persistence:
       enabled: true
+      storageClass: ""
+      size: "" # Defined in profiles
+    resources: { } # Defined in profiles
 
 kafka:
   image:
     repository: bitnamilegacy/kafka
   auth:
     clientProtocol: sasl_plaintext
+    interBrokerProtocol: sasl_plaintext
+    saslMechanism: plain
+    existingSecret: "chatapp-secrets"
   persistence:
     enabled: true
+    storageClass: ""
+    size: "" # Defined in profiles
+  resources: { } # Defined in profiles
+  zookeeper:
+    resources: { } # Defined in profiles

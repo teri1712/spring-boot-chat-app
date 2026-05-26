@@ -1,6 +1,6 @@
 package com.decade.practice.inbox.unit;
 
-import com.decade.practice.inbox.application.events.BatchRoundRobinSaver;
+import com.decade.practice.inbox.application.events.BatchParticipantLogSaver;
 import com.decade.practice.inbox.application.ports.out.ConversationRepository;
 import com.decade.practice.inbox.application.ports.out.DeliveryService;
 import com.decade.practice.inbox.application.ports.out.LogBroadCaster;
@@ -35,7 +35,7 @@ import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.*;
 
 @ExtendWith(MockitoExtension.class)
-class BatchRoundRobinSaverTest {
+class BatchParticipantLogSaverTest {
 
     @Mock
     ConversationRepository conversations;
@@ -54,12 +54,12 @@ class BatchRoundRobinSaverTest {
 
     LogBroadCaster broadcaster;
 
-    BatchRoundRobinSaver saver;
+    BatchParticipantLogSaver saver;
 
     @BeforeEach
     void setUp() {
         broadcaster = new LogBroadCaster(logs, conversations, deliveryService, messageStateMapper, conversationInfoService);
-        saver = new BatchRoundRobinSaver(broadcaster, conversations);
+        saver = new BatchParticipantLogSaver(broadcaster, conversations);
     }
 
     @Test
@@ -94,7 +94,7 @@ class BatchRoundRobinSaverTest {
             new ConversationView(convo2, room)
         );
 
-        when(conversations.findByChatIdBetweenRoundRobin(eq(chatId), any(), any()))
+        when(conversations.findByChatIdBetweenParticipantIndex(eq(chatId), any(), any()))
             .thenReturn(views);
 
         // When
@@ -143,7 +143,7 @@ class BatchRoundRobinSaverTest {
             new ConversationView(convo1, room)
         );
 
-        when(conversations.findByChatIdBetweenRoundRobin(eq(chatId), any(), any()))
+        when(conversations.findByChatIdBetweenParticipantIndex(eq(chatId), any(), any()))
             .thenReturn(views);
 
         // When

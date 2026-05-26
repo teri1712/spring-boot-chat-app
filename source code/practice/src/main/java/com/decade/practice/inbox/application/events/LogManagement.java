@@ -10,49 +10,49 @@ import com.decade.practice.inbox.domain.events.MessageCreated;
 import com.decade.practice.inbox.domain.events.MessageUpdated;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.context.event.EventListener;
 import org.springframework.stereotype.Component;
-import org.springframework.transaction.annotation.Propagation;
-import org.springframework.transaction.annotation.Transactional;
 
 @Slf4j
 @Component
 @RequiredArgsConstructor
-public class DeliveringManagement {
+public class LogManagement {
 
     final RoomRepository rooms;
     final ApplicationEventPublisher publisher;
     final LogBroadCaster broadcaster;
     final ConversationRepository conversations;
 
+
+    @Value("${inbox.batch-size}")
+    int batchSize;
+
     @EventListener
-    @Transactional(propagation = Propagation.MANDATORY)
     void on(MessageCreated event) {
         String chatId = event.chatId();
         Room room = rooms.findByChatId(chatId).orElseThrow();
-        if (room.getParticipantCount() < 20) {
+        if (room.getParticipantCount() < batchSize) {
             broadcaster.broadcastInsert(event, conversations.findByChatId(chatId));
-        } else if (room.getParticipantCount() <= 100) {
-            for (int i = 0; i < room.getParticipantCount(); i += 20) {
-                publisher.publishEvent(new BatchInsertionEvent(i, i + 20, event));
-            }
         } else {
-            // TODO: To be continued
+            for (int i = 0; i < room.getParticipantCount(); i += batchSize) {
+                publisher.publishEvent(new BatchInsertionEvent(i, i + batchSize, event));
+            }
         }
     }
 
     @EventListener
-    @Transactional(propagation = Propagation.MANDATORY)
     void on(MessageUpdated event) {
         String chatId = event.chatId();
         Room room = rooms.findByChatId(chatId).orElseThrow();
-        if (room.getParticipantCount() < 20) {
+        if (room.getParticipantCount() < batchSize) {
             broadcaster.broadcastUpdate(event, conversations.findByChatId(chatId));
-        } else if (room.getParticipantCount() <= 100) {
-            for (int i = 0; i < room.getParticipantCount(); i += 20) {
-                publisher.publishEvent(new BatchUpdateEvent(i, i + 20, event));
+        } else {
+            for (int i = 0; i < room.getParticipantCount(); i += batchSize) {
+                publisher.publishEvent(new BatchUpdateEvent(i, i + batchSize, event));
             }
         }
     }
+
 }

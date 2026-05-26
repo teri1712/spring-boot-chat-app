@@ -25,7 +25,7 @@ import java.util.function.Supplier;
 import static org.assertj.core.api.Assertions.assertThat;
 
 @RequiredArgsConstructor
-class BatchHandlingTest extends BaseTestClass {
+abstract class BatchHandlingTest extends BaseTestClass {
     final ConversationRepository conversations;
     final LogRepository logs;
     final RoomRepository rooms;

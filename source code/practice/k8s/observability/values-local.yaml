@@ -1,33 +1,60 @@
-# LOCAL-ONLY Overrides for Kind - Observability
-# Disables persistence for local development
-
+# LOCAL Scaling Down for Kind
 kube-prometheus-stack:
   prometheus:
     prometheusSpec:
-      # Allows Prometheus to find ServiceMonitors in ANY namespace
-      serviceMonitorSelectorNilUsesHelmValues: false
-  grafana:
-    enabled: false
+      storageSpec:
+        volumeClaimTemplate:
+          spec:
+            resources:
+              requests:
+                storage: 1Gi
+      resources:
+        limits:
+          cpu: 1000m
+          memory: 1Gi
+        requests:
+          cpu: 500m
+          memory: 256Mi
 
 grafana:
+  initChownData:
+    enabled: false
   persistence:
-    enabled: true
+    size: 512Mi
+  resources:
+    limits:
+      cpu: 500m
+      memory: 256Mi
+    requests:
+      cpu: 200m
+      memory: 128Mi
 
 loki:
-  backend:
-    replicas: 0
-  read:
-    replicas: 0
-  write:
-    replicas: 0
-  singleBinary:
-    replicas: 1
-    persistence:
-      enabled: true
   loki:
-    useTestSchema: true
+    server:
+      http_server_write_timeout: 1m
+    ingester:
+      lifecycler:
+        final_sleep: 15s
+  singleBinary:
+    persistence:
+      size: 2Gi
+    resources:
+      limits:
+        cpu: 2000m
+        memory: 2Gi
+      requests:
+        cpu: 1000m
+        memory: 256Mi
 
 tempo:
   tempo:
     persistence:
-      enabled: true
+      size: 2Gi
+    resources:
+      limits:
+        cpu: 1000m
+        memory: 1Gi
+      requests:
+        cpu: 500m
+        memory: 256Mi

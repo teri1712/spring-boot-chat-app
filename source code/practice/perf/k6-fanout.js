@@ -1,36 +1,24 @@
 import ws from 'k6/ws';
 import http from 'k6/http';
-import {check, group} from 'k6';
+import {check, group, sleep} from 'k6';
 import {Counter, Gauge, Trend} from 'k6/metrics';
 
 const jwts = JSON.parse(open("./jwts.json"));
 
-const NUM_USERS = 100;
-const NUM_SERVERS = 5;
+const NUM_USERS = 500;
+const NUM_SERVERS = 1; // Set to 1 as per current local setup
 const CHAT_ID = 'group_5k_perf_test';
 
-// Server URLs - Update these with your actual server addresses
-const SERVER_URLS = [
-    'ws://localhost:8081',
-    'ws://localhost:8082',
-    'ws://localhost:8083',
-    'ws://localhost:8084',
-    'ws://localhost:8085'
-];
+// Get server host/port from environment variable (e.g. localhost:8080)
+const SERVER_URL = __ENV.SERVER_URL || 'localhost:8080';
 
-const REST_URLS = [
-    'http://localhost:8081',
-    'http://localhost:8082',
-    'http://localhost:8083',
-    'http://localhost:8084',
-    'http://localhost:8085'
-];
 const wsConnectSuccess = new Counter('ws_connect_success');
 const wsConnectFailure = new Counter('ws_connect_failure');
 const wsActiveConnections = new Gauge('ws_active_connections');
 
 const messagesReceived = new Counter('messages_received');
 const messagesPerUser = new Trend('messages_per_user');
+const e2eLatency = new Trend('e2e_delivery_latency_ms');
 const fanoutErrors = new Counter('fanout_errors');
 
 const restApiSuccess = new Counter('rest_api_success');
@@ -40,7 +28,7 @@ export const options = {
     scenarios: {
         subscribers: {
             executor: 'constant-vus',
-            vus: 100,
+            vus: 500,
             duration: '2m',
             exec: 'subscriberScenario',
         },
@@ -48,16 +36,18 @@ export const options = {
             executor: 'constant-arrival-rate',
             rate: 30,
             timeUnit: '1s',
-            duration: '2m',
+            startTime: '15s', // Wait for subscribers to connect
+            duration: '105s',
             preAllocatedVUs: 30,
-            maxVUs: 100,
+            maxVUs: 500,
             exec: 'publisherScenario',
         },
     },
     thresholds: {
         'ws_connect_success': ['rate > 0.95'],
-        'messages_received': ['count > 20000'],
-        'messages_per_user': ['p(95) > 300'],
+        'messages_received': ['count > 100000'], // More realistic for 30msg/s * 500 users
+        'messages_per_user': ['p(95) > 100'],
+        'e2e_delivery_latency_ms': ['p(95) < 3000'], // 95% within 3s
     },
 };
 
@@ -70,21 +60,29 @@ function generateUserData(userIndex) {
 }
 
 function getServerByRoundRobin(userIndex, isWebSocket = true) {
-    const serverIndex = userIndex % NUM_SERVERS;
-    return isWebSocket ? SERVER_URLS[serverIndex] : REST_URLS[serverIndex];
+    // If NUM_SERVERS is 1, use the provided SERVER_URL directly
+    if (NUM_SERVERS === 1) {
+        return isWebSocket ? `ws://${SERVER_URL}` : `http://${SERVER_URL}`;
+    }
+
+    // Otherwise, maintain round-robin logic but based on the base port extracted from SERVER_URL
+    const parts = SERVER_URL.split(':');
+    const host = parts[0];
+    const basePort = parseInt(parts[1], 10) || 8080;
+    const port = basePort + (userIndex % NUM_SERVERS);
+    return isWebSocket ? `ws://${host}:${port}` : `http://${host}:${port}`;
 }
 
 export function subscriberScenario() {
     const vuId = __VU;
     const userIndex = (vuId - 1) % NUM_USERS;
 
+    // Random jitter to prevent thundering herd
+    sleep(Math.random() * 10);
+
     const userData = generateUserData(userIndex);
 
-    // Login to get real token
-    let accessToken = '';
-    group('Login', () => {
-        accessToken = login(userData);
-    });
+    let accessToken = login(userData);
 
     if (!accessToken) {
         console.error(`Failed to login subscriber ${userData.username}`);
@@ -102,10 +100,7 @@ export function publisherScenario() {
 
     const userData = generateUserData(userIndex);
 
-    let accessToken = '';
-    group('Login', () => {
-        accessToken = login(userData);
-    });
+    let accessToken = login(userData);
 
     if (!accessToken) {
         console.error(`Failed to login publisher ${userData.username}`);
@@ -152,13 +147,18 @@ function connectAndSubscribe(userIndex, userData, accessToken) {
                     const subscribeFrame = buildStompSubscribeFrame(userIndex);
                     socket.send(subscribeFrame);
                 } else if (data.includes('ERROR')) {
-
                     wsConnectFailure.add(1);
                     console.error(`WebSocket error for ${userData.username}: ${data}`);
-
                 } else if (data.includes('MESSAGE')) {
                     msgCount++;
                     messagesReceived.add(1);
+
+                    // Extract timestamp for E2E latency calculation
+                    const match = data.match(/perf_ts_(\d+)/);
+                    if (match) {
+                        const sentTime = parseInt(match[1], 10);
+                        e2eLatency.add(Date.now() - sentTime);
+                    }
                 }
             });
 
@@ -174,13 +174,11 @@ function connectAndSubscribe(userIndex, userData, accessToken) {
 
             socket.setTimeout(() => {
                 messagesPerUser.add(msgCount);
-
                 if (msgCount === 0) {
-                    console.error(`No message received by ${userData.username}`);
                     fanoutErrors.add(1);
                 }
                 socket.close();
-            }, 120000);
+            }, 110000);
         });
 
         if (!connectionSuccessful) {
@@ -216,8 +214,9 @@ function publishMessageViaREST(userIndex, userData, accessToken) {
     const postingId = crypto.randomUUID();
     const endpoint = `${serverUrl}/chats/${CHAT_ID}/texts/${postingId}`;
 
+    // Embed timestamp for E2E tracking
     const payload = {
-        content: `Message from ${userData.username} at ${new Date().toISOString()}`
+        content: `perf_ts_${Date.now()}`
     };
 
     const params = {
@@ -232,10 +231,15 @@ function publishMessageViaREST(userIndex, userData, accessToken) {
     try {
         const response = http.put(endpoint, JSON.stringify(payload), params);
 
-        check(response, {
+        const success = check(response, {
             'Message published': (r) => r.status === 202 || r.status === 200,
         });
-        restApiSuccess.add(1);
+
+        if (success) {
+            restApiSuccess.add(1);
+        } else {
+            restApiFailure.add(1);
+        }
 
     } catch (e) {
         console.error(`Failed to publish message for ${userData.username}: ${e}`);

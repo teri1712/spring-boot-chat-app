@@ -47,8 +47,8 @@ public class SecurityConfiguration {
             .securityMatcher(EndpointRequest.toAnyEndpoint())
             .authorizeHttpRequests(
                 auth -> auth
-                    .requestMatchers(EndpointRequest.to("health", "info")).permitAll()
-                    .requestMatchers(EndpointRequest.to("prometheus")).hasRole("OPS")
+                    .requestMatchers(EndpointRequest.to("health", "info", "prometheus")).permitAll()
+                    .requestMatchers(EndpointRequest.to("beans")).permitAll()
                     .anyRequest().denyAll()
             )
             .httpBasic(Customizer.withDefaults())

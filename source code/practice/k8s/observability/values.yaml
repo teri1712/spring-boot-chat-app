@@ -1,17 +1,43 @@
-# Global configuration for Observability Stack
-
+# Blueprint for Observability Stack
 kube-prometheus-stack:
+  nodeExporter:
+    enabled: false
+  alertmanager:
+    enabled: false
+  grafana:
+    enabled: false
+  kubeProxy:
+    enabled: false
+  kubeScheduler:
+    enabled: false
+  kubeControllerManager:
+    enabled: false
+  kubeEtcd:
+    enabled: false
+  coreDns:
+    enabled: false
   prometheus:
     prometheusSpec:
-      # Allows Prometheus to find ServiceMonitors in ANY namespace
       serviceMonitorSelectorNilUsesHelmValues: false
-  grafana:
-    enabled: false # Using standalone grafana dependency
+      storageSpec:
+        volumeClaimTemplate:
+          spec:
+            accessModes: [ "ReadWriteOnce" ]
+            resources:
+              requests:
+                storage: "" # Defined in profiles
+      resources: { } # Defined in profiles
 
 grafana:
   enabled: true
+  admin:
+    existingSecret: "chatapp-secrets"
+    userKey: "admin-user"
+    passwordKey: "admin-password"
   persistence:
     enabled: true
+    size: "" # Defined in profiles
+  resources: { } # Defined in profiles
   serviceMonitor:
     enabled: true
   additionalDataSources:
@@ -30,7 +56,17 @@ grafana:
       access: proxy
 
 loki:
-  deploymentMode: SingleBinary
+  deploymentMode: Monolithic
+  test:
+    enabled: false
+  lokiCanary:
+    enabled: false
+  gateway:
+    enabled: false
+  resultsCache:
+    enabled: false
+  chunksCache:
+    enabled: false
   monitoring:
     serviceMonitor:
       enabled: true
@@ -40,18 +76,30 @@ loki:
         install: false
   loki:
     auth_enabled: false
+    useTestSchema: true
     commonConfig:
       replication_factor: 1
     storage:
       type: 'filesystem'
   singleBinary:
+    replicas: 1
     persistence:
       enabled: true
+      size: "" # Defined in profiles
+    resources: { } # Defined in profiles
+  read:
+    replicas: 0
+  write:
+    replicas: 0
+  backend:
+    replicas: 0
 
 tempo:
   tempo:
     persistence:
       enabled: true
+      size: "" # Defined in profiles
+    resources: { } # Defined in profiles
     receivers:
       otlp:
         protocols:

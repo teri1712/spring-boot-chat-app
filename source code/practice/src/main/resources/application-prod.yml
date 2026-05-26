@@ -24,7 +24,9 @@ management:
   otlp:
     tracing:
       endpoint: ${OTLP_ENDPOINT}
-
+  tracing:
+    sampling:
+      probability: 0.1
 loki:
   url: ${LOKI_URL}
 
