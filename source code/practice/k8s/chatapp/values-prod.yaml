@@ -28,3 +28,7 @@ autoscaling:
   maxReplicas: 10
   targetCPUUtilizationPercentage: 70
   targetMemoryUtilizationPercentage: 80
+
+env:
+  REDIS_CACHE_ENABLED: "true"
+  BATCH_MODE: "kafka"

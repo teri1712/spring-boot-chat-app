@@ -36,7 +36,7 @@ public class LogBroadCaster {
             Conversation conversation = cv.conversation();
             UUID ownerId = conversation.getOwnerId();
 
-            InboxLog log = new InboxLog(LogAction.ADDITION, message.senderId(), ownerId, conversation.getId(), message.id(), message.currentState());
+            InboxLog log = new InboxLog(LogAction.ADDITION, message.senderId(), ownerId, conversation.getId(), message.id());
             logsToSave.add(log);
 
             conversation.addRecent(message.currentState());
@@ -60,7 +60,7 @@ public class LogBroadCaster {
                 log.getSenderId(),
                 conversation.getOwnerId(),
                 log.getAction(),
-                messageStateMapper.toResponse(log.getMessageState())
+                messageStateMapper.toResponse(message.currentState())
             ));
         }
     }
@@ -74,7 +74,7 @@ public class LogBroadCaster {
             Conversation conversation = cv.conversation();
             UUID ownerId = conversation.getOwnerId();
 
-            InboxLog log = new InboxLog(LogAction.UPDATE, message.senderId(), ownerId, conversation.getId(), message.id(), message.currentState());
+            InboxLog log = new InboxLog(LogAction.UPDATE, message.senderId(), ownerId, conversation.getId(), message.id());
             logsToSave.add(log);
 
             conversation.updateRecent(message.currentState());
@@ -98,7 +98,7 @@ public class LogBroadCaster {
                 log.getSenderId(),
                 conversation.getOwnerId(),
                 log.getAction(),
-                messageStateMapper.toResponse(log.getMessageState())
+                messageStateMapper.toResponse(message.currentState())
             ));
         }
     }

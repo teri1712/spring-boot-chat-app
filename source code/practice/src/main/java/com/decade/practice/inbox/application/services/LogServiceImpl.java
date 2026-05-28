@@ -21,7 +21,7 @@ import java.util.function.Function;
 @Slf4j
 @Service
 @AllArgsConstructor
-@Transactional
+@Transactional(readOnly = true)
 public class LogServiceImpl implements LogService {
 
     private final LogRepository logs;

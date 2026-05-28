@@ -99,5 +99,5 @@ FROM (SELECT id, owner_id
 
 
 select *
-from inbox_log
-where owner_id = (SELECT id FROM user_member WHERE username = 'user_1' LIMIT 1);
+from user_member;
+

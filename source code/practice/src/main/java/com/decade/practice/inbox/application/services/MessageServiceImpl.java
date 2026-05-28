@@ -16,7 +16,7 @@ import java.util.UUID;
 
 @Service
 @AllArgsConstructor
-@Transactional
+@Transactional(readOnly = true)
 public class MessageServiceImpl implements MessageService {
 
     private final MessageRepository messages;
