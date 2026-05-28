@@ -19,7 +19,7 @@ public interface LogRepository extends JpaRepository<InboxLog, Long> {
         "join fetch Conversation c on l.conversationId = c.id " +
         "join fetch Room r on r.id = c.roomId " +
         "join fetch Message m on l.messageId = m.sequenceId " +
-        "where l.sequenceId >= :sequenceId and l.ownerId = :ownerId and r.chatId = :chatId")
+        "where r.chatId = :chatId and c.ownerId = :ownerId and l.sequenceId >= :sequenceId")
     List<LogView> findByOwnerIdAndChatIdAndSequenceIdGreaterThanEqual(UUID ownerId, String chatId, Long sequenceId, Pageable pageable);
 
     @Query("select distinct new com.decade.practice.inbox.application.ports.out.projection.LogView(l,m, new com.decade.practice.inbox.application.ports.out.projection.ConversationView(c,r)) " +

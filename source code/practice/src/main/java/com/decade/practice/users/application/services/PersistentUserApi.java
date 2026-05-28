@@ -3,6 +3,7 @@ package com.decade.practice.users.application.services;
 import com.decade.practice.users.api.UserApi;
 import com.decade.practice.users.api.UserInfo;
 import com.decade.practice.users.application.ports.out.UserRepository;
+import io.micrometer.observation.annotation.Observed;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
@@ -12,14 +13,17 @@ import java.util.UUID;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 
-@Service
 @RequiredArgsConstructor
-public class UserApiImpl implements UserApi {
+@Service("persistentUserApi")
+public class PersistentUserApi implements UserApi {
 
-      private final UserRepository users;
+    private final UserRepository users;
 
-      @Override
-      public Map<UUID, UserInfo> getUserInfo(Set<UUID> ids) {
-            return users.findByIdIn(ids).stream().collect(Collectors.toMap(UserInfo::id, Function.identity()));
-      }
+    @Override
+    @Observed(name = "users.infos", lowCardinalityKeyValues = {
+        "hit", "database"
+    })
+    public Map<UUID, UserInfo> getUserInfo(Set<UUID> ids) {
+        return users.findByIdIn(ids).stream().collect(Collectors.toMap(UserInfo::id, Function.identity()));
+    }
 }

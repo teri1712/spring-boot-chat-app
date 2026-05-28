@@ -22,7 +22,7 @@ public class LogController {
     private final LogService logService;
     private final LookUpRegistry lookUpRegistry;
     private final InboxLogWithPartnerMapper inboxLogWithPartnerMapper;
-    private final LogUserAggregator logAggregator;
+    private final LogAggregator logAggregator;
 
     // TODO: Adjust client to new endpoint
     @GetMapping("/chats/{chatId}/logs")

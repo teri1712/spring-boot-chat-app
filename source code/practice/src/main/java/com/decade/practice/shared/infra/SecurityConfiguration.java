@@ -51,7 +51,9 @@ public class SecurityConfiguration {
                     .requestMatchers(EndpointRequest.to("beans")).permitAll()
                     .anyRequest().denyAll()
             )
+            .formLogin(AbstractHttpConfigurer::disable)
             .httpBasic(Customizer.withDefaults())
+            .cors(AbstractHttpConfigurer::disable)
             .csrf(AbstractHttpConfigurer::disable);
         return http.build();
     }

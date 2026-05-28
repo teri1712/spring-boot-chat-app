@@ -77,7 +77,7 @@ abstract class BatchHandlingTest extends BaseTestClass {
 
         AtomicInteger index = new AtomicInteger();
         for (int i = 0; i < limit; i++) participants.add(UUID.randomUUID());
-
+    
         conversations.saveAll(participants.stream()
             .map(participantId -> new Conversation(participantId, room.getId(), offset + index.getAndIncrement()))
             .toList());

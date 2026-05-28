@@ -3,25 +3,14 @@ import {check, group} from 'k6';
 import {Trend} from 'k6/metrics';
 
 const jwtData = JSON.parse(open('./jwts.json'));
-const userIds = Object.values(jwtData).map(jwt => {
-    try {
-        const profile = jwt.profile;
-        return profile.id;
-    } catch (e) {
-        console.error('Failed to parse JWT', e);
-        return null;
-    }
-}).filter(id => id !== null);
+const usernames = Object.keys(jwtData);
 
 // Custom metric for tracking response times
-const requestDuration = new Trend('user_info_duration');
+const requestDuration = new Trend('chat_logs_duration');
 
-// Get server host/port from environment variable (e.g. localhost:8080)
+// Get server host/port from environment variable
 const SERVER_URL = __ENV.SERVER_URL || 'localhost:8080';
-
-const config = {
-    userIdsPerRequest: 10,
-};
+const CHAT_ID = 'group_5k_perf_test';
 
 export const options = {
     stages: [
@@ -35,48 +24,36 @@ export const options = {
     },
 };
 
-// Helper function to get random user IDs
-function getRandomUserIds(count) {
-    const selected = [];
-    for (let i = 0; i < count; i++) {
-        selected.push(userIds[Math.floor(Math.random() * userIds.length)]);
-    }
-    return selected;
-}
+export default function () {
+    // Pick a user for this VU/iteration
+    const userIndex = (__VU - 1 + __ITER) % usernames.length;
+    const userKey = usernames[userIndex];
+    const accessToken = jwtData[userKey].token;
 
-function makeUserRequest(accessToken, userIdList) {
     const params = {
         headers: {
-            'Content-Type': 'application/json',
             'Authorization': `Bearer ${accessToken}`,
         },
-        tags: {name: 'GetUsers'},
+        tags: {name: 'GetChatLogs'},
     };
 
-    const queryString = userIdList.map(id => `userId=${id}`).join('&');
-    const fullUrl = `http://${SERVER_URL}/infos?${queryString}`;
+    // anchorSequenceNumber as requested (using JS safe max integer)
+    const anchorSequenceNumber = 0;
+    const fullUrl = `http://${SERVER_URL}/chats/${CHAT_ID}/logs?anchorSequenceNumber=${anchorSequenceNumber}`;
 
-    const response = http.get(fullUrl, params);
+    group('Get Chat Logs', function () {
+        const response = http.get(fullUrl, params);
 
-    check(response, {
-        'status is 200': (r) => r.status === 200,
-        'response time < 500ms': (r) => r.timings.duration < 500,
-    });
+        check(response, {
+            'status is 200': (r) => r.status === 200,
+        });
 
-    if (response.status !== 200) {
-        console.error(`Request to ${fullUrl} failed with status ${response.status}`);
-    }
+        if (response.status !== 200) {
+            console.error(`User ${userKey} (VU ${__VU}) failed to get logs from ${fullUrl}. Status: ${response.status}`);
+        }
 
-    requestDuration.add(response.timings.duration);
-
-    return response;
-}
-
-export default function () {
-    const randomUserIds = getRandomUserIds(config.userIdsPerRequest);
-
-    group('User Info Request', function () {
-        // Using user_1 as a standard requester
-        makeUserRequest(jwtData["user_1"].token, randomUserIds);
+        requestDuration.add(response.timings.duration);
     });
 }
+
+[]

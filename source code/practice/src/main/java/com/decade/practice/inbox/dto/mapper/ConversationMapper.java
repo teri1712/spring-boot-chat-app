@@ -11,10 +11,10 @@ import org.mapstruct.ReportingPolicy;
 @Mapper(unmappedTargetPolicy = ReportingPolicy.ERROR, componentModel = MappingConstants.ComponentModel.SPRING, uses = {MessageMapper.class})
 public interface ConversationMapper {
 
-    @Mapping(source = "c.room.chatId", target = "identifier")
-    @Mapping(source = "c.conversation.hash.value", target = "revisionNumber")
-    @Mapping(source = "c.conversation.recents", target = "recents")
-    @Mapping(source = "c.conversation.modifiedAt", target = "modifiedAt")
-    ConversationResponse map(ConversationView c, ConversationInfo info);
+    @Mapping(source = "view.room.chatId", target = "identifier")
+    @Mapping(source = "view.conversation.hash.value", target = "revisionNumber")
+    @Mapping(source = "view.conversation.recents", target = "recents")
+    @Mapping(source = "view.conversation.modifiedAt", target = "modifiedAt")
+    ConversationResponse map(ConversationView view, ConversationInfo info);
 
 }

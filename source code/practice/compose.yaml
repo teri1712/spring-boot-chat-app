@@ -18,6 +18,7 @@ services:
     image: redis/redis-stack:latest
     ports:
       - "6379:6379"
+      - "8001:8001"
     healthcheck:
       test: [ "CMD", "redis-cli", "ping" ]
       interval: 5s
@@ -75,7 +76,7 @@ services:
     ports:
       - "9090:9090"
     volumes:
-      - ./observability/prometheus.yml:/etc/prometheus/prometheus.yml
+      - ./prometheus.yml:/etc/prometheus/prometheus.yml
     extra_hosts:
       - "host.docker.internal:host-gateway"
     cpus: 0.5
@@ -92,6 +93,7 @@ services:
     ports:
       - "3100:3100"
     command: -config.file=/etc/loki/local-config.yaml
+
   tempo:
     image: grafana/tempo:2.5.0
     command: -config.file=/etc/tempo.yaml
@@ -100,7 +102,7 @@ services:
       - "4317:4317"
       - "4318:4318"
     volumes:
-      - ./observability/tempo.yml:/etc/tempo.yaml
+      - ./tempo.yml:/etc/tempo.yaml
 
   grafana:
     image: grafana/grafana:11.0.0

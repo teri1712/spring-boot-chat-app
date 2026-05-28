@@ -19,7 +19,6 @@ public interface InboxLogWithPartnerMapper {
     @Mapping(target = "roomAvatar", expression = "java(log.info().getAvatar(lookUp))")
     @Mapping(target = "revisionNumber", source = "log.revisionNumber")
     @Mapping(target = "sender", source = "log.senderId")
-    @Mapping(target = "owner", source = "log.ownerId")
     @Mapping(target = "action", source = "log.action")
     @Mapping(target = "messageState", source = "log.messageState")
     InboxLogWithPartnerDto toDto(InboxLogResponse log, @Context PartnerLookUp lookUp);

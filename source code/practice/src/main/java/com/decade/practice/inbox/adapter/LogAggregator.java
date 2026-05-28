@@ -9,7 +9,7 @@ import java.util.stream.Stream;
 
 @Component
 @RequiredArgsConstructor
-public class LogUserAggregator implements UserIdsAggregator<InboxLogResponse> {
+public class LogAggregator implements UserIdsAggregator<InboxLogResponse> {
     private final ConversationInfoUserAggregator infoAggregator;
     private final MessageStateUserAggregator messageAggregator;
 

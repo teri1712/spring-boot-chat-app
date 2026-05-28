@@ -2,8 +2,6 @@ package com.decade.practice.inbox.dto;
 
 import com.decade.practice.inbox.domain.LogAction;
 
-import java.util.UUID;
-
 public record InboxLogMessageWithPartnerDto(
     Long sequenceNumber,
     String chatId,
@@ -11,7 +9,6 @@ public record InboxLogMessageWithPartnerDto(
     String roomAvatar,
     Long revisionNumber,
     PartnerResponse sender,
-    UUID ownerId,
     LogAction action,
     MessageStateWithPartnerDto messageState
 ) {

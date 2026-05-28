@@ -34,7 +34,7 @@ public class LogManagement {
         String chatId = event.chatId();
         Room room = rooms.findByChatId(chatId).orElseThrow();
         if (room.getParticipantCount() < batchSize) {
-            broadcaster.broadcastInsert(event, conversations.findByChatId(chatId));
+            broadcaster.broadcastInsert(event, conversations.findByChatIdBetweenParticipantIndex(chatId, 0, batchSize + 1));
         } else {
             for (int i = 0; i < room.getParticipantCount(); i += batchSize) {
                 publisher.publishEvent(new BatchInsertionEvent(i, i + batchSize, event));
@@ -47,7 +47,7 @@ public class LogManagement {
         String chatId = event.chatId();
         Room room = rooms.findByChatId(chatId).orElseThrow();
         if (room.getParticipantCount() < batchSize) {
-            broadcaster.broadcastUpdate(event, conversations.findByChatId(chatId));
+            broadcaster.broadcastUpdate(event, conversations.findByChatIdBetweenParticipantIndex(chatId, 0, batchSize + 1));
         } else {
             for (int i = 0; i < room.getParticipantCount(); i += batchSize) {
                 publisher.publishEvent(new BatchUpdateEvent(i, i + batchSize, event));

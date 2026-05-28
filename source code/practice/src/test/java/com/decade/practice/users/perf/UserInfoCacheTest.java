@@ -1,4 +1,4 @@
-package com.decade.practice.inbox.integration;
+package com.decade.practice.users.perf;
 
 import com.decade.practice.integration.BaseTestClass;
 import com.decade.practice.users.api.UserApi;
@@ -24,9 +24,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 
 @Slf4j
 @TestPropertySource(properties = {
-    "spring.profiles.active=dev,redis-cache",
-    "logging.level.root=INFO",
-    "logging.level.com.decade.practice.inbox.integration=TRACE"
+    "redis.cache.enabled=true"
 })
 @Sql(value = "/sql/clean.sql", executionPhase = Sql.ExecutionPhase.AFTER_TEST_METHOD)
 class UserInfoCacheTest extends BaseTestClass {
@@ -98,7 +96,7 @@ class UserInfoCacheTest extends BaseTestClass {
     @Sql({"/sql/clean.sql"})
     void given800UsersAlreadyInCache_whenQueryWithAnother200User_thenStillFaster() throws Exception {
         List<UUID> userList = seed();
-        Set<UUID> query1 = new HashSet<>(userList.subList(0, 800));
+        Set<UUID> query1 = new HashSet<>(userList.subList(0, 900));
         Set<UUID> query2 = new HashSet<>(userList.subList(0, 1000));
 
         Instant before, after;

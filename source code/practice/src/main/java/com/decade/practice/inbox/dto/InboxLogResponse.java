@@ -11,7 +11,6 @@ public record InboxLogResponse(
     ConversationInfo info,
     Long revisionNumber,
     UUID senderId,
-    UUID ownerId,
     LogAction action,
     MessageStateResponse messageState
 ) {

@@ -28,7 +28,6 @@ public abstract class InboxLogMapper {
     @Mapping(target = "messageState", source = "logView.log.messageState")
     @Mapping(target = "senderId", source = "logView.log.senderId")
     @Mapping(target = "chatId", source = "logView.conversationView.room.chatId")
-    @Mapping(target = "ownerId", source = "logView.log.ownerId")
     @Mapping(target = "action", source = "logView.log.action")
     public abstract InboxLogResponse map(LogView logView, ConversationInfo info);
 

@@ -52,3 +52,52 @@ WHERE u.username LIKE 'user_%';
 
 drop sequence robin_seq;
 
+
+-- Seed 500 Text messages for the room
+INSERT INTO message (sequence_id, posting_id, sender_id, message_type, chat_id, created_at, updated_at, content)
+SELECT nextval('message_seq'),
+       gen_random_uuid(),
+       (SELECT id FROM user_member WHERE username = 'user_' || (floor(random() * 500) + 1)::text LIMIT 1),
+       'TEXT',
+       'group_5k_perf_test',
+       NOW() - INTERVAL '1 hour' + (i * INTERVAL '1 second'),
+       NOW() - INTERVAL '1 hour' + (i * INTERVAL '1 second'),
+       'Performance message ' || i
+FROM generate_series(1, 500) AS t(i);
+
+-- Seed 10 InboxLog per participant
+INSERT INTO inbox_log (sequence_id, sender_id, owner_id, conversation_id, message_id, action, message_state)
+SELECT nextval('inbox_log_seq'),
+       m.sender_id,
+       c.owner_id,
+       c.id,
+       m.sequence_id,
+       'ADDITION',
+       jsonb_build_object(
+               'type', 'text',
+               'sequenceId', m.sequence_id,
+               'postingId', m.posting_id,
+               'senderId', m.sender_id,
+               'messageType', 'TEXT',
+               'chatId', m.chat_id,
+               'createdAt', m.created_at,
+               'updatedAt', m.updated_at,
+               'seenByIds', '[]'::jsonb,
+               'content', m.content
+       )
+FROM (SELECT id, owner_id
+      FROM conversation
+      WHERE room_id = (SELECT id FROM room WHERE chat_id = 'group_5k_perf_test' LIMIT 1)) c
+         CROSS JOIN generate_series(1, 10) gs
+         JOIN LATERAL (
+    SELECT *
+    FROM message
+    WHERE chat_id = 'group_5k_perf_test'
+    ORDER BY random()
+    LIMIT 1
+    ) m ON true;
+
+
+select *
+from inbox_log
+where owner_id = (SELECT id FROM user_member WHERE username = 'user_1' LIMIT 1);

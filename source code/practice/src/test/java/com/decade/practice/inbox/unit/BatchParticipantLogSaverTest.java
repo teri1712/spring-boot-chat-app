@@ -109,8 +109,8 @@ class BatchParticipantLogSaverTest {
         assertThat(messages.stream().map(e -> e.ownerId()))
             .containsExactlyInAnyOrder(owner1, owner2);
 
-        verify(conversations, times(2)).save(any(Conversation.class));
-        verify(logs, times(2)).save(any());
+        verify(conversations, times(1)).saveAll(anyList());
+        verify(logs, times(1)).saveAll(anyList());
     }
 
     @Test
@@ -156,7 +156,12 @@ class BatchParticipantLogSaverTest {
         InboxLogMessage message = captor.getValue();
         assertThat(message.ownerId()).isEqualTo(owner1);
 
-        verify(conversations, times(1)).save(any(Conversation.class));
-        verify(logs, times(1)).save(any());
+        ArgumentCaptor<List> conversationCaptor = ArgumentCaptor.forClass(List.class);
+        verify(conversations, times(1)).saveAll(conversationCaptor.capture());
+        assertThat(conversationCaptor.getValue()).hasSize(1);
+
+        ArgumentCaptor<List> logCaptor = ArgumentCaptor.forClass(List.class);
+        verify(logs, times(1)).saveAll(logCaptor.capture());
+        assertThat(logCaptor.getValue()).hasSize(1);
     }
 }

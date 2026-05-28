@@ -2,17 +2,16 @@
 postgresql:
   primary:
     persistence:
-      size: 1Gi
+      enabled: false
 
 redis:
   master:
     persistence:
-      size: 1Gi
-
+      enabled: false
 
 kafka:
   persistence:
-    size: 2Gi
+    enabled: false
   resources:
     limits:
       cpu: 2000m

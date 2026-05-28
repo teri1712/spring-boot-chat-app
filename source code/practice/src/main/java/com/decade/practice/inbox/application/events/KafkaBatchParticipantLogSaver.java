@@ -19,7 +19,6 @@ public class KafkaBatchParticipantLogSaver extends BatchParticipantLogSaver {
 
     @Override
     @KafkaListener(topics = "batch-insertion-placed", groupId = "inbox")
-
     @Observed(name = "batch-insertion-placed",
         lowCardinalityKeyValues = {
             "batch-mode", "kafka"

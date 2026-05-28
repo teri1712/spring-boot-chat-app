@@ -100,6 +100,11 @@ management:
   tracing:
     sampling:
       probability: 1.0
+
+  observations:
+    annotations:
+      enabled: true
+
 frontend:
   host:
     address: http://localhost:4200
@@ -128,3 +133,4 @@ websocket:
 
 inbox:
   batch-size: 100
+
