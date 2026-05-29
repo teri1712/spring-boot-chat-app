@@ -79,30 +79,27 @@ livenessProbe:
   httpGet:
     path: /actuator/health/liveness
     port: 8081
-  initialDelaySeconds: 10
+  initialDelaySeconds: 0
+  periodSeconds: 10
+  timeoutSeconds: 3
+  failureThreshold: 3
 readinessProbe:
   httpGet:
     path: /actuator/health/readiness
     port: 8081
-  initialDelaySeconds: 10
+  initialDelaySeconds: 0
+  periodSeconds: 10
+  timeoutSeconds: 3
+  failureThreshold: 3
 startupProbe:
   httpGet:
     path: /actuator/health/liveness
     port: 8081
-  failureThreshold: 30
-  periodSeconds: 10
-
-ingress:
-  enabled: true
-  className: "nginx"
-  hosts:
-    - host: "" # Defined in profiles
-      paths:
-        - path: /
-          pathType: Prefix
-
-autoscaling:
-  enabled: false # Defined in profiles
+  failureThreshold: 60
+  periodSeconds: 5
+  timeoutSeconds: 3
 
 httpRoute:
   enabled: false
+ingress:
+  enabled: true

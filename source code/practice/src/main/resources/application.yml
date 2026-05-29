@@ -17,7 +17,6 @@ spring:
       minimum-idle: 10
   jpa:
     database: POSTGRESQL
-    show-sql: true
     hibernate:
       ddl-auto: validate
       naming:

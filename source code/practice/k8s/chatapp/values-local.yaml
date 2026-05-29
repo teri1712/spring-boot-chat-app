@@ -5,6 +5,7 @@ image:
   tag: "local"
 
 ingress:
+  className: "nginx"
   hosts:
     - host: localhost
       paths:
@@ -12,4 +13,4 @@ ingress:
           pathType: Prefix
 
 autoscaling:
-  enabled: false
+  enabled: false # Defined in profiles

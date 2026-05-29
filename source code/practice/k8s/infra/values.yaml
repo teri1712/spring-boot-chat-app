@@ -10,9 +10,6 @@ postgresql:
   primary:
     persistence:
       enabled: true
-      storageClass: ""
-      size: "" # Defined in profiles
-    resources: { } # Defined in profiles
 
 redis:
   auth:
@@ -22,9 +19,6 @@ redis:
   master:
     persistence:
       enabled: true
-      storageClass: ""
-      size: "" # Defined in profiles
-    resources: { } # Defined in profiles
 
 kafka:
   image:
@@ -34,10 +28,9 @@ kafka:
     interBrokerProtocol: sasl_plaintext
     saslMechanism: plain
     existingSecret: "chatapp-secrets"
+    jaas:
+      clientUser: "user"
+      existingSecret: "chatapp-secrets"
+      existingSecretPasswordKey: "kafka-password"
   persistence:
     enabled: true
-    storageClass: ""
-    size: "" # Defined in profiles
-  resources: { } # Defined in profiles
-  zookeeper:
-    resources: { } # Defined in profiles

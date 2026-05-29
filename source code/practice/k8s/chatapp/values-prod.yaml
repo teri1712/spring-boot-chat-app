@@ -1,8 +1,12 @@
 # GKE Production Profile - App
 replicaCount: 3
 
+service:
+  type: NodePort
+
 image:
   tag: "latest"
+  pullPolicy: Always
 
 resources:
   limits:

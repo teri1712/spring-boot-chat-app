@@ -2,6 +2,22 @@
 # Economical settings to prioritize resources for App and Infra services
 
 kube-prometheus-stack:
+  nodeExporter:
+    enabled: false
+  alertmanager:
+    enabled: false
+  grafana:
+    enabled: false
+  kubeProxy:
+    enabled: false
+  kubeScheduler:
+    enabled: false
+  kubeControllerManager:
+    enabled: false
+  kubeEtcd:
+    enabled: false
+  coreDns:
+    enabled: false
   prometheusOperator:
     resources:
       limits:
@@ -48,6 +64,16 @@ grafana:
       memory: 512Mi
 
 loki:
+  test:
+    enabled: false
+  lokiCanary:
+    enabled: false
+  gateway:
+    enabled: false
+  resultsCache:
+    enabled: false
+  chunksCache:
+    enabled: false
   singleBinary:
     persistence:
       storageClass: "premium-rwo"
