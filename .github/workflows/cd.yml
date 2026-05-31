@@ -2,8 +2,7 @@ name: CD - Spring Boot Chat App
 
 on:
     push:
-        branches:
-            - master*
+        branches: [master]
 
 jobs:
     build-artifacts:
@@ -26,7 +25,7 @@ jobs:
               run: echo "IMAGE_TAG=${GITHUB_SHA}" >> "$GITHUB_ENV"
 
             - name: Build image
-              working-directory: ./source code/practice
+              working-directory: .
               run: |
                   docker build \
                     -t "${IMAGE_REPO}:latest" \
@@ -38,43 +37,54 @@ jobs:
                   docker push "${IMAGE_REPO}:latest"
                   docker push "${IMAGE_REPO}:${IMAGE_TAG}"
 
-#    google-cloud-deployment:
-#        needs: build-artifacts
-#        runs-on: ubuntu-latest
-#        timeout-minutes: 20
-#        permissions:
-#            contents: read
-#
-#        env:
-#            IMAGE_TAG: ${{ github.sha }}
-#
-#        steps:
-#            - name: Deploy to VM
-#              uses: appleboy/ssh-action@v1.2.0
-#              with:
-#                  host: ${{ secrets.GOOGLE_CLOUD_HOST }}
-#                  username: ${{ secrets.GOOGLE_CLOUD_USER }}
-#                  key: ${{ secrets.GOOGLE_CLOUD_SSH_KEY }}
-#                  script_stop: true
-#                  script: |
-#                      cd ~/app/spring-boot-chat-app/source\ code/practice
-#
-#                      git reset --hard HEAD
-#                      git fetch
-#                      git checkout ${{ github.ref_name }}
-#                      git pull origin ${{ github.ref_name }}
-#
-#                      cd ./prometheus
-#                      envsubst < prometheus.yml.template > prometheus.yml
-#                      cd ..
-#                      
-#                      export IMAGE_TAG=${{ env.IMAGE_TAG }}
-#                      docker pull teri1712/chat-app:${IMAGE_TAG}
-#                      docker pull teri1712/chat-app:latest
-#
-#                      docker compose -f docker-compose.infra.yml -f docker-compose.production.yml pull
-#                      docker compose -f docker-compose.infra.yml -f docker-compose.production.yml build filebeat
-#                      docker compose -f docker-compose.infra.yml -f docker-compose.production.yml up -d --remove-orphans
-#                      docker compose -f docker-compose.infra.yml -f docker-compose.production.yml exec server nginx -s reload
-#
-#                      docker image prune -a
+    deploy-to-gke:
+        needs: build-artifacts
+        runs-on: ubuntu-latest
+        timeout-minutes: 20
+        permissions:
+            contents: read
+
+        env:
+            IMAGE_TAG: ${{ github.sha }}
+
+        steps:
+            - name: Checkout repository
+              uses: actions/checkout@v4
+
+            - name: Authenticate to Google Cloud
+              uses: google-github-actions/auth@v2
+              with:
+                  credentials_json: ${{ secrets.GCP_SA_KEY }}
+
+            - name: Get GKE Credentials
+              uses: google-github-actions/get-gke-credentials@v2
+              with:
+                  cluster_name: ${{ secrets.GKE_CLUSTER }}
+                  location: ${{ secrets.GKE_ZONE }}
+
+            - name: Set up Helm
+              uses: azure/setup-helm@v4
+              with:
+                  version: v3.14.0
+
+            - name: Deploy Infrastructure
+              run: |
+                  helm upgrade --install infra ./k8s/infra \
+                    --namespace default \
+                    -f ./k8s/infra/values-prod.yaml \
+                    --wait --timeout 10m
+
+            - name: Deploy Observability
+              run: |
+                  helm upgrade --install observability ./k8s/observability \
+                    --namespace default \
+                    -f ./k8s/observability/values-prod.yaml \
+                    --wait --timeout 10m
+
+            - name: Deploy Chat App
+              run: |
+                  helm upgrade --install chatapp ./k8s/chatapp \
+                    --namespace default \
+                    -f ./k8s/chatapp/values-prod.yaml \
+                    --set image.tag=${{ env.IMAGE_TAG }} \
+                    --wait --timeout 10m
