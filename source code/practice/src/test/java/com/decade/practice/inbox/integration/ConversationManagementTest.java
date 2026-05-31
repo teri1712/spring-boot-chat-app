@@ -49,7 +49,7 @@ class ConversationManagementTest extends BaseTestClass {
                     if (room.getParticipantCount() != 4) {
                         return null;
                     }
-                    return conversations.findByChatId(chatId);
+                    return conversations.findByChatIdBetweenParticipantIndex(chatId, 0, 5);
                 }
             })
             .andVerify(convos -> {

@@ -59,6 +59,7 @@ public class ChatOrchestrator implements ChatService {
     }
 
     @Override
+    @Transactional(readOnly = true)
     public ChatResponse find(String chatId, UUID userId) {
         ChatPolicyInfo policyInfo = engagementApi.find(chatId, userId).orElseThrow();
         SettingsInfo settingsInfo = settingApi.find(Set.of(chatId)).get(chatId);

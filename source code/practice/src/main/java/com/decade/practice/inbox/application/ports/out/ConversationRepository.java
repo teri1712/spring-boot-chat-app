@@ -30,10 +30,10 @@ public interface ConversationRepository extends JpaRepository<Conversation, Long
             from Conversation c
             join Room r on r.id = c.roomId
             where r.chatId = :chatId
-              and c.roundRobin >= :lowerBound
-              and c.roundRobin < :upperBound
+              and c.participantIndex >= :lowerBound
+              and c.participantIndex < :upperBound
         """)
-    List<ConversationView> findByChatIdBetweenRoundRobin(String chatId, Integer lowerBound, Integer upperBound);
+    List<ConversationView> findByChatIdBetweenParticipantIndex(String chatId, Integer lowerBound, Integer upperBound);
 
     @Query("""
         select new com.decade.practice.inbox.application.ports.out.projection.ConversationView(c,r)

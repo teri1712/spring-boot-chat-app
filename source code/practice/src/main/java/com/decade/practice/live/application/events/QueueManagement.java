@@ -1,6 +1,6 @@
 package com.decade.practice.live.application.events;
 
-import com.decade.practice.live.application.ports.in.QueueService;
+import com.decade.practice.live.application.ports.out.LivenessBroker;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
@@ -20,33 +20,43 @@ import java.util.UUID;
 public class QueueManagement {
 
 
-      @Value("${websocket.topics.user}")
-      private String userTopic;
+    @Value("${websocket.topics.user}")
+    private String userTopic;
 
-      @Value("${websocket.topics.queue}")
-      private String queueTopic;
+    @Value("${websocket.topics.queue}")
+    private String queueTopic;
 
-      private final QueueService queueService;
+    @Value("${broker.topics.queue}")
+    private String brokerQueueTopic;
 
-      @EventListener
-      public void subQueue(SessionSubscribeEvent event) {
-            if (isQueueDestination(event.getMessage())) {
-                  queueService.subQueue(UUID.fromString(event.getUser().getName()));
-            }
-      }
+    private final LivenessBroker broker;
 
-      private boolean isQueueDestination(Message<?> message) {
-            StompHeaderAccessor accessor =
-                      MessageHeaderAccessor.getAccessor(message, StompHeaderAccessor.class);
 
-            String destination = accessor.getDestination();
-            return destination != null && destination.startsWith(userTopic + queueTopic);
-      }
+    private String toBrokerDestination(UUID userId) {
+        return brokerQueueTopic + ":" + userId;
+    }
 
-      @EventListener
-      public void onUnsubscribe(SessionUnsubscribeEvent event) {
-            if (isQueueDestination(event.getMessage())) {
-                  queueService.unSubQueue(UUID.fromString(event.getUser().getName()));
-            }
-      }
+    @EventListener
+    public void subQueue(SessionSubscribeEvent event) {
+        if (isQueueDestination(event.getMessage())) {
+            UUID userId = UUID.fromString(event.getUser().getName());
+            broker.sub(toBrokerDestination(userId));
+        }
+    }
+
+    private boolean isQueueDestination(Message<?> message) {
+        StompHeaderAccessor accessor =
+            MessageHeaderAccessor.getAccessor(message, StompHeaderAccessor.class);
+
+        String destination = accessor.getDestination();
+        return destination != null && destination.startsWith(userTopic + queueTopic);
+    }
+
+    @EventListener
+    public void onUnsubscribe(SessionUnsubscribeEvent event) {
+        if (isQueueDestination(event.getMessage())) {
+            UUID userId = UUID.fromString(event.getUser().getName());
+            broker.unSub(toBrokerDestination(userId));
+        }
+    }
 }

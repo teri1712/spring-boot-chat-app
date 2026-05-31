@@ -1,0 +1,54 @@
+# GKE Production Profile - Observability
+# Economical settings to prioritize resources for App and Infra services
+
+prometheus:
+  server:
+    persistentVolume:
+      storageClass: "premium-rwo"
+      size: 10Gi
+    resources:
+      limits:
+        cpu: 500m
+        memory: 1Gi
+      requests:
+        cpu: 500m
+        memory: 1Gi
+
+grafana:
+  persistence:
+    storageClassName: "premium-rwo"
+    size: 1Gi
+  resources:
+    limits:
+      cpu: 250m
+      memory: 512Mi
+    requests:
+      cpu: 250m
+      memory: 512Mi
+
+loki:
+  loki:
+    resources:
+      limits:
+        cpu: 500m
+        memory: 1Gi
+      requests:
+        cpu: 500m
+        memory: 1Gi
+  singleBinary:
+    persistence:
+      storageClass: "premium-rwo"
+      size: 5Gi
+
+tempo:
+  tempo:
+    persistence:
+      storageClass: "premium-rwo"
+      size: 5Gi
+    resources:
+      limits:
+        cpu: 500m
+        memory: 1Gi
+      requests:
+        cpu: 500m
+        memory: 1Gi

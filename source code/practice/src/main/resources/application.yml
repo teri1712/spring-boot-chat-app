@@ -1,26 +1,22 @@
 spring:
   profiles:
-    active: dev
+    active: ${APP_PROFILES:dev}
   security:
     oauth2:
       resourceserver:
         jwt:
           issuer-uri: https://accounts.google.com
   application:
-    name: chat-app
+    name: chatapp
   datasource:
     type: com.zaxxer.hikari.HikariDataSource
-    url: jdbc:postgresql://localhost:5432/chatapp
     driver-class-name: org.postgresql.Driver
-    username: root
-    password: root
     hikari:
       maximum-pool-size: 15
       connection-timeout: 30000
-      minimum-idle: 5
+      minimum-idle: 10
   jpa:
     database: POSTGRESQL
-    show-sql: true
     hibernate:
       ddl-auto: validate
       naming:
@@ -34,19 +30,13 @@ spring:
       hibernate:
         format_sql: true
         highlight_sql: true
+        order_inserts: true
         order_updates: true
     open-in-view: true
   data:
     redis:
-      host: localhost
-      port: 6379
       timeout: 60000
       client-type: lettuce
-      # username: username
-      # password: password
-      # ssl:
-      #   enabled: true
-      #   bundle: general
   mvc:
     problemdetails:
       enabled: true
@@ -55,7 +45,8 @@ spring:
     enabled: true
 
   kafka:
-    bootstrap-servers: localhost:9092
+    listener:
+      concurrency: 4
     producer:
       key-serializer: org.apache.kafka.common.serialization.StringSerializer
       value-serializer: org.springframework.kafka.support.serializer.JsonSerializer
@@ -89,22 +80,13 @@ server:
         same-site: Lax
   # ssl:
   #   bundle: general
-
-frontend:
-  host:
-    address: http://localhost:4200
-
-jwt:
-  secret: vcl-vcl-vcl-vcl-vcl-vcl-vcl-vcl-vcl-vcl
-
-
 management:
   server:
     port: 8081
   endpoints:
     web:
       exposure:
-        include: health,env,bean,info,prometheus,modulith
+        include: health,env,beans,info,prometheus,modulith
   endpoint:
     health:
       probes:
@@ -116,9 +98,14 @@ management:
   tracing:
     sampling:
       probability: 1.0
-  otlp:
-    tracing:
-      endpoint: http://localhost:4318/v1/traces
+
+  observations:
+    annotations:
+      enabled: true
+
+frontend:
+  host:
+    address: http://localhost:4200
 
 aws:
   s3:
@@ -140,3 +127,9 @@ websocket:
     user: /user
     queue: /queue
     room: /room
+    setting: /setting
+
+
+inbox:
+  batch-size: 100
+

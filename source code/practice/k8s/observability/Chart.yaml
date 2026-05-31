@@ -1,0 +1,20 @@
+apiVersion: v2
+name: observability
+description: Centralized LGTM Stack for Messenger Clone
+type: application
+version: 0.1.0
+appVersion: "1.0.0"
+
+dependencies:
+  - name: prometheus
+    version: 29.8.0
+    repository: https://prometheus-community.github.io/helm-charts
+  - name: loki
+    version: 16.1.0
+    repository: https://grafana-community.github.io/helm-charts
+  - name: tempo
+    version: 2.1.2
+    repository: https://grafana-community.github.io/helm-charts
+  - name: grafana
+    version: 12.3.2
+    repository: https://grafana-community.github.io/helm-charts

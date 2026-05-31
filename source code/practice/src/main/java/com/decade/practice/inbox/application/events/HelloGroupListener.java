@@ -17,9 +17,9 @@ public class HelloGroupListener {
 
     private final MessageRepository messages;
 
-    @ApplicationModuleListener(id = "group_listener")
+    @ApplicationModuleListener
     public void on(RoomCreated event) {
-        if (event.representatives().size() > 2) {
+        if (event.participants().size() > 2) {
             HelloGroup message = new HelloGroup(
                 UUID.randomUUID(),
                 event.creator(),

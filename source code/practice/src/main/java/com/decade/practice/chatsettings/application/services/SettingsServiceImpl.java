@@ -48,10 +48,10 @@ public class SettingsServiceImpl implements SettingsService, SettingApi {
         if (request.themeId() != null)
             chain = chain.theme(themes.findById(request.themeId()).orElseThrow());
 
-        if (request.customName() != null)
+        if (request.customName() != null && !request.customName().isBlank())
             chain = chain.roomName(request.customName());
 
-        if (request.customAvatar() != null)
+        if (request.customAvatar() != null && !request.customAvatar().isBlank())
             chain = chain.roomAvatar(request.customAvatar());
 
         Preference preference = chain.complete();

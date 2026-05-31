@@ -1,0 +1,29 @@
+# LOCAL Scaling Down for Kind
+postgresql:
+  primary:
+    persistence:
+      enabled: false
+
+redis:
+  master:
+    persistence:
+      enabled: false
+
+kafka:
+  persistence:
+    enabled: false
+  resources:
+    limits:
+      cpu: 2000m
+      memory: 2Gi
+    requests:
+      cpu: 1000m
+      memory: 512Mi
+  zookeeper:
+    resources:
+      limits:
+        cpu: 500m
+        memory: 512Mi
+      requests:
+        cpu: 200m
+        memory: 256Mi

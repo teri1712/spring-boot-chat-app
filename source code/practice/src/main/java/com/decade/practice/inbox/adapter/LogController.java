@@ -22,9 +22,8 @@ public class LogController {
     private final LogService logService;
     private final LookUpRegistry lookUpRegistry;
     private final InboxLogWithPartnerMapper inboxLogWithPartnerMapper;
-    private final LogUserAggregator logAggregator;
+    private final LogAggregator logAggregator;
 
-    // TODO: Adjust client to new endpoint
     @GetMapping("/chats/{chatId}/logs")
     List<InboxLogWithPartnerDto> listLog(
         @AuthenticationPrincipal(expression = "id") UUID userId,
@@ -37,7 +36,6 @@ public class LogController {
         return inboxLogWithPartnerMapper.toDtos(logs, lookUpRegistry.registerLookUp(allUsers));
     }
 
-    // TODO: Adjust client to last currentState
     @GetMapping("/users/me/logs")
     List<InboxLogWithPartnerDto> listLog(
         @AuthenticationPrincipal(expression = "id") UUID userId,

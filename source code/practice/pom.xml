@@ -9,7 +9,7 @@
         <relativePath/> <!-- lookup parent from repository -->
     </parent>
     <groupId>com.decade</groupId>
-    <artifactId>demo</artifactId>
+    <artifactId>chat-app-server</artifactId>
     <version>0.0.1-SNAPSHOT</version>
     <name/>
     <description/>
@@ -251,7 +251,7 @@
         <dependency>
             <groupId>com.github.loki4j</groupId>
             <artifactId>loki-logback-appender</artifactId>
-            <version>1.5.2</version>
+            <version>1.6.0</version>
         </dependency>
 
         <!-- Metrics → Prometheus -->

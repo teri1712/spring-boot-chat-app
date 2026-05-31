@@ -1,0 +1,17 @@
+apiVersion: v2
+name: infra
+description: Infrastructure stack for Messenger Clone
+type: application
+version: 0.1.0
+appVersion: "1.0.0"
+
+dependencies:
+  - name: postgresql
+    version: 18.6.7
+    repository: https://charts.bitnami.com/bitnami
+  - name: redis
+    version: 25.5.3
+    repository: https://charts.bitnami.com/bitnami
+  - name: kafka
+    version: 32.4.3
+    repository: https://charts.bitnami.com/bitnami

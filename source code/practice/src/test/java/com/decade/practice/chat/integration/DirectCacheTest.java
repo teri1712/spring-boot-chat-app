@@ -19,8 +19,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 
 @Slf4j
 @TestPropertySource(properties = {
-    "spring.profiles.active=dev,redis-cache",
-    "logging.level.root=INFO"
+    "redis.cache.enabled=true"
 })
 @Sql(value = "/sql/clean.sql", executionPhase = Sql.ExecutionPhase.AFTER_TEST_METHOD)
 class DirectCacheTest extends BaseTestClass {

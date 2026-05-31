@@ -25,7 +25,7 @@ import java.util.function.Supplier;
 import static org.assertj.core.api.Assertions.assertThat;
 
 @RequiredArgsConstructor
-class BatchHandlingTest extends BaseTestClass {
+abstract class BatchHandlingTest extends BaseTestClass {
     final ConversationRepository conversations;
     final LogRepository logs;
     final RoomRepository rooms;
@@ -77,7 +77,7 @@ class BatchHandlingTest extends BaseTestClass {
 
         AtomicInteger index = new AtomicInteger();
         for (int i = 0; i < limit; i++) participants.add(UUID.randomUUID());
-
+    
         conversations.saveAll(participants.stream()
             .map(participantId -> new Conversation(participantId, room.getId(), offset + index.getAndIncrement()))
             .toList());

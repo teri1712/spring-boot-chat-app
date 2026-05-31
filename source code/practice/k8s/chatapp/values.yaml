@@ -1,0 +1,116 @@
+# Blueprint for Application (Structure & Logic)
+replicaCount: "" # Defined in profiles
+
+image:
+  repository: teri1712/chat-app
+  pullPolicy: IfNotPresent
+  tag: "" # Defined in profiles
+
+restartPolicy: Always
+
+service:
+  type: ClusterIP
+  port: 80
+
+serviceAccount:
+  create: true
+  automount: true
+
+podAnnotations:
+  prometheus.io/scrape: "true"
+  prometheus.io/path: "/actuator/prometheus"
+  prometheus.io/port: "8081"
+
+serviceMonitor:
+  enabled: false
+  release: observability
+
+# --- STANDARD ENVIRONMENT (Uses Secrets) ---
+env:
+  APP_PROFILES: "prod"
+  DB_URL: "jdbc:postgresql://infra-postgresql:5432/chatapp"
+  DB_USERNAME:
+    valueFrom:
+      secretKeyRef:
+        name: chatapp-secrets
+        key: database-username
+  DB_PASSWORD:
+    valueFrom:
+      secretKeyRef:
+        name: chatapp-secrets
+        key: postgres-password
+  REDIS_HOST: "infra-redis-master"
+  REDIS_PASSWORD:
+    valueFrom:
+      secretKeyRef:
+        name: chatapp-secrets
+        key: redis-password
+  KAFKA_SERVERS: "infra-kafka:9092"
+  KAFKA_SECURITY_PROTOCOL: "SASL_PLAINTEXT"
+  KAFKA_USER:
+    valueFrom:
+      secretKeyRef:
+        name: chatapp-secrets
+        key: client-users
+  KAFKA_PASSWORD:
+    valueFrom:
+      secretKeyRef:
+        name: chatapp-secrets
+        key: client-passwords
+  JWT_SECRET:
+    valueFrom:
+      secretKeyRef:
+        name: chatapp-secrets
+        key: jwt-secret
+  AWS_ACCESS_KEY_ID:
+    valueFrom:
+      secretKeyRef:
+        name: chatapp-secrets
+        key: aws-access-id
+  AWS_SECRET_ACCESS_KEY:
+    valueFrom:
+      secretKeyRef:
+        name: chatapp-secrets
+        key: aws-secret-key
+  AWS_S3_REGION: "ap-southeast-1"
+  AWS_S3_BUCKET: "decade-bucket"
+  LOKI_URL: "http://observability-loki:3100/loki/api/v1/push"
+  OTLP_ENDPOINT: "http://observability-tempo:4318/v1/traces"
+  JAVA_TOOL_OPTIONS: "-XX:MaxRAMPercentage=75.0 -XX:InitialRAMPercentage=50.0"
+  REDIS_CACHE_ENABLED: "true"
+  BATCH_MODE: "kafka"
+  SPRING_KAFKA_LISTENER_CONCURRENCY: "1"
+  SPRING_DATASOURCE_HIKARI_MAXIMUM_POOL_SIZE: "15"
+  SPRING_DATASOURCE_HIKARI_MINIMUM_IDLE: "10"
+
+resources: { } # Defined in profiles
+
+livenessProbe:
+  httpGet:
+    path: /actuator/health/liveness
+    port: 8081
+  initialDelaySeconds: 0
+  periodSeconds: 10
+  timeoutSeconds: 3
+  failureThreshold: 3
+readinessProbe:
+  httpGet:
+    path: /actuator/health/readiness
+    port: 8081
+  initialDelaySeconds: 0
+  periodSeconds: 10
+  timeoutSeconds: 3
+  failureThreshold: 3
+startupProbe:
+  httpGet:
+    path: /actuator/health/liveness
+    port: 8081
+  failureThreshold: 60
+  periodSeconds: 5
+  timeoutSeconds: 3
+
+httpRoute:
+  enabled: false
+ingress:
+  enabled: true
+

@@ -1,0 +1,119 @@
+# Blueprint for Observability Stack
+prometheus:
+  prometheus-node-exporter:
+    enabled: false
+  alertmanager:
+    enabled: false
+  prometheus-pushgateway:
+    enabled: false
+  kube-state-metrics:
+    enabled: false
+  configmapReload:
+    prometheus:
+      enabled: false
+  server:
+    persistentVolume:
+      enabled: true
+      accessModes: [ "ReadWriteOnce" ]
+      size: "" # Defined in profiles
+    resources: { } # Defined in profiles
+
+grafana:
+  enabled: true
+  admin:
+    existingSecret: "chatapp-secrets"
+    userKey: "admin-user"
+    passwordKey: "admin-password"
+  testFramework:
+    enabled: false
+  initChownData:
+    enabled: false
+  persistence:
+    enabled: true
+    size: "" # Defined in profiles
+  resources: { } # Defined in profiles
+  serviceMonitor:
+    enabled: false
+  grafana.ini:
+    unified_alerting:
+      enabled: false
+    alerting:
+      enabled: false
+  additionalDataSources:
+    - name: Prometheus
+      type: prometheus
+      url: http://observability-prometheus-server
+      access: proxy
+      isDefault: true
+    - name: Loki
+      type: loki
+      url: http://observability-loki:3100
+      access: proxy
+    - name: Tempo
+      type: tempo
+      url: http://observability-tempo:3200
+      access: proxy
+
+loki:
+  deploymentMode: Monolithic
+  test:
+    enabled: false
+  lokiCanary:
+    enabled: false
+  gateway:
+    enabled: false
+  resultsCache:
+    enabled: false
+  chunksCache:
+    enabled: false
+  monitoring:
+    serviceMonitor:
+      enabled: false
+    selfMonitoring:
+      enabled: false
+      grafanaAgent:
+        install: false
+  loki:
+    auth_enabled: false
+    useTestSchema: true
+    commonConfig:
+      replication_factor: 1
+    storage:
+      type: 'filesystem'
+  singleBinary:
+    replicas: 1
+    persistence:
+      enabled: true
+      size: "" # Defined in profiles
+    resources: { } # Defined in profiles
+  read:
+    replicas: 0
+  write:
+    replicas: 0
+  backend:
+    replicas: 0
+  memcached:
+    chunksCache:
+      enabled: false
+    resultsCache:
+      enabled: false
+  minio:
+    enabled: false
+
+tempo:
+  tempo:
+    persistence:
+      enabled: true
+      size: "" # Defined in profiles
+    resources: { } # Defined in profiles
+    receivers:
+      otlp:
+        protocols:
+          http:
+            endpoint: "0.0.0.0:4318"
+          grpc:
+            endpoint: "0.0.0.0:4317"
+  serviceMonitor:
+    enabled: false
+  gateway:
+    enabled: false

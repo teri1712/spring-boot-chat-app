@@ -6,3 +6,6 @@ spring:
 logging:
   level:
     root: DEBUG
+
+jwt:
+  secret: vcl-vcl-vcl-vcl-vcl-vcl-vcl-vcl-vcl-vcl

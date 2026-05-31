@@ -17,7 +17,7 @@ import org.springframework.stereotype.Component;
 
 @Component
 @RequiredArgsConstructor
-@Order(0)
+@Order(1)
 public class RoomInterceptor implements ChannelInterceptor {
 
     private final RoomService roomService;
@@ -53,7 +53,7 @@ public class RoomInterceptor implements ChannelInterceptor {
             } else if (command == StompCommand.SEND) {
                 String chatId = extractChatId(accessor.getDestination());
                 JwtUser jwtUser = ((SocketAuthentication) accessor.getUser()).jwtUser();
-                roomService.send(chatId, jwtUser.getId(), jwtUser.getClaims().avatar());
+                roomService.type(chatId, jwtUser.getId(), jwtUser.getClaims().avatar());
                 return null;
             }
         }

@@ -1,0 +1,55 @@
+# LOCAL Scaling Down for Kind
+prometheus:
+  server:
+    persistentVolume:
+      size: 2Gi
+    resources:
+      limits:
+        cpu: 500m
+        memory: 512Mi
+      requests:
+        cpu: 250m
+        memory: 512Mi
+
+grafana:
+  initChownData:
+    enabled: false
+  persistence:
+    size: 1Gi
+  resources:
+    limits:
+      cpu: 500m
+      memory: 256Mi
+    requests:
+      cpu: 200m
+      memory: 128Mi
+
+loki:
+  loki:
+    server:
+      http_server_write_timeout: 1m
+    ingester:
+      lifecycler:
+        final_sleep: 15s
+  singleBinary:
+    persistence:
+      size: 2Gi
+    resources:
+      limits:
+        cpu: 2000m
+        memory: 2Gi
+      requests:
+        cpu: 1000m
+        memory: 256Mi
+
+tempo:
+  tempo:
+    persistence:
+      size: 2Gi
+    resources:
+      limits:
+        cpu: 1000m
+        memory: 1Gi
+      requests:
+        cpu: 500m
+        memory: 256Mi

@@ -4,6 +4,7 @@ import com.decade.practice.shared.security.jwt.JwtService;
 import com.decade.practice.shared.security.jwt.JwtTokenFilter;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.core.annotation.Order;
 import org.springframework.http.HttpStatus;
 import org.springframework.security.config.Customizer;
 import org.springframework.security.config.annotation.method.configuration.EnableMethodSecurity;
@@ -20,12 +21,13 @@ import org.springframework.security.web.context.RequestAttributeSecurityContextR
 public class InboxSecurity {
 
     @Bean
+    @Order(1)
     public SecurityFilterChain inboxChain(
         HttpSecurity http,
         JwtService jwtService
     ) throws Exception {
         http
-            .securityMatcher("**/logs", "**/logs", "/conversations/**")
+            .securityMatcher("**/logs", "/conversations/**")
             .requestCache(Customizer.withDefaults())
             .securityContext(context ->
                 context.securityContextRepository(new RequestAttributeSecurityContextRepository())
@@ -36,6 +38,7 @@ public class InboxSecurity {
                 exceptionHandling.accessDeniedPage(null)
                     .authenticationEntryPoint(new HttpStatusEntryPoint(HttpStatus.UNAUTHORIZED))
             )
+            .httpBasic(Customizer.withDefaults())
             .addFilterAfter(new JwtTokenFilter(jwtService), UsernamePasswordAuthenticationFilter.class)
             .authorizeHttpRequests(authorize ->
                 authorize.anyRequest().authenticated()

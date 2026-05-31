@@ -34,3 +34,6 @@ build/
 **/logs
 
 localstack/
+*.tgz
+
+**/secret.yaml

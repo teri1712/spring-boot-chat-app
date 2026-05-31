@@ -1,0 +1,16 @@
+# LOCAL Scaling Down for Kind
+replicaCount: 2
+
+image:
+  tag: "local"
+
+ingress:
+  className: "nginx"
+  hosts:
+    - host: localhost
+      paths:
+        - path: /
+          pathType: Prefix
+
+autoscaling:
+  enabled: false # Defined in profiles

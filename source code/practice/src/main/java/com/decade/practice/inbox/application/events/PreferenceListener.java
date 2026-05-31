@@ -22,7 +22,7 @@ public class PreferenceListener {
     private final RoomRepository rooms;
 
 
-    @ApplicationModuleListener(id = "preference_listener")
+    @ApplicationModuleListener(id = "room-preference-changed")
     public void on(PreferenceChanged event) {
 
         Room room = rooms.findByChatId(event.getChatId()).orElseThrow();
