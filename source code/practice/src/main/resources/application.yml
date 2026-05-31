@@ -32,7 +32,6 @@ spring:
         highlight_sql: true
         order_inserts: true
         order_updates: true
-        jdbc.batch_size: 50
     open-in-view: true
   data:
     redis:
