@@ -10,6 +10,7 @@ import com.decade.practice.inbox.domain.messages.InboxLogMessage;
 import com.decade.practice.inbox.domain.services.ConversationInfoService;
 import com.decade.practice.inbox.dto.mapper.MessageStateResponseMapper;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -17,6 +18,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
 
+@Slf4j
 @RequiredArgsConstructor
 @Service
 public class LogBroadCaster {
@@ -32,6 +34,7 @@ public class LogBroadCaster {
         List<InboxLog> logsToSave = new ArrayList<>(convos.size());
         List<Conversation> convosToSave = new ArrayList<>(convos.size());
 
+        log.info("Broadcasting insert for {} convos", convos.size());
         for (ConversationView cv : convos) {
             Conversation conversation = cv.conversation();
             UUID ownerId = conversation.getOwnerId();

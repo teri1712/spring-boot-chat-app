@@ -31,7 +31,7 @@ public class EnthusiasmManagement {
     public void on(RoomCreated event) {
         String chatId = event.chatId();
 
-        event.representatives().forEach(participant ->
+        event.participants().forEach(participant ->
             scoreEngine.incScore(chatId, participant.toString()));
     }
 

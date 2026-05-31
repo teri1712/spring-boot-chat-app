@@ -1,6 +1,5 @@
 package com.decade.practice.inbox.domain;
 
-import com.decade.practice.inbox.domain.events.RoomCreated;
 import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -43,7 +42,6 @@ public class Room extends AbstractAggregateRoot<Room> {
         this.representatives = new HashSet<>();
         this.participantCount = participants.size();
         participants.forEach(this::addRepresentative);
-        registerEvent(new RoomCreated(chatId, creator, lastActivity, Set.copyOf(representatives)));
     }
 
     @JdbcTypeCode(SqlTypes.JSON)

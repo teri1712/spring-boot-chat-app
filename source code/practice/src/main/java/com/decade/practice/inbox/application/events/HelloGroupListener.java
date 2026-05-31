@@ -5,7 +5,7 @@ import com.decade.practice.inbox.domain.HelloGroup;
 import com.decade.practice.inbox.domain.events.RoomCreated;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.context.event.EventListener;
+import org.springframework.modulith.events.ApplicationModuleListener;
 import org.springframework.stereotype.Service;
 
 import java.util.UUID;
@@ -17,9 +17,9 @@ public class HelloGroupListener {
 
     private final MessageRepository messages;
 
-    @EventListener
+    @ApplicationModuleListener
     public void on(RoomCreated event) {
-        if (event.representatives().size() > 2) {
+        if (event.participants().size() > 2) {
             HelloGroup message = new HelloGroup(
                 UUID.randomUUID(),
                 event.creator(),
