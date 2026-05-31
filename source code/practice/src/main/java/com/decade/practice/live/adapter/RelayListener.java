@@ -1,8 +1,8 @@
 package com.decade.practice.live.adapter;
 
-import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.context.annotation.Lazy;
 import org.springframework.data.redis.connection.Message;
 import org.springframework.data.redis.connection.MessageListener;
 import org.springframework.messaging.simp.SimpMessageHeaderAccessor;
@@ -15,7 +15,6 @@ import java.nio.charset.StandardCharsets;
 
 @Slf4j
 @Component
-@RequiredArgsConstructor
 public class RelayListener implements MessageListener {
 
     @Value("${broker.topics.queue}")
@@ -25,6 +24,10 @@ public class RelayListener implements MessageListener {
     private String queueTopic;
 
     private final SimpMessagingTemplate template;
+
+    public RelayListener(@Lazy SimpMessagingTemplate template) {
+        this.template = template;
+    }
 
     @Override
     public void onMessage(Message message, byte[] pattern) {

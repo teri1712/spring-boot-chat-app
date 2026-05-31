@@ -1,26 +1,21 @@
 # LOCAL Scaling Down for Kind
-kube-prometheus-stack:
-  prometheus:
-    prometheusSpec:
-      storageSpec:
-        volumeClaimTemplate:
-          spec:
-            resources:
-              requests:
-                storage: 1Gi
-      resources:
-        limits:
-          cpu: 1000m
-          memory: 1Gi
-        requests:
-          cpu: 500m
-          memory: 256Mi
+prometheus:
+  server:
+    persistentVolume:
+      size: 2Gi
+    resources:
+      limits:
+        cpu: 500m
+        memory: 512Mi
+      requests:
+        cpu: 250m
+        memory: 512Mi
 
 grafana:
   initChownData:
     enabled: false
   persistence:
-    size: 512Mi
+    size: 1Gi
   resources:
     limits:
       cpu: 500m

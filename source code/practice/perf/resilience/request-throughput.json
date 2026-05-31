@@ -1,0 +1,1015 @@
+[
+  {
+    "schema": {
+      "refId": "A",
+      "meta": {
+        "type": "timeseries-multi",
+        "typeVersion": [
+          0,
+          1
+        ],
+        "custom": {
+          "calculatedMinStep": 15000,
+          "resultType": "matrix"
+        },
+        "executedQueryString": "Expr: http_server_requests_seconds_count{uri=\"/chats/{chatId}/texts/{postingId}\"}\nStep: 15s",
+        "preferredVisualisationType": "graph"
+      },
+      "fields": [
+        {
+          "name": "Time",
+          "type": "time",
+          "typeInfo": {
+            "frame": "time.Time"
+          },
+          "config": {
+            "interval": 15000
+          }
+        },
+        {
+          "name": "http_server_requests_seconds_count",
+          "type": "number",
+          "typeInfo": {
+            "frame": "float64"
+          },
+          "labels": {
+            "__name__": "http_server_requests_seconds_count",
+            "app_kubernetes_io_instance": "chatapp",
+            "app_kubernetes_io_managed_by": "Helm",
+            "app_kubernetes_io_name": "chatapp",
+            "app_kubernetes_io_version": "1.0.0",
+            "application": "chatapp",
+            "error": "CannotCreateTransactionException",
+            "exception": "CannotCreateTransactionException",
+            "helm_sh_chart": "chatapp-0.1.0",
+            "instance": "10.69.0.204:8081",
+            "job": "kubernetes-pods",
+            "method": "PUT",
+            "namespace": "default",
+            "node": "gk3-chatapp-staging-cluster-pool-1-cd52a096-twlz",
+            "outcome": "SERVER_ERROR",
+            "pod": "chatapp-6f547-wsmth",
+            "pod_template_hash": "6f547",
+            "status": "500",
+            "topology_kubernetes_io_region": "asia-southeast1",
+            "topology_kubernetes_io_zone": "asia-southeast1-b",
+            "uri": "/chats/{chatId}/texts/{postingId}"
+          },
+          "config": {
+            "displayNameFromDS": "{error=\"CannotCreateTransactionException\", exception=\"CannotCreateTransactionException\", instance=\"10.69.0.204:8081\", node=\"gk3-chatapp-staging-cluster-pool-1-cd52a096-twlz\", outcome=\"SERVER_ERROR\", pod=\"chatapp-6f547-wsmth\", pod_template_hash=\"6f547\", status=\"500\", topology_kubernetes_io_zone=\"asia-southeast1-b\"}"
+          }
+        }
+      ]
+    },
+    "data": {
+      "values": [
+        [
+          1780223145000,
+          1780223160000,
+          1780223175000,
+          1780223190000,
+          1780223205000,
+          1780223220000,
+          1780223235000,
+          1780223250000
+        ],
+        [
+          184,
+          184,
+          184,
+          184,
+          323,
+          323,
+          323,
+          323
+        ]
+      ]
+    }
+  },
+  {
+    "schema": {
+      "refId": "A",
+      "meta": {
+        "type": "timeseries-multi",
+        "typeVersion": [
+          0,
+          1
+        ],
+        "custom": {
+          "resultType": "matrix"
+        },
+        "preferredVisualisationType": "graph"
+      },
+      "fields": [
+        {
+          "name": "Time",
+          "type": "time",
+          "typeInfo": {
+            "frame": "time.Time"
+          },
+          "config": {
+            "interval": 15000
+          }
+        },
+        {
+          "name": "http_server_requests_seconds_count",
+          "type": "number",
+          "typeInfo": {
+            "frame": "float64"
+          },
+          "labels": {
+            "__name__": "http_server_requests_seconds_count",
+            "app_kubernetes_io_instance": "chatapp",
+            "app_kubernetes_io_managed_by": "Helm",
+            "app_kubernetes_io_name": "chatapp",
+            "app_kubernetes_io_version": "1.0.0",
+            "application": "chatapp",
+            "error": "CannotCreateTransactionException",
+            "exception": "CannotCreateTransactionException",
+            "helm_sh_chart": "chatapp-0.1.0",
+            "instance": "10.69.0.69:8081",
+            "job": "kubernetes-pods",
+            "method": "PUT",
+            "namespace": "default",
+            "node": "gk3-chatapp-staging-clus-nap-1t9evicx-7e035836-2r9r",
+            "outcome": "SERVER_ERROR",
+            "pod": "chatapp-5555dbc56-glf58",
+            "pod_template_hash": "5555dbc56",
+            "status": "500",
+            "topology_kubernetes_io_region": "asia-southeast1",
+            "topology_kubernetes_io_zone": "asia-southeast1-c",
+            "uri": "/chats/{chatId}/texts/{postingId}"
+          },
+          "config": {
+            "displayNameFromDS": "{error=\"CannotCreateTransactionException\", exception=\"CannotCreateTransactionException\", instance=\"10.69.0.69:8081\", node=\"gk3-chatapp-staging-clus-nap-1t9evicx-7e035836-2r9r\", outcome=\"SERVER_ERROR\", pod=\"chatapp-5555dbc56-glf58\", pod_template_hash=\"5555dbc56\", status=\"500\", topology_kubernetes_io_zone=\"asia-southeast1-c\"}"
+          }
+        }
+      ]
+    },
+    "data": {
+      "values": [
+        [
+          1780224480000,
+          1780224495000,
+          1780224510000,
+          1780224525000,
+          1780224540000,
+          1780224555000,
+          1780224570000,
+          1780224585000,
+          1780224600000,
+          1780224615000,
+          1780224630000,
+          1780224645000
+        ],
+        [
+          1,
+          1,
+          1,
+          1,
+          74,
+          74,
+          74,
+          74,
+          101,
+          101,
+          101,
+          101
+        ]
+      ]
+    }
+  },
+  {
+    "schema": {
+      "refId": "A",
+      "meta": {
+        "type": "timeseries-multi",
+        "typeVersion": [
+          0,
+          1
+        ],
+        "custom": {
+          "resultType": "matrix"
+        },
+        "preferredVisualisationType": "graph"
+      },
+      "fields": [
+        {
+          "name": "Time",
+          "type": "time",
+          "typeInfo": {
+            "frame": "time.Time"
+          },
+          "config": {
+            "interval": 15000
+          }
+        },
+        {
+          "name": "http_server_requests_seconds_count",
+          "type": "number",
+          "typeInfo": {
+            "frame": "float64"
+          },
+          "labels": {
+            "__name__": "http_server_requests_seconds_count",
+            "app_kubernetes_io_instance": "chatapp",
+            "app_kubernetes_io_managed_by": "Helm",
+            "app_kubernetes_io_name": "chatapp",
+            "app_kubernetes_io_version": "1.0.0",
+            "application": "chatapp",
+            "error": "CannotCreateTransactionException",
+            "exception": "CannotCreateTransactionException",
+            "helm_sh_chart": "chatapp-0.1.0",
+            "instance": "10.69.0.70:8081",
+            "job": "kubernetes-pods",
+            "method": "PUT",
+            "namespace": "default",
+            "node": "gk3-chatapp-staging-clus-nap-1t9evicx-7e035836-2r9r",
+            "outcome": "SERVER_ERROR",
+            "pod": "chatapp-5555dbc56-zzk5z",
+            "pod_template_hash": "5555dbc56",
+            "status": "500",
+            "topology_kubernetes_io_region": "asia-southeast1",
+            "topology_kubernetes_io_zone": "asia-southeast1-c",
+            "uri": "/chats/{chatId}/texts/{postingId}"
+          },
+          "config": {
+            "displayNameFromDS": "{error=\"CannotCreateTransactionException\", exception=\"CannotCreateTransactionException\", instance=\"10.69.0.70:8081\", node=\"gk3-chatapp-staging-clus-nap-1t9evicx-7e035836-2r9r\", outcome=\"SERVER_ERROR\", pod=\"chatapp-5555dbc56-zzk5z\", pod_template_hash=\"5555dbc56\", status=\"500\", topology_kubernetes_io_zone=\"asia-southeast1-c\"}"
+          }
+        }
+      ]
+    },
+    "data": {
+      "values": [
+        [
+          1780224480000,
+          1780224495000,
+          1780224510000,
+          1780224525000,
+          1780224540000,
+          1780224555000,
+          1780224570000,
+          1780224585000,
+          1780224600000,
+          1780224615000,
+          1780224630000,
+          1780224645000
+        ],
+        [
+          7,
+          7,
+          7,
+          7,
+          132,
+          132,
+          132,
+          132,
+          179,
+          179,
+          179,
+          179
+        ]
+      ]
+    }
+  },
+  {
+    "schema": {
+      "refId": "A",
+      "meta": {
+        "type": "timeseries-multi",
+        "typeVersion": [
+          0,
+          1
+        ],
+        "custom": {
+          "resultType": "matrix"
+        },
+        "preferredVisualisationType": "graph"
+      },
+      "fields": [
+        {
+          "name": "Time",
+          "type": "time",
+          "typeInfo": {
+            "frame": "time.Time"
+          },
+          "config": {
+            "interval": 15000
+          }
+        },
+        {
+          "name": "http_server_requests_seconds_count",
+          "type": "number",
+          "typeInfo": {
+            "frame": "float64"
+          },
+          "labels": {
+            "__name__": "http_server_requests_seconds_count",
+            "app_kubernetes_io_instance": "chatapp",
+            "app_kubernetes_io_managed_by": "Helm",
+            "app_kubernetes_io_name": "chatapp",
+            "app_kubernetes_io_version": "1.0.0",
+            "application": "chatapp",
+            "error": "CannotCreateTransactionException",
+            "exception": "CannotCreateTransactionException",
+            "helm_sh_chart": "chatapp-0.1.0",
+            "instance": "10.69.0.71:8081",
+            "job": "kubernetes-pods",
+            "method": "PUT",
+            "namespace": "default",
+            "node": "gk3-chatapp-staging-clus-nap-1t9evicx-7e035836-2r9r",
+            "outcome": "SERVER_ERROR",
+            "pod": "chatapp-5555dbc56-sg2sm",
+            "pod_template_hash": "5555dbc56",
+            "status": "500",
+            "topology_kubernetes_io_region": "asia-southeast1",
+            "topology_kubernetes_io_zone": "asia-southeast1-c",
+            "uri": "/chats/{chatId}/texts/{postingId}"
+          },
+          "config": {
+            "displayNameFromDS": "{error=\"CannotCreateTransactionException\", exception=\"CannotCreateTransactionException\", instance=\"10.69.0.71:8081\", node=\"gk3-chatapp-staging-clus-nap-1t9evicx-7e035836-2r9r\", outcome=\"SERVER_ERROR\", pod=\"chatapp-5555dbc56-sg2sm\", pod_template_hash=\"5555dbc56\", status=\"500\", topology_kubernetes_io_zone=\"asia-southeast1-c\"}"
+          }
+        }
+      ]
+    },
+    "data": {
+      "values": [
+        [
+          1780224480000,
+          1780224495000,
+          1780224510000,
+          1780224525000,
+          1780224540000,
+          1780224555000,
+          1780224570000,
+          1780224585000,
+          1780224600000,
+          1780224615000,
+          1780224630000,
+          1780224645000
+        ],
+        [
+          2,
+          2,
+          2,
+          2,
+          80,
+          80,
+          80,
+          80,
+          108,
+          108,
+          108,
+          108
+        ]
+      ]
+    }
+  },
+  {
+    "schema": {
+      "refId": "A",
+      "meta": {
+        "type": "timeseries-multi",
+        "typeVersion": [
+          0,
+          1
+        ],
+        "custom": {
+          "resultType": "matrix"
+        },
+        "preferredVisualisationType": "graph"
+      },
+      "fields": [
+        {
+          "name": "Time",
+          "type": "time",
+          "typeInfo": {
+            "frame": "time.Time"
+          },
+          "config": {
+            "interval": 15000
+          }
+        },
+        {
+          "name": "http_server_requests_seconds_count",
+          "type": "number",
+          "typeInfo": {
+            "frame": "float64"
+          },
+          "labels": {
+            "__name__": "http_server_requests_seconds_count",
+            "app_kubernetes_io_instance": "chatapp",
+            "app_kubernetes_io_managed_by": "Helm",
+            "app_kubernetes_io_name": "chatapp",
+            "app_kubernetes_io_version": "1.0.0",
+            "application": "chatapp",
+            "error": "CannotCreateTransactionException",
+            "exception": "CannotCreateTransactionException",
+            "helm_sh_chart": "chatapp-0.1.0",
+            "instance": "10.69.0.77:8081",
+            "job": "kubernetes-pods",
+            "method": "PUT",
+            "namespace": "default",
+            "node": "gk3-chatapp-staging-cluster-pool-1-350e5819-scjs",
+            "outcome": "SERVER_ERROR",
+            "pod": "chatapp-6f547-rk6kt",
+            "pod_template_hash": "6f547",
+            "status": "500",
+            "topology_kubernetes_io_region": "asia-southeast1",
+            "topology_kubernetes_io_zone": "asia-southeast1-a",
+            "uri": "/chats/{chatId}/texts/{postingId}"
+          },
+          "config": {
+            "displayNameFromDS": "{error=\"CannotCreateTransactionException\", exception=\"CannotCreateTransactionException\", instance=\"10.69.0.77:8081\", node=\"gk3-chatapp-staging-cluster-pool-1-350e5819-scjs\", outcome=\"SERVER_ERROR\", pod=\"chatapp-6f547-rk6kt\", pod_template_hash=\"6f547\", status=\"500\", topology_kubernetes_io_zone=\"asia-southeast1-a\"}"
+          }
+        }
+      ]
+    },
+    "data": {
+      "values": [
+        [
+          1780223160000,
+          1780223175000,
+          1780223190000,
+          1780223205000,
+          1780223220000,
+          1780223235000,
+          1780223250000,
+          1780223265000
+        ],
+        [
+          228,
+          228,
+          228,
+          228,
+          361,
+          361,
+          361,
+          361
+        ]
+      ]
+    }
+  },
+  {
+    "schema": {
+      "refId": "A",
+      "meta": {
+        "type": "timeseries-multi",
+        "typeVersion": [
+          0,
+          1
+        ],
+        "custom": {
+          "resultType": "matrix"
+        },
+        "preferredVisualisationType": "graph"
+      },
+      "fields": [
+        {
+          "name": "Time",
+          "type": "time",
+          "typeInfo": {
+            "frame": "time.Time"
+          },
+          "config": {
+            "interval": 15000
+          }
+        },
+        {
+          "name": "http_server_requests_seconds_count",
+          "type": "number",
+          "typeInfo": {
+            "frame": "float64"
+          },
+          "labels": {
+            "__name__": "http_server_requests_seconds_count",
+            "app_kubernetes_io_instance": "chatapp",
+            "app_kubernetes_io_managed_by": "Helm",
+            "app_kubernetes_io_name": "chatapp",
+            "app_kubernetes_io_version": "1.0.0",
+            "application": "chatapp",
+            "error": "none",
+            "exception": "none",
+            "helm_sh_chart": "chatapp-0.1.0",
+            "instance": "10.69.0.204:8081",
+            "job": "kubernetes-pods",
+            "method": "PUT",
+            "namespace": "default",
+            "node": "gk3-chatapp-staging-cluster-pool-1-cd52a096-twlz",
+            "outcome": "SUCCESS",
+            "pod": "chatapp-6f547-wsmth",
+            "pod_template_hash": "6f547",
+            "status": "202",
+            "topology_kubernetes_io_region": "asia-southeast1",
+            "topology_kubernetes_io_zone": "asia-southeast1-b",
+            "uri": "/chats/{chatId}/texts/{postingId}"
+          },
+          "config": {
+            "displayNameFromDS": "{error=\"none\", exception=\"none\", instance=\"10.69.0.204:8081\", node=\"gk3-chatapp-staging-cluster-pool-1-cd52a096-twlz\", outcome=\"SUCCESS\", pod=\"chatapp-6f547-wsmth\", pod_template_hash=\"6f547\", status=\"202\", topology_kubernetes_io_zone=\"asia-southeast1-b\"}"
+          }
+        }
+      ]
+    },
+    "data": {
+      "values": [
+        [
+          1780223085000,
+          1780223100000,
+          1780223115000,
+          1780223130000,
+          1780223145000,
+          1780223160000,
+          1780223175000,
+          1780223190000,
+          1780223205000,
+          1780223220000,
+          1780223235000,
+          1780223250000
+        ],
+        [
+          19,
+          19,
+          19,
+          19,
+          89,
+          89,
+          89,
+          89,
+          154,
+          154,
+          154,
+          154
+        ]
+      ]
+    }
+  },
+  {
+    "schema": {
+      "refId": "A",
+      "meta": {
+        "type": "timeseries-multi",
+        "typeVersion": [
+          0,
+          1
+        ],
+        "custom": {
+          "resultType": "matrix"
+        },
+        "preferredVisualisationType": "graph"
+      },
+      "fields": [
+        {
+          "name": "Time",
+          "type": "time",
+          "typeInfo": {
+            "frame": "time.Time"
+          },
+          "config": {
+            "interval": 15000
+          }
+        },
+        {
+          "name": "http_server_requests_seconds_count",
+          "type": "number",
+          "typeInfo": {
+            "frame": "float64"
+          },
+          "labels": {
+            "__name__": "http_server_requests_seconds_count",
+            "app_kubernetes_io_instance": "chatapp",
+            "app_kubernetes_io_managed_by": "Helm",
+            "app_kubernetes_io_name": "chatapp",
+            "app_kubernetes_io_version": "1.0.0",
+            "application": "chatapp",
+            "error": "none",
+            "exception": "none",
+            "helm_sh_chart": "chatapp-0.1.0",
+            "instance": "10.69.0.69:8081",
+            "job": "kubernetes-pods",
+            "method": "PUT",
+            "namespace": "default",
+            "node": "gk3-chatapp-staging-clus-nap-1t9evicx-7e035836-2r9r",
+            "outcome": "SUCCESS",
+            "pod": "chatapp-5555dbc56-glf58",
+            "pod_template_hash": "5555dbc56",
+            "status": "202",
+            "topology_kubernetes_io_region": "asia-southeast1",
+            "topology_kubernetes_io_zone": "asia-southeast1-c",
+            "uri": "/chats/{chatId}/texts/{postingId}"
+          },
+          "config": {
+            "displayNameFromDS": "{error=\"none\", exception=\"none\", instance=\"10.69.0.69:8081\", node=\"gk3-chatapp-staging-clus-nap-1t9evicx-7e035836-2r9r\", outcome=\"SUCCESS\", pod=\"chatapp-5555dbc56-glf58\", pod_template_hash=\"5555dbc56\", status=\"202\", topology_kubernetes_io_zone=\"asia-southeast1-c\"}"
+          }
+        }
+      ]
+    },
+    "data": {
+      "values": [
+        [
+          1780224480000,
+          1780224495000,
+          1780224510000,
+          1780224525000,
+          1780224540000,
+          1780224555000,
+          1780224570000,
+          1780224585000,
+          1780224600000,
+          1780224615000,
+          1780224630000,
+          1780224645000
+        ],
+        [
+          129,
+          129,
+          129,
+          129,
+          354,
+          354,
+          354,
+          354,
+          548,
+          548,
+          548,
+          548
+        ]
+      ]
+    }
+  },
+  {
+    "schema": {
+      "refId": "A",
+      "meta": {
+        "type": "timeseries-multi",
+        "typeVersion": [
+          0,
+          1
+        ],
+        "custom": {
+          "resultType": "matrix"
+        },
+        "preferredVisualisationType": "graph"
+      },
+      "fields": [
+        {
+          "name": "Time",
+          "type": "time",
+          "typeInfo": {
+            "frame": "time.Time"
+          },
+          "config": {
+            "interval": 15000
+          }
+        },
+        {
+          "name": "http_server_requests_seconds_count",
+          "type": "number",
+          "typeInfo": {
+            "frame": "float64"
+          },
+          "labels": {
+            "__name__": "http_server_requests_seconds_count",
+            "app_kubernetes_io_instance": "chatapp",
+            "app_kubernetes_io_managed_by": "Helm",
+            "app_kubernetes_io_name": "chatapp",
+            "app_kubernetes_io_version": "1.0.0",
+            "application": "chatapp",
+            "error": "none",
+            "exception": "none",
+            "helm_sh_chart": "chatapp-0.1.0",
+            "instance": "10.69.0.70:8081",
+            "job": "kubernetes-pods",
+            "method": "PUT",
+            "namespace": "default",
+            "node": "gk3-chatapp-staging-clus-nap-1t9evicx-7e035836-2r9r",
+            "outcome": "SUCCESS",
+            "pod": "chatapp-5555dbc56-zzk5z",
+            "pod_template_hash": "5555dbc56",
+            "status": "202",
+            "topology_kubernetes_io_region": "asia-southeast1",
+            "topology_kubernetes_io_zone": "asia-southeast1-c",
+            "uri": "/chats/{chatId}/texts/{postingId}"
+          },
+          "config": {
+            "displayNameFromDS": "{error=\"none\", exception=\"none\", instance=\"10.69.0.70:8081\", node=\"gk3-chatapp-staging-clus-nap-1t9evicx-7e035836-2r9r\", outcome=\"SUCCESS\", pod=\"chatapp-5555dbc56-zzk5z\", pod_template_hash=\"5555dbc56\", status=\"202\", topology_kubernetes_io_zone=\"asia-southeast1-c\"}"
+          }
+        }
+      ]
+    },
+    "data": {
+      "values": [
+        [
+          1780224480000,
+          1780224495000,
+          1780224510000,
+          1780224525000,
+          1780224540000,
+          1780224555000,
+          1780224570000,
+          1780224585000,
+          1780224600000,
+          1780224615000,
+          1780224630000,
+          1780224645000
+        ],
+        [
+          157,
+          157,
+          157,
+          157,
+          351,
+          351,
+          351,
+          351,
+          488,
+          488,
+          488,
+          488
+        ]
+      ]
+    }
+  },
+  {
+    "schema": {
+      "refId": "A",
+      "meta": {
+        "type": "timeseries-multi",
+        "typeVersion": [
+          0,
+          1
+        ],
+        "custom": {
+          "resultType": "matrix"
+        },
+        "preferredVisualisationType": "graph"
+      },
+      "fields": [
+        {
+          "name": "Time",
+          "type": "time",
+          "typeInfo": {
+            "frame": "time.Time"
+          },
+          "config": {
+            "interval": 15000
+          }
+        },
+        {
+          "name": "http_server_requests_seconds_count",
+          "type": "number",
+          "typeInfo": {
+            "frame": "float64"
+          },
+          "labels": {
+            "__name__": "http_server_requests_seconds_count",
+            "app_kubernetes_io_instance": "chatapp",
+            "app_kubernetes_io_managed_by": "Helm",
+            "app_kubernetes_io_name": "chatapp",
+            "app_kubernetes_io_version": "1.0.0",
+            "application": "chatapp",
+            "error": "none",
+            "exception": "none",
+            "helm_sh_chart": "chatapp-0.1.0",
+            "instance": "10.69.0.71:8081",
+            "job": "kubernetes-pods",
+            "method": "PUT",
+            "namespace": "default",
+            "node": "gk3-chatapp-staging-clus-nap-1t9evicx-7e035836-2r9r",
+            "outcome": "SUCCESS",
+            "pod": "chatapp-5555dbc56-sg2sm",
+            "pod_template_hash": "5555dbc56",
+            "status": "202",
+            "topology_kubernetes_io_region": "asia-southeast1",
+            "topology_kubernetes_io_zone": "asia-southeast1-c",
+            "uri": "/chats/{chatId}/texts/{postingId}"
+          },
+          "config": {
+            "displayNameFromDS": "{error=\"none\", exception=\"none\", instance=\"10.69.0.71:8081\", node=\"gk3-chatapp-staging-clus-nap-1t9evicx-7e035836-2r9r\", outcome=\"SUCCESS\", pod=\"chatapp-5555dbc56-sg2sm\", pod_template_hash=\"5555dbc56\", status=\"202\", topology_kubernetes_io_zone=\"asia-southeast1-c\"}"
+          }
+        }
+      ]
+    },
+    "data": {
+      "values": [
+        [
+          1780224480000,
+          1780224495000,
+          1780224510000,
+          1780224525000,
+          1780224540000,
+          1780224555000,
+          1780224570000,
+          1780224585000,
+          1780224600000,
+          1780224615000,
+          1780224630000,
+          1780224645000
+        ],
+        [
+          149,
+          149,
+          149,
+          149,
+          350,
+          350,
+          350,
+          350,
+          497,
+          497,
+          497,
+          497
+        ]
+      ]
+    }
+  },
+  {
+    "schema": {
+      "refId": "A",
+      "meta": {
+        "type": "timeseries-multi",
+        "typeVersion": [
+          0,
+          1
+        ],
+        "custom": {
+          "resultType": "matrix"
+        },
+        "preferredVisualisationType": "graph"
+      },
+      "fields": [
+        {
+          "name": "Time",
+          "type": "time",
+          "typeInfo": {
+            "frame": "time.Time"
+          },
+          "config": {
+            "interval": 15000
+          }
+        },
+        {
+          "name": "http_server_requests_seconds_count",
+          "type": "number",
+          "typeInfo": {
+            "frame": "float64"
+          },
+          "labels": {
+            "__name__": "http_server_requests_seconds_count",
+            "app_kubernetes_io_instance": "chatapp",
+            "app_kubernetes_io_managed_by": "Helm",
+            "app_kubernetes_io_name": "chatapp",
+            "app_kubernetes_io_version": "1.0.0",
+            "application": "chatapp",
+            "error": "none",
+            "exception": "none",
+            "helm_sh_chart": "chatapp-0.1.0",
+            "instance": "10.69.0.77:8081",
+            "job": "kubernetes-pods",
+            "method": "PUT",
+            "namespace": "default",
+            "node": "gk3-chatapp-staging-cluster-pool-1-350e5819-scjs",
+            "outcome": "CLIENT_ERROR",
+            "pod": "chatapp-6f547-rk6kt",
+            "pod_template_hash": "6f547",
+            "status": "401",
+            "topology_kubernetes_io_region": "asia-southeast1",
+            "topology_kubernetes_io_zone": "asia-southeast1-a",
+            "uri": "/chats/{chatId}/texts/{postingId}"
+          },
+          "config": {
+            "displayNameFromDS": "{error=\"none\", exception=\"none\", instance=\"10.69.0.77:8081\", node=\"gk3-chatapp-staging-cluster-pool-1-350e5819-scjs\", outcome=\"CLIENT_ERROR\", pod=\"chatapp-6f547-rk6kt\", pod_template_hash=\"6f547\", status=\"401\", topology_kubernetes_io_zone=\"asia-southeast1-a\"}"
+          }
+        }
+      ]
+    },
+    "data": {
+      "values": [
+        [
+          1780223220000,
+          1780223235000,
+          1780223250000,
+          1780223265000
+        ],
+        [
+          2,
+          2,
+          2,
+          2
+        ]
+      ]
+    }
+  },
+  {
+    "schema": {
+      "refId": "A",
+      "meta": {
+        "type": "timeseries-multi",
+        "typeVersion": [
+          0,
+          1
+        ],
+        "custom": {
+          "resultType": "matrix"
+        },
+        "preferredVisualisationType": "graph"
+      },
+      "fields": [
+        {
+          "name": "Time",
+          "type": "time",
+          "typeInfo": {
+            "frame": "time.Time"
+          },
+          "config": {
+            "interval": 15000
+          }
+        },
+        {
+          "name": "http_server_requests_seconds_count",
+          "type": "number",
+          "typeInfo": {
+            "frame": "float64"
+          },
+          "labels": {
+            "__name__": "http_server_requests_seconds_count",
+            "app_kubernetes_io_instance": "chatapp",
+            "app_kubernetes_io_managed_by": "Helm",
+            "app_kubernetes_io_name": "chatapp",
+            "app_kubernetes_io_version": "1.0.0",
+            "application": "chatapp",
+            "error": "none",
+            "exception": "none",
+            "helm_sh_chart": "chatapp-0.1.0",
+            "instance": "10.69.0.77:8081",
+            "job": "kubernetes-pods",
+            "method": "PUT",
+            "namespace": "default",
+            "node": "gk3-chatapp-staging-cluster-pool-1-350e5819-scjs",
+            "outcome": "SUCCESS",
+            "pod": "chatapp-6f547-rk6kt",
+            "pod_template_hash": "6f547",
+            "status": "202",
+            "topology_kubernetes_io_region": "asia-southeast1",
+            "topology_kubernetes_io_zone": "asia-southeast1-a",
+            "uri": "/chats/{chatId}/texts/{postingId}"
+          },
+          "config": {
+            "displayNameFromDS": "{error=\"none\", exception=\"none\", instance=\"10.69.0.77:8081\", node=\"gk3-chatapp-staging-cluster-pool-1-350e5819-scjs\", outcome=\"SUCCESS\", pod=\"chatapp-6f547-rk6kt\", pod_template_hash=\"6f547\", status=\"202\", topology_kubernetes_io_zone=\"asia-southeast1-a\"}"
+          }
+        }
+      ]
+    },
+    "data": {
+      "values": [
+        [
+          1780223100000,
+          1780223115000,
+          1780223130000,
+          1780223145000,
+          1780223160000,
+          1780223175000,
+          1780223190000,
+          1780223205000,
+          1780223220000,
+          1780223235000,
+          1780223250000,
+          1780223265000
+        ],
+        [
+          38,
+          38,
+          38,
+          38,
+          105,
+          105,
+          105,
+          105,
+          162,
+          162,
+          162,
+          162
+        ]
+      ]
+    }
+  },
+  {
+    "schema": {
+      "refId": "A-Instant",
+      "meta": {
+        "typeVersion": [
+          0,
+          0
+        ],
+        "custom": {
+          "calculatedMinStep": 15000
+        },
+        "executedQueryString": "Expr: http_server_requests_seconds_count{uri=\"/chats/{chatId}/texts/{postingId}\"}\nStep: 15s",
+        "preferredVisualisationType": "graph"
+      },
+      "fields": []
+    },
+    "data": {
+      "values": []
+    }
+  }
+]

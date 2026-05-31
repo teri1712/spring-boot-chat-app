@@ -16,8 +16,13 @@ serviceAccount:
   create: true
   automount: true
 
+podAnnotations:
+  prometheus.io/scrape: "true"
+  prometheus.io/path: "/actuator/prometheus"
+  prometheus.io/port: "8081"
+
 serviceMonitor:
-  enabled: true
+  enabled: false
   release: observability
 
 # --- STANDARD ENVIRONMENT (Uses Secrets) ---
@@ -46,12 +51,12 @@ env:
     valueFrom:
       secretKeyRef:
         name: chatapp-secrets
-        key: kafka-user
+        key: client-users
   KAFKA_PASSWORD:
     valueFrom:
       secretKeyRef:
         name: chatapp-secrets
-        key: kafka-password
+        key: client-passwords
   JWT_SECRET:
     valueFrom:
       secretKeyRef:
@@ -72,6 +77,11 @@ env:
   LOKI_URL: "http://observability-loki:3100/loki/api/v1/push"
   OTLP_ENDPOINT: "http://observability-tempo:4318/v1/traces"
   JAVA_TOOL_OPTIONS: "-XX:MaxRAMPercentage=75.0 -XX:InitialRAMPercentage=50.0"
+  REDIS_CACHE_ENABLED: "true"
+  BATCH_MODE: "kafka"
+  SPRING_KAFKA_LISTENER_CONCURRENCY: "1"
+  SPRING_DATASOURCE_HIKARI_MAXIMUM_POOL_SIZE: "15"
+  SPRING_DATASOURCE_HIKARI_MINIMUM_IDLE: "10"
 
 resources: { } # Defined in profiles
 
@@ -103,3 +113,4 @@ httpRoute:
   enabled: false
 ingress:
   enabled: true
+

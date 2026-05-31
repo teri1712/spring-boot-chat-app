@@ -1,11 +1,13 @@
 package com.decade.practice.live.application.ports.in;
 
+import com.decade.practice.live.application.ports.out.LivenessBroker;
+
 import java.util.UUID;
 
-public interface RoomService {
-    void join(String liveChatId, UUID userId, String avatar);
+public abstract class RoomService extends LiveChatTopic {
+    public RoomService(LivenessBroker broker) {
+        super(broker);
+    }
 
-    void send(String liveChatId, UUID userId, String avatar);
-
-    void leave(String liveChatId, UUID userId, String avatar);
+    public abstract void type(String chatId, UUID userId, String avatar);
 }

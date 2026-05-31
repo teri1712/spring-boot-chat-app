@@ -24,13 +24,17 @@ kafka:
   image:
     repository: bitnamilegacy/kafka
   auth:
-    clientProtocol: sasl_plaintext
-    interBrokerProtocol: sasl_plaintext
-    saslMechanism: plain
+    clientProtocol: SASL_PLAINTEXT
+    interBrokerProtocol: SASL_PLAINTEXT
+    saslMechanism: PLAIN
+  sasl:
+    enabledMechanisms: PLAIN
     existingSecret: "chatapp-secrets"
-    jaas:
-      clientUser: "user"
-      existingSecret: "chatapp-secrets"
-      existingSecretPasswordKey: "kafka-password"
+    client:
+      users: [ "user" ]
+    interbroker:
+      user: "inter-broker-user"
+    controller:
+      user: "controller-user"
   persistence:
     enabled: true

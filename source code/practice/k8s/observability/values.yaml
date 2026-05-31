@@ -1,32 +1,22 @@
 # Blueprint for Observability Stack
-kube-prometheus-stack:
-  nodeExporter:
+prometheus:
+  prometheus-node-exporter:
     enabled: false
   alertmanager:
     enabled: false
-  grafana:
+  prometheus-pushgateway:
     enabled: false
-  kubeProxy:
+  kube-state-metrics:
     enabled: false
-  kubeScheduler:
-    enabled: false
-  kubeControllerManager:
-    enabled: false
-  kubeEtcd:
-    enabled: false
-  coreDns:
-    enabled: false
-  prometheus:
-    prometheusSpec:
-      serviceMonitorSelectorNilUsesHelmValues: false
-      storageSpec:
-        volumeClaimTemplate:
-          spec:
-            accessModes: [ "ReadWriteOnce" ]
-            resources:
-              requests:
-                storage: "" # Defined in profiles
-      resources: { } # Defined in profiles
+  configmapReload:
+    prometheus:
+      enabled: false
+  server:
+    persistentVolume:
+      enabled: true
+      accessModes: [ "ReadWriteOnce" ]
+      size: "" # Defined in profiles
+    resources: { } # Defined in profiles
 
 grafana:
   enabled: true
@@ -34,21 +24,30 @@ grafana:
     existingSecret: "chatapp-secrets"
     userKey: "admin-user"
     passwordKey: "admin-password"
+  testFramework:
+    enabled: false
+  initChownData:
+    enabled: false
   persistence:
     enabled: true
     size: "" # Defined in profiles
   resources: { } # Defined in profiles
   serviceMonitor:
-    enabled: true
+    enabled: false
+  grafana.ini:
+    unified_alerting:
+      enabled: false
+    alerting:
+      enabled: false
   additionalDataSources:
     - name: Prometheus
       type: prometheus
-      url: http://observability-kube-prometh-prometheus:9090
+      url: http://observability-prometheus-server
       access: proxy
       isDefault: true
     - name: Loki
       type: loki
-      url: http://observability-loki-gateway:80
+      url: http://observability-loki:3100
       access: proxy
     - name: Tempo
       type: tempo
@@ -69,7 +68,7 @@ loki:
     enabled: false
   monitoring:
     serviceMonitor:
-      enabled: true
+      enabled: false
     selfMonitoring:
       enabled: false
       grafanaAgent:
@@ -93,6 +92,13 @@ loki:
     replicas: 0
   backend:
     replicas: 0
+  memcached:
+    chunksCache:
+      enabled: false
+    resultsCache:
+      enabled: false
+  minio:
+    enabled: false
 
 tempo:
   tempo:
@@ -108,4 +114,6 @@ tempo:
           grpc:
             endpoint: "0.0.0.0:4317"
   serviceMonitor:
-    enabled: true
+    enabled: false
+  gateway:
+    enabled: false

@@ -128,6 +128,7 @@ websocket:
     user: /user
     queue: /queue
     room: /room
+    setting: /setting
 
 
 inbox:

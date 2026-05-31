@@ -29,13 +29,6 @@ public class KafkaBatchParticipantLogSaver extends BatchParticipantLogSaver {
 
     @Override
     @KafkaListener(topics = "batch-update-placed", groupId = "inbox")
-//    @RetryableTopic(
-//        attempts = "3",
-//        backoff = @Backoff(
-//            delay = 1000,
-//            multiplier = 2.0
-//        )
-//    )
     @Observed(name = "batch-update-placed",
         lowCardinalityKeyValues = {
             "batch-mode", "kafka"

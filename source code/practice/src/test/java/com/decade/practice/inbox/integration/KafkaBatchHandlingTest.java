@@ -8,7 +8,10 @@ import org.springframework.test.context.jdbc.Sql;
 
 @Sql(scripts = "/sql/clean.sql", executionPhase = Sql.ExecutionPhase.AFTER_TEST_METHOD)
 @TestPropertySource(
-    properties = "batch.mode=kafka"
+    properties = {
+        "batch.mode=kafka",
+        "inbox.batch-size=20"
+    }
 )
 class KafkaBatchHandlingTest extends BatchHandlingTest {
 

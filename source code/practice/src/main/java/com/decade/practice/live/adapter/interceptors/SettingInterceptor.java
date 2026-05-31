@@ -1,6 +1,6 @@
 package com.decade.practice.live.adapter.interceptors;
 
-import com.decade.practice.live.application.ports.in.RoomService;
+import com.decade.practice.live.application.ports.in.SettingService;
 import com.decade.practice.live.infras.security.SocketAuthentication;
 import com.decade.practice.shared.security.jwt.JwtUser;
 import lombok.RequiredArgsConstructor;
@@ -17,20 +17,20 @@ import org.springframework.stereotype.Component;
 
 @Component
 @RequiredArgsConstructor
-@Order(1)
-public class RoomInterceptor implements ChannelInterceptor {
+@Order(0)
+public class SettingInterceptor implements ChannelInterceptor {
 
-    private final RoomService roomService;
+    @Value("${websocket.topics.setting}")
+    String settingTopic;
 
-    @Value("${websocket.topics.room}")
-    private String roomTopic;
+    final SettingService settingService;
 
-    private boolean isRoomDestination(String destination) {
-        return destination != null && destination.contains(roomTopic);
+    private boolean isSettingDestination(String destination) {
+        return destination != null && destination.contains(settingTopic);
     }
 
     private String extractChatId(String destination) {
-        return destination.substring(roomTopic.length() + 1);
+        return destination.substring(settingTopic.length() + 1);
     }
 
     @Nullable
@@ -40,20 +40,17 @@ public class RoomInterceptor implements ChannelInterceptor {
         StompHeaderAccessor accessor =
             MessageHeaderAccessor.getAccessor(message, StompHeaderAccessor.class);
         String destination = accessor.getDestination();
-        if (isRoomDestination(destination)) {
+        if (isSettingDestination(destination)) {
             StompCommand command = accessor.getCommand();
             if (command == StompCommand.SUBSCRIBE) {
                 String chatId = extractChatId(accessor.getDestination());
                 JwtUser jwtUser = ((SocketAuthentication) accessor.getUser()).jwtUser();
-                roomService.join(chatId, jwtUser.getId(), jwtUser.getClaims().avatar());
+                settingService.join(chatId, jwtUser.getId(), jwtUser.getClaims().avatar());
             } else if (command == StompCommand.UNSUBSCRIBE) {
                 String chatId = extractChatId(accessor.getDestination());
                 JwtUser jwtUser = ((SocketAuthentication) accessor.getUser()).jwtUser();
-                roomService.leave(chatId, jwtUser.getId(), jwtUser.getClaims().avatar());
+                settingService.leave(chatId, jwtUser.getId(), jwtUser.getClaims().avatar());
             } else if (command == StompCommand.SEND) {
-                String chatId = extractChatId(accessor.getDestination());
-                JwtUser jwtUser = ((SocketAuthentication) accessor.getUser()).jwtUser();
-                roomService.type(chatId, jwtUser.getId(), jwtUser.getClaims().avatar());
                 return null;
             }
         }

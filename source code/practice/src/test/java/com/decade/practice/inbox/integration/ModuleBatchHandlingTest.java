@@ -8,7 +8,9 @@ import org.springframework.test.context.jdbc.Sql;
 
 @Sql(scripts = "/sql/clean.sql", executionPhase = Sql.ExecutionPhase.AFTER_TEST_METHOD)
 @TestPropertySource(
-    properties = "batch.mode=module"
+    properties = {
+        "batch.mode=module",
+        "inbox.batch-size=20"}
 )
 class ModuleBatchHandlingTest extends BatchHandlingTest {
 

@@ -28,11 +28,7 @@ ingress:
 
 autoscaling:
   enabled: true
-  minReplicas: 3
-  maxReplicas: 10
+  minReplicas: 2
+  maxReplicas: 7
   targetCPUUtilizationPercentage: 70
   targetMemoryUtilizationPercentage: 80
-
-env:
-  REDIS_CACHE_ENABLED: "true"
-  BATCH_MODE: "kafka"

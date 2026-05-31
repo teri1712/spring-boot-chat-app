@@ -6,8 +6,8 @@ version: 0.1.0
 appVersion: "1.0.0"
 
 dependencies:
-  - name: kube-prometheus-stack
-    version: 85.2.0
+  - name: prometheus
+    version: 29.8.0
     repository: https://prometheus-community.github.io/helm-charts
   - name: loki
     version: 16.1.0

@@ -67,7 +67,7 @@ services:
       AWS_DEFAULT_REGION: ap-southeast-1
     volumes:
       - /var/run/docker.sock:/var/run/docker.sock
-      - ./s3/init:/etc/localstack/init/ready.d
+      - ./compose/s3:/etc/localstack/init/ready.d
     cpus: 0.5
     cpu_count: 3
     mem_limit: 500m
@@ -76,7 +76,7 @@ services:
     ports:
       - "9090:9090"
     volumes:
-      - ./prometheus.yml:/etc/prometheus/prometheus.yml
+      - ./compose/prometheus.yml:/etc/prometheus/prometheus.yml
     extra_hosts:
       - "host.docker.internal:host-gateway"
     cpus: 0.5
@@ -102,7 +102,7 @@ services:
       - "4317:4317"
       - "4318:4318"
     volumes:
-      - ./tempo.yml:/etc/tempo.yaml
+      - ./compose/tempo.yml:/etc/tempo.yaml
 
   grafana:
     image: grafana/grafana:11.0.0
