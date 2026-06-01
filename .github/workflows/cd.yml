@@ -28,7 +28,7 @@ jobs:
         runs-on: ubuntu-latest
 
         env:
-            IMAGE_REPO: teri1712/t1chat-server
+            IMAGE_REPO: teri1712/t1ichat-server
 
         steps:
             - name: Checkout repository

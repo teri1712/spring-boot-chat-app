@@ -2,7 +2,7 @@
 replicaCount: "" # Defined in profiles
 
 image:
-  repository: teri1712/chat-app
+  repository: teri1712/t1ichat-server
   pullPolicy: IfNotPresent
   tag: "" # Defined in profiles
 
