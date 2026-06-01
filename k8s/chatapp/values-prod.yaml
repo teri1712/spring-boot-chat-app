@@ -1,27 +1,5 @@
-# GKE Production Profile - App
-replicaCount: 3
-
-service:
-  type: NodePort
-
-image:
-  tag: "latest"
-  pullPolicy: Always
-
-resources:
-  limits:
-    cpu: 1000m
-    memory: 2Gi
-  requests:
-    cpu: 400m
-    memory: 1Gi
-
 ingress:
-  className: "gce"
-  annotations:
-    kubernetes.io/ingress.allow-http: "false"
   managedCertificate:
-    enabled: true
     domains:
       - "t1ichat.ddnsfree.com"
   hosts:
@@ -29,11 +7,3 @@ ingress:
       paths:
         - path: /
           pathType: Prefix
-  tls: []
-
-autoscaling:
-  enabled: true
-  minReplicas: 2
-  maxReplicas: 5
-  targetCPUUtilizationPercentage: 70
-  targetMemoryUtilizationPercentage: 80

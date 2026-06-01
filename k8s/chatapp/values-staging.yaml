@@ -1,0 +1,10 @@
+
+ingress:
+  managedCertificate:
+    domains:
+      - "t1ichat-staging.ddnsfree.com"
+  hosts:
+    - host: "t1ichat-staging.ddnsfree.com"
+      paths:
+        - path: /
+          pathType: Prefix

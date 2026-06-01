@@ -16,5 +16,6 @@ jobs:
             GKE_CLUSTER: ${{ vars.GKE_CLUSTER }}
             GKE_LOCATION: ${{ vars.GKE_LOCATION }}
             PROJECT_ID: ${{ vars.PROJECT_ID }}
+            ENV: prod
             FRONTEND: ${{ vars.PROD_FRONTEND }}
         secrets: inherit

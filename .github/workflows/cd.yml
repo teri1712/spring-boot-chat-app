@@ -12,13 +12,16 @@ on:
             PROJECT_ID:
                 required: true
                 type: string
+            ENV:
+                required: true
+                type: string
             FRONTEND:
                 required: true
                 type: string
 
 permissions:
-  contents: read
-  id-token: write
+    contents: read
+    id-token: write
 
 jobs:
     build-artifacts:
@@ -54,11 +57,12 @@ jobs:
         needs: build-artifacts
         runs-on: ubuntu-latest
         timeout-minutes: 20
-        
+
         env:
             GKE_CLUSTER: ${{ inputs.GKE_CLUSTER }}
             GKE_LOCATION: ${{ inputs.GKE_LOCATION }}
             PROJECT_ID: ${{ inputs.PROJECT_ID }}
+            DEPLOY_ENV: ${{ inputs.ENV }}
             FRONTEND: ${{ inputs.FRONTEND }}
 
         steps:
@@ -68,8 +72,8 @@ jobs:
             - name: Authenticate to Google Cloud
               uses: google-github-actions/auth@v2
               with:
-                workload_identity_provider: ${{ secrets.WORKLOAD_IDENTITY_PROVIDER }}
-                service_account: ${{ secrets.SERVICE_ACCOUNT }}
+                  workload_identity_provider: ${{ secrets.WORKLOAD_IDENTITY_PROVIDER }}
+                  service_account: ${{ secrets.SERVICE_ACCOUNT }}
 
             - name: Get GKE Credentials
               uses: google-github-actions/get-gke-credentials@v2
@@ -77,30 +81,36 @@ jobs:
                   cluster_name: ${{ env.GKE_CLUSTER }}
                   project_id: ${{ env.PROJECT_ID }}
                   location: ${{ env.GKE_LOCATION }}
+
             - name: Set up Helm
               uses: azure/setup-helm@v4
               with:
                   version: v3.14.0
-
+            - name: Add Helm Repo
+              run: |
+                 helm repo add https://charts.bitnami.com/bitnami
+                 helm repo add https://prometheus-community.github.io/helm-charts
+                 helm repo add https://grafana-community.github.io/helm-charts
             - name: Deploy Infrastructure
               run: |
                   helm dependency build ./k8s/infra
                   helm upgrade --install infra ./k8s/infra \
-                    -f ./k8s/infra/values-prod.yaml \
+                    -f ./k8s/infra/values-gke.yaml \
                     --wait --timeout 10m
 
             - name: Deploy Observability
               run: |
                   helm dependency build ./k8s/observability
                   helm upgrade --install observability ./k8s/observability \
-                    -f ./k8s/observability/values-prod.yaml \
+                    -f ./k8s/observability/values-gke.yaml \
                     --wait --timeout 10m
 
             - name: Deploy Chat App
               run: |
                   helm dependency build ./k8s/chatapp
                   helm upgrade --install chatapp ./k8s/chatapp \
-                    -f ./k8s/chatapp/values-prod.yaml \
+                    -f ./k8s/chatapp/values-gke.yaml \
+                    -f ./k8s/chatapp/values-${{ env.DEPLOY_ENV }}.yaml \
                     --set image.tag=${{ github.sha }} \
                     --set env.FRONTEND=${{ env.FRONTEND }} \
                     --wait --timeout 10m
