@@ -84,18 +84,21 @@ jobs:
 
             - name: Deploy Infrastructure
               run: |
+                  helm dependency build ./k8s/infra
                   helm upgrade --install infra ./k8s/infra \
                     -f ./k8s/infra/values-prod.yaml \
                     --wait --timeout 10m
 
             - name: Deploy Observability
               run: |
+                  helm dependency build ./k8s/observability
                   helm upgrade --install observability ./k8s/observability \
                     -f ./k8s/observability/values-prod.yaml \
                     --wait --timeout 10m
 
             - name: Deploy Chat App
               run: |
+                  helm dependency build ./k8s/chatapp
                   helm upgrade --install chatapp ./k8s/chatapp \
                     -f ./k8s/chatapp/values-prod.yaml \
                     --set image.tag=${{ github.sha }} \
