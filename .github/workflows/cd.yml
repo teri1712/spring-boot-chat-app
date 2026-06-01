@@ -88,9 +88,11 @@ jobs:
                   version: v3.14.0
             - name: Add Helm Repo
               run: |
-                 helm repo add https://charts.bitnami.com/bitnami
-                 helm repo add https://prometheus-community.github.io/helm-charts
-                 helm repo add https://grafana-community.github.io/helm-charts
+                 helm repo add bitnami https://charts.bitnami.com/bitnami
+                 helm repo add prometheus-community https://prometheus-community.github.io/helm-charts
+                 helm repo add grafana-community https://grafana-community.github.io/helm-charts
+                
+                 helm repo update
             - name: Deploy Infrastructure
               run: |
                   helm dependency build ./k8s/infra
