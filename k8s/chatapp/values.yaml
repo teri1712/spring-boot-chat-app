@@ -113,4 +113,8 @@ httpRoute:
   enabled: false
 ingress:
   enabled: true
+  tls: []
+  managedCertificate:
+    enabled: false
+    domains: []
 

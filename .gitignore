@@ -36,4 +36,4 @@ build/
 localstack/
 *.tgz
 
-**/secret.yaml
+k8s/secret.prod.yaml
