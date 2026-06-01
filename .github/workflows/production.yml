@@ -1,0 +1,12 @@
+name: CD - Production
+
+on:
+    push:
+        branches: [ master ]
+
+jobs:
+    deploy:
+        uses: ./.github/workflows/cd.yml
+        with:
+            GKE_CLUSTER: ${{ secrets.GKE_CLUSTER }}
+        secrets: inherit

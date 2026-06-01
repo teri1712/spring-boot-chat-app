@@ -1,8 +1,12 @@
-name: CD - Spring Boot Chat App
+name: CD Template
 
 on:
-    push:
-        branches: [ master, develop ]
+    workflow_call:
+        inputs:
+            GKE_CLUSTER:
+                required: true
+                type: string
+
 permissions:
   contents: read
   id-token: write
@@ -37,10 +41,13 @@ jobs:
                   docker push "${IMAGE_REPO}:latest"
                   docker push "${IMAGE_REPO}:${{ github.sha }}"
 
-    deploy-to-gke:
+    deploy:
         needs: build-artifacts
         runs-on: ubuntu-latest
         timeout-minutes: 20
+        
+        env:
+            GKE_CLUSTER: ${{ inputs.GKE_CLUSTER }}
 
         steps:
             - name: Checkout repository
@@ -55,7 +62,7 @@ jobs:
             - name: Get GKE Credentials
               uses: google-github-actions/get-gke-credentials@v2
               with:
-                  cluster_name: ${{ secrets.GKE_CLUSTER }}
+                  cluster_name: ${{ env.GKE_CLUSTER }}
 
             - name: Set up Helm
               uses: azure/setup-helm@v4
