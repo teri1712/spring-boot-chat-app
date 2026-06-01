@@ -6,6 +6,12 @@ on:
             GKE_CLUSTER:
                 required: true
                 type: string
+            GKE_LOCATION:
+                required: true
+                type: string
+            PROJECT_ID:
+                required: true
+                type: string
             FRONTEND:
                 required: true
                 type: string
@@ -51,6 +57,8 @@ jobs:
         
         env:
             GKE_CLUSTER: ${{ inputs.GKE_CLUSTER }}
+            GKE_LOCATION: ${{ inputs.GKE_LOCATION }}
+            PROJECT_ID: ${{ inputs.PROJECT_ID }}
             FRONTEND: ${{ inputs.FRONTEND }}
 
         steps:
@@ -67,7 +75,8 @@ jobs:
               uses: google-github-actions/get-gke-credentials@v2
               with:
                   cluster_name: ${{ env.GKE_CLUSTER }}
-
+                  project_id: ${{ env.PROJECT_ID }}
+                  location: ${{ env.GKE_LOCATION }}
             - name: Set up Helm
               uses: azure/setup-helm@v4
               with:

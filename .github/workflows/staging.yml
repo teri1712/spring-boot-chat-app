@@ -13,5 +13,7 @@ jobs:
         uses: ./.github/workflows/cd.yml
         with:
             GKE_CLUSTER: ${{ vars.GKE_STAGING_CLUSTER }}
+            GKE_LOCATION: ${{ vars.GKE_LOCATION }}
+            PROJECT_ID: ${{ vars.PROJECT_ID }}
             FRONTEND: ${{ vars.STAGING_FRONTEND }}
         secrets: inherit
