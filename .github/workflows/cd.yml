@@ -3,13 +3,16 @@ name: CD - Spring Boot Chat App
 on:
     push:
         branches: [master]
+permissions:
+  contents: read
+  id-token: write
 
 jobs:
     build-artifacts:
         runs-on: ubuntu-latest
 
         env:
-            IMAGE_REPO: ${{ secrets.DOCKERHUB_USERNAME }}/chat-app
+            IMAGE_REPO: ${{ secrets.DOCKERHUB_USERNAME }}/t1chat-server
 
         steps:
             - name: Checkout repository
@@ -21,21 +24,18 @@ jobs:
                   username: ${{ secrets.DOCKERHUB_USERNAME }}
                   password: ${{ secrets.DOCKERHUB_TOKEN }}
 
-            - name: Set image tag
-              run: echo "IMAGE_TAG=${GITHUB_SHA}" >> "$GITHUB_ENV"
-
             - name: Build image
               working-directory: .
               run: |
                   docker build \
                     -t "${IMAGE_REPO}:latest" \
-                    -t "${IMAGE_REPO}:${IMAGE_TAG}" \
+                    -t "${IMAGE_REPO}:${{ github.sha }}" \
                     .
 
             - name: Push image tags
               run: |
                   docker push "${IMAGE_REPO}:latest"
-                  docker push "${IMAGE_REPO}:${IMAGE_TAG}"
+                  docker push "${IMAGE_REPO}:${{ github.sha }}"
 
     deploy-to-gke:
         needs: build-artifacts
@@ -43,9 +43,6 @@ jobs:
         timeout-minutes: 20
         permissions:
             contents: read
-
-        env:
-            IMAGE_TAG: ${{ github.sha }}
 
         steps:
             - name: Checkout repository
@@ -55,13 +52,12 @@ jobs:
               uses: google-github-actions/auth@v2
               with:
                 workload_identity_provider: ${{ secrets.WORKLOAD_IDENTITY_PROVIDER }}
-                service_account: github-cd-sa@side-projects-deployment.iam.gserviceaccount.com
+                service_account: ${{ secrets.SERVICE_ACCOUNT }}
 
             - name: Get GKE Credentials
               uses: google-github-actions/get-gke-credentials@v2
               with:
                   cluster_name: ${{ secrets.GKE_CLUSTER }}
-                  location: ${{ secrets.GKE_ZONE }}
 
             - name: Set up Helm
               uses: azure/setup-helm@v4
@@ -71,21 +67,18 @@ jobs:
             - name: Deploy Infrastructure
               run: |
                   helm upgrade --install infra ./k8s/infra \
-                    --namespace default \
                     -f ./k8s/infra/values-prod.yaml \
                     --wait --timeout 10m
 
             - name: Deploy Observability
               run: |
                   helm upgrade --install observability ./k8s/observability \
-                    --namespace default \
                     -f ./k8s/observability/values-prod.yaml \
                     --wait --timeout 10m
 
             - name: Deploy Chat App
               run: |
                   helm upgrade --install chatapp ./k8s/chatapp \
-                    --namespace default \
                     -f ./k8s/chatapp/values-prod.yaml \
-                    --set image.tag=${{ env.IMAGE_TAG }} \
+                    --set image.tag=${{ github.sha }} \
                     --wait --timeout 10m
