@@ -2,7 +2,7 @@ name: CD - Spring Boot Chat App
 
 on:
     push:
-        branches: [master]
+        branches: [ master, develop ]
 permissions:
   contents: read
   id-token: write
