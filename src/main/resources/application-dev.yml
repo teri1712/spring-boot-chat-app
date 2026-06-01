@@ -39,3 +39,7 @@ management:
 
 batch:
   mode: module
+
+frontend:
+  host:
+    address: http://localhost:4200

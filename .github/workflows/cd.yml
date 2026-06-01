@@ -6,6 +6,9 @@ on:
             GKE_CLUSTER:
                 required: true
                 type: string
+            FRONTEND:
+                required: true
+                type: string
 
 permissions:
   contents: read
@@ -48,6 +51,7 @@ jobs:
         
         env:
             GKE_CLUSTER: ${{ inputs.GKE_CLUSTER }}
+            FRONTEND: ${{ inputs.FRONTEND }}
 
         steps:
             - name: Checkout repository
@@ -86,4 +90,5 @@ jobs:
                   helm upgrade --install chatapp ./k8s/chatapp \
                     -f ./k8s/chatapp/values-prod.yaml \
                     --set image.tag=${{ github.sha }} \
+                    --set env.FRONTEND=${{ env.FRONTEND }} \
                     --wait --timeout 10m

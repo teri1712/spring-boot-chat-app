@@ -4,9 +4,15 @@ on:
     push:
         branches: [ master ]
 
+permissions:
+    contents: read
+    id-token: write
+
+
 jobs:
     deploy:
         uses: ./.github/workflows/cd.yml
         with:
             GKE_CLUSTER: ${{ secrets.GKE_CLUSTER }}
+            FRONTEND: ${{ secrets.PROD_FRONTEND }}
         secrets: inherit

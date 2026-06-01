@@ -103,10 +103,6 @@ management:
     annotations:
       enabled: true
 
-frontend:
-  host:
-    address: http://localhost:4200
-
 aws:
   s3:
     region: ap-southeast-1
