@@ -13,6 +13,6 @@ jobs:
     deploy:
         uses: ./.github/workflows/cd.yml
         with:
-            GKE_CLUSTER: ${{ secrets.GKE_CLUSTER }}
-            FRONTEND: ${{ secrets.PROD_FRONTEND }}
+            GKE_CLUSTER: ${{ vars.GKE_CLUSTER }}
+            FRONTEND: ${{ vars.PROD_FRONTEND }}
         secrets: inherit
