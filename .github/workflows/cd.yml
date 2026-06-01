@@ -12,7 +12,7 @@ jobs:
         runs-on: ubuntu-latest
 
         env:
-            IMAGE_REPO: ${{ secrets.DOCKERHUB_USERNAME }}/t1chat-server
+            IMAGE_REPO: teri1712/t1chat-server
 
         steps:
             - name: Checkout repository
@@ -21,7 +21,7 @@ jobs:
             - name: Login to DockerHub
               uses: docker/login-action@v3
               with:
-                  username: ${{ secrets.DOCKERHUB_USERNAME }}
+                  username: teri1712
                   password: ${{ secrets.DOCKERHUB_TOKEN }}
 
             - name: Build image
@@ -41,8 +41,6 @@ jobs:
         needs: build-artifacts
         runs-on: ubuntu-latest
         timeout-minutes: 20
-        permissions:
-            contents: read
 
         steps:
             - name: Checkout repository
