@@ -38,13 +38,13 @@ loki:
   singleBinary:
     persistence:
       storageClass: "standard-rwo"
-      size: 5Gi
+      size: 3Gi
 
 tempo:
   tempo:
     persistence:
       storageClass: "standard-rwo"
-      size: 5Gi
+      size: 3Gi
     resources:
       limits:
         cpu: 500m

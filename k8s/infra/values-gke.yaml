@@ -3,7 +3,7 @@ postgresql:
   primary:
     persistence:
       storageClass: "standard-rwo"
-      size: 10Gi
+      size: 5Gi
     resources:
       limits:
         cpu: 1000m
@@ -18,7 +18,7 @@ redis:
   master:
     persistence:
       storageClass: "standard-rwo"
-      size: 8Gi
+      size: 3Gi
     resources:
       limits:
         cpu: 500m
@@ -32,7 +32,7 @@ kafka:
     replicaCount: 2
   persistence:
     storageClass: "standard-rwo"
-    size: 20Gi
+    size: 10Gi
   resources:
     limits:
       cpu: 2000m
