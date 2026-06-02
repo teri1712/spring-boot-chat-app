@@ -5,16 +5,17 @@ metadata:
   name: {{ include "chatapp.fullname" . }}
   labels:
     {{- include "chatapp.labels" . | nindent 4 }}
-  {{- $managedCert := and .Values.ingress.managedCertificate.enabled (eq .Values.ingress.className "gce") -}}
-  {{- if or $managedCert .Values.ingress.annotations }}
+  {{- $managedCert := and .Values.ingress.managedCertificate.enabled (eq .Values.ingress.className "gce") }}
   annotations:
+    {{- if .Values.ingress.className }}
+    kubernetes.io/ingress.class: {{ .Values.ingress.className | quote }}
+    {{- end }}
     {{- if $managedCert }}
     networking.gke.io/managed-certificates: {{ include "chatapp.fullname" . }}-cert
     {{- end }}
-    {{- with .Values.ingress.annotations }}
-    {{- toYaml . | nindent 4 }}
+    {{- if .Values.ingress.annotations }}
+    {{- toYaml .Values.ingress.annotations | nindent 4 }}
     {{- end }}
-  {{- end }}
 spec:
   {{- with .Values.ingress.className }}
   ingressClassName: {{ . }}
