@@ -4,7 +4,7 @@
 prometheus:
   server:
     persistentVolume:
-      storageClass: "premium-rwo"
+      storageClass: "standard-rwo"
       size: 10Gi
     resources:
       limits:
@@ -12,11 +12,11 @@ prometheus:
         memory: 1Gi
       requests:
         cpu: 500m
-        memory: 1Gi
+        memory: 512Mi
 
 grafana:
   persistence:
-    storageClassName: "premium-rwo"
+    storageClassName: "standard-rwo"
     size: 1Gi
   resources:
     limits:
@@ -34,16 +34,16 @@ loki:
         memory: 1Gi
       requests:
         cpu: 500m
-        memory: 1Gi
+        memory: 512Mi
   singleBinary:
     persistence:
-      storageClass: "premium-rwo"
+      storageClass: "standard-rwo"
       size: 5Gi
 
 tempo:
   tempo:
     persistence:
-      storageClass: "premium-rwo"
+      storageClass: "standard-rwo"
       size: 5Gi
     resources:
       limits:
@@ -51,4 +51,4 @@ tempo:
         memory: 1Gi
       requests:
         cpu: 500m
-        memory: 1Gi
+        memory: 512Mi

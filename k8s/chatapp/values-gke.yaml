@@ -10,11 +10,11 @@ image:
 
 resources:
   limits:
-    cpu: 1000m
-    memory: 2Gi
+    cpu: 700m
+    memory: 1Gi
   requests:
     cpu: 400m
-    memory: 1Gi
+    memory: 512Mi
 
 ingress:
   className: "gce"
@@ -26,7 +26,7 @@ ingress:
 
 autoscaling:
   enabled: true
-  minReplicas: 2
-  maxReplicas: 5
+  minReplicas: 1
+  maxReplicas: 3
   targetCPUUtilizationPercentage: 70
   targetMemoryUtilizationPercentage: 80
