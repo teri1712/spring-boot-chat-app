@@ -1,7 +1,7 @@
 package com.decade.practice.resources.files.adapter;
 
 import com.decade.practice.resources.files.application.PresignedUrlService;
-import com.decade.practice.resources.files.dto.S3PresignedResponse;
+import com.decade.practice.resources.files.dto.PresignedResponse;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.core.context.SecurityContextHolder;
@@ -19,7 +19,7 @@ public class PresignController {
       private final PresignedUrlService service;
 
       @PostMapping("/upload")
-      public S3PresignedResponse uploadUrl(@RequestParam String filename) {
+      public PresignedResponse uploadUrl(@RequestParam String filename) {
             String user = SecurityContextHolder.getContextHolderStrategy().getContext().getAuthentication().getName();
             return service.generateUploadUrl(filename, user);
       }

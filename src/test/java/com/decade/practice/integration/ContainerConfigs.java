@@ -41,6 +41,7 @@ public class ContainerConfigs {
     DynamicPropertyRegistrar awsProperties(LocalStackContainer localStack) {
         return registry -> {
             registry.add("aws.s3.endpoint", () -> localStack.getEndpointOverride(S3).toString());
+            registry.add("aws.s3.public-endpoint", () -> localStack.getEndpointOverride(S3).toString());
             registry.add("aws.s3.access.id", localStack::getAccessKey);
             registry.add("aws.s3.access.secret", localStack::getSecretKey);
             registry.add("aws.s3.region", localStack::getRegion);

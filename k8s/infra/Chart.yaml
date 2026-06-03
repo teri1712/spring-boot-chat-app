@@ -15,3 +15,6 @@ dependencies:
   - name: kafka
     version: 32.4.3
     repository: https://charts.bitnami.com/bitnami
+  - name: minio
+    version: 5.4.0
+    repository: https://charts.min.io/

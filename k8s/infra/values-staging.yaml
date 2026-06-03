@@ -1,0 +1,11 @@
+minio:
+  managedCertificate:
+    enabled: true
+    domains:
+      - s3-t1ichat-staging.ddnsfree.com
+  ingress:
+    hosts:
+      - s3-t1ichat-staging.ddnsfree.com
+
+  environment:
+    MINIO_API_CORS_ALLOW_ORIGIN: https://t1ichat-frontend-staging-732519168410.asia-southeast1.run.app

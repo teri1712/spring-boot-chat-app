@@ -8,5 +8,8 @@ dependencies:
 - name: kafka
   repository: https://charts.bitnami.com/bitnami
   version: 32.4.3
-digest: sha256:2093aef133e7581b57ce59634dfd6ba1f40c870c746c2e87788fa6bc69addeda
-generated: "2026-05-22T19:33:40.6650106+07:00"
+- name: minio
+  repository: https://charts.min.io/
+  version: 5.4.0
+digest: sha256:427251803ed37df7bbf5395a004dac640c0f766c30cd83f7544d7c03a8887a40
+generated: "2026-06-03T21:04:04.792481057+07:00"

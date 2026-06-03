@@ -36,5 +36,16 @@ kafka:
       user: "inter-broker-user"
     controller:
       user: "controller-user"
-  persistence:
-    enabled: true
+
+minio:
+  mode: standalone
+  replicas: 1
+  existingSecret: "minio-secrets"
+  managedCertificate:
+    enabled: false
+    domains: []
+  buckets:
+    - name: decade-bucket
+      policy: download
+      purge: false
+
