@@ -1,9 +1,7 @@
 
 ingress:
   annotations:
-    kubernetes.io/ingress.allow-http: "true"
   managedCertificate:
-    enabled: false
     domains:
       - "t1ichat-staging.ddnsfree.com"
   hosts:
