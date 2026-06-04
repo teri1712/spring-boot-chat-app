@@ -5,7 +5,7 @@ prometheus:
   server:
     persistentVolume:
       storageClass: "standard-rwo"
-      size: 10Gi
+      size: 8Gi
     resources:
       limits:
         cpu: 500m
@@ -16,7 +16,6 @@ prometheus:
 
 grafana:
   persistence:
-    storageClassName: "standard-rwo"
     size: 1Gi
   resources:
     limits:
@@ -38,13 +37,13 @@ loki:
   singleBinary:
     persistence:
       storageClass: "standard-rwo"
-      size: 3Gi
+      size: 8Gi
 
 tempo:
+  persistence:
+    storageClass: "standard-rwo"
+    size: 8Gi
   tempo:
-    persistence:
-      storageClass: "standard-rwo"
-      size: 3Gi
     resources:
       limits:
         cpu: 500m
