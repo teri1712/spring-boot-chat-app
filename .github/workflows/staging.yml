@@ -16,5 +16,4 @@ jobs:
             GKE_LOCATION: ${{ vars.GKE_LOCATION }}
             PROJECT_ID: ${{ vars.PROJECT_ID }}
             ENV: staging
-            FRONTEND: ${{ vars.STAGING_FRONTEND }}
         secrets: inherit

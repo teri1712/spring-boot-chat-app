@@ -29,22 +29,44 @@ redis:
 
 kafka:
   controller:
-    replicaCount: 2
-  persistence:
-    storageClass: "standard-rwo"
-    size: 10Gi
-  resources:
-    limits:
-      cpu: 2000m
-      memory: 4Gi
-    requests:
-      cpu: 500m
-      memory: 2Gi
-  zookeeper:
+    replicaCount: 1
+    persistence:
+      enabled: true
+      storageClass: "standard-rwo"
+      size: 3Gi
     resources:
       limits:
-        cpu: 250m
-        memory: 512Mi
+        cpu: 1000m
+        memory: 2Gi
       requests:
-        cpu: 250m
+        cpu: 500m
         memory: 512Mi
+
+minio:
+  persistence:
+    storageClass: "standard-rwo"
+    size: 3Gi
+  resources:
+    limits:
+      cpu: 500m
+      memory: 512Mi
+    requests:
+      cpu: 250m
+      memory: 256Mi
+
+  managedCertificate:
+    enabled: true
+    domains:
+      - s3.decade.ddnsfree.com
+
+  ingress:
+    enabled: true
+    ingressClassName: "gce"
+    annotations:
+      kubernetes.io/ingress.class: "gce"
+      kubernetes.io/ingress.allow-http: "false"
+      kubernetes.io/ingress.global-static-ip-name: "s3-t1ichat-server"
+      networking.gke.io/managed-certificates: "infra-minio-cert"
+
+  consoleIngress:
+    enabled: false

@@ -17,6 +17,8 @@ public class S3Config {
 
       @Value("${aws.s3.endpoint}")
       private String endpoint;
+      @Value("${aws.s3.public-endpoint}")
+      private String publicEndpoint;
 
       @Value("${aws.s3.region}")
       private String region;
@@ -31,7 +33,7 @@ public class S3Config {
       @Bean
       public S3Presigner s3Presigner() {
             return S3Presigner.builder()
-                      .endpointOverride(URI.create(endpoint))
+                      .endpointOverride(URI.create(publicEndpoint))
                       .region(Region.of(region))
                       .serviceConfiguration(S3Configuration.builder()
                                 .pathStyleAccessEnabled(true)

@@ -65,15 +65,16 @@ env:
   AWS_ACCESS_KEY_ID:
     valueFrom:
       secretKeyRef:
-        name: chatapp-secrets
-        key: aws-access-id
+        name: minio-secrets
+        key: rootUser
   AWS_SECRET_ACCESS_KEY:
     valueFrom:
       secretKeyRef:
-        name: chatapp-secrets
-        key: aws-secret-key
+        name: minio-secrets
+        key: rootPassword
   AWS_S3_REGION: "ap-southeast-1"
   AWS_S3_BUCKET: "decade-bucket"
+  S3_ENDPOINT: "http://infra-minio:9000"
   LOKI_URL: "http://observability-loki:3100/loki/api/v1/push"
   OTLP_ENDPOINT: "http://observability-tempo:4318/v1/traces"
   JAVA_TOOL_OPTIONS: "-XX:MaxRAMPercentage=75.0 -XX:InitialRAMPercentage=50.0"
@@ -113,8 +114,4 @@ httpRoute:
   enabled: false
 ingress:
   enabled: true
-  tls: []
-  managedCertificate:
-    enabled: false
-    domains: []
 

@@ -3,7 +3,9 @@ replicaCount: 2
 
 image:
   tag: "local"
-
+env:
+  S3_PUBLIC_ENDPOINT: "http://localhost:9000"
+  FRONTEND: "http://localhost:4200"
 ingress:
   className: "nginx"
   hosts:
@@ -11,6 +13,9 @@ ingress:
       paths:
         - path: /
           pathType: Prefix
-
+  managedCertificate:
+    enabled: false
+    domains: []
+  tls: []
 autoscaling:
   enabled: false # Defined in profiles

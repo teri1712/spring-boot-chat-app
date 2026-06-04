@@ -27,7 +27,7 @@ public class S3StorageGenerator implements StoragePathGenerator {
       @Value("${aws.s3.bucket}")
       private String bucket;
 
-      @Value("${aws.s3.endpoint}")
+      @Value("${aws.s3.public-endpoint}")
       private String s3Endpoint;
 
       private String generateKey(String username, String filename) {

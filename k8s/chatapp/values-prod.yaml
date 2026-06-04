@@ -1,9 +1,0 @@
-ingress:
-  managedCertificate:
-    domains:
-      - "t1ichat.ddnsfree.com"
-  hosts:
-    - host: "t1ichat.ddnsfree.com"
-      paths:
-        - path: /
-          pathType: Prefix

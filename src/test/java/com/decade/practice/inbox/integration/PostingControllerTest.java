@@ -2,7 +2,7 @@ package com.decade.practice.inbox.integration;
 
 import com.decade.practice.inbox.apis.ConversationApi;
 import com.decade.practice.inbox.domain.events.*;
-import com.decade.practice.resources.files.dto.S3PresignedResponse;
+import com.decade.practice.resources.files.dto.PresignedResponse;
 import com.decade.practice.shared.security.jwt.WithJwtUser;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.RequiredArgsConstructor;
@@ -88,7 +88,7 @@ class PostingControllerTest extends BaseInboxTestClass {
             .andExpect(status().isOk())
             .andReturn();
 
-        S3PresignedResponse response = objectMapper.readValue(result.getResponse().getContentAsString(), S3PresignedResponse.class);
+        PresignedResponse response = objectMapper.readValue(result.getResponse().getContentAsString(), PresignedResponse.class);
 
         String eTag = Assertions.assertDoesNotThrow(() -> {
             RestClient restClient = RestClient.builder()
@@ -244,7 +244,7 @@ class PostingControllerTest extends BaseInboxTestClass {
             .andExpect(status().isOk())
             .andReturn();
 
-        S3PresignedResponse response = objectMapper.readValue(result.getResponse().getContentAsString(), S3PresignedResponse.class);
+        PresignedResponse response = objectMapper.readValue(result.getResponse().getContentAsString(), PresignedResponse.class);
 
         String eTag = Assertions.assertDoesNotThrow(() -> {
             RestClient restClient = RestClient.builder()

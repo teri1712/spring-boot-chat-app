@@ -15,9 +15,6 @@ on:
             ENV:
                 required: true
                 type: string
-            FRONTEND:
-                required: true
-                type: string
 
 permissions:
     contents: read
@@ -63,7 +60,6 @@ jobs:
             GKE_LOCATION: ${{ inputs.GKE_LOCATION }}
             PROJECT_ID: ${{ inputs.PROJECT_ID }}
             DEPLOY_ENV: ${{ inputs.ENV }}
-            FRONTEND: ${{ inputs.FRONTEND }}
 
         steps:
             - name: Checkout repository
@@ -98,6 +94,7 @@ jobs:
                   helm dependency build ./k8s/infra
                   helm upgrade --install infra ./k8s/infra \
                     -f ./k8s/infra/values-gke.yaml \
+                    -f ./k8s/infra/values-${{ env.DEPLOY_ENV }}.yaml \
                     --wait --timeout 10m
 
             - name: Deploy Observability
@@ -114,5 +111,4 @@ jobs:
                     -f ./k8s/chatapp/values-gke.yaml \
                     -f ./k8s/chatapp/values-${{ env.DEPLOY_ENV }}.yaml \
                     --set image.tag=${{ github.sha }} \
-                    --set env.FRONTEND=${{ env.FRONTEND }} \
                     --wait --timeout 10m

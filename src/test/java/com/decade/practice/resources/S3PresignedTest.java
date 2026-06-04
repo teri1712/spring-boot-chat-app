@@ -1,7 +1,7 @@
 package com.decade.practice.resources;
 
 import com.decade.practice.integration.BaseTestClass;
-import com.decade.practice.resources.files.dto.S3PresignedResponse;
+import com.decade.practice.resources.files.dto.PresignedResponse;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
@@ -53,7 +53,7 @@ class S3PresignedTest extends BaseTestClass {
             .andExpect(status().isOk())
             .andReturn();
 
-        S3PresignedResponse response = objectMapper.readValue(result.getResponse().getContentAsString(), S3PresignedResponse.class);
+        PresignedResponse response = objectMapper.readValue(result.getResponse().getContentAsString(), PresignedResponse.class);
 
         String eTag = Assertions.assertDoesNotThrow(() -> {
             RestClient restClient = RestClient.builder()

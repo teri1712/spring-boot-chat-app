@@ -20,6 +20,7 @@ ingress:
   className: "gce"
   annotations:
     kubernetes.io/ingress.allow-http: "false"
+    kubernetes.io/ingress.global-static-ip-name: "t1ichat-server"
   managedCertificate:
     enabled: true
   tls: []
