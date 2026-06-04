@@ -1,4 +1,4 @@
-{{- if and .Values.minio.enabled .Values.minio.ingress.enabled (eq .Values.minio.ingress.ingressClassName "gce") .Values.minio.managedCertificate.enabled -}}
+{{- if and .Values.minio.ingress.enabled (eq .Values.minio.ingress.ingressClassName "gce") .Values.minio.managedCertificate.enabled -}}
 apiVersion: networking.gke.io/v1
 kind: ManagedCertificate
 metadata:

@@ -1,6 +1,6 @@
 
 env:
-  S3_PUBLIC_ENDPOINT: "http://s3-t1ichat-staging.ddnsfree.com"
+  S3_PUBLIC_ENDPOINT: "https://s3-t1ichat-staging.ddnsfree.com"
   FRONTEND: "https://t1ichat-frontend-staging-732519168410.asia-southeast1.run.app"
 
 ingress:
