@@ -6,6 +6,7 @@ import com.decade.practice.users.application.ports.out.TokenGenerator;
 import com.decade.practice.users.dto.AccessToken;
 import io.jsonwebtoken.JwtException;
 import lombok.RequiredArgsConstructor;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 
 import java.time.Duration;
@@ -13,20 +14,25 @@ import java.time.Duration;
 @Component
 @RequiredArgsConstructor
 public class TokenGeneratorImpl implements TokenGenerator {
-    private static final Duration ONE_WEEK = Duration.ofDays(7);
-    private static final Duration FIVE_MINUTES = Duration.ofMinutes(30);
-    private final TokenService tokenService;
+
+    @Value("${token.access.duration}")
+    Duration accessDuration;
+
+    @Value("${token.refresh.duration}")
+    Duration refreshDuration;
+    final TokenService tokenService;
+
 
     @Override
     public AccessToken generate(UserClaims userClaims) {
-        String accessToken = tokenService.encodeToken(userClaims, FIVE_MINUTES);
+        String accessToken = tokenService.encodeToken(userClaims, accessDuration);
         String refreshToken = generateRefreshToken(userClaims);
         return new AccessToken(accessToken, refreshToken);
     }
 
     @Override
     public String generateRefreshToken(UserClaims userClaims) {
-        return tokenService.encodeToken(userClaims, ONE_WEEK);
+        return tokenService.encodeToken(userClaims, refreshDuration);
     }
 
     @Override

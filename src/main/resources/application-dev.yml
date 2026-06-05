@@ -50,3 +50,7 @@ batch:
 frontend:
   host:
     address: http://localhost:4200
+
+token:
+  access:
+    duration: 2m

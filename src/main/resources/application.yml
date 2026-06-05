@@ -122,3 +122,8 @@ websocket:
 inbox:
   batch-size: 100
 
+token:
+  access:
+    duration: 12h
+  refresh:
+    duration: 7d

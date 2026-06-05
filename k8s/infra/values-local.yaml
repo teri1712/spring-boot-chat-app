@@ -33,7 +33,7 @@ minio:
     ingressClassName: "nginx"
     hosts:
       - localhost
-  consoleIngress:
+  backendConfig:
     enabled: false
 
   environment:

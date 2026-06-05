@@ -59,6 +59,14 @@ minio:
     domains:
       - s3.decade.ddnsfree.com
 
+  backendConfig:
+    enabled: true
+
+  service:
+    annotations:
+      cloud.google.com/backend-config: '{"default": "infra-minio-bc"}'
+      cloud.google.com/neg: '{"ingress": true}'
+
   ingress:
     enabled: true
     ingressClassName: "gce"
@@ -68,5 +76,3 @@ minio:
       kubernetes.io/ingress.global-static-ip-name: "s3-t1ichat-server"
       networking.gke.io/managed-certificates: "infra-minio-cert"
 
-  consoleIngress:
-    enabled: false

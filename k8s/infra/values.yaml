@@ -43,7 +43,10 @@ minio:
   existingSecret: "minio-secrets"
   managedCertificate:
     enabled: false
-    domains: []
+    domains: [ ]
+
+  consoleIngress:
+    enabled: false
   buckets:
     - name: decade-bucket
       policy: download
