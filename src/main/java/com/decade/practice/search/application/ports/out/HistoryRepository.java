@@ -8,7 +8,7 @@ import org.springframework.stereotype.Repository;
 import java.util.List;
 
 @Repository
-public interface MessageHistoryRepository extends CrudRepository<MessageHistory, Long> {
+public interface HistoryRepository extends CrudRepository<MessageHistory, Long> {
 
     @Query(value = """
         select *
@@ -18,4 +18,6 @@ public interface MessageHistoryRepository extends CrudRepository<MessageHistory,
                 limit 20
         """)
     List<MessageHistory> findByChatIdAndContent(String chatId, String content);
+
+    MessageHistory findBySequenceNumber(Long sequenceNumber);
 }
