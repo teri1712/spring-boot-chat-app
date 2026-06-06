@@ -1,0 +1,18 @@
+{{- if and .Values.minio.ingress.enabled (eq .Values.minio.ingress.ingressClassName "gce") .Values.minio.backendConfig.enabled -}}
+apiVersion: cloud.google.com/v1
+kind: BackendConfig
+metadata:
+  name: {{ include "infra.fullname" . }}-minio-bc
+  labels:
+    {{- include "infra.labels" . | nindent 4 }}
+spec:
+  healthCheck:
+    checkIntervalSec: 15
+    timeoutSec: 5
+    healthyThreshold: 1
+    unhealthyThreshold: 2
+    type: HTTP
+    requestPath: /minio/health/live
+    port: 9000
+  timeoutSec: 60
+{{- end }}

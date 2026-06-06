@@ -1,0 +1,13 @@
+{{- if and .Values.minio.ingress.enabled (eq .Values.minio.ingress.ingressClassName "gce") .Values.minio.managedCertificate.enabled -}}
+apiVersion: networking.gke.io/v1
+kind: ManagedCertificate
+metadata:
+  name: {{ include "infra.fullname" . }}-minio-cert
+  labels:
+    {{- include "infra.labels" . | nindent 4 }}
+spec:
+  domains:
+    {{- range .Values.minio.managedCertificate.domains }}
+    - {{ . | quote }}
+    {{- end }}
+{{- end }}

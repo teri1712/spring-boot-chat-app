@@ -1,0 +1,78 @@
+# GKE Production Profile - Infrastructure
+postgresql:
+  primary:
+    persistence:
+      storageClass: "standard-rwo"
+      size: 5Gi
+    resources:
+      limits:
+        cpu: 1000m
+        memory: 2Gi
+      requests:
+        cpu: 500m
+        memory: 1Gi
+
+redis:
+  replica:
+    replicaCount: 1
+  master:
+    persistence:
+      storageClass: "standard-rwo"
+      size: 3Gi
+    resources:
+      limits:
+        cpu: 500m
+        memory: 512Mi
+      requests:
+        cpu: 250m
+        memory: 512Mi
+
+kafka:
+  controller:
+    replicaCount: 1
+    persistence:
+      enabled: true
+      storageClass: "standard-rwo"
+      size: 3Gi
+    resources:
+      limits:
+        cpu: 1000m
+        memory: 2Gi
+      requests:
+        cpu: 500m
+        memory: 512Mi
+
+minio:
+  persistence:
+    storageClass: "standard-rwo"
+    size: 3Gi
+  resources:
+    limits:
+      cpu: 500m
+      memory: 512Mi
+    requests:
+      cpu: 250m
+      memory: 256Mi
+
+  managedCertificate:
+    enabled: true
+    domains:
+      - s3.decade.ddnsfree.com
+
+  backendConfig:
+    enabled: true
+
+  service:
+    annotations:
+      cloud.google.com/backend-config: '{"default": "infra-minio-bc"}'
+      cloud.google.com/neg: '{"ingress": true}'
+
+  ingress:
+    enabled: true
+    ingressClassName: "gce"
+    annotations:
+      kubernetes.io/ingress.class: "gce"
+      kubernetes.io/ingress.allow-http: "false"
+      kubernetes.io/ingress.global-static-ip-name: "s3-t1ichat-server"
+      networking.gke.io/managed-certificates: "infra-minio-cert"
+

@@ -1,0 +1,19 @@
+name: CD - Staging
+
+on:
+    push:
+        branches: [ develop ]
+
+permissions:
+    contents: read
+    id-token: write
+
+jobs:
+    deploy:
+        uses: ./.github/workflows/cd.yml
+        with:
+            GKE_CLUSTER: ${{ vars.GKE_STAGING_CLUSTER }}
+            GKE_LOCATION: ${{ vars.GKE_LOCATION }}
+            PROJECT_ID: ${{ vars.PROJECT_ID }}
+            ENV: staging
+        secrets: inherit

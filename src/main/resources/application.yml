@@ -1,0 +1,129 @@
+spring:
+  profiles:
+    active: ${APP_PROFILES:dev}
+  security:
+    oauth2:
+      resourceserver:
+        jwt:
+          issuer-uri: https://accounts.google.com
+  application:
+    name: chatapp
+  datasource:
+    type: com.zaxxer.hikari.HikariDataSource
+    driver-class-name: org.postgresql.Driver
+    hikari:
+      maximum-pool-size: 15
+      connection-timeout: 30000
+      minimum-idle: 10
+  jpa:
+    database: POSTGRESQL
+    hibernate:
+      ddl-auto: validate
+      naming:
+        physical-strategy: org.hibernate.boot.model.naming.CamelCaseToUnderscoresNamingStrategy
+        implicit-strategy: jpa
+    properties:
+      javax:
+        persistence:
+          validation:
+            mode: none
+      hibernate:
+        format_sql: true
+        highlight_sql: true
+        order_inserts: true
+        order_updates: true
+    open-in-view: true
+  data:
+    redis:
+      timeout: 60000
+      client-type: lettuce
+  mvc:
+    problemdetails:
+      enabled: true
+  flyway:
+    clean-disabled: false
+    enabled: true
+
+  kafka:
+    listener:
+      concurrency: 4
+    producer:
+      key-serializer: org.apache.kafka.common.serialization.StringSerializer
+      value-serializer: org.springframework.kafka.support.serializer.JsonSerializer
+
+    consumer:
+      auto-offset-reset: earliest
+      key-deserializer: org.apache.kafka.common.serialization.StringDeserializer
+      value-deserializer: org.springframework.kafka.support.serializer.JsonDeserializer
+      properties:
+        spring.json.trusted.packages: "*"
+
+  modulith:
+    events:
+      jdbc:
+        schema-initialization:
+          enabled: true
+
+
+actuator:
+  user:
+    name: admin
+    password: admin
+    roles: OPS
+server:
+  port: 8080
+  error:
+    include-message: always
+  servlet:
+    session:
+      cookie:
+        same-site: Lax
+  # ssl:
+  #   bundle: general
+management:
+  server:
+    port: 8081
+  endpoints:
+    web:
+      exposure:
+        include: health,env,beans,info,prometheus,modulith
+  endpoint:
+    health:
+      probes:
+        enabled: true
+      show-details: ALWAYS
+  metrics:
+    tags:
+      application: ${spring.application.name}
+  tracing:
+    sampling:
+      probability: 1.0
+
+  observations:
+    annotations:
+      enabled: true
+
+
+
+broker:
+  topics:
+    queue: queue
+    room: room
+    setting: setting
+
+websocket:
+  topics:
+    user: /user
+    queue: /queue
+    room: /room
+    setting: /setting
+
+
+inbox:
+  batch-size: 100
+
+token:
+  access:
+    duration: 12h
+  refresh:
+    duration: 7d

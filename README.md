@@ -3,9 +3,12 @@
 A real-time chat application built with Spring Boot for the backend and Angular for the frontend. Users can manage
 profiles, authenticate, searching and participate in live chat rooms.
 
-## Live web app (Un available now due to budget constraint, please refer to setting up locally)
-http://decade.ddnsfree.com:4200/
+## Live web app
+
+https://t1ichat-frontend-staging-732519168410.asia-southeast1.run.app/
+
 ## Demo
+
 A initial version of the application demo is available here:
 
 * Web: [https://youtu.be/xm_pWF36_Uo](https://youtu.be/xm_pWF36_Uo)
@@ -22,7 +25,8 @@ A initial version of the application demo is available here:
 ### Repositories
 
 * Backend: [https://github.com/teri1712/spring-boot-chat-app.git](https://github.com/teri1712/spring-boot-chat-app.git)
-* Frontend: [https://github.com/teri1712/angular-chat-application.git](https://github.com/teri1712/angular-chat-application.git)
+*
+Frontend: [https://github.com/teri1712/angular-chat-application.git](https://github.com/teri1712/angular-chat-application.git)
 
 ## Run Locally
 
@@ -48,69 +52,47 @@ Visit http://localhost:4200/ to access the application.
 
 # Performance Test Report
 
-- Detailed reports are available in: `performance otimization report`, use compression tools to unzip the files please
-- Detailed performance setting up are available ta `source code/practice/perf`
+- Detailed reports and scripts are available in the [performance/](./performance/) directory.
 
-## Cache Performance Test
+## Cache Performance Test (Large Room Scenario)
 
 ### Test Setup
-- **Scenarios**: 2 server pools compared
-  - Pool 1: Cache disabled (2 servers)
-  - Pool 2: Cache enabled (2 servers)
-- **Load Profile**: 
-  - 0-30s: Ramp up to 20 concurrent users
-  - 30s-90s: Maintain 50 concurrent users
-  - 90s-120s: Ramp down to 0
-- **Total Requests**: 34,772
 
-
+- **Scenario**: Fetching chat logs for a room with 5,000+ messages and 500 participants.
+- **Load Profile**:
+    - 0-30s: Ramp up to 20 concurrent users
+    - 30s-90s: Maintain 50 concurrent users
+    - 90s-120s: Ramp down to 0
+- **Metrics Source**: `performance/cache/no-cache.json` and `performance/cache/with-cache.json`
 
 ### Results
 
-| Metric            | Value         |
-| ----------------- | ------------- |
-| Min Response Time | 4.25 ms       |
-| Max Response Time | 1,520.00 ms   |
-| Avg Response Time | **89.94 ms**  |
-| Success Rate      | **99.20%**    |
-| Failed Requests   | 0             |
+| Metric            | Cache Disabled | Cache Enabled | Improvement |
+|-------------------|----------------|---------------|-------------|
+| Avg Response Time | 530.42 ms      | 368.59 ms     | **~30.5%**  |
+| Throughput (Reqs) | 5,928          | 8,537         | **~44.0%**  |
+| Success Rate      | 100%           | 100%          | -           |
 
 ---
 
-### Cache Performance Comparison
-
-| Scenario       | Avg Response Time |
-| -------------- | ----------------- |
-| Cache Disabled | **128.83 ms**     |
-| Cache Enabled  | **51.06 ms**      |
-
----
-
-### Performance Impact
-
-* Enabling cache reduced average response time by **~60.4%**
-* Achieved **~2.52× faster response times** with caching enabled
-
----
-
-## Fanout Performance Test (WebSocket Messaging)
+## Resilience & Throughput (Kafka vs Internal Events)
 
 ### Test Setup
-- **Scenarios**: Publisher-Subscriber messaging pattern
-  - **Subscribers**: 100 concurrent WebSocket connections (constant) to receive fanout
-  - **Publishers**: 30 messages/sec (constant arrival rate), with actual success rate at ~5.5 messages/sec due to database concurrent large fanout batch insertions and system constraints as bottleneck.
-  - **Test Duration**: 2 minutes per scenario
-- **Infrastructure**: 5 server instances for load distribution
-- **Total Requests**: 791 REST API calls
+- **Scenario**: High-volume messaging fanout to 500 concurrent subscribers.
+- **Load Profile**: Constant arrival rate of 30 messages/sec.
+- **Infrastructure**: Distributed staging cluster.
+- **Goal**: Compare system resilience and publishing throughput between internal module events and Kafka-backed messaging.
+- **Metrics Source**: `performance/resilience/module-batch-fanout.json` and `performance/resilience/kafka-batch-fanout.json`
 
 ### Results
-| Metric | Value |
-|--------|-------|
-| WebSocket Connections | **100 concurrent** |
-| Message Delivery Rate | **~11,137 messages/minute** |
+
+| Metric | Internal Events | Kafka Batching | Improvement |
+|--------|-----------------|----------------|-------------|
+| Successful Publishes | ~0.73 msgs/sec | **~4.40 msgs/sec** | **~6.0x Higher** |
+| Success Rate | ~6.1% | **~34.3%** | **~5.6x Higher** |
+| Reliability | Highly sensitive to DB load | **Buffered & resilient** | - |
 
 ---
-
 
 # Test Report
 

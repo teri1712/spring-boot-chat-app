@@ -1,0 +1,61 @@
+package com.decade.practice.integration;
+
+import com.decade.practice.engagement.domain.ChatCreators;
+import com.decade.practice.engagement.domain.services.DirectChatFactory;
+import com.decade.practice.inbox.domain.events.TextRoomEventCreated;
+import lombok.AllArgsConstructor;
+import org.springframework.boot.test.context.TestComponent;
+import org.springframework.boot.test.context.TestConfiguration;
+import org.springframework.context.ApplicationEventPublisher;
+import org.springframework.context.annotation.Bean;
+import org.springframework.core.task.SyncTaskExecutor;
+import org.springframework.core.task.TaskExecutor;
+import org.springframework.transaction.annotation.Propagation;
+import org.springframework.transaction.annotation.Transactional;
+
+import java.time.Instant;
+import java.util.Set;
+import java.util.UUID;
+
+@TestConfiguration
+public class TestBeans {
+
+    @Bean
+    TaskExecutor taskExecutor() {
+        return new SyncTaskExecutor();
+    }
+
+    @TestComponent
+    @AllArgsConstructor
+    public static class PrivateChatSender {
+
+        private final ModuleEventPublisher applicationEventPublisher;
+
+        public void emitText(String message, UUID senderId, UUID recipientId) {
+            String chatId = new DirectChatFactory().make(new ChatCreators(senderId, Set.of(recipientId)));
+
+            applicationEventPublisher.publishEvent(TextRoomEventCreated.builder()
+                .senderId(senderId)
+                .chatId(chatId)
+                .chatEventId(UUID.randomUUID())
+                .createdAt(Instant.now())
+                .content(message)
+                .build()
+            );
+        }
+
+    }
+
+    @AllArgsConstructor
+    @TestComponent
+    public static class ModuleEventPublisher {
+
+        private final ApplicationEventPublisher applicationEventPublisher;
+
+        @Transactional(propagation = Propagation.REQUIRES_NEW)
+        public void publishEvent(Object event) {
+            applicationEventPublisher.publishEvent(event);
+        }
+
+    }
+}

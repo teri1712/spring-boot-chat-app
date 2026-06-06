@@ -1,0 +1,19 @@
+spring:
+  docker:
+    compose:
+      enabled: false
+
+logging:
+  level:
+    root: DEBUG
+
+jwt:
+  secret: vcl-vcl-vcl-vcl-vcl-vcl-vcl-vcl-vcl-vcl
+
+aws:
+  s3:
+    bucket: decade-bucket
+
+frontend:
+  host:
+    address: http://localhost:4200

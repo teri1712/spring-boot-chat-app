@@ -1,0 +1,45 @@
+logging:
+  level:
+    root: INFO
+    org.springframework: WARN
+    com.decade: INFO
+spring:
+  datasource:
+    url: ${DB_URL}
+    username: ${DB_USERNAME}
+    password: ${DB_PASSWORD}
+  data:
+    redis:
+      host: ${REDIS_HOST}
+      password: ${REDIS_PASSWORD}
+  kafka:
+    bootstrap-servers: ${KAFKA_SERVERS}
+    properties:
+      security.protocol: ${KAFKA_SECURITY_PROTOCOL}
+      sasl.mechanism: PLAIN
+      sasl.jaas.config: org.apache.kafka.common.security.plain.PlainLoginModule required username="${KAFKA_USER}" password="${KAFKA_PASSWORD}";
+
+management:
+  otlp:
+    tracing:
+      endpoint: ${OTLP_ENDPOINT}
+  tracing:
+    sampling:
+      probability: 0.1
+loki:
+  url: ${LOKI_URL}
+
+aws:
+  s3:
+    endpoint: ${S3_ENDPOINT}
+    public-endpoint: ${S3_PUBLIC_ENDPOINT}
+    region: ${AWS_S3_REGION}
+    bucket: ${AWS_S3_BUCKET}
+    access:
+      id: ${AWS_ACCESS_KEY_ID}
+      secret: ${AWS_SECRET_ACCESS_KEY}
+
+
+frontend:
+  host:
+    address: ${FRONTEND}

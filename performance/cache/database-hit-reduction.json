@@ -1,0 +1,605 @@
+[
+  {
+    "schema": {
+      "refId": "A",
+      "meta": {
+        "type": "timeseries-multi",
+        "typeVersion": [
+          0,
+          1
+        ],
+        "custom": {
+          "calculatedMinStep": 15000,
+          "resultType": "matrix"
+        },
+        "executedQueryString": "Expr: users_infos_seconds_count{hit=\"database\"}\nStep: 15s",
+        "preferredVisualisationType": "graph"
+      },
+      "fields": [
+        {
+          "name": "Time",
+          "type": "time",
+          "typeInfo": {
+            "frame": "time.Time"
+          },
+          "config": {
+            "interval": 15000
+          }
+        },
+        {
+          "name": "users_infos_seconds_count",
+          "type": "number",
+          "typeInfo": {
+            "frame": "float64"
+          },
+          "labels": {
+            "__name__": "users_infos_seconds_count",
+            "application": "chatapp",
+            "class": "com.decade.practice.users.application.services.PersistentUserApi",
+            "container": "chatapp",
+            "endpoint": "management",
+            "error": "none",
+            "hit": "database",
+            "instance": "10.69.0.130:8081",
+            "job": "chatapp",
+            "method": "getUserInfo",
+            "namespace": "default",
+            "pod": "chatapp-6864c448d6-vg44z",
+            "service": "chatapp"
+          },
+          "config": {
+            "displayNameFromDS": "{instance=\"10.69.0.130:8081\", pod=\"chatapp-6864c448d6-vg44z\"}"
+          }
+        }
+      ]
+    },
+    "data": {
+      "values": [
+        [
+          1780052835000,
+          1780052850000,
+          1780052865000,
+          1780052880000,
+          1780052895000,
+          1780052910000,
+          1780052925000,
+          1780052940000,
+          1780052955000,
+          1780052970000,
+          1780052985000,
+          1780053000000,
+          1780053015000
+        ],
+        [
+          9,
+          15,
+          16,
+          16,
+          16,
+          16,
+          16,
+          16,
+          16,
+          16,
+          16,
+          16,
+          16
+        ]
+      ]
+    }
+  },
+  {
+    "schema": {
+      "refId": "A",
+      "meta": {
+        "type": "timeseries-multi",
+        "typeVersion": [
+          0,
+          1
+        ],
+        "custom": {
+          "resultType": "matrix"
+        },
+        "preferredVisualisationType": "graph"
+      },
+      "fields": [
+        {
+          "name": "Time",
+          "type": "time",
+          "typeInfo": {
+            "frame": "time.Time"
+          },
+          "config": {
+            "interval": 15000
+          }
+        },
+        {
+          "name": "users_infos_seconds_count",
+          "type": "number",
+          "typeInfo": {
+            "frame": "float64"
+          },
+          "labels": {
+            "__name__": "users_infos_seconds_count",
+            "application": "chatapp",
+            "class": "com.decade.practice.users.application.services.PersistentUserApi",
+            "container": "chatapp",
+            "endpoint": "management",
+            "error": "none",
+            "hit": "database",
+            "instance": "10.69.0.226:8081",
+            "job": "chatapp",
+            "method": "getUserInfo",
+            "namespace": "default",
+            "pod": "chatapp-6864c448d6-7k2ng",
+            "service": "chatapp"
+          },
+          "config": {
+            "displayNameFromDS": "{instance=\"10.69.0.226:8081\", pod=\"chatapp-6864c448d6-7k2ng\"}"
+          }
+        }
+      ]
+    },
+    "data": {
+      "values": [
+        [
+          1780052835000,
+          1780052850000,
+          1780052865000,
+          1780052880000,
+          1780052895000,
+          1780052910000,
+          1780052925000,
+          1780052940000,
+          1780052955000,
+          1780052970000,
+          1780052985000,
+          1780053000000,
+          1780053015000
+        ],
+        [
+          17,
+          17,
+          17,
+          17,
+          17,
+          17,
+          17,
+          17,
+          17,
+          17,
+          17,
+          17,
+          17
+        ]
+      ]
+    }
+  },
+  {
+    "schema": {
+      "refId": "A",
+      "meta": {
+        "type": "timeseries-multi",
+        "typeVersion": [
+          0,
+          1
+        ],
+        "custom": {
+          "resultType": "matrix"
+        },
+        "preferredVisualisationType": "graph"
+      },
+      "fields": [
+        {
+          "name": "Time",
+          "type": "time",
+          "typeInfo": {
+            "frame": "time.Time"
+          },
+          "config": {
+            "interval": 15000
+          }
+        },
+        {
+          "name": "users_infos_seconds_count",
+          "type": "number",
+          "typeInfo": {
+            "frame": "float64"
+          },
+          "labels": {
+            "__name__": "users_infos_seconds_count",
+            "application": "chatapp",
+            "class": "com.decade.practice.users.application.services.PersistentUserApi",
+            "container": "chatapp",
+            "endpoint": "management",
+            "error": "none",
+            "hit": "database",
+            "instance": "10.69.0.71:8081",
+            "job": "chatapp",
+            "method": "getUserInfo",
+            "module_key": "inbox",
+            "namespace": "default",
+            "pod": "chatapp-596986cc69-h7gvn",
+            "service": "chatapp"
+          },
+          "config": {
+            "displayNameFromDS": "{instance=\"10.69.0.71:8081\", module_key=\"inbox\", pod=\"chatapp-596986cc69-h7gvn\"}"
+          }
+        }
+      ]
+    },
+    "data": {
+      "values": [
+        [
+          1780051395000,
+          1780051410000,
+          1780051425000,
+          1780051440000,
+          1780051455000,
+          1780051470000,
+          1780051485000,
+          1780051500000,
+          1780051515000
+        ],
+        [
+          22,
+          137,
+          352,
+          596,
+          858,
+          1174,
+          1491,
+          1832,
+          1937
+        ]
+      ]
+    }
+  },
+  {
+    "schema": {
+      "refId": "A",
+      "meta": {
+        "type": "timeseries-multi",
+        "typeVersion": [
+          0,
+          1
+        ],
+        "custom": {
+          "resultType": "matrix"
+        },
+        "preferredVisualisationType": "graph"
+      },
+      "fields": [
+        {
+          "name": "Time",
+          "type": "time",
+          "typeInfo": {
+            "frame": "time.Time"
+          },
+          "config": {
+            "interval": 15000
+          }
+        },
+        {
+          "name": "users_infos_seconds_count",
+          "type": "number",
+          "typeInfo": {
+            "frame": "float64"
+          },
+          "labels": {
+            "__name__": "users_infos_seconds_count",
+            "application": "chatapp",
+            "class": "com.decade.practice.users.application.services.PersistentUserApi",
+            "container": "chatapp",
+            "endpoint": "management",
+            "error": "none",
+            "hit": "database",
+            "instance": "10.69.0.72:8081",
+            "job": "chatapp",
+            "method": "getUserInfo",
+            "module_key": "inbox",
+            "namespace": "default",
+            "pod": "chatapp-596986cc69-pcqzn",
+            "service": "chatapp"
+          },
+          "config": {
+            "displayNameFromDS": "{instance=\"10.69.0.72:8081\", module_key=\"inbox\", pod=\"chatapp-596986cc69-pcqzn\"}"
+          }
+        }
+      ]
+    },
+    "data": {
+      "values": [
+        [
+          1780051395000,
+          1780051410000,
+          1780051425000,
+          1780051440000,
+          1780051455000,
+          1780051470000,
+          1780051485000,
+          1780051500000,
+          1780051515000
+        ],
+        [
+          82,
+          242,
+          480,
+          745,
+          1052,
+          1382,
+          1702,
+          1942,
+          1946
+        ]
+      ]
+    }
+  },
+  {
+    "schema": {
+      "refId": "A",
+      "meta": {
+        "type": "timeseries-multi",
+        "typeVersion": [
+          0,
+          1
+        ],
+        "custom": {
+          "resultType": "matrix"
+        },
+        "preferredVisualisationType": "graph"
+      },
+      "fields": [
+        {
+          "name": "Time",
+          "type": "time",
+          "typeInfo": {
+            "frame": "time.Time"
+          },
+          "config": {
+            "interval": 15000
+          }
+        },
+        {
+          "name": "users_infos_seconds_count",
+          "type": "number",
+          "typeInfo": {
+            "frame": "float64"
+          },
+          "labels": {
+            "__name__": "users_infos_seconds_count",
+            "application": "chatapp",
+            "class": "com.decade.practice.users.application.services.PersistentUserApi",
+            "container": "chatapp",
+            "endpoint": "management",
+            "error": "none",
+            "hit": "database",
+            "instance": "10.69.0.73:8081",
+            "job": "chatapp",
+            "method": "getUserInfo",
+            "module_key": "inbox",
+            "namespace": "default",
+            "pod": "chatapp-596986cc69-47hvm",
+            "service": "chatapp"
+          },
+          "config": {
+            "displayNameFromDS": "{instance=\"10.69.0.73:8081\", module_key=\"inbox\", pod=\"chatapp-596986cc69-47hvm\"}"
+          }
+        }
+      ]
+    },
+    "data": {
+      "values": [
+        [
+          1780051395000,
+          1780051410000,
+          1780051425000,
+          1780051440000,
+          1780051455000,
+          1780051470000,
+          1780051485000,
+          1780051500000,
+          1780051515000
+        ],
+        [
+          105,
+          297,
+          540,
+          831,
+          1133,
+          1478,
+          1812,
+          2041,
+          2045
+        ]
+      ]
+    }
+  },
+  {
+    "schema": {
+      "refId": "A-Instant",
+      "meta": {
+        "type": "numeric-multi",
+        "typeVersion": [
+          0,
+          1
+        ],
+        "custom": {
+          "calculatedMinStep": 15000,
+          "resultType": "vector"
+        },
+        "executedQueryString": "Expr: users_infos_seconds_count{hit=\"database\"}\nStep: 15s",
+        "preferredVisualisationType": "rawPrometheus"
+      },
+      "fields": [
+        {
+          "name": "Time",
+          "type": "time",
+          "config": {
+            "interval": 15000
+          }
+        },
+        {
+          "name": "__name__",
+          "config": {
+            "filterable": true
+          },
+          "type": "string"
+        },
+        {
+          "name": "application",
+          "config": {
+            "filterable": true
+          },
+          "type": "string"
+        },
+        {
+          "name": "class",
+          "config": {
+            "filterable": true
+          },
+          "type": "string"
+        },
+        {
+          "name": "container",
+          "config": {
+            "filterable": true
+          },
+          "type": "string"
+        },
+        {
+          "name": "endpoint",
+          "config": {
+            "filterable": true
+          },
+          "type": "string"
+        },
+        {
+          "name": "error",
+          "config": {
+            "filterable": true
+          },
+          "type": "string"
+        },
+        {
+          "name": "hit",
+          "config": {
+            "filterable": true
+          },
+          "type": "string"
+        },
+        {
+          "name": "instance",
+          "config": {
+            "filterable": true
+          },
+          "type": "string"
+        },
+        {
+          "name": "job",
+          "config": {
+            "filterable": true
+          },
+          "type": "string"
+        },
+        {
+          "name": "method",
+          "config": {
+            "filterable": true
+          },
+          "type": "string"
+        },
+        {
+          "name": "namespace",
+          "config": {
+            "filterable": true
+          },
+          "type": "string"
+        },
+        {
+          "name": "pod",
+          "config": {
+            "filterable": true
+          },
+          "type": "string"
+        },
+        {
+          "name": "service",
+          "config": {
+            "filterable": true
+          },
+          "type": "string"
+        },
+        {
+          "name": "Value",
+          "type": "number",
+          "config": {}
+        }
+      ]
+    },
+    "data": {
+      "values": [
+        [
+          1780053028105,
+          1780053028105
+        ],
+        [
+          "users_infos_seconds_count",
+          "users_infos_seconds_count"
+        ],
+        [
+          "chatapp",
+          "chatapp"
+        ],
+        [
+          "com.decade.practice.users.application.services.PersistentUserApi",
+          "com.decade.practice.users.application.services.PersistentUserApi"
+        ],
+        [
+          "chatapp",
+          "chatapp"
+        ],
+        [
+          "management",
+          "management"
+        ],
+        [
+          "none",
+          "none"
+        ],
+        [
+          "database",
+          "database"
+        ],
+        [
+          "10.69.0.130:8081",
+          "10.69.0.226:8081"
+        ],
+        [
+          "chatapp",
+          "chatapp"
+        ],
+        [
+          "getUserInfo",
+          "getUserInfo"
+        ],
+        [
+          "default",
+          "default"
+        ],
+        [
+          "chatapp-6864c448d6-vg44z",
+          "chatapp-6864c448d6-7k2ng"
+        ],
+        [
+          "chatapp",
+          "chatapp"
+        ],
+        [
+          16,
+          17
+        ]
+      ]
+    }
+  }
+]

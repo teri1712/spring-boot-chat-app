@@ -1,0 +1,35 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<configuration debug="true">
+    <include resource="org/springframework/boot/logging/logback/defaults.xml"/>
+    
+    <springProperty scope="context" name="APP_NAME" source="spring.application.name" defaultValue="chatapp"/>
+    <springProperty scope="context" name="LOKI_URL" source="loki.url" defaultValue="http://localhost:3100/loki/api/v1/push"/>
+
+    <appender name="CONSOLE" class="ch.qos.logback.core.ConsoleAppender">
+        <encoder>
+            <pattern>%clr(%d{yyyy-MM-dd HH:mm:ss}){faint} %clr([%thread]){faint} %clr(%-5level) %clr(%logger{36}){cyan} %clr(traceId=%X{traceId} spanId=%X{spanId}){faint} - %msg%n${LOG_EXCEPTION_CONVERSION_WORD:-%wEx}</pattern>
+        </encoder>
+    </appender>
+
+    <appender name="LOKI" class="com.github.loki4j.logback.Loki4jAppender">
+        <http>
+            <url>${LOKI_URL}</url>
+        </http>
+        <maxRetries>5</maxRetries>
+        <minRetryBackoffMs>1000</minRetryBackoffMs>
+        <maxRetryBackoffMs>60000</maxRetryBackoffMs>
+        <format>
+            <label>
+                <pattern>app=${APP_NAME},host=${HOSTNAME}</pattern>
+            </label>
+            <message>
+                <pattern>traceId=%X{traceId} spanId=%X{spanId} %d{HH:mm:ss} %-5level %logger{36} - %msg%n</pattern>
+            </message>
+        </format>
+    </appender>
+
+    <root level="INFO">
+        <appender-ref ref="CONSOLE"/>
+        <appender-ref ref="LOKI"/>
+    </root>
+</configuration>

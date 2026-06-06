@@ -1,0 +1,40 @@
+# LOCAL Scaling Down for Kind
+postgresql:
+  primary:
+    persistence:
+      enabled: false
+redis:
+  replica:
+    replicaCount: 2
+    persistence:
+      enabled: false
+  master:
+    persistence:
+      enabled: false
+
+kafka:
+  controller:
+    replicaCount: 2
+    persistence:
+      enabled: false
+    resources:
+      limits:
+        cpu: 1000m
+        memory: 1Gi
+      requests:
+        cpu: 500m
+        memory: 512Mi
+
+minio:
+  persistence:
+    enabled: false
+  ingress:
+    enabled: true
+    ingressClassName: "nginx"
+    hosts:
+      - localhost
+  backendConfig:
+    enabled: false
+
+  environment:
+    MINIO_API_CORS_ALLOW_ORIGIN: http://localhost:4200

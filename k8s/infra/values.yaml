@@ -1,0 +1,54 @@
+# Blueprint for Infrastructure Stack
+postgresql:
+  auth:
+    username: root
+    database: chatapp
+    existingSecret: "chatapp-secrets"
+    secretKeys:
+      adminPasswordKey: "postgres-password"
+      userPasswordKey: "postgres-password"
+  primary:
+    persistence:
+      enabled: true
+
+redis:
+  auth:
+    enabled: true
+    existingSecret: "chatapp-secrets"
+    existingSecretPasswordKey: "redis-password"
+  master:
+    persistence:
+      enabled: true
+
+kafka:
+  image:
+    repository: bitnamilegacy/kafka
+  auth:
+    clientProtocol: SASL_PLAINTEXT
+    interBrokerProtocol: SASL_PLAINTEXT
+    saslMechanism: PLAIN
+  sasl:
+    enabledMechanisms: PLAIN
+    existingSecret: "chatapp-secrets"
+    client:
+      users: [ "user" ]
+    interbroker:
+      user: "inter-broker-user"
+    controller:
+      user: "controller-user"
+
+minio:
+  mode: standalone
+  replicas: 1
+  existingSecret: "minio-secrets"
+  managedCertificate:
+    enabled: false
+    domains: [ ]
+
+  consoleIngress:
+    enabled: false
+  buckets:
+    - name: decade-bucket
+      policy: download
+      purge: false
+
