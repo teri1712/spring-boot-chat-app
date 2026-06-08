@@ -16,8 +16,18 @@ public class BatchHandlingConfiguration {
         havingValue = "immediate",
         matchIfMissing = true
     )
-    BatchParticipantLogSaver batchParticipantLogSaver(LogBroadCaster broadcaster, ConversationRepository conversations) {
-        return new ImmediateBatchParticipantLogSaver(broadcaster, conversations);
+    BatchInsertionLogSaver batchInsertionLogSaver(LogBroadCaster broadcaster, ConversationRepository conversations) {
+        return new ImmediateBatchInsertionLogSaver(broadcaster, conversations);
+    }
+
+    @Bean
+    @ConditionalOnProperty(
+        name = "batch.mode",
+        havingValue = "immediate",
+        matchIfMissing = true
+    )
+    BatchUpdateLogSaver batchUpdateLogSaver(LogBroadCaster broadcaster, ConversationRepository conversations) {
+        return new ImmediateBatchUpdateLogSaver(broadcaster, conversations);
     }
 
     @Bean
@@ -26,8 +36,18 @@ public class BatchHandlingConfiguration {
         havingValue = "module",
         matchIfMissing = true
     )
-    BatchParticipantLogSaver moduleBatchParticipantLogSaver(LogBroadCaster broadcaster, ConversationRepository conversations) {
-        return new ModuleBatchParticipantLogSaver(broadcaster, conversations);
+    BatchInsertionLogSaver moduleBatchInsertionLogSaver(LogBroadCaster broadcaster, ConversationRepository conversations) {
+        return new ModuleBatchInsertionLogSaver(broadcaster, conversations);
+    }
+
+    @Bean
+    @ConditionalOnProperty(
+        name = "batch.mode",
+        havingValue = "module",
+        matchIfMissing = true
+    )
+    BatchUpdateLogSaver moduleBatchUpdateLogSaver(LogBroadCaster broadcaster, ConversationRepository conversations) {
+        return new ModuleBatchUpdateLogSaver(broadcaster, conversations);
     }
 
     @Bean
@@ -36,7 +56,17 @@ public class BatchHandlingConfiguration {
         havingValue = "kafka",
         matchIfMissing = true
     )
-    BatchParticipantLogSaver kafkaBatchParticipantLogSaver(LogBroadCaster broadcaster, ConversationRepository conversations) {
-        return new KafkaBatchParticipantLogSaver(broadcaster, conversations);
+    BatchInsertionLogSaver kafkaBatchInsertionLogSaver(LogBroadCaster broadcaster, ConversationRepository conversations) {
+        return new KafkaBatchInsertionLogSaver(broadcaster, conversations);
+    }
+
+    @Bean
+    @ConditionalOnProperty(
+        name = "batch.mode",
+        havingValue = "kafka",
+        matchIfMissing = true
+    )
+    BatchUpdateLogSaver kafkaBatchUpdateLogSaver(LogBroadCaster broadcaster, ConversationRepository conversations) {
+        return new KafkaBatchUpdateLogSaver(broadcaster, conversations);
     }
 }

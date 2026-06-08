@@ -5,14 +5,14 @@ prometheus:
   server:
     persistentVolume:
       storageClass: "standard-rwo"
-      size: 8Gi
+      size: 10Gi
     resources:
       limits:
-        cpu: 500m
+        cpu: 1000m
         memory: 1Gi
       requests:
         cpu: 500m
-        memory: 512Mi
+        memory: 1Gi
 
 grafana:
   persistence:
