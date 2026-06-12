@@ -1,8 +1,8 @@
-package com.decade.practice.live;
+package com.decade.practice.live.integration;
 
-import com.decade.practice.chatsettings.domain.messages.PreferenceMessage;
 import com.decade.practice.engagement.api.EngagementApi;
 import com.decade.practice.integration.BaseTestClass;
+import com.decade.practice.live.dto.TypeMessage;
 import com.decade.practice.shared.security.TokenService;
 import com.decade.practice.shared.security.UserClaims;
 import lombok.RequiredArgsConstructor;
@@ -11,10 +11,10 @@ import org.jetbrains.annotations.Nullable;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.Timeout;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.web.server.LocalServerPort;
-import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.messaging.converter.MessageConverter;
 import org.springframework.messaging.simp.stomp.*;
 import org.springframework.test.context.bean.override.mockito.MockitoSpyBean;
@@ -39,23 +39,22 @@ import static org.mockito.Mockito.when;
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
 @Sql(value = "/sql/clean.sql", executionPhase = Sql.ExecutionPhase.AFTER_TEST_METHOD)
 @RequiredArgsConstructor
-class SettingTopicTest extends BaseTestClass {
+class RoomJoinerTest extends BaseTestClass {
 
     @LocalServerPort
     int port = 0;
 
-    @Value("${websocket.topics.setting}")
-    String settingTopic;
+    @Value("${websocket.topics.room}")
+    String roomTopic;
 
-    @Value("${broker.topics.setting}")
-    String brokerSettingTopic;
+    @Autowired
+    final MessageConverter converter;
+
+    @Autowired
+    final TokenService tokenService;
 
     @MockitoSpyBean
     EngagementApi engagementApi;
-
-    final MessageConverter converter;
-    final TokenService tokenService;
-    final RedisTemplate<String, Object> redisTemplate;
 
     @BeforeEach
     void allowEngagement() {
@@ -69,10 +68,11 @@ class SettingTopicTest extends BaseTestClass {
     @Test
     @Timeout(20)
     @Sql(value = {"/sql/clean.sql", "/sql/seed_users.sql", "/sql/seed_chats.sql"}, executionPhase = Sql.ExecutionPhase.BEFORE_TEST_METHOD)
-    public void givenAliceSubToSetting_whenBrokerEmitPrefMessage_thenAliceReceiveThePrefMessage() throws Exception {
+    public void givenAliceAndBobIsOnline_whenAliceTypeSth_thenBobReceiveTheTypeEvent() throws Exception {
 
 
         StompSession aliceSession = null;
+        StompSession bobSession = null;
         WebSocketStompClient stompClient = null;
 
         try {
@@ -83,12 +83,19 @@ class SettingTopicTest extends BaseTestClass {
                 "alice",
                 "vcl.jpg");
 
+            UserClaims bob = new UserClaims(
+                UUID.fromString("22222222-2222-2222-2222-222222222222"),
+                "bob",
+                "bob",
+                "vcl.jpg");
 
             String chatId = "12345678";
 
             String aliceToken = tokenService.encodeToken(alice, Duration.ofDays(5));
+            String bobToken = tokenService.encodeToken(bob, Duration.ofDays(5));
 
-            CompletableFuture<PreferenceMessage> aliceEvent = new CompletableFuture<>();
+            CompletableFuture<TypeMessage> aliceEvent = new CompletableFuture<>();
+            CompletableFuture<TypeMessage> bobEvent = new CompletableFuture<>();
 
             stompClient = new WebSocketStompClient(new StandardWebSocketClient());
             stompClient.setMessageConverter(converter);
@@ -106,39 +113,67 @@ class SettingTopicTest extends BaseTestClass {
                     }
                 }).get(10, TimeUnit.SECONDS);
 
+            StompHeaders bobHeaders = new StompHeaders();
+            bobHeaders.add(HEADER_NAME, BEARER + bobToken);
+            bobSession = stompClient.connectAsync(
+                "ws://localhost:" + port + "/handshake",
+                new WebSocketHttpHeaders(),
+                bobHeaders,
+                new StompSessionHandlerAdapter() {
+                    @Override
+                    public void handleException(StompSession session, @Nullable StompCommand command, StompHeaders headers, byte[] payload, Throwable exception) {
+                        log.error("Error", exception);
+                    }
+                }).get(10, TimeUnit.SECONDS);
+
+
             StompHeaders aliceStompHeaders = new StompHeaders();
-            aliceStompHeaders.setDestination(settingTopic + "/" + chatId);
+            aliceStompHeaders.setDestination(roomTopic + "/" + chatId);
+
+            StompHeaders bobStompHeaders = new StompHeaders();
+            bobStompHeaders.setDestination(roomTopic + "/" + chatId);
 
             aliceSession.subscribe(aliceStompHeaders, new StompFrameHandler() {
                 @Override
                 public Type getPayloadType(StompHeaders headers) {
-                    return PreferenceMessage.class;
+                    return TypeMessage.class;
                 }
 
                 @Override
                 public void handleFrame(StompHeaders headers, Object payload) {
-                    aliceEvent.complete((PreferenceMessage) payload);
+                    aliceEvent.complete((TypeMessage) payload);
                 }
             });
-            Thread.sleep(2000);
 
-            redisTemplate.convertAndSend(brokerSettingTopic + ":" + chatId,
-                PreferenceMessage.builder()
-                    .iconId(1)
-                    .customName("hello")
-                    .build()
-            );
+            bobSession.subscribe(bobStompHeaders, new StompFrameHandler() {
+                @Override
+                public Type getPayloadType(StompHeaders headers) {
+                    return TypeMessage.class;
+                }
 
-            PreferenceMessage aliceMessage = aliceEvent.get(5, TimeUnit.SECONDS);
-            assertThat(aliceMessage)
-                .extracting(PreferenceMessage::getCustomName)
-                .isEqualTo("hello");
+                @Override
+                public void handleFrame(StompHeaders headers, Object payload) {
+                    bobEvent.complete((TypeMessage) payload);
+                }
+            });
+
+            StompHeaders chatStompHeaders = new StompHeaders();
+            chatStompHeaders.setDestination(roomTopic + "/" + chatId);
+            bobSession.send(chatStompHeaders, "Hello");
+
+            TypeMessage aliceMessage = aliceEvent.get(5, TimeUnit.SECONDS);
+            TypeMessage bobMessage = bobEvent.get(5, TimeUnit.SECONDS);
+            assertThat(aliceMessage.from())
+                .isEqualTo(bobMessage.from());
 
 
         } finally {
 
             if (aliceSession != null && aliceSession.isConnected()) {
                 aliceSession.disconnect();
+            }
+            if (bobSession != null && bobSession.isConnected()) {
+                bobSession.disconnect();
             }
             if (stompClient != null) {
                 stompClient.stop();

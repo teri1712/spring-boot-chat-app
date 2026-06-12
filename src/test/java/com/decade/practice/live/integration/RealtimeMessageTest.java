@@ -1,13 +1,13 @@
-package com.decade.practice.live;
+package com.decade.practice.live.integration;
 
 import com.decade.practice.engagement.api.EngagementApi;
 import com.decade.practice.integration.BaseTestClass;
-import com.decade.practice.live.dto.TypeMessage;
 import com.decade.practice.shared.security.TokenService;
 import com.decade.practice.shared.security.UserClaims;
+import jakarta.annotation.Nullable;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.jetbrains.annotations.Nullable;
+import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.Timeout;
@@ -15,10 +15,10 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.web.server.LocalServerPort;
+import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.messaging.converter.MessageConverter;
 import org.springframework.messaging.simp.stomp.*;
 import org.springframework.test.context.bean.override.mockito.MockitoSpyBean;
-import org.springframework.test.context.jdbc.Sql;
 import org.springframework.web.socket.WebSocketHttpHeaders;
 import org.springframework.web.socket.client.standard.StandardWebSocketClient;
 import org.springframework.web.socket.messaging.WebSocketStompClient;
@@ -37,21 +37,31 @@ import static org.mockito.Mockito.when;
 
 @Slf4j
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
-@Sql(value = "/sql/clean.sql", executionPhase = Sql.ExecutionPhase.AFTER_TEST_METHOD)
 @RequiredArgsConstructor
-class RoomJoinerTest extends BaseTestClass {
+class RealtimeMessageTest extends BaseTestClass {
 
     @LocalServerPort
     int port = 0;
+    @Value("${websocket.topics.queue}")
+    String queueTopic;
 
-    @Value("${websocket.topics.room}")
-    String roomTopic;
+    @Value("${websocket.topics.user}")
+    String userTopic;
+
+    @Value("${broker.topics.queue}")
+    String brokerQueueTopic;
 
     @Autowired
     final MessageConverter converter;
 
     @Autowired
     final TokenService tokenService;
+
+
+    final RedisTemplate<String, Object> redisTemplate;
+
+    record SomeDTO(String someField) {
+    }
 
     @MockitoSpyBean
     EngagementApi engagementApi;
@@ -65,40 +75,40 @@ class RoomJoinerTest extends BaseTestClass {
             .thenReturn(true);
     }
 
-    @Test
-    @Timeout(20)
-    @Sql(value = {"/sql/clean.sql", "/sql/seed_users.sql", "/sql/seed_chats.sql"}, executionPhase = Sql.ExecutionPhase.BEFORE_TEST_METHOD)
-    public void givenAliceAndBobIsOnline_whenAliceTypeSth_thenBobReceiveTheTypeEvent() throws Exception {
 
+    @Test
+    @Timeout(value = 20, unit = TimeUnit.SECONDS)
+    void giveAliceAndBobOnline_whenAliceSendToBob_thenBobReceiveMessageViaWebsocket() throws Exception {
 
         StompSession aliceSession = null;
         StompSession bobSession = null;
         WebSocketStompClient stompClient = null;
 
         try {
-
             UserClaims alice = new UserClaims(
                 UUID.fromString("11111111-1111-1111-1111-111111111111"),
                 "alice",
                 "alice",
-                "vcl.jpg");
+                "ROLE_USER"
+            );
+
 
             UserClaims bob = new UserClaims(
                 UUID.fromString("22222222-2222-2222-2222-222222222222"),
                 "bob",
                 "bob",
-                "vcl.jpg");
-
-            String chatId = "12345678";
+                "ROLE_USER"
+            );
 
             String aliceToken = tokenService.encodeToken(alice, Duration.ofDays(5));
             String bobToken = tokenService.encodeToken(bob, Duration.ofDays(5));
 
-            CompletableFuture<TypeMessage> aliceEvent = new CompletableFuture<>();
-            CompletableFuture<TypeMessage> bobEvent = new CompletableFuture<>();
+            CompletableFuture<SomeDTO> aliceEvent = new CompletableFuture<>();
+            CompletableFuture<SomeDTO> bobEvent = new CompletableFuture<>();
 
             stompClient = new WebSocketStompClient(new StandardWebSocketClient());
             stompClient.setMessageConverter(converter);
+
 
             StompHeaders aliceHeaders = new StompHeaders();
             aliceHeaders.add(HEADER_NAME, BEARER + aliceToken);
@@ -126,46 +136,42 @@ class RoomJoinerTest extends BaseTestClass {
                     }
                 }).get(10, TimeUnit.SECONDS);
 
+            Assertions.assertNotNull(aliceSession);
+            Assertions.assertNotNull(bobSession);
 
-            StompHeaders aliceStompHeaders = new StompHeaders();
-            aliceStompHeaders.setDestination(roomTopic + "/" + chatId);
 
-            StompHeaders bobStompHeaders = new StompHeaders();
-            bobStompHeaders.setDestination(roomTopic + "/" + chatId);
-
-            aliceSession.subscribe(aliceStompHeaders, new StompFrameHandler() {
+            aliceSession.subscribe(userTopic + queueTopic, new StompFrameHandler() {
                 @Override
                 public Type getPayloadType(StompHeaders headers) {
-                    return TypeMessage.class;
+                    return SomeDTO.class;
                 }
 
                 @Override
                 public void handleFrame(StompHeaders headers, Object payload) {
-                    aliceEvent.complete((TypeMessage) payload);
+                    aliceEvent.complete((SomeDTO) payload);
                 }
             });
 
-            bobSession.subscribe(bobStompHeaders, new StompFrameHandler() {
+            bobSession.subscribe(userTopic + queueTopic, new StompFrameHandler() {
                 @Override
                 public Type getPayloadType(StompHeaders headers) {
-                    return TypeMessage.class;
+                    return SomeDTO.class;
                 }
 
                 @Override
                 public void handleFrame(StompHeaders headers, Object payload) {
-                    bobEvent.complete((TypeMessage) payload);
+                    bobEvent.complete((SomeDTO) payload);
                 }
             });
+            Thread.sleep(5000);
+            redisTemplate.convertAndSend(brokerQueueTopic + ":" + alice.id(), new SomeDTO("Hello"));
+            redisTemplate.convertAndSend(brokerQueueTopic + ":" + bob.id(), new SomeDTO("How are you"));
 
-            StompHeaders chatStompHeaders = new StompHeaders();
-            chatStompHeaders.setDestination(roomTopic + "/" + chatId);
-            bobSession.send(chatStompHeaders, "Hello");
+            assertThat(aliceEvent.get(10, TimeUnit.SECONDS)).extracting(SomeDTO::someField)
+                .isEqualTo("Hello");
 
-            TypeMessage aliceMessage = aliceEvent.get(5, TimeUnit.SECONDS);
-            TypeMessage bobMessage = bobEvent.get(5, TimeUnit.SECONDS);
-            assertThat(aliceMessage.from())
-                .isEqualTo(bobMessage.from());
-
+            assertThat(bobEvent.get(10, TimeUnit.SECONDS)).extracting(SomeDTO::someField)
+                .isEqualTo("How are you");
 
         } finally {
 
@@ -179,8 +185,6 @@ class RoomJoinerTest extends BaseTestClass {
                 stompClient.stop();
             }
         }
-
     }
-
 
 }

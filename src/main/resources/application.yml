@@ -127,3 +127,11 @@ token:
     duration: 12h
   refresh:
     duration: 7d
+
+
+scoring:
+  capacity: 500
+  recency:
+    decay: 1e-5
+  frequency:
+    bonus: 10

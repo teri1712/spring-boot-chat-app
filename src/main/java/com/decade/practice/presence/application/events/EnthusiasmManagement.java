@@ -7,8 +7,10 @@ import com.decade.practice.live.domain.events.JoinerJoined;
 import com.decade.practice.live.domain.events.JoinerTyped;
 import com.decade.practice.presence.application.ports.out.ScoreEngine;
 import lombok.RequiredArgsConstructor;
-import org.springframework.modulith.events.ApplicationModuleListener;
+import org.springframework.context.event.EventListener;
+import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.event.TransactionalEventListener;
 
 import java.util.UUID;
 
@@ -18,7 +20,8 @@ public class EnthusiasmManagement {
 
     private final ScoreEngine scoreEngine;
 
-    @ApplicationModuleListener(id = "enthus_room_event")
+    @Async
+    @TransactionalEventListener(id = "enthus_room_event")
     public void on(RoomEventCreated event) {
         UUID userId = event.getSenderId();
         String chatId = event.getChatId();
@@ -27,7 +30,8 @@ public class EnthusiasmManagement {
 
     }
 
-    @ApplicationModuleListener(id = "enthus_room_created")
+    @Async
+    @TransactionalEventListener(id = "enthus_room_created")
     public void on(RoomCreated event) {
         String chatId = event.chatId();
 
@@ -35,21 +39,24 @@ public class EnthusiasmManagement {
             scoreEngine.incScore(chatId, participant.toString()));
     }
 
-    @ApplicationModuleListener(id = "enthus_user_typed")
+    @Async
+    @EventListener(id = "enthus_user_typed")
     public void on(JoinerTyped event) {
         String chatId = event.chatId();
         String userId = event.userId().toString();
         scoreEngine.incScore(chatId, userId);
     }
 
-    @ApplicationModuleListener(id = "enthus_user_joined")
+    @Async
+    @EventListener(id = "enthus_user_joined")
     public void on(JoinerJoined event) {
         String chatId = event.chatId();
         String userId = event.userId().toString();
         scoreEngine.incScore(chatId, userId);
     }
 
-    @ApplicationModuleListener(id = "enthus_user_stalked")
+    @Async
+    @EventListener(id = "enthus_user_stalked")
     public void on(StalkEvent event) {
         scoreEngine.incScore(event.senderId().toString(), event.receiverId().toString());
     }
