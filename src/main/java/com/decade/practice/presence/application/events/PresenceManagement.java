@@ -4,7 +4,8 @@ import com.decade.practice.presence.application.ports.out.PresenceRepository;
 import com.decade.practice.presence.domain.Presence;
 import com.decade.practice.web.events.ConnectionInteracted;
 import lombok.RequiredArgsConstructor;
-import org.springframework.modulith.events.ApplicationModuleListener;
+import org.springframework.context.event.EventListener;
+import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
 
 import java.time.Instant;
@@ -15,7 +16,8 @@ public class PresenceManagement {
 
     private final PresenceRepository presences;
 
-    @ApplicationModuleListener(id = "presence_user_connected")
+    @Async
+    @EventListener(id = "presence_user_connected")
     public void on(ConnectionInteracted event) {
         Presence presence = new Presence(event.userId(), Instant.now());
         presences.save(presence);
