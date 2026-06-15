@@ -1,16 +1,14 @@
-package com.decade.practice.users.perf;
+package com.decade.practice.users.integration;
 
-import com.decade.practice.common.BaseTestClass;
+import com.decade.practice.common.ComponentTest;
+import com.decade.practice.common.RedisDataset;
 import com.decade.practice.users.api.UserApi;
 import com.decade.practice.users.api.UserInfo;
 import com.decade.practice.users.application.ports.out.UserRepository;
 import com.decade.practice.users.domain.User;
+import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.junit.jupiter.api.AfterEach;
-import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.test.context.TestPropertySource;
 import org.springframework.test.context.jdbc.Sql;
 
@@ -26,17 +24,11 @@ import static org.assertj.core.api.Assertions.assertThat;
 @TestPropertySource(properties = {
     "redis.cache.enabled=true"
 })
-@Sql(value = "/sql/clean.sql", executionPhase = Sql.ExecutionPhase.AFTER_TEST_METHOD)
-class UserInfoCacheTest extends BaseTestClass {
-
-    @Autowired
-    private UserRepository users;
-
-    @Autowired
-    private UserApi userApi;
-
-    @Autowired
-    private RedisTemplate<String, Object> redisTemplate;
+@ComponentTest(datasets = {RedisDataset.class, UserDataset.class})
+@RequiredArgsConstructor
+class UserInfoCacheTest {
+    final UserRepository users;
+    final UserApi userApi;
 
 
     private List<UUID> seed() {
@@ -56,12 +48,6 @@ class UserInfoCacheTest extends BaseTestClass {
         }).toList();
         users.saveAll(seedUsers);
         return seedUsers.stream().map(User::getId).toList();
-    }
-
-    @AfterEach
-    @BeforeEach
-    void cleanUp() {
-        redisTemplate.getConnectionFactory().getConnection().flushAll();
     }
 
     @Test

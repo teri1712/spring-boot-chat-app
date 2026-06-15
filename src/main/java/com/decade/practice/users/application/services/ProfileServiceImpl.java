@@ -1,6 +1,6 @@
 package com.decade.practice.users.application.services;
 
-import com.decade.practice.resources.files.api.DownloadPathGenerator;
+import com.decade.practice.files.api.DownloadPathGenerator;
 import com.decade.practice.shared.security.UserClaims;
 import com.decade.practice.users.application.ports.in.ProfileService;
 import com.decade.practice.users.application.ports.out.TokenGenerator;

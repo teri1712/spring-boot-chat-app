@@ -1,4 +1,4 @@
-package com.decade.practice.resources.files.dto;
+package com.decade.practice.files.dto;
 
 public record CompleteUploadRequest(String key, String eTag) {
 }

@@ -1,4 +1,4 @@
-package com.decade.practice.resources.infra;
+package com.decade.practice.files.infra;
 
 import com.decade.practice.shared.security.jwt.JwtService;
 import com.decade.practice.shared.security.jwt.JwtTokenFilter;

@@ -1,9 +1,9 @@
 package com.decade.practice.search.integration;
 
+import com.decade.practice.common.ComponentTest;
 import com.decade.practice.common.security.jwt.WithJwtUser;
 import com.decade.practice.engagement.api.EngagementApi;
 import com.decade.practice.inbox.domain.events.TextAdded;
-import com.decade.practice.common.BaseTestClass;
 import com.decade.practice.search.application.ports.out.HistoryRepository;
 import com.decade.practice.search.application.ports.out.PeopleRepository;
 import com.decade.practice.search.domain.MessageHistory;
@@ -30,7 +30,8 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 @RequiredArgsConstructor
-class SearchControllerTest extends BaseTestClass {
+@ComponentTest(datasets = SearchDataset.class)
+class SearchControllerTest {
 
     final MockMvc mockMvc;
     final PeopleRepository people;

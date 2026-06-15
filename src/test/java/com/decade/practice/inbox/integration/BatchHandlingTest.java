@@ -8,7 +8,6 @@ import com.decade.practice.inbox.domain.events.BatchInsertionEvent;
 import com.decade.practice.inbox.domain.events.BatchUpdateEvent;
 import com.decade.practice.inbox.domain.events.MessageCreated;
 import com.decade.practice.inbox.domain.events.MessageUpdated;
-import com.decade.practice.common.BaseTestClass;
 import lombok.RequiredArgsConstructor;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.ValueSource;
@@ -25,7 +24,7 @@ import java.util.function.Supplier;
 import static org.assertj.core.api.Assertions.assertThat;
 
 @RequiredArgsConstructor
-abstract class BatchHandlingTest extends BaseTestClass {
+abstract class BatchHandlingTest extends BaseInboxTestClass {
     final ConversationRepository conversations;
     final LogRepository logs;
     final RoomRepository rooms;

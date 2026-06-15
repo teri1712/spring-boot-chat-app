@@ -1,6 +1,6 @@
 package com.decade.practice.search.integration;
 
-import com.decade.practice.common.BaseTestClass;
+import com.decade.practice.common.ComponentTest;
 import com.decade.practice.search.application.ports.out.PeopleRepository;
 import com.decade.practice.search.domain.Person;
 import lombok.RequiredArgsConstructor;
@@ -11,12 +11,14 @@ import java.util.UUID;
 import static org.assertj.core.api.Assertions.assertThat;
 
 @RequiredArgsConstructor
-class PeopleRepositoryTest extends BaseTestClass {
+@ComponentTest(datasets = SearchDataset.class)
+class PeopleRepositoryTest {
 
     final PeopleRepository people;
 
     @Test
     void givenAliceAndBobExist_findAlice_thenMustReturnAliceOnly() {
+
         people.save(new Person(null, UUID.randomUUID(), "alice", "alice", "Male", "alice.jpg"));
         people.save(new Person(null, UUID.randomUUID(), "bob", "bob", "Male", "bob.jpg"));
 

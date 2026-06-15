@@ -1,4 +1,4 @@
-package com.decade.practice.resources.files.api;
+package com.decade.practice.files.api;
 
 public record FileIntegrity(String fileKey, String eTag) {
 }

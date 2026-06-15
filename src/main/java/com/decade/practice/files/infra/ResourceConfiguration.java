@@ -1,4 +1,4 @@
-package com.decade.practice.resources;
+package com.decade.practice.files.infra;
 
 import org.springframework.context.annotation.Configuration;
 import org.springframework.core.Ordered;
@@ -18,19 +18,19 @@ public class ResourceConfiguration implements WebMvcConfigurer {
     @Override
     public void addResourceHandlers(ResourceHandlerRegistry registry) {
         VersionResourceResolver versionResolver = new VersionResourceResolver()
-                .addVersionStrategy(new ContentVersionStrategy(), "**/*.css", "**/*.js");
+            .addVersionStrategy(new ContentVersionStrategy(), "**/*.css", "**/*.js");
 
         registry.addResourceHandler("/*.css", "/*.js")
-                .addResourceLocations("classpath:/static/")
-                .setCacheControl(CacheControl.maxAge(365, TimeUnit.DAYS))
-                .resourceChain(true)
-                .addResolver(versionResolver);
+            .addResourceLocations("classpath:/static/")
+            .setCacheControl(CacheControl.maxAge(365, TimeUnit.DAYS))
+            .resourceChain(true)
+            .addResolver(versionResolver);
 
 
         registry.addResourceHandler("/theme/**")
-                .addResourceLocations(
-                        "classpath:/static/theme/"
-                )
-                .setCacheControl(CacheControl.maxAge(7, TimeUnit.DAYS));
+            .addResourceLocations(
+                "classpath:/static/theme/"
+            )
+            .setCacheControl(CacheControl.maxAge(7, TimeUnit.DAYS));
     }
 }

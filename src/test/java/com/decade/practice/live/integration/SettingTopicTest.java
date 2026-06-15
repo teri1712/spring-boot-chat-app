@@ -16,7 +16,6 @@ import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.messaging.converter.MessageConverter;
 import org.springframework.messaging.simp.stomp.*;
 import org.springframework.test.context.bean.override.mockito.MockitoSpyBean;
-import org.springframework.test.context.jdbc.Sql;
 import org.springframework.web.socket.WebSocketHttpHeaders;
 import org.springframework.web.socket.client.standard.StandardWebSocketClient;
 import org.springframework.web.socket.messaging.WebSocketStompClient;
@@ -64,7 +63,6 @@ class SettingTopicTest extends BaseLiveTest {
 
     @Test
     @Timeout(20)
-    @Sql(value = {"/sql/clean.sql", "/sql/seed_users.sql", "/sql/seed_chats.sql"}, executionPhase = Sql.ExecutionPhase.BEFORE_TEST_METHOD)
     public void givenAliceSubToSetting_whenBrokerEmitPrefMessage_thenAliceReceiveThePrefMessage() throws Exception {
 
 

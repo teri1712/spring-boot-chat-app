@@ -1,7 +1,6 @@
 package com.decade.practice.chat.integration;
 
 import com.decade.practice.chatsettings.integration.SettingDataset;
-import com.decade.practice.common.BaseTestClass;
 import com.decade.practice.common.ComponentTest;
 import com.decade.practice.common.security.jwt.WithJwtUser;
 import com.decade.practice.engagement.api.EngagementApi;
@@ -30,7 +29,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 )
 @RequiredArgsConstructor
 @ComponentTest(datasets = {InboxDataset.class, SettingDataset.class, EngagementDataset.class})
-class ChatControllerTest extends BaseTestClass {
+class ChatControllerTest {
 
     @MockitoSpyBean
     EngagementApi engagementApi;
