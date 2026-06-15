@@ -19,11 +19,11 @@ public class DatasetTestExecutionListener extends AbstractTestExecutionListener 
         getDatasets(testContext).forEach(TestDataset::clean);
     }
 
-    private List<? extends TestDataset> getDatasets(TestContext testContext) {
-        ComponentTest annotation = MergedAnnotations.from(testContext.getTestClass())
+    private List<TestDataset> getDatasets(TestContext testContext) {
+        ComponentTest annotation = MergedAnnotations.from(testContext.getTestClass(), MergedAnnotations.SearchStrategy.TYPE_HIERARCHY)
             .get(ComponentTest.class).synthesize();
         ApplicationContext context = testContext.getApplicationContext();
         return Arrays.stream(annotation.datasets())
-            .map(context::getBean).toList();
+            .map(clazz -> (TestDataset) context.getBean(clazz)).toList();
     }
 }

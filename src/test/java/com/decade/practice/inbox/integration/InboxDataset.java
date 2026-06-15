@@ -15,6 +15,11 @@ public class InboxDataset implements TestDataset {
     final MessageRepository messages;
 
     @Override
+    public void setup() {
+        this.clean();
+    }
+
+    @Override
     public void clean() {
         roomEvents.deleteAll();
         logs.deleteAll();

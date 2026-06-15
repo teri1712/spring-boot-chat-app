@@ -1,15 +1,11 @@
 package com.decade.practice.engagement.integration;
 
-import com.decade.practice.common.BaseTestClass;
 import com.decade.practice.common.ComponentTest;
 import com.decade.practice.common.security.jwt.WithJwtUser;
-import com.decade.practice.engagement.application.ports.out.ChatRepository;
+import com.decade.practice.engagement.api.EngagementApi;
 import com.decade.practice.engagement.application.ports.out.ParticipantRepository;
-import com.decade.practice.engagement.domain.Chat;
-import com.decade.practice.engagement.domain.ChatCreators;
-import com.decade.practice.engagement.domain.Participant;
+import lombok.RequiredArgsConstructor;
 import org.junit.jupiter.api.Test;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.test.web.servlet.MockMvc;
 
 import java.util.Set;
@@ -26,16 +22,11 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
     username = "alice"
 )
 @ComponentTest(datasets = {EngagementDataset.class})
-class EngagementControllerTest extends BaseTestClass {
-
-    @Autowired
-    MockMvc mockMvc;
-
-    @Autowired
-    ChatRepository chats;
-
-    @Autowired
-    ParticipantRepository participants;
+@RequiredArgsConstructor
+class EngagementControllerTest {
+    final MockMvc mockMvc;
+    final EngagementApi engagementApi;
+    final ParticipantRepository participants;
 
     @Test
     void givenGroupExistWithAliceAndBob_whenAliceAddCharlie_thenReturnParticipantsIncludes3OfThem() throws Exception {
@@ -43,11 +34,7 @@ class EngagementControllerTest extends BaseTestClass {
         UUID bob = UUID.fromString("22222222-2222-2222-2222-222222222222");
         UUID charlie = UUID.fromString("33333333-3333-3333-3333-333333333333");
 
-        String chatId = UUID.randomUUID().toString();
-        Chat chat = new Chat(chatId, 1000, new ChatCreators(alice, Set.of(bob)));
-        chats.save(chat);
-
-        participants.saveAll(Set.of(new Participant(alice, chatId), new Participant(bob, chatId)));
+        String chatId = engagementApi.createGroup(alice, Set.of(bob)).identifier();
 
         mockMvc.perform(post("/engagements/{id}/participants", chatId)
                 .param("partner", charlie.toString())
@@ -65,12 +52,7 @@ class EngagementControllerTest extends BaseTestClass {
         UUID bob = UUID.fromString("22222222-2222-2222-2222-222222222222");
         UUID charlie = UUID.fromString("33333333-3333-3333-3333-333333333333");
 
-        String chatId = UUID.randomUUID().toString();
-        Chat chat = new Chat(chatId, 2, new ChatCreators(alice, Set.of(bob)));
-        chats.save(chat);
-
-        participants.saveAll(Set.of(new Participant(alice, chatId), new Participant(bob, chatId)));
-
+        String chatId = engagementApi.createDirect(alice, bob).mapping().chatId();
         mockMvc.perform(post("/engagements/{id}/participants", chatId)
                 .param("partner", charlie.toString())
             )

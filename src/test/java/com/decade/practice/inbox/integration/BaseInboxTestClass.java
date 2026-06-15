@@ -1,7 +1,7 @@
 package com.decade.practice.inbox.integration;
 
-import com.decade.practice.common.BaseTestClass;
 import com.decade.practice.common.ComponentTest;
+import com.decade.practice.common.S3Dataset;
 import com.decade.practice.engagement.api.EngagementApi;
 import com.decade.practice.inbox.application.ports.out.LookUpRegistry;
 import com.decade.practice.inbox.application.ports.out.PartnerLookUp;
@@ -22,9 +22,9 @@ import static org.springframework.test.web.servlet.request.MockMvcRequestBuilder
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 @ComponentTest(datasets = {
-    InboxDataset.class
+    InboxDataset.class, S3Dataset.class
 })
-public class BaseInboxTestClass extends BaseTestClass {
+public class BaseInboxTestClass {
 
 
     UUID aliceId = UUID.fromString("11111111-1111-1111-1111-111111111111");
