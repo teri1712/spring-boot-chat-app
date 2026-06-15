@@ -2,7 +2,6 @@ package com.decade.practice.live.integration;
 
 import com.decade.practice.chatsettings.domain.messages.PreferenceMessage;
 import com.decade.practice.engagement.api.EngagementApi;
-import com.decade.practice.integration.BaseTestClass;
 import com.decade.practice.shared.security.TokenService;
 import com.decade.practice.shared.security.UserClaims;
 import lombok.RequiredArgsConstructor;
@@ -12,7 +11,6 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.Timeout;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.web.server.LocalServerPort;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.messaging.converter.MessageConverter;
@@ -36,10 +34,8 @@ import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.when;
 
 @Slf4j
-@SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
-@Sql(value = "/sql/clean.sql", executionPhase = Sql.ExecutionPhase.AFTER_TEST_METHOD)
 @RequiredArgsConstructor
-class SettingTopicTest extends BaseTestClass {
+class SettingTopicTest extends BaseLiveTest {
 
     @LocalServerPort
     int port = 0;

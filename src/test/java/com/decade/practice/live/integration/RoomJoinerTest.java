@@ -1,7 +1,6 @@
 package com.decade.practice.live.integration;
 
 import com.decade.practice.engagement.api.EngagementApi;
-import com.decade.practice.integration.BaseTestClass;
 import com.decade.practice.live.dto.TypeMessage;
 import com.decade.practice.shared.security.TokenService;
 import com.decade.practice.shared.security.UserClaims;
@@ -13,7 +12,6 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.Timeout;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.web.server.LocalServerPort;
 import org.springframework.messaging.converter.MessageConverter;
 import org.springframework.messaging.simp.stomp.*;
@@ -36,10 +34,8 @@ import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.when;
 
 @Slf4j
-@SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
-@Sql(value = "/sql/clean.sql", executionPhase = Sql.ExecutionPhase.AFTER_TEST_METHOD)
 @RequiredArgsConstructor
-class RoomJoinerTest extends BaseTestClass {
+class RoomJoinerTest extends BaseLiveTest {
 
     @LocalServerPort
     int port = 0;

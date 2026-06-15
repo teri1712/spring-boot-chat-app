@@ -11,12 +11,12 @@ import software.amazon.awssdk.services.s3.model.DeleteBucketRequest;
 @Slf4j
 @RequiredArgsConstructor
 @TestComponent
-public class S3SetTest implements TestDataSet {
+public class S3Dataset implements TestDataset {
     private final S3Client s3Client;
     private @Value("${aws.s3.bucket}") String bucket;
 
     @Override
-    public void setUp() {
+    public void setup() {
         s3Client.createBucket(CreateBucketRequest.builder()
             .bucket(bucket)
             .build());
@@ -31,8 +31,5 @@ public class S3SetTest implements TestDataSet {
         } catch (Exception ignore) {
             log.debug("Bucket {} might be already deleted", bucket);
         }
-        s3Client.createBucket(CreateBucketRequest.builder()
-            .bucket(bucket)
-            .build());
     }
 }

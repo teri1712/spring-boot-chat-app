@@ -1,6 +1,6 @@
 package com.decade.practice.users.perf;
 
-import com.decade.practice.integration.BaseTestClass;
+import com.decade.practice.common.BaseTestClass;
 import com.decade.practice.users.api.UserApi;
 import com.decade.practice.users.api.UserInfo;
 import com.decade.practice.users.application.ports.out.UserRepository;

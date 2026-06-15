@@ -1,11 +1,10 @@
 package com.decade.practice.inbox.integration;
 
+import com.decade.practice.common.security.jwt.WithJwtUser;
 import com.decade.practice.inbox.apis.ConversationApi;
 import com.decade.practice.inbox.application.ports.out.ConversationRepository;
-import com.decade.practice.inbox.domain.Conversation;
 import com.decade.practice.inbox.domain.HashValue;
 import com.decade.practice.inbox.domain.events.InboxLogCreated;
-import com.decade.practice.shared.security.jwt.WithJwtUser;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.junit.jupiter.api.Test;

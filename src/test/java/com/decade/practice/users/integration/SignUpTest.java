@@ -1,6 +1,6 @@
 package com.decade.practice.users.integration;
 
-import com.decade.practice.integration.BaseTestClass;
+import com.decade.practice.common.BaseTestClass;
 import com.decade.practice.users.domain.events.UserCreated;
 import com.decade.practice.users.dto.SignUpRequest;
 import com.fasterxml.jackson.databind.ObjectMapper;

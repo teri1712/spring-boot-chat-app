@@ -1,6 +1,6 @@
 package com.decade.practice.users.integration;
 
-import com.decade.practice.integration.BaseTestClass;
+import com.decade.practice.common.BaseTestClass;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.MediaType;

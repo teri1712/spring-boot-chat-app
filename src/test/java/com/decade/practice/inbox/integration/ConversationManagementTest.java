@@ -7,7 +7,7 @@ import com.decade.practice.inbox.application.ports.out.RoomRepository;
 import com.decade.practice.inbox.application.ports.out.projection.ConversationView;
 import com.decade.practice.inbox.domain.Conversation;
 import com.decade.practice.inbox.domain.Room;
-import com.decade.practice.integration.BaseTestClass;
+import com.decade.practice.common.BaseTestClass;
 import lombok.RequiredArgsConstructor;
 import org.junit.jupiter.api.Test;
 import org.springframework.modulith.test.Scenario;

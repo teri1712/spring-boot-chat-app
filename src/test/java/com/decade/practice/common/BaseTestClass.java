@@ -1,8 +1,5 @@
-package com.decade.practice.integration;
+package com.decade.practice.common;
 
-import com.decade.practice.common.DataCleanUpBeans;
-import com.decade.practice.common.OIDCConfig;
-import com.decade.practice.common.TestDataSet;
 import lombok.extern.slf4j.Slf4j;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
@@ -18,20 +15,20 @@ import org.springframework.test.context.event.RecordApplicationEvents;
 
 @EnableScenarios
 @TestConstructor(autowireMode = TestConstructor.AutowireMode.ALL)
+@RecordApplicationEvents
 @Slf4j
 @AutoConfigureMockMvc
 @ActiveProfiles("test")
-@RecordApplicationEvents
 @SpringBootTest
 @Import({TestBeans.class, ContainerConfigs.class, OIDCConfig.class, DataCleanUpBeans.class})
 public abstract class BaseTestClass {
 
     @Autowired
-    private TestDataSet data;
+    private TestDataset data;
 
     @BeforeEach
     void setUp() {
-        data.setUp();
+        data.setup();
     }
 
     @AfterEach

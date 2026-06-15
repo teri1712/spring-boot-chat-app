@@ -1,9 +1,9 @@
 package com.decade.practice.inbox.integration;
 
+import com.decade.practice.common.security.jwt.WithJwtUser;
 import com.decade.practice.inbox.apis.ConversationApi;
 import com.decade.practice.inbox.domain.events.InboxLogCreated;
 import com.decade.practice.inbox.dto.MessageStateResponse;
-import com.decade.practice.shared.security.jwt.WithJwtUser;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.RequiredArgsConstructor;

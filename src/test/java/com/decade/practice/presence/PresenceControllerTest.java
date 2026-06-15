@@ -1,10 +1,11 @@
 package com.decade.practice.presence;
 
+import com.decade.practice.common.ComponentTest;
+import com.decade.practice.common.RedisDataset;
+import com.decade.practice.common.security.jwt.WithJwtUser;
 import com.decade.practice.engagement.domain.events.StalkEvent;
 import com.decade.practice.inbox.domain.events.RoomCreated;
-import com.decade.practice.integration.BaseTestClass;
 import com.decade.practice.presence.dto.RoomPresenceResponse;
-import com.decade.practice.shared.security.jwt.WithJwtUser;
 import com.decade.practice.users.api.UserApi;
 import com.decade.practice.users.api.UserInfo;
 import com.decade.practice.web.events.ConnectionInteracted;
@@ -17,7 +18,6 @@ import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.http.MediaType;
 import org.springframework.modulith.test.Scenario;
 import org.springframework.test.context.bean.override.mockito.MockitoSpyBean;
-import org.springframework.test.context.jdbc.Sql;
 import org.springframework.test.web.servlet.MockMvc;
 
 import java.time.Instant;
@@ -32,13 +32,16 @@ import static org.springframework.test.web.servlet.request.MockMvcRequestBuilder
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
-@Sql(scripts = "/sql/clean.sql", executionPhase = Sql.ExecutionPhase.AFTER_TEST_METHOD)
 @RequiredArgsConstructor
-public class PresenceControllerTest extends BaseTestClass {
+@ComponentTest(datasets = {
+    RedisDataset.class
+})
+public class PresenceControllerTest {
 
     final MockMvc mockMvc;
     final ObjectMapper objectMapper;
     final ApplicationEventPublisher publisher;
+
 
     @MockitoSpyBean
     UserApi userApi;

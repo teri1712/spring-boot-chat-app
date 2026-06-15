@@ -1,6 +1,6 @@
 package com.decade.practice.users.integration;
 
-import com.decade.practice.integration.BaseTestClass;
+import com.decade.practice.common.BaseTestClass;
 import com.decade.practice.users.domain.events.UserPasswordChanged;
 import com.decade.practice.users.dto.ProfileRequest;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -56,7 +56,7 @@ class ProfileControllerTest extends BaseTestClass {
             .andExpect(status().isOk())
             .andExpect(jsonPath("$.name").value("Alice in Wonderland"));
     }
-    
+
     @Test
     @Sql(scripts = {"/sql/clean.sql", "/sql/seed_users.sql"})
     @WithUserDetails("alice")

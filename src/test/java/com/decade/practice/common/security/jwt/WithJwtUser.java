@@ -1,4 +1,4 @@
-package com.decade.practice.shared.security.jwt;
+package com.decade.practice.common.security.jwt;
 
 import org.springframework.core.annotation.AliasFor;
 import org.springframework.security.test.context.support.WithSecurityContext;
@@ -14,7 +14,7 @@ public @interface WithJwtUser {
 
     @AliasFor("username")
     String value() default "alice";
-        
+
     @AliasFor("value")
     String username() default "alice";
 

@@ -1,4 +1,4 @@
-package com.decade.practice.integration;
+package com.decade.practice.common;
 
 import com.decade.practice.engagement.domain.ChatCreators;
 import com.decade.practice.engagement.domain.services.DirectChatFactory;

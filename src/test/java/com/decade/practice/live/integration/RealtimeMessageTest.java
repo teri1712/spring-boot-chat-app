@@ -1,7 +1,6 @@
 package com.decade.practice.live.integration;
 
 import com.decade.practice.engagement.api.EngagementApi;
-import com.decade.practice.integration.BaseTestClass;
 import com.decade.practice.shared.security.TokenService;
 import com.decade.practice.shared.security.UserClaims;
 import jakarta.annotation.Nullable;
@@ -13,7 +12,6 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.Timeout;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.web.server.LocalServerPort;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.messaging.converter.MessageConverter;
@@ -36,9 +34,8 @@ import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.when;
 
 @Slf4j
-@SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
 @RequiredArgsConstructor
-class RealtimeMessageTest extends BaseTestClass {
+class RealtimeMessageTest extends BaseLiveTest {
 
     @LocalServerPort
     int port = 0;

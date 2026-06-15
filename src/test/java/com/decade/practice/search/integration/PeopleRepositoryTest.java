@@ -1,6 +1,6 @@
 package com.decade.practice.search.integration;
 
-import com.decade.practice.integration.BaseTestClass;
+import com.decade.practice.common.BaseTestClass;
 import com.decade.practice.search.application.ports.out.PeopleRepository;
 import com.decade.practice.search.domain.Person;
 import lombok.RequiredArgsConstructor;

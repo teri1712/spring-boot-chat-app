@@ -1,6 +1,6 @@
 package com.decade.practice.users.integration;
 
-import com.decade.practice.integration.BaseTestClass;
+import com.decade.practice.common.BaseTestClass;
 import com.decade.practice.shared.security.TokenService;
 import com.decade.practice.shared.security.TokenUtils;
 import com.decade.practice.shared.security.UserClaims;

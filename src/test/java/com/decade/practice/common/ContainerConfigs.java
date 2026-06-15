@@ -1,4 +1,4 @@
-package com.decade.practice.integration;
+package com.decade.practice.common;
 
 import com.redis.testcontainers.RedisContainer;
 import org.springframework.boot.test.context.TestConfiguration;

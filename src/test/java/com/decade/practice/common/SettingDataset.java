@@ -6,11 +6,11 @@ import org.springframework.boot.test.context.TestComponent;
 
 @TestComponent
 @RequiredArgsConstructor
-public class SettingDataSet implements TestDataSet {
+public class SettingDataset implements TestDataset {
     final SettingRepository settings;
 
     @Override
-    public void setUp() {
+    public void setup() {
     }
 
     @Override

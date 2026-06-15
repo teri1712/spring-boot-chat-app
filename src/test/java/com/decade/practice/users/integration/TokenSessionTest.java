@@ -1,7 +1,7 @@
 package com.decade.practice.users.integration;
 
 
-import com.decade.practice.integration.BaseTestClass;
+import com.decade.practice.common.BaseTestClass;
 import com.decade.practice.users.application.ports.in.ProfileService;
 import com.decade.practice.users.application.ports.in.TokenSessionService;
 import com.decade.practice.users.application.ports.out.TokenStore;

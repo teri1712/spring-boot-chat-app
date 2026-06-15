@@ -1,15 +1,15 @@
 package com.decade.practice.engagement.integration;
 
+import com.decade.practice.common.BaseTestClass;
+import com.decade.practice.common.ComponentTest;
+import com.decade.practice.common.security.jwt.WithJwtUser;
 import com.decade.practice.engagement.application.ports.out.ChatRepository;
 import com.decade.practice.engagement.application.ports.out.ParticipantRepository;
 import com.decade.practice.engagement.domain.Chat;
 import com.decade.practice.engagement.domain.ChatCreators;
 import com.decade.practice.engagement.domain.Participant;
-import com.decade.practice.integration.BaseTestClass;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.security.test.context.support.WithUserDetails;
-import org.springframework.test.context.jdbc.Sql;
 import org.springframework.test.web.servlet.MockMvc;
 
 import java.util.Set;
@@ -19,6 +19,13 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
+
+@WithJwtUser(
+    id = "11111111-1111-1111-1111-111111111111",
+    name = "alice",
+    username = "alice"
+)
+@ComponentTest(datasets = {EngagementDataset.class})
 class EngagementControllerTest extends BaseTestClass {
 
     @Autowired
@@ -31,8 +38,6 @@ class EngagementControllerTest extends BaseTestClass {
     ParticipantRepository participants;
 
     @Test
-    @WithUserDetails("alice")
-    @Sql(scripts = {"/sql/clean.sql", "/sql/seed_users.sql"})
     void givenGroupExistWithAliceAndBob_whenAliceAddCharlie_thenReturnParticipantsIncludes3OfThem() throws Exception {
         UUID alice = UUID.fromString("11111111-1111-1111-1111-111111111111");
         UUID bob = UUID.fromString("22222222-2222-2222-2222-222222222222");
@@ -55,8 +60,6 @@ class EngagementControllerTest extends BaseTestClass {
     }
 
     @Test
-    @WithUserDetails("alice")
-    @Sql(scripts = {"/sql/clean.sql", "/sql/seed_users.sql"})
     void givenGroupExistWithAliceAndBobAndCapacityIs2_whenAliceAddCharlie_thenMustReturnBadRequest() throws Exception {
         UUID alice = UUID.fromString("11111111-1111-1111-1111-111111111111");
         UUID bob = UUID.fromString("22222222-2222-2222-2222-222222222222");

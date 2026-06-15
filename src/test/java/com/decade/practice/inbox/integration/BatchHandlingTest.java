@@ -8,7 +8,7 @@ import com.decade.practice.inbox.domain.events.BatchInsertionEvent;
 import com.decade.practice.inbox.domain.events.BatchUpdateEvent;
 import com.decade.practice.inbox.domain.events.MessageCreated;
 import com.decade.practice.inbox.domain.events.MessageUpdated;
-import com.decade.practice.integration.BaseTestClass;
+import com.decade.practice.common.BaseTestClass;
 import lombok.RequiredArgsConstructor;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.ValueSource;
@@ -77,7 +77,7 @@ abstract class BatchHandlingTest extends BaseTestClass {
 
         AtomicInteger index = new AtomicInteger();
         for (int i = 0; i < limit; i++) participants.add(UUID.randomUUID());
-    
+
         conversations.saveAll(participants.stream()
             .map(participantId -> new Conversation(participantId, room.getId(), offset + index.getAndIncrement()))
             .toList());

@@ -1,8 +1,8 @@
 package com.decade.practice.common;
 
-public interface TestDataSet {
+public interface TestDataset {
     void clean();
 
-    default void setUp() {
+    default void setup() {
     }
 }

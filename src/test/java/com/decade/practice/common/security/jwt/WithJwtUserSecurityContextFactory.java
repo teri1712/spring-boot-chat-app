@@ -1,6 +1,9 @@
-package com.decade.practice.shared.security.jwt;
+package com.decade.practice.common.security.jwt;
 
 import com.decade.practice.shared.security.UserClaims;
+import com.decade.practice.shared.security.jwt.JwtService;
+import com.decade.practice.shared.security.jwt.JwtUser;
+import com.decade.practice.shared.security.jwt.JwtUserAuthentication;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContext;
 import org.springframework.security.core.context.SecurityContextHolder;
