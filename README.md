@@ -43,9 +43,8 @@ This repository contains the Spring Boot backend. You can run it with Docker Com
 From the repository root:
 
 ```bash
-cd "source code/practice"
-docker network create backend
-docker compose -f docker-compose.dev.yml -f docker-compose.infra.yml up -d
+docker compose up -d
+mvn spring-boot:run
 ```
 
 Visit http://localhost:4200/ to access the application.
