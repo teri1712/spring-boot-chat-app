@@ -2,7 +2,6 @@ package com.decade.practice.live.integration;
 
 import com.decade.practice.chatsettings.domain.messages.PreferenceMessage;
 import com.decade.practice.engagement.api.EngagementApi;
-import com.decade.practice.integration.BaseTestClass;
 import com.decade.practice.shared.security.TokenService;
 import com.decade.practice.shared.security.UserClaims;
 import lombok.RequiredArgsConstructor;
@@ -12,13 +11,11 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.Timeout;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.web.server.LocalServerPort;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.messaging.converter.MessageConverter;
 import org.springframework.messaging.simp.stomp.*;
 import org.springframework.test.context.bean.override.mockito.MockitoSpyBean;
-import org.springframework.test.context.jdbc.Sql;
 import org.springframework.web.socket.WebSocketHttpHeaders;
 import org.springframework.web.socket.client.standard.StandardWebSocketClient;
 import org.springframework.web.socket.messaging.WebSocketStompClient;
@@ -36,10 +33,8 @@ import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.when;
 
 @Slf4j
-@SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
-@Sql(value = "/sql/clean.sql", executionPhase = Sql.ExecutionPhase.AFTER_TEST_METHOD)
 @RequiredArgsConstructor
-class SettingTopicTest extends BaseTestClass {
+class SettingTopicTest extends BaseLiveTest {
 
     @LocalServerPort
     int port = 0;
@@ -68,7 +63,6 @@ class SettingTopicTest extends BaseTestClass {
 
     @Test
     @Timeout(20)
-    @Sql(value = {"/sql/clean.sql", "/sql/seed_users.sql", "/sql/seed_chats.sql"}, executionPhase = Sql.ExecutionPhase.BEFORE_TEST_METHOD)
     public void givenAliceSubToSetting_whenBrokerEmitPrefMessage_thenAliceReceiveThePrefMessage() throws Exception {
 
 

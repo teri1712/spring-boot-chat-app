@@ -1,26 +1,22 @@
 package com.decade.practice.inbox.integration;
 
+import com.decade.practice.common.security.jwt.WithJwtUser;
 import com.decade.practice.inbox.apis.ConversationApi;
 import com.decade.practice.inbox.domain.events.InboxLogCreated;
 import com.decade.practice.inbox.dto.InboxLogWithPartnerDto;
-import com.decade.practice.shared.security.jwt.WithJwtUser;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.RequiredArgsConstructor;
 import org.junit.jupiter.api.Test;
-import org.springframework.http.MediaType;
 import org.springframework.test.context.jdbc.Sql;
-import org.springframework.test.web.servlet.MockMvc;
 
 import java.util.List;
 import java.util.Set;
-import java.util.UUID;
 import java.util.concurrent.TimeUnit;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.awaitility.Awaitility.await;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.put;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 

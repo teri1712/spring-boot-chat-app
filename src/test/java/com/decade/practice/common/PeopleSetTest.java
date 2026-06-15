@@ -6,7 +6,7 @@ import org.springframework.boot.test.context.TestComponent;
 
 @TestComponent
 @RequiredArgsConstructor
-public class PeopleSetTest implements TestDataSet {
+public class PeopleSetTest implements TestDataset {
     private final PeopleRepository people;
 
     @Override

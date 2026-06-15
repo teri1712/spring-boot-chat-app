@@ -1,12 +1,14 @@
 package com.decade.practice.chat.integration;
 
-import com.decade.practice.integration.BaseTestClass;
+import com.decade.practice.chatsettings.integration.SettingDataset;
+import com.decade.practice.common.ComponentTest;
+import com.decade.practice.common.security.jwt.WithJwtUser;
+import com.decade.practice.engagement.integration.EngagementDataset;
+import com.decade.practice.inbox.integration.InboxDataset;
+import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.junit.jupiter.api.Test;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.security.test.context.support.WithUserDetails;
 import org.springframework.test.context.TestPropertySource;
-import org.springframework.test.context.jdbc.Sql;
 import org.springframework.test.web.servlet.MockMvc;
 
 import java.time.Duration;
@@ -21,15 +23,15 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 @TestPropertySource(properties = {
     "redis.cache.enabled=true"
 })
-@Sql(value = "/sql/clean.sql", executionPhase = Sql.ExecutionPhase.AFTER_TEST_METHOD)
-class DirectCacheTest extends BaseTestClass {
 
-    @Autowired
-    MockMvc mockMvc;
+@ComponentTest(datasets = {InboxDataset.class, SettingDataset.class, EngagementDataset.class})
+@RequiredArgsConstructor
+class DirectCacheTest {
+
+    final MockMvc mockMvc;
 
     @Test
-    @WithUserDetails("alice")
-    @Sql(scripts = {"/sql/clean.sql", "/sql/seed_users.sql"}, executionPhase = Sql.ExecutionPhase.BEFORE_TEST_METHOD)
+    @WithJwtUser
     void givenFirstCallSuccess_whenSecondCallMade_returnTheCachedOne() throws Exception {
 
         mockMvc.perform(put("/direct-chats/{partnerId}", "22222222-2222-2222-2222-222222222222"))

@@ -6,7 +6,7 @@ import org.springframework.boot.test.context.TestComponent;
 
 @RequiredArgsConstructor
 @TestComponent
-public class UserSetTest implements TestDataSet {
+public class UserSetTest implements TestDataset {
 
     private final UserRepository users;
 

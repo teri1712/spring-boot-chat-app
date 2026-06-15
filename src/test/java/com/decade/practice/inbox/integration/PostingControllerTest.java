@@ -1,9 +1,9 @@
 package com.decade.practice.inbox.integration;
 
+import com.decade.practice.common.security.jwt.WithJwtUser;
+import com.decade.practice.files.dto.PresignedResponse;
 import com.decade.practice.inbox.apis.ConversationApi;
 import com.decade.practice.inbox.domain.events.*;
-import com.decade.practice.resources.files.dto.PresignedResponse;
-import com.decade.practice.shared.security.jwt.WithJwtUser;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.RequiredArgsConstructor;
 import org.junit.jupiter.api.Assertions;

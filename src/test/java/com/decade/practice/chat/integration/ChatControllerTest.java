@@ -1,17 +1,17 @@
 package com.decade.practice.chat.integration;
 
+import com.decade.practice.chatsettings.integration.SettingDataset;
+import com.decade.practice.common.ComponentTest;
+import com.decade.practice.common.security.jwt.WithJwtUser;
 import com.decade.practice.engagement.api.EngagementApi;
-import com.decade.practice.integration.BaseTestClass;
-import com.decade.practice.shared.security.jwt.WithJwtUser;
-import com.fasterxml.jackson.databind.ObjectMapper;
+import com.decade.practice.engagement.integration.EngagementDataset;
+import com.decade.practice.inbox.integration.InboxDataset;
 import lombok.RequiredArgsConstructor;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.MediaType;
 import org.springframework.security.access.AccessDeniedException;
 import org.springframework.test.context.bean.override.mockito.MockitoSpyBean;
-import org.springframework.test.context.event.ApplicationEvents;
 import org.springframework.test.web.servlet.MockMvc;
 
 import java.util.UUID;
@@ -28,7 +28,8 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
     username = "alice"
 )
 @RequiredArgsConstructor
-class ChatControllerTest extends BaseTestClass {
+@ComponentTest(datasets = {InboxDataset.class, SettingDataset.class, EngagementDataset.class})
+class ChatControllerTest {
 
     @MockitoSpyBean
     EngagementApi engagementApi;
@@ -43,9 +44,6 @@ class ChatControllerTest extends BaseTestClass {
     }
 
     final MockMvc mockMvc;
-    @Autowired
-    ApplicationEvents events;
-    final ObjectMapper objectMapper;
 
 
     @Test

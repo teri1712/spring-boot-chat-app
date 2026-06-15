@@ -1,6 +1,6 @@
 package com.decade.practice.users.dto;
 
-import com.decade.practice.resources.files.api.FileIntegrity;
+import com.decade.practice.files.api.FileIntegrity;
 import jakarta.annotation.Nullable;
 import jakarta.validation.constraints.Past;
 import jakarta.validation.constraints.Pattern;

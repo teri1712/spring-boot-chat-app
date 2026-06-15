@@ -7,9 +7,9 @@ import com.decade.practice.chatsettings.application.ports.out.ThemeRepository;
 import com.decade.practice.chatsettings.domain.Theme;
 import com.decade.practice.chatsettings.domain.events.PreferenceChanged;
 import com.decade.practice.chatsettings.dto.PreferenceRequest;
+import com.decade.practice.common.ComponentTest;
+import com.decade.practice.common.security.jwt.WithJwtUser;
 import com.decade.practice.engagement.api.EngagementApi;
-import com.decade.practice.integration.BaseTestClass;
-import com.decade.practice.shared.security.jwt.WithJwtUser;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.RequiredArgsConstructor;
 import org.junit.jupiter.api.BeforeEach;
@@ -40,7 +40,8 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
     name = "alice",
     username = "alice"
 )
-public class SettingControllerTest extends BaseTestClass {
+@ComponentTest(datasets = SettingDataset.class)
+public class SettingControllerTest {
 
     final MockMvc mockMvc;
     final ObjectMapper objectMapper;

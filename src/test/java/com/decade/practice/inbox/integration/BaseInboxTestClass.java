@@ -1,10 +1,11 @@
 package com.decade.practice.inbox.integration;
 
+import com.decade.practice.common.ComponentTest;
+import com.decade.practice.common.S3Dataset;
 import com.decade.practice.engagement.api.EngagementApi;
 import com.decade.practice.inbox.application.ports.out.LookUpRegistry;
 import com.decade.practice.inbox.application.ports.out.PartnerLookUp;
 import com.decade.practice.inbox.domain.Partner;
-import com.decade.practice.integration.BaseTestClass;
 import org.junit.jupiter.api.BeforeEach;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.MediaType;
@@ -20,7 +21,10 @@ import static org.mockito.Mockito.when;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.put;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
-public class BaseInboxTestClass extends BaseTestClass {
+@ComponentTest(datasets = {
+    InboxDataset.class, S3Dataset.class
+})
+public class BaseInboxTestClass {
 
 
     UUID aliceId = UUID.fromString("11111111-1111-1111-1111-111111111111");
